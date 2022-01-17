@@ -1,0 +1,80 @@
+name: nightly-window-2022
+env:
+  name: staging_environment
+
+concurrency: staging_environment
+
+on:
+  push:
+    paths:
+      - "**/main.yml"
+#
+jobs:
+  test-1:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-2022]
+        node-version: [14]
+    steps:
+      - name: Get short SHA 🔑
+        id: slug
+        run: |
+          echo "::set-output name=sha7::${GITHUB_SHA::7}"
+        shell: bash
+
+      - name: Checkout ${{ steps.slug.outputs.sha7 }} ⬇️   
+        uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@zeeis"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PAT }}
+
+      - name: Get last commit date
+        id: vars
+        run: |
+          echo "::set-output name=date::$(git log -1 --date=format:'%Y%m%d' --format='%cd')"
+          echo "git describe --abbrev=0 --tags"
+          echo "::set-output name=tag::$(git describe --abbrev=0 --tags)"
+        shell: bash
+
+      - name: Checkout vars-date ${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.tag }} ⬇️
+        run: |
+          echo "${{ steps.vars.outputs.date }}"
+          echo "${{ steps.vars.outputs.tag }}"
+
+      - name: Install dependencies 👨🏻‍💻
+        run: yarn install
+
+      - name: Install winappdriver.msi
+        run: | 
+          Invoke-WebRequest "https://github.com/microsoft/WinAppDriver/releases/download/v1.2.1/WindowsApplicationDriver_1.2.1.msi" -OutFIle "C:\WindowsApplicationDriver_1.2.1.msi"
+          Start-Process msiexec -ArgumentList "/quiet","/x","{087BBF93-D9E3-4D27-BDBE-9C702E0066FC}" -Verb runAs -Wait
+          Start-Process msiexec -ArgumentList "/quiet","/i","C:\WindowsApplicationDriver_1.2.1.msi" -Verb runAs -Wait
+          Start-Sleep -s 5
+        shell: powershell
+
+      - name: Install Alphabiz
+        run: |
+          curl -L https://github.com/tanshuai/alphabiz/releases/download/nightly-20220117-b5d39f6/alphabiz-windows-nightly-20220117-b5d39f6.7z > alphabiz.7z
+          7z x alphabiz.7z
+
+      - name: Run appium
+        run: |
+          Start-Process PowerShell -ArgumentList "yarn appium --log ./test/output/release/appium.log"
+          Start-Sleep -s 10
+          
+      - name: Run release test 🧪
+        run: yarn run jest
+      
+      - name: Upload Test Results 🗃
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: "output"
+          path: output/**
