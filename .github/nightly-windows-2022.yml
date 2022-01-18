@@ -1,4 +1,4 @@
-name: nightly-window-2022
+name: nightly-windows-2022
 env:
   name: staging_environment
 
@@ -7,7 +7,7 @@ concurrency: staging_environment
 on:
   push:
     paths:
-      - "**/main.yml"
+      - "**/nightly-windows-2022.yml"
 #
 jobs:
   test-1:
