@@ -1,6 +1,6 @@
 const path = require('path')
 
-const AlphabizAppId = path.resolve(__dirname, './alphabiz/electron/Alphabiz-win32-x64/Alphabiz.exe')
+const AlphabizAppId = path.resolve(__dirname, '../../../electron/Alphabiz-win32-x64/Alphabiz.exe')
 // 'C:/alphabiz/electron/Alphabiz-win32-x64/Alphabiz.exe'
 
 export const opts = {
