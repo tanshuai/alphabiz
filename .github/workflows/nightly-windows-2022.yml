@@ -1,7 +1,4 @@
 name: nightly-windows-2022
-env:
-  name: staging_environment
-
 env: 
   name: CICD
   NODE_AUTH_TOKEN: ${{ secrets.PAT }}
@@ -19,7 +16,7 @@ env:
   TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
   TEST_RESET_PASSWORD: ${{ secrets.TEST_RESET_PASSWORD }}
 
-concurrency: staging_environment
+concurrency: CICD
 
 on:
   push:
