@@ -86,7 +86,7 @@ jobs:
 
       - name: Install Alphabiz
         run: |
-          curl -L https://github.com/tanshuai/alphabiz/releases/download/${{ steps.keydb.outputs.release }}/alphabiz-windows-${{ steps.keydb.outputs.release }}.7z > alphabiz.7z
+          curl -L https://github.com/tanshuai/alphabiz/releases/download/${{ steps.keydb.outputs.release }}/alphabiz-windows-self-hosted-${{ steps.keydb.outputs.release }}.7z > alphabiz.7z
           7z x alphabiz.7z
         shell: bash
 
@@ -97,7 +97,7 @@ jobs:
 
       - name: Run release test 🧪
         run: yarn run jest
-        
+
       - name: Win1 run release test creditsUpload 🧪
         run: yarn test:release:creditsUpload
       
