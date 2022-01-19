@@ -122,13 +122,14 @@ describe('download', () => {
         await homePage.jumpPage('creditsLink')
         const changedCredit = await creditsPage.checkCredits()
         if (Number(initialCredit) + 2 <= Number(changedCredit)) console.log('success!')
+        
+        // 等待种子下载完成
+        await homePage.jumpPage('uploadingStatusTab')
+        await client.$('//Text[@Name="' + torrentName + '"]').waitForDisplayed({ timeout: 60000 * 4 })
+        const taskStatus = await homePage.getTaskStatus(torrentName)
+        expect(taskStatus).toBe('Status: Seeding')
       }
     }
-    // // 等待种子下载完成
-    await homePage.jumpPage('uploadingStatusTab')
-    await client.$('//Text[@Name="' + torrentName + '"]').waitForDisplayed({ timeout: 60000 * 4 })
-    const taskStatus = await homePage.getTaskStatus(torrentName)
-    expect(taskStatus).toBe('Status: Seeding')
     expect(1).toBe(1)
   })
 })

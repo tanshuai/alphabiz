@@ -138,15 +138,23 @@ class HomePage {
   // status = 1  ->  wait display
   // status = 0  ->  wait hidden
   async waitTaskPeers (torrentName, timeout, status) {
+    let isWaitHidden
     const taskPeers = await this.page.$('//Text[@Name="' + torrentName + '"]/following-sibling::Button[starts-with(@Name,"PEERS:")]')
     console.log('waitTaskPeers')
     await this.page.$('//Text[@Name="' + torrentName + '"]').click()
-    await taskPeers.waitUntil(async function () {
-      return (status ? (await this.isDisplayed()) === true : (await this.isEnabled()) === false)
-    }, {
-      timeout: timeout,
-      timeoutMsg: 'timeout'
-    })
+    if (!status) {
+      isWaitHidden = await taskPeers.isDisplayed()
+    }
+    console.log('isWaitHidden:' + isWaitHidden)
+    if (status || isWaitHidden) {
+      console.log('wait peer')
+      await taskPeers.waitUntil(async function () {
+        return (status ? (await this.isDisplayed()) === true : (await this.isEnabled()) === false)
+      }, {
+        timeout: timeout,
+        timeoutMsg: 'timeout'
+      })
+    }
   }
 
   async getTaskStatus (torrentName) {
