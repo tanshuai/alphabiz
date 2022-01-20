@@ -106,7 +106,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: "output1"
-          path: output/**
+          path: test/output/**
 
   test-2:
     runs-on: ${{ matrix.os }}
@@ -201,4 +201,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: "output2"
-          path: output/**
+          path: test/output/**
