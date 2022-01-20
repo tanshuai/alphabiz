@@ -1,6 +1,20 @@
 name: nightly-windows-2022
 env:
   name: staging_environment
+  NODE_AUTH_TOKEN: ${{ secrets.PAT }}
+  GITHUB_PAT: ${{ secrets.PAT }}
+  EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
+  EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+  PHONE_NUMBER_ACCOUNT: ${{ secrets.PHONE_NUMBER_ACCOUNT }}
+  PHONE_NUMBER_TOKEN: ${{ secrets.PHONE_NUMBER_TOKEN }}
+  TEST1_EMAIL: ${{ secrets.TEST1_EMAIL }}
+  TEST2_EMAIL: ${{ secrets.TEST2_EMAIL }}
+  TEST3_EMAIL: ${{ secrets.TEST3_EMAIL }}
+  TEST1_PHONE_NUMBER: ${{ secrets.TEST1_PHONE_NUMBER }}
+  TEST2_PHONE_NUMBER: ${{ secrets.TEST2_PHONE_NUMBER }}
+  TEST3_PHONE_NUMBER: ${{ secrets.TEST3_PHONE_NUMBER }}
+  TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+  TEST_RESET_PASSWORD: ${{ secrets.TEST_RESET_PASSWORD }}
 
 concurrency: staging_environment
 
@@ -35,21 +49,26 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PAT }}
 
+      - name: Install dependencies 👨🏻‍💻
+        run: yarn install
+      
       - name: Get last commit date
         id: vars
         run: |
           echo "::set-output name=date::$(git log -1 --date=format:'%Y%m%d' --format='%cd')"
-          echo "git describe --abbrev=0 --tags"
+          echo "event.tag:${{ github.event.release.tag_name }}"
           echo "::set-output name=tag::$(git describe --abbrev=0 --tags)"
         shell: bash
+
+      - name: 'Get Previous tag'
+        id: previoustag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
 
       - name: Checkout vars-date ${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.tag }} ⬇️
         run: |
           echo "${{ steps.vars.outputs.date }}"
-          echo "${{ steps.vars.outputs.tag }}"
-
-      - name: Install dependencies 👨🏻‍💻
-        run: yarn install
+          echo "tag1:${{ steps.vars.outputs.tag }}"
+          echo "tag2:${{ steps.previoustag.outputs.tag }}"
 
       - name: Install winappdriver.msi
         run: | 
@@ -63,6 +82,9 @@ jobs:
         run: |
           curl -L https://github.com/tanshuai/alphabiz/releases/download/nightly-20220117-b5d39f6/alphabiz-windows-nightly-20220117-b5d39f6.7z > alphabiz.7z
           7z x alphabiz.7z
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PAT }}
+          GITHUB_PAT: ${{ secrets.PAT }}
 
       - name: Run appium
         run: |
