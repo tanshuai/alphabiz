@@ -163,7 +163,7 @@ jobs:
         with:
           owner: tanshuai
           repo: alphabiz
-          excludes: prerelease, draft
+          excludes: draft
 
       - name: Checkout vars-date ${{ steps.vars.outputs.date }} ⬇️
         run: |
