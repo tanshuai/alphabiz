@@ -1,6 +1,9 @@
 name: nightly-windows-2022
 env:
   name: staging_environment
+
+env: 
+  name: CICD
   NODE_AUTH_TOKEN: ${{ secrets.PAT }}
   GITHUB_PAT: ${{ secrets.PAT }}
   EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
