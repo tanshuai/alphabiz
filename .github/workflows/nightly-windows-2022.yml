@@ -1,22 +1,8 @@
 name: nightly-windows-2022
-env: 
-  name: CICD
-  NODE_AUTH_TOKEN: ${{ secrets.PAT }}
-  GITHUB_PAT: ${{ secrets.PAT }}
-  EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
-  EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
-  PHONE_NUMBER_ACCOUNT: ${{ secrets.PHONE_NUMBER_ACCOUNT }}
-  PHONE_NUMBER_TOKEN: ${{ secrets.PHONE_NUMBER_TOKEN }}
-  TEST1_EMAIL: ${{ secrets.TEST1_EMAIL }}
-  TEST2_EMAIL: ${{ secrets.TEST2_EMAIL }}
-  TEST3_EMAIL: ${{ secrets.TEST3_EMAIL }}
-  TEST1_PHONE_NUMBER: ${{ secrets.TEST1_PHONE_NUMBER }}
-  TEST2_PHONE_NUMBER: ${{ secrets.TEST2_PHONE_NUMBER }}
-  TEST3_PHONE_NUMBER: ${{ secrets.TEST3_PHONE_NUMBER }}
-  TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
-  TEST_RESET_PASSWORD: ${{ secrets.TEST_RESET_PASSWORD }}
+env:
+  name: staging_environment
 
-concurrency: CICD
+concurrency: staging_environment
 
 on:
   push:
@@ -31,6 +17,22 @@ jobs:
       matrix:
         os: [windows-2022]
         node-version: [14]
+    environment: 
+      name: CICD
+      NODE_AUTH_TOKEN: ${{ secrets.PAT }}
+      GITHUB_PAT: ${{ secrets.PAT }}
+      EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
+      EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+      PHONE_NUMBER_ACCOUNT: ${{ secrets.PHONE_NUMBER_ACCOUNT }}
+      PHONE_NUMBER_TOKEN: ${{ secrets.PHONE_NUMBER_TOKEN }}
+      TEST1_EMAIL: ${{ secrets.TEST1_EMAIL }}
+      TEST2_EMAIL: ${{ secrets.TEST2_EMAIL }}
+      TEST3_EMAIL: ${{ secrets.TEST3_EMAIL }}
+      TEST1_PHONE_NUMBER: ${{ secrets.TEST1_PHONE_NUMBER }}
+      TEST2_PHONE_NUMBER: ${{ secrets.TEST2_PHONE_NUMBER }}
+      TEST3_PHONE_NUMBER: ${{ secrets.TEST3_PHONE_NUMBER }}
+      TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+      TEST_RESET_PASSWORD: ${{ secrets.TEST_RESET_PASSWORD }}
     steps:
       - name: Get short SHA 🔑
         id: slug
@@ -117,6 +119,22 @@ jobs:
       matrix:
         os: [windows-2022]
         node-version: [14]
+    environment: 
+      name: CICD
+      NODE_AUTH_TOKEN: ${{ secrets.PAT }}
+      GITHUB_PAT: ${{ secrets.PAT }}
+      EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
+      EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+      PHONE_NUMBER_ACCOUNT: ${{ secrets.PHONE_NUMBER_ACCOUNT }}
+      PHONE_NUMBER_TOKEN: ${{ secrets.PHONE_NUMBER_TOKEN }}
+      TEST1_EMAIL: ${{ secrets.TEST1_EMAIL }}
+      TEST2_EMAIL: ${{ secrets.TEST2_EMAIL }}
+      TEST3_EMAIL: ${{ secrets.TEST3_EMAIL }}
+      TEST1_PHONE_NUMBER: ${{ secrets.TEST1_PHONE_NUMBER }}
+      TEST2_PHONE_NUMBER: ${{ secrets.TEST2_PHONE_NUMBER }}
+      TEST3_PHONE_NUMBER: ${{ secrets.TEST3_PHONE_NUMBER }}
+      TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+      TEST_RESET_PASSWORD: ${{ secrets.TEST_RESET_PASSWORD }}
     steps:
       - name: Get short SHA 🔑
         id: slug
