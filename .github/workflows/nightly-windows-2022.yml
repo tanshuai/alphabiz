@@ -19,8 +19,6 @@ jobs:
         node-version: [14]
     environment: 
       name: CICD
-      NODE_AUTH_TOKEN: ${{ secrets.PAT }}
-      GITHUB_PAT: ${{ secrets.PAT }}
       EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
       EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
       PHONE_NUMBER_ACCOUNT: ${{ secrets.PHONE_NUMBER_ACCOUNT }}
@@ -121,8 +119,6 @@ jobs:
         node-version: [14]
     environment: 
       name: CICD
-      NODE_AUTH_TOKEN: ${{ secrets.PAT }}
-      GITHUB_PAT: ${{ secrets.PAT }}
       EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
       EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
       PHONE_NUMBER_ACCOUNT: ${{ secrets.PHONE_NUMBER_ACCOUNT }}
