@@ -94,12 +94,12 @@ jobs:
         run: |
           Start-Process PowerShell -ArgumentList "yarn test:appium"
           Start-Sleep -s 10
-      
-      - name: Win1 run release test creditsUpload 🧪
-        run: yarn test:release:creditsUpload
 
       - name: Run release test 🧪
         run: yarn run jest
+        
+      - name: Win1 run release test creditsUpload 🧪
+        run: yarn test:release:creditsUpload
       
       - name: Upload Test Results 🗃
         if: always()
