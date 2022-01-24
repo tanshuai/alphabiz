@@ -19,6 +19,7 @@ jobs:
         node-version: [14]
     environment: 
       name: CICD
+    env:
       EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
       EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
       PHONE_NUMBER_ACCOUNT: ${{ secrets.PHONE_NUMBER_ACCOUNT }}
@@ -88,9 +89,6 @@ jobs:
           curl -L https://github.com/tanshuai/alphabiz/releases/download/${{ steps.keydb.outputs.release }}/alphabiz-windows-${{ steps.keydb.outputs.release }}.7z > alphabiz.7z
           7z x alphabiz.7z
         shell: bash
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.PAT }}
-          GITHUB_PAT: ${{ secrets.PAT }}
 
       - name: Run appium
         run: |
@@ -119,6 +117,7 @@ jobs:
         node-version: [14]
     environment: 
       name: CICD
+    env:
       EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
       EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
       PHONE_NUMBER_ACCOUNT: ${{ secrets.PHONE_NUMBER_ACCOUNT }}
@@ -188,9 +187,6 @@ jobs:
           curl -L https://github.com/tanshuai/alphabiz/releases/download/${{ steps.keydb.outputs.release }}/alphabiz-windows-${{ steps.keydb.outputs.release }}.7z > alphabiz.7z
           7z x alphabiz.7z
         shell: bash
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.PAT }}
-          GITHUB_PAT: ${{ secrets.PAT }}
 
       - name: Run appium
         run: |
