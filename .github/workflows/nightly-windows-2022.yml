@@ -96,7 +96,7 @@ jobs:
           Start-Sleep -s 10
 
       - name: Run release test 🧪
-        run: yarn run jest
+        run: yarn test:release
 
       - name: Win1 run release test creditsUpload 🧪
         run: yarn test:release:creditsUpload
