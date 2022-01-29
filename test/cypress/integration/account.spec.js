@@ -2,7 +2,7 @@
 /// <reference path="../support/index.d.ts" />
 import userData from '../fixtures/userData.json'
 let isSkip = false
-describe('Account', () => {
+describe.skip('Account', () => {
   before(() => {
     // Cypress.session.clearAllSavedSessions()
   })
