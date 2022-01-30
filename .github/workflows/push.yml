@@ -7,7 +7,11 @@ concurrency: staging_environment
 on:
   push:
     paths:
-      - "**/online-experiments.yml"
+      - "**/push.yml"
+      - "build/**"
+    branches: [main]
+  pull_request:
+    branches: [main]
 #
 jobs:
   test-1:
@@ -17,7 +21,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         node-version: [14]
-    environment: 
+    environment:
       name: CICD
     env:
       EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
@@ -39,7 +43,7 @@ jobs:
           echo "::set-output name=sha7::${GITHUB_SHA::7}"
         shell: bash
 
-      - name: Checkout ${{ steps.slug.outputs.sha7 }} ⬇️   
+      - name: Checkout ${{ steps.slug.outputs.sha7 }} ⬇️
         uses: actions/checkout@v2
 
       - name: Use Node.js ${{ matrix.node-version }}
@@ -50,7 +54,7 @@ jobs:
           scope: "@zeeis"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PAT }}
-      
+
       - name: Get last commit date
         id: vars
         run: |
@@ -69,7 +73,7 @@ jobs:
 
       - name: E2E Test 🧪
         run: yarn test:e2e:ci
-      
+
       - name: Upload Test Results 🗃
         if: always()
         uses: actions/upload-artifact@v2
