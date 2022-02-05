@@ -1,4 +1,4 @@
-name: online-experiments
+name: CI/CT for each push
 env:
   name: staging_environment
 
@@ -24,6 +24,8 @@ jobs:
     environment:
       name: CICD
     env:
+      NODE_AUTH_TOKEN: ${{ secrets.PAT }}
+      GITHUB_PAT: ${{ secrets.PAT }}
       EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
       EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
       PHONE_NUMBER_ACCOUNT: ${{ secrets.PHONE_NUMBER_ACCOUNT }}
