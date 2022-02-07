@@ -1,0 +1,111 @@
+diff --git a/node_modules/webtorrent/index.js b/node_modules/webtorrent/index.js
+index 3e07d04..ff17701 100644
+--- a/node_modules/webtorrent/index.js
++++ b/node_modules/webtorrent/index.js
+@@ -98,7 +98,10 @@ class WebTorrent extends EventEmitter {
+ 
+     this.throttleGroups = {
+       down: new ThrottleGroup({ rate: Math.max(this._downloadLimit, 0), enabled: this._downloadLimit >= 0 }),
+-      up: new ThrottleGroup({ rate: Math.max(this._uploadLimit, 0), enabled: this._uploadLimit >= 0 })
++      // upload groups
++      low: new ThrottleGroup({ rate: 51200, enabled: true }),
++      mid: new ThrottleGroup({ rate: Math.max(this._uploadLimit * 0.3, 0), enabled: this._uploadLimit >= 0 }),
++      high: new ThrottleGroup({ rate: Math.max(this._uploadLimit * 0.7, 0), enabled: this._uploadLimit >= 0 })
+     }
+ 
+     if (this.tracker) {
+@@ -454,13 +457,23 @@ class WebTorrent extends EventEmitter {
+    * Set global upload throttle rate
+    * @param  {Number} rate (must be bigger or equal than zero, or -1 to disable throttling)
+    */
+-  throttleUpload (rate) {
++  throttleUpload (rate, radix = 0.7) {
+     rate = Number(rate)
+     if (isNaN(rate) || !isFinite(rate) || rate < -1) return false
++    radix = Number(radix)
++    if (isNaN(radix) || !isFinite(radix) || radix < 0 || radix > 1) return false
+     this._uploadLimit = rate
+-    if (this._uploadLimit < 0) return this.throttleGroups.up.setEnabled(false)
+-    this.throttleGroups.up.setEnabled(true)
+-    this.throttleGroups.up.setRate(this._uploadLimit)
++    this._throttleRadix = radix
++    if (this._uploadLimit < 0) {
++      this.throttleGroups.high.setEnabled(false)
++      this.throttleGroups.mid.setEnabled(true)
++      this.throttleGroups.mid.setRate(307200)
++      return
++    }
++    this.throttleGroups.high.setEnabled(true)
++    this.throttleGroups.mid.setEnabled(true)
++    this.throttleGroups.high.setRate(parseInt(this._uploadLimit * radix))
++    this.throttleGroups.mid.setRate(parseInt(this._uploadLimit * (1 - radix)))
+   }
+ 
+   /**
+@@ -501,7 +514,9 @@ class WebTorrent extends EventEmitter {
+     this.dht = null
+ 
+     this.throttleGroups.down.destroy()
+-    this.throttleGroups.up.destroy()
++    this.throttleGroups.low.destroy()
++    this.throttleGroups.mid.destroy()
++    this.throttleGroups.high.destroy()
+   }
+ 
+   _onListening () {
+diff --git a/node_modules/webtorrent/lib/peer.js b/node_modules/webtorrent/lib/peer.js
+index 19cb5ff..8cd6538 100644
+--- a/node_modules/webtorrent/lib/peer.js
++++ b/node_modules/webtorrent/lib/peer.js
+@@ -267,8 +267,11 @@ class Peer extends EventEmitter {
+ 
+   setThrottlePipes () {
+     const self = this
++    // Patched by Alphabiz: ban non-alphabiz peers
++    this.wire._uploadThrottle = this.throttleGroups.low.throttle()
++    this.wire._downloadThrottle = this.throttleGroups.down.throttle()
+     this.conn
+-      .pipe(this.throttleGroups.down.throttle())
++      .pipe(this.wire._downloadThrottle)
+       .pipe(new Transform({
+         transform (chunk, _, callback) {
+           self.emit('download', chunk.length)
+@@ -277,7 +280,7 @@ class Peer extends EventEmitter {
+         }
+       }))
+       .pipe(this.wire)
+-      .pipe(this.throttleGroups.up.throttle())
++      .pipe(this.wire._uploadThrottle)
+       .pipe(new Transform({
+         transform (chunk, _, callback) {
+           self.emit('upload', chunk.length)
+@@ -381,7 +384,12 @@ class Peer extends EventEmitter {
+       conn.on('error', () => {})
+       conn.destroy()
+     }
+-    if (wire) wire.destroy()
++    if (wire) {
++      wire.destroy()
++      // Fix throttles memory leak
++      wire._uploadThrottle && wire._uploadThrottle.destroy()
++      wire._downloadThrottle && wire._downloadThrottle.destroy()
++    }
+     if (swarm) swarm.removePeer(this.id)
+   }
+ }
+diff --git a/node_modules/webtorrent/lib/utp.js b/node_modules/webtorrent/lib/utp.js
+index 2cde3f4..21956e3 100644
+--- a/node_modules/webtorrent/lib/utp.js
++++ b/node_modules/webtorrent/lib/utp.js
+@@ -1,8 +1,3 @@
+-module.exports = (() => {
+-  try {
+-    return require('utp-native')
+-  } catch (err) {
+-    console.warn('WebTorrent: uTP not supported')
+-    return {}
+-  }
+-})()
++// Patched by Alphabiz
++// the `utp-native` causes memory leak in electron, disable it
++module.exports = {}
