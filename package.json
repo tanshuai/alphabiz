@@ -51,7 +51,10 @@
   },
   "dependencies": {
     "symlink-dir": "^5.0.1",
-    "video.js": "7.13.3",
+    "video.js": "^7.13.3",
+    "videojs-ass": "^0.8.0",
+    "videojs-ass-es6": "0.0.4",
+    "videojs-hotkeys": "^0.2.27",
     "webtorrent": "1.5.8"
   }
 }
