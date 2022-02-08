@@ -7,6 +7,7 @@ concurrency: staging_environment
 on:
   push:
     paths:
+      - "**.js"
       - "**/push.yml"
       - "build/**"
     branches: [main]
@@ -62,12 +63,18 @@ jobs:
         id: vars
         run: |
           git fetch --prune --unshallow
+          echo "::set-output name=commit::$(git log -1 --pretty=%B --author="AlphabizTeam")"
+          echo "::set-output name=commit-version::$(git log -1 --pretty=%B --author="AlphabizTeam" | perl -wnE'say for /(?<=v)\d+\.\d+\.\d+/g')"
+          echo "::set-output name=commit-message::$(git log -1 --pretty=%B --author="AlphabizTeam" | perl -wnE'say for /\d{8,12}-\w+/g')"
           echo "::set-output name=date::$(git log -1 --date=format:'%Y%m%d' --format='%cd')"
           echo "::set-output name=tag::$(git describe --abbrev=0 --tags)"
         shell: bash
 
       - name: Checkout vars-date ${{ steps.vars.outputs.date }} ⬇️
         run: |
+          echo "commit-version:${{ steps.vars.outputs.commit }}"
+          echo "commit-version:${{ steps.vars.outputs.commit-version }}"
+          echo "commit-message:${{ steps.vars.outputs.commit-message }}"
           echo "${{ steps.vars.outputs.date }}"
           echo "${{ steps.vars.outputs.tag }}"
 
@@ -76,7 +83,6 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PAT }}
           GITHUB_PAT: ${{ secrets.PAT }}
-
 
       - name: E2E Test 🧪
         run: yarn test:e2e:ci
