@@ -166,7 +166,7 @@ Cypress.Commands.add('deleteUser', (password) => {
   cy.get('.q-card', { timeout: 10000 }).should('be.visible').then($el => {
     cy.get('[aria-label="Password"]').type('{selectall}{backspace}').type(Cypress.env(password))
 
-    cy.get("[data-cy='submit-btn']").click()
+    cy.get('.q-card').contains('Submit').click()
   })
   cy.location('pathname', { timeout: 15000 }).should('eq', '/')
   // cy.contains('Want to Join?', { timeout: 12000 })
