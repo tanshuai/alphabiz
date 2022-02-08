@@ -72,7 +72,11 @@ jobs:
           echo "${{ steps.vars.outputs.tag }}"
 
       - name: Install dependencies 👨🏻‍💻
-        run: yarn install
+        run: yarn
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PAT }}
+          GITHUB_PAT: ${{ secrets.PAT }}
+
 
       - name: E2E Test 🧪
         run: yarn test:e2e:ci
