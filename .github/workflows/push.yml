@@ -87,6 +87,12 @@ jobs:
       - name: E2E Test 🧪
         run: yarn test:e2e:ci
 
+      - name: Patch unpackaged node_modules
+        run: yarn patch-unpackaged
+
+      - name: E2E Test for Electron 🧪
+        run: yarn test:e2e:electron
+
       - name: Upload Test Results 🗃
         if: always()
         uses: actions/upload-artifact@v2
