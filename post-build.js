@@ -14,7 +14,7 @@ const srcIconPath = resolve(__dirname, 'public/favicon.ico')
 const iconPath = 'favicon.ico'
 const buildDarwin = () => {
   const plist = require('plist')
-  const appPath = resolve(__dirname, './build/electron/Alphabiz-darwin-x64/Alphabiz.app')
+  const appPath = resolve(__dirname, 'build/electron/Alphabiz-darwin-x64/Alphabiz.app')
   const contentsPath = resolve(appPath, 'Contents')
   const resourcesPath = resolve(contentsPath, 'Resources')
   const infoPlistPath = resolve(contentsPath, 'Info.plist')
