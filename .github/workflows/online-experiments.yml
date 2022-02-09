@@ -16,6 +16,106 @@ on:
     branches: [main]
 
 jobs:
+  build-1:
+    timeout-minutes: 60
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # os: [ubuntu-latest, windows-latest, macos-self-hosted]
+        os: [ubuntu-latest, macos-self-hosted]
+        node-version: [14]
+    environment:
+      name: CICD
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.PAT }}
+      GITHUB_PAT: ${{ secrets.PAT }}
+      EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
+      EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+      PHONE_NUMBER_ACCOUNT: ${{ secrets.PHONE_NUMBER_ACCOUNT }}
+      PHONE_NUMBER_TOKEN: ${{ secrets.PHONE_NUMBER_TOKEN }}
+      TEST1_EMAIL: ${{ secrets.TEST1_EMAIL }}
+      TEST2_EMAIL: ${{ secrets.TEST2_EMAIL }}
+      TEST3_EMAIL: ${{ secrets.TEST3_EMAIL }}
+      TEST1_PHONE_NUMBER: ${{ secrets.TEST1_PHONE_NUMBER }}
+      TEST2_PHONE_NUMBER: ${{ secrets.TEST2_PHONE_NUMBER }}
+      TEST3_PHONE_NUMBER: ${{ secrets.TEST3_PHONE_NUMBER }}
+      TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+      TEST_RESET_PASSWORD: ${{ secrets.TEST_RESET_PASSWORD }}
+    steps:
+      - name: Get short SHA 🔑
+        id: slug
+        run: |
+          echo "::set-output name=sha7::${GITHUB_SHA::7}"
+        shell: bash
+
+      - name: Checkout ${{ steps.slug.outputs.sha7 }} ⬇️
+        uses: actions/checkout@v2
+
+      - name: Get commit message and last commit date
+        id: vars
+        run: |
+          git fetch --prune --unshallow
+          echo "::set-output name=commit-version::$(git log -1 --pretty=%B --author="AlphabizTeam" | perl -wnE'say for /(?<=v)\d+\.\d+\.\d+/g')"
+          echo "::set-output name=commit-message::$(git log -1 --pretty=%B --author="AlphabizTeam" | perl -wnE'say for /\d{8,12}-\w+/g')"
+          echo "::set-output name=commit-date::$(git log -1 --pretty=%B --author="AlphabizTeam" | perl -wnE'say for /\d{8,12}/g')"
+          echo "::set-output name=date::$(git log -1 --date=format:'%Y%m%d%H%M' --format='%cd')"
+        shell: bash
+
+      - name: Get package-version
+        id: version
+        uses: notiz-dev/github-action-json-property@release
+        with:
+          path: "package.json"
+          prop_path: "version"
+
+      - name: Checkout ${{ steps.vars.outputs.date }}
+        run: |
+          echo "commit-version:${{ steps.vars.outputs.commit-version }}"
+          echo "commit-message:${{ steps.vars.outputs.commit-message }}"
+          echo "commit-date:${{ steps.vars.outputs.commit-date }}"
+          echo "${{ steps.vars.outputs.date }}"
+          echo "v${{ steps.version.outputs.prop }}"
+
+      - name: Setup Node.js ${{ matrix.node-version }} 📮
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@zeeis"
+
+      - name: Install dependencies 👨🏻‍💻
+        run: yarn
+
+      - name: Install UnPackaged 👨🏻‍💻
+        run: |
+          cd build/electron/UnPackaged
+          yarn
+        shell: bash
+
+      - name: Run electron-packager
+        run: yarn packager
+
+      - name: Package for ${{ matrix.os }}-nightly-${{ steps.vars.outputs.commit-message }} Release 🗜️
+        run: 7z a -t7z -mx=9 alphabiz-${{ matrix.os }}-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}.7z ./build/electron -xr!UnPackaged
+
+      # - name: Pack app 📦
+      #   run: |
+      #     export PATH=$PATH:/c/Program\ Files\ \(x86\)/WiX\ Toolset\ v3.11/bin
+      #     yarn make
+      #   env:
+      #     NODE_AUTH_TOKEN: ${{ secrets.PAT }}
+      #     GITHUB_PAT: ${{ secrets.PAT }}
+      #   shell: bash
+
+      - name: Release ${{ matrix.os }}-nightly-${{ steps.vars.outputs.commit-message }}.7z to GitHub 📰
+        uses: softprops/action-gh-release@v1
+        with:
+          prerelease: true
+          name: test-${{ steps.vars.outputs.commit-version }}-alphabiz-nightly-${{ steps.vars.outputs.commit-message }}
+          tag_name: test-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-date }}
+          files: |
+            alphabiz-${{ matrix.os }}-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}.7z
+
   build-2:
     timeout-minutes: 60
     runs-on: ${{ matrix.os }}
@@ -61,6 +161,7 @@ jobs:
           git fetch --prune --unshallow
           echo "::set-output name=commit-version::$(git log -1 --pretty=%B --author="AlphabizTeam" | perl -wnE'say for /(?<=v)\d+\.\d+\.\d+/g')"
           echo "::set-output name=commit-message::$(git log -1 --pretty=%B --author="AlphabizTeam" | perl -wnE'say for /\d{8,12}-\w+/g')"
+          echo "::set-output name=commit-date::$(git log -1 --pretty=%B --author="AlphabizTeam" | perl -wnE'say for /\d{8,12}/g')"
           echo "::set-output name=date::$(git log -1 --date=format:'%Y%m%d%H%M' --format='%cd')"
         shell: bash
 
@@ -75,6 +176,7 @@ jobs:
         run: |
           echo "commit-version:${{ steps.vars.outputs.commit-version }}"
           echo "commit-message:${{ steps.vars.outputs.commit-message }}"
+          echo "commit-date:${{ steps.vars.outputs.commit-date }}"
           echo "${{ steps.vars.outputs.date }}"
           echo "v${{ steps.version.outputs.prop }}"
 
@@ -114,6 +216,6 @@ jobs:
         with:
           prerelease: true
           name: test-${{ steps.vars.outputs.commit-version }}-alphabiz-nightly-${{ steps.vars.outputs.commit-message }}
-          tag_name: test-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.date }}
+          tag_name: test-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-date }}
           files: |
             alphabiz-windows-self-hosted-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}.7z
