@@ -7,7 +7,7 @@
   "author": "Alphabiz Team <dev@alpha.biz>",
   "scripts": {
     "postinstall": "patch-package && node ./node_modules/symlink-dir/dist/cli.js node_modules/@zeeis/velectron node_modules/electron && ./node_modules/.bin/electron-rebuild -v 11.5.0",
-    "packager": "yarn node packager.js",
+    "packager": "node packager.js",
     "postpackager": "node post-build",
     "patch-unpackaged": "node copyPatch.js",
     "test:e2e": "cross-env E2E_TEST=true start-test \"http-server build/spa/\" http-get://localhost:8080 \"cypress open\"",
