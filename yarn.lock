@@ -2537,21 +2537,30 @@
   dependencies:
     "@types/node" "*"
 
-"@videojs/http-streaming@2.12.0":
-  version "2.12.0"
-  resolved "https://registry.yarnpkg.com/@videojs/http-streaming/-/http-streaming-2.12.0.tgz#850069e063e26cf2fa5ed9bb3addfc92fa899f78"
-  integrity sha512-vdQA0lDYBXGJqV2T02AGqg1w4dcgyRoN+bYG+G8uF4DpCEMhEtUI0BA4tRu4/Njar8w/9D5k0a1KX40pcvM3fA==
+"@videojs/http-streaming@2.10.2":
+  version "2.10.2"
+  resolved "https://registry.yarnpkg.com/@videojs/http-streaming/-/http-streaming-2.10.2.tgz#02e6fcfa74f7850b5f9eb40a8e5c85c9d7d33eaf"
+  integrity sha512-JTAlAUHzj0sTsge2WBh4DWKM2I5BDFEZYOvzxmsK/ySILmI0GRyjAHx9uid68ZECQ2qbEAIRmZW5lWp0R5PeNA==
   dependencies:
     "@babel/runtime" "^7.12.5"
-    "@videojs/vhs-utils" "3.0.4"
+    "@videojs/vhs-utils" "3.0.3"
     aes-decrypter "3.1.2"
     global "^4.4.0"
     m3u8-parser "4.7.0"
-    mpd-parser "0.19.2"
-    mux.js "5.14.1"
+    mpd-parser "0.19.0"
+    mux.js "5.13.0"
     video.js "^6 || ^7"
 
-"@videojs/vhs-utils@3.0.4", "@videojs/vhs-utils@^3.0.0", "@videojs/vhs-utils@^3.0.2", "@videojs/vhs-utils@^3.0.3":
+"@videojs/vhs-utils@3.0.3":
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/@videojs/vhs-utils/-/vhs-utils-3.0.3.tgz#708bc50742e9481712039695299b32da6582ef92"
+  integrity sha512-bU7daxDHhzcTDbmty1cXjzsTYvx2cBGbA8hG5H2Gvpuk4sdfuvkZtMCwtCqL59p6dsleMPspyaNS+7tWXx2Y0A==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+    global "^4.4.0"
+    url-toolkit "^2.2.1"
+
+"@videojs/vhs-utils@^3.0.0", "@videojs/vhs-utils@^3.0.2", "@videojs/vhs-utils@^3.0.3":
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/@videojs/vhs-utils/-/vhs-utils-3.0.4.tgz#e253eecd8e9318f767e752010d213587f94bb03a"
   integrity sha512-hui4zOj2I1kLzDgf8QDVxD3IzrwjS/43KiS8IHQO0OeeSsb4pB/lgNt1NG7Dv0wMQfCccUpMVLGcK618s890Yg==
@@ -10159,10 +10168,10 @@ mp4-stream@^3.0.0:
     queue-microtask "^1.2.2"
     readable-stream "^3.0.6"
 
-mpd-parser@0.19.2:
-  version "0.19.2"
-  resolved "https://registry.yarnpkg.com/mpd-parser/-/mpd-parser-0.19.2.tgz#68611e653cdf2cc1e90688825c4a129b7f9007e0"
-  integrity sha512-M5tAIdtBM2TN+OSTz/37T7V+h9ZLvhyNqq4TNIdtjAQ/Hg8UnMRf5nJQDjffcXag3POXi31yUJQEKOXdcAM/nw==
+mpd-parser@0.19.0:
+  version "0.19.0"
+  resolved "https://registry.yarnpkg.com/mpd-parser/-/mpd-parser-0.19.0.tgz#8937044040ca85e20398ecf5d94552655e2c6728"
+  integrity sha512-FDLIXtZMZs99fv5iXNFg94quNFT26tobo0NUgHu7L3XgZvEq1NBarf5yxDFFJ1zzfbcmtj+NRaml6nYIxoPWvw==
   dependencies:
     "@babel/runtime" "^7.12.5"
     "@videojs/vhs-utils" "^3.0.2"
@@ -10228,10 +10237,10 @@ mute-stream@0.0.8:
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.8.tgz#1630c42b2251ff81e2a283de96a5497ea92e5e0d"
   integrity sha512-nnbWWOkoWyUsTjKrhgD0dcz22mdkSnpYqbEjIm2nhwhuxlSkpywJmBo8h0ZqJdkp73mb90SssHkN4rsRaBAfAA==
 
-mux.js@5.14.1:
-  version "5.14.1"
-  resolved "https://registry.yarnpkg.com/mux.js/-/mux.js-5.14.1.tgz#209583f454255d9ba2ff1bb61ad5a6867cf61878"
-  integrity sha512-38kA/xjWRDzMbcpHQfhKbJAME8eTZVsb9U2Puk890oGvGqnyu8B/AkKdICKPHkigfqYX9MY20vje88TP14nhog==
+mux.js@5.13.0:
+  version "5.13.0"
+  resolved "https://registry.yarnpkg.com/mux.js/-/mux.js-5.13.0.tgz#99c3da21f6c0362a1529729d1c5e5b51f34f606d"
+  integrity sha512-PkmnzHcTQjUBEHp3KRPQAFoNkJtKlpCEvsYtXDfDrC+/WqbMuxHvoYfmAbHVAH7Sa/KliPVU0dT1ureO8wilog==
   dependencies:
     "@babel/runtime" "^7.11.2"
 
@@ -13963,20 +13972,20 @@ verror@1.10.0:
     extsprintf "^1.2.0"
 
 "video.js@^6 || ^7", video.js@^7.13.3:
-  version "7.17.0"
-  resolved "https://registry.yarnpkg.com/video.js/-/video.js-7.17.0.tgz#35918cc03748a5680f5d5f1da410e06eeea7786e"
-  integrity sha512-8RbLu9+Pdpep9OTPncUHIvZXFgn/7hKdPnSTE/lGSnlFSucXtTUBp41R7NDwncscMLQ0WgazUbmFlvr4MNWMbA==
+  version "7.15.4"
+  resolved "https://registry.yarnpkg.com/video.js/-/video.js-7.15.4.tgz#0f96ef138035138cb30bf00a989b6174f0d16bac"
+  integrity sha512-hghxkgptLUvfkpktB4wxcIVF3VpY/hVsMkrjHSv0jpj1bW9Jplzdt8IgpTm9YhlB1KYAp07syVQeZcBFUBwhkw==
   dependencies:
     "@babel/runtime" "^7.12.5"
-    "@videojs/http-streaming" "2.12.0"
+    "@videojs/http-streaming" "2.10.2"
     "@videojs/vhs-utils" "^3.0.3"
     "@videojs/xhr" "2.6.0"
     aes-decrypter "3.1.2"
     global "^4.4.0"
     keycode "^2.2.0"
     m3u8-parser "4.7.0"
-    mpd-parser "0.19.2"
-    mux.js "5.14.1"
+    mpd-parser "0.19.0"
+    mux.js "5.13.0"
     safe-json-parse "4.0.0"
     videojs-font "3.2.0"
     videojs-vtt.js "^0.15.3"
