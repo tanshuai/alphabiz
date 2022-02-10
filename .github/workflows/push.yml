@@ -8,7 +8,7 @@ on:
   push:
     paths:
       - "**.js"
-      - "**/push.yml"
+      - "!**/push.yml"
       - "build/**"
     branches: [main]
   pull_request:
@@ -72,9 +72,9 @@ jobs:
 
       - name: Checkout vars-date ${{ steps.vars.outputs.date }} ⬇️
         run: |
-          echo "commit-version:${{ steps.vars.outputs.commit }}"
-          echo "commit-version:${{ steps.vars.outputs.commit-version }}"
-          echo "commit-message:${{ steps.vars.outputs.commit-message }}"
+          echo "commit: ${{ steps.vars.outputs.commit }}"
+          echo "commit-version: ${{ steps.vars.outputs.commit-version }}"
+          echo "commit-message: ${{ steps.vars.outputs.commit-message }}"
           echo "${{ steps.vars.outputs.date }}"
           echo "${{ steps.vars.outputs.tag }}"
 
