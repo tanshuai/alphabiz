@@ -1,8 +1,8 @@
 name: CI/CT for each push
-env:
-  name: staging_environment
+# env:
+#   name: staging_environment
 
-concurrency: staging_environment
+# concurrency: staging_environment
 
 on:
   push:
@@ -21,7 +21,7 @@ jobs:
       max-parallel: 1
       matrix:
         # os: [windows-latest, macos-latest]
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         node-version: [14]
     environment:
       name: CICD
