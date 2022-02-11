@@ -1,0 +1,27 @@
+# This workflow will do a clean install of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Backup Weekly
+
+on:
+  schedule:
+    - cron:  '00 11 * * 6'
+  push:
+    paths:
+      - '**/weekly.yml'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get Date 📅
+        id: slug
+        run: echo "::set-output name=date::$(date +'%Y/%m/%d')"
+
+      - uses: actions/checkout@v2
+      - name: Create Branch for Backup ⬆️
+        run: |
+          git checkout -b baks/${{ steps.slug.outputs.date }}
+          git push origin baks/${{ steps.slug.outputs.date }}
