@@ -16,12 +16,33 @@
     "test:appium": "appium --log ./test/output/release/appium.log",
     "test:release": "jest test/jest/release/main.spec.js --c=./test/jest/release/jest.config.js",
     "test:release:creditsUpload": "jest test/jest/release/creditsUpload.spec.js --c=./test/jest/release/jest.config.js",
-    "test:release:creditsDownload": "jest test/jest/release/creditsDownload.spec.js --c=./test/jest/release/jest.config.js"
+    "test:release:creditsDownload": "jest test/jest/release/creditsDownload.spec.js --c=./test/jest/release/jest.config.js",
+    "make": "node make.js --make",
+    "make:win": "yarn make:squirrel && yarn make:msi",
+    "make:squirrel": "electron-forge make --skip-package --targets @electron-forge/maker-squirrel",
+    "make:msi": "electron-forge make --skip-package --targets @electron-forge/maker-wix",
+    "make:dmg": "electron-forge make --skip-package --targets @electron-forge/maker-dmg",
+    "make:deb": "electron-forge make --skip-package --targets @electron-forge/maker-deb",
+    "postmake": "node make.js --postmake"
+  },
+  "dependencies": {
+    "symlink-dir": "^5.0.1",
+    "video.js": "^7.13.3",
+    "videojs-ass": "^0.8.0",
+    "videojs-ass-es6": "0.0.4",
+    "videojs-hotkeys": "^0.2.27",
+    "webtorrent": "1.5.8"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.16.8",
     "@electron-forge/cli": "^6.0.0-beta.63",
-    "@electron-forge/plugin-local-electron": "^6.0.0-beta.63",
+    "@electron-forge/maker-deb": "^6.0.0-beta.63",
+    "@electron-forge/maker-dmg": "^6.0.0-beta.63",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.63",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.63",
+    "@electron-forge/maker-wix": "^6.0.0-beta.63",
+    "@electron-forge/maker-zip": "^6.0.0-beta.63",
+    "@electron-forge/plugin-local-electron": "6.0.0-beta.63",
     "@playwright/test": "^1.18.1",
     "@types/plist": "^3.0.2",
     "@zeeis/velectron": "^1.0.3",
@@ -33,7 +54,6 @@
     "cypress-file-upload": "^5.0.8",
     "dotenv": "^14.1.0",
     "electron": "11.5.0",
-    "electron-forge": "^5.2.4",
     "electron-packager": "^15.4.0",
     "electron-rebuild": "^3.2.7",
     "eslint": "^8.7.0",
@@ -52,13 +72,5 @@
   },
   "config": {
     "forge": "./forge.config.js"
-  },
-  "dependencies": {
-    "symlink-dir": "^5.0.1",
-    "video.js": "^7.13.3",
-    "videojs-ass": "^0.8.0",
-    "videojs-ass-es6": "0.0.4",
-    "videojs-hotkeys": "^0.2.27",
-    "webtorrent": "1.5.8"
   }
 }

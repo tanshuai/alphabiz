@@ -67,11 +67,12 @@ jobs:
           git fetch --prune --unshallow
           echo "::set-output name=commit::$(git log -1 --pretty=%B --author="AlphabizTeam")"
           echo "::set-output name=commit-version::$(git log -1 --pretty=%B --author="AlphabizTeam" | perl -wnE'say for /(?<=v)\d+\.\d+\.\d+/g')"
+          echo "::set-output name=commit-date::$(git log -1 --pretty=%B --author="AlphabizTeam" | perl -wnE'say for /(?<=-)\d{8,12}(?=-)/g')"
           echo "::set-output name=commit-message::$(git log -1 --pretty=%B --author="AlphabizTeam" | perl -wnE'say for /\d{8,12}-\w+/g')"
-          echo "::set-output name=date::$(git log -1 --date=format:'%Y%m%d' --format='%cd')"
+          echo "::set-output name=date::$(git log -1 --date=format:'%Y%m%d' --author="AlphabizTeam" --format='%cd')"
           echo "::set-output name=tag::$(git describe --abbrev=0 --tags)"
           echo "::set-output name=current-hour::$(date +'%H')"
-          echo "::set-output name=release-date::$(git log -1 --date=format:'%Y-%m-%d' --format='%cd')"
+          echo "::set-output name=release-date::$(git log -1 --date=format:'%Y-%m-%d' --format='%cd' --author="AlphabizTeam")"
         shell: bash
 
       # 获取所以今天 作者为AlphabizTeam的commit message,正则:不匹配'[-]符号'前面的任意字符、不匹配空行
@@ -88,6 +89,7 @@ jobs:
         run: |
           echo "commit: ${{ steps.vars.outputs.commit }}"
           echo "commit-version: ${{ steps.vars.outputs.commit-version }}"
+          echo "commit-date: ${{ steps.vars.outputs.commit-date }}"
           echo "commit-message: ${{ steps.vars.outputs.commit-message }}"
           echo "${{ steps.vars.outputs.date }}"
           echo "${{ steps.vars.outputs.tag }}"
@@ -133,14 +135,15 @@ jobs:
         # if: contains(steps.vars.outputs.current-hour, '12')
         run: 7z a -t7z -mx=9 alphabiz-${{ matrix.os }}-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}.7z ./build/electron -xr!UnPackaged
 
-      # - name: Pack app 📦
-      #   run: |
-      #     export PATH=$PATH:/c/Program\ Files\ \(x86\)/WiX\ Toolset\ v3.11/bin
-      #     yarn make
-      #   env:
-      #     NODE_AUTH_TOKEN: ${{ secrets.PAT }}
-      #     GITHUB_PAT: ${{ secrets.PAT }}
-      #   shell: bash
+      - name: Pack app 📦
+        # if: contains(steps.vars.outputs.current-hour, '12')
+        run: |
+          if [[ "matrix.os" = "windows-2022" ]] ;\
+          then export PATH=$PATH:/c/Program\ Files\ \(x86\)/WiX\ Toolset\ v3.11/bin ; \
+          fi
+          export BUILD_VERSION=${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-date }}
+          yarn make
+        shell: bash
 
       - name: Release ${{ matrix.os }}-nightly-${{ steps.vars.outputs.commit-message }}.7z to GitHub 📰
         # if: contains(steps.vars.outputs.current-hour, '12')
@@ -152,3 +155,4 @@ jobs:
           body: ${{ env.DESCRIBE }}
           files: |
             alphabiz-${{ matrix.os }}-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}.7z
+            ./out/installers/${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-date }}/**
