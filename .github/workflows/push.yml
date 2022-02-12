@@ -126,11 +126,11 @@ jobs:
       #后面的step晚上运行
 
       - name: Run electron-packager
-        if: contains(steps.vars.outputs.current-hour, '12')
+        # if: contains(steps.vars.outputs.current-hour, '12')
         run: yarn packager
 
       - name: Package for ${{ matrix.os }}-nightly-${{ steps.vars.outputs.commit-message }} Release 🗜️
-        if: contains(steps.vars.outputs.current-hour, '12')
+        # if: contains(steps.vars.outputs.current-hour, '12')
         run: 7z a -t7z -mx=9 alphabiz-${{ matrix.os }}-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}.7z ./build/electron -xr!UnPackaged
 
       # - name: Pack app 📦
@@ -143,7 +143,7 @@ jobs:
       #   shell: bash
 
       - name: Release ${{ matrix.os }}-nightly-${{ steps.vars.outputs.commit-message }}.7z to GitHub 📰
-        if: contains(steps.vars.outputs.current-hour, '12')
+        # if: contains(steps.vars.outputs.current-hour, '12')
         uses: softprops/action-gh-release@v1
         with:
           prerelease: true
