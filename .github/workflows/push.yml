@@ -138,9 +138,12 @@ jobs:
       - name: Pack app 📦
         # if: contains(steps.vars.outputs.current-hour, '12')
         run: |
-          if [[ "matrix.os" = "windows-2022" ]] ;\
+          if [[ "matrix.os" = "windows-2022" ]] ; \
           then export PATH=$PATH:/c/Program\ Files\ \(x86\)/WiX\ Toolset\ v3.11/bin ; \
+          else echo "It is not a Windows - 2022" ; \
           fi
+          echo "$PATH"
+          export PATH=$PATH:/c/Program\ Files\ \(x86\)/WiX\ Toolset\ v3.11/bin
           export BUILD_VERSION=${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-date }}
           yarn make
         shell: bash
