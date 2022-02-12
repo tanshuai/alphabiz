@@ -281,6 +281,8 @@ test.describe('download ', () => {
     // await commands.jumpPage('downloadedStatus')
 
     await commands.jumpPage('uploadingStatus')
+    await window.waitForLoadState()
+    await window.screenshot({ path: `${ScreenshotsPath}taskStatus.png` })
     // 切换列表模式
     const listMode = await window.locator('button[role="button"]:has-text("view_agenda")')
     if (await listMode.isVisible()) {
@@ -289,7 +291,7 @@ test.describe('download ', () => {
     // 验证文件类型图标
     await sleep(2000)
     // 截图验证
-    await window.screenshot({ path: `${ScreenshotsPath}taskStatus.png` })
+    // await window.screenshot({ path: `${ScreenshotsPath}taskStatus.png` })
     const bbbFileIcon = await window.locator('text=bbb_sunflower_1080p_30fps_normal.mp4 >> //preceding::*[1]').innerText()
     expect(bbbFileIcon).toBe('video_file')
     const uTorrentFileIcon = await window.locator('text=uTorrent Web >> //preceding::*[1]').innerText()
@@ -301,7 +303,6 @@ test.describe('download ', () => {
     await window.waitForSelector('.vjs-progress-control', { timeout: 10000 })
     await commands.jumpPage('uploadingStatus')
     await sleep(1000)
-    await window.screenshot({ path: `${ScreenshotsPath}taskStatus3.png` })
     // 文件大小
     const fileSize = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::*[2]').innerText()
     // expect(fileSize).toBe('56.07 MB')
@@ -337,22 +338,22 @@ test.describe('download ', () => {
     await window.locator('button[role="button"]:has-text("Not now")').click()
     // "更多"功能检查Download url
     await moreIcon.click()
-    const downloadURI = await window.locator('[aria-label="Download URI"]').innerText()
-    console.log('The WIRED CD downloadURI:' + downloadURI)
+    // const downloadURI = await window.locator('[aria-label="Download URI"]').innerText()
+    // console.log('The WIRED CD downloadURI:' + downloadURI)
     await window.click('text=content_copy')
 
-    // "更多"功能检查文件路径
+    // // "更多"功能检查文件路径
     const filePathElement = await window.locator('text=play_arrowfolder')
-    const filePathText = await filePathElement.innerText()
-    const filePath = path.resolve(__dirname, '../download')
-    // 字符串路径转为正则表达式
-    let filePathReg = ''
-    for (const char of filePath) {
-      if (char === '\\') filePathReg += '\\' + char
-      else filePathReg += char
-    }
-    const reg = new RegExp(filePathReg + '\\\\The WIRED CD')
-    expect(reg.test(filePathText)).toBe(true)
+    // const filePathText = await filePathElement.innerText()
+    // const filePath = path.resolve(__dirname, '../download')
+    // // 字符串路径转为正则表达式
+    // let filePathReg = ''
+    // for (const char of filePath) {
+    //   if (char === '\\') filePathReg += '\\' + char
+    //   else filePathReg += char
+    // }
+    // const reg = new RegExp(filePathReg + '\\\\The WIRED CD')
+    // expect(reg.test(filePathText)).toBe(true)
     // console.log('reg:' + reg)
     // console.log('filePathText:' + filePathText)
     // expect(reg.test(filePathText)).toBe(true)
