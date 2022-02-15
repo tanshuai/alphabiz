@@ -93,6 +93,27 @@ index 19cb5ff..8cd6538 100644
      if (swarm) swarm.removePeer(this.id)
    }
  }
+diff --git a/node_modules/webtorrent/lib/torrent.js b/node_modules/webtorrent/lib/torrent.js
+index ac7cb97..4773e56 100644
+--- a/node_modules/webtorrent/lib/torrent.js
++++ b/node_modules/webtorrent/lib/torrent.js
+@@ -753,6 +753,8 @@ class Torrent extends EventEmitter {
+     this._peers = null
+     this._servers = null
+     this._xsRequests = null
++
++    this.removeAllListeners()
+   }
+ 
+   addPeer (peer) {
+@@ -1144,6 +1146,7 @@ class Torrent extends EventEmitter {
+     })
+ 
+     wire.once('close', () => {
++      wire.ut_metadata = null
+       clearTimeout(timeoutId)
+     })
+ 
 diff --git a/node_modules/webtorrent/lib/utp.js b/node_modules/webtorrent/lib/utp.js
 index 2cde3f4..21956e3 100644
 --- a/node_modules/webtorrent/lib/utp.js
