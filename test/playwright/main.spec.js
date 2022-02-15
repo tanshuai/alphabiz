@@ -77,13 +77,13 @@ test('close set default', async () => {
 test('reset torrent status', async () => {
   await window.waitForLoadState()
   await commands.jumpPage('downloadingStatus')
-  if (await window.isVisible('button[role="button"]:has-text("Remove all")')) {
+  if (await window.isEnabled('button[role="button"]:has-text("Remove all")')) {
     await window.click('button[role="button"]:has-text("Remove all")')
     await window.click('[aria-label="Also delete files"]')
     await window.click('text=NOT NOW >> //following::*[1]')
   }
   await commands.jumpPage('uploadingStatus')
-  if (await window.isVisible('button[role="button"]:has-text("Remove all")')) {
+  if (await window.isEnabled('button[role="button"]:has-text("Remove all")')) {
     await window.click('button[role="button"]:has-text("Remove all")')
     await window.click('[aria-label="Also delete files"]')
     await window.click('[aria-label="Remove auto-upload files"]')
