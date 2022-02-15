@@ -103,5 +103,9 @@ dist
 # TernJS port file
 .tern-port
 
-
+# build/
 *.torrent
+test-results/
+playwright-report/
+test/download/**
+test/output/**
