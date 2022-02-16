@@ -84,14 +84,19 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.PAT }}
           GITHUB_PAT: ${{ secrets.PAT }}
 
-      - name: E2E Test 🧪
-        run: yarn test:e2e:ci
+      - name: Install UnPackaged 👨🏻‍💻
+        run: |
+          cd build/electron/UnPackaged
+          yarn
+        shell: bash
 
       - name: Patch unpackaged node_modules
         run: yarn patch-unpackaged
 
       - name: E2E Test for Electron 🧪
         run: yarn test:e2e:electron
+      - name: E2E Test 🧪
+        run: yarn test:e2e:ci
 
       - name: Upload Test Results 🗃
         if: always()
