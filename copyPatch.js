@@ -4,7 +4,7 @@
 const fs = require('fs')
 const path = require('path')
 const copy = async () => {
-  ['webtorrent'].forEach(dep => {
+  ['webtorrent', '@videojs'].forEach(dep => {
     const src = path.resolve(__dirname, 'node_modules', dep)
     const dest = path.resolve(__dirname, 'build/electron/UnPackaged/node_modules', dep)
     if (!fs.existsSync(src)) return
