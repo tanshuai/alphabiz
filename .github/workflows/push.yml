@@ -20,7 +20,7 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        os: [windows-latest]
+        os: [windows-latest, macos-latest]
         node-version: [14]
     environment:
       name: CICD
