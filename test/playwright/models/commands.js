@@ -14,7 +14,7 @@ class Commands {
     this.accountLink = page.locator('.corner')
     this.accountSettings = page.locator('[data-cy="account-settings-btn"]')
     // home
-    this.downloadBtn = page.locator('button[role="button"]:has-text("Download")')
+    this.downloadBtn = page.locator('button:has-text("Download")')
     // credits
     // account
   }
@@ -41,7 +41,7 @@ class Commands {
     await this.downloadBtn.click()
     await this.page.fill('[aria-label="Download directory position"]  >> //preceding::*[1]', magnet)
     await this.page.fill('[aria-label="Download directory position"]', './test/download')
-    await this.page.click(':nth-match(button[role="button"]:has-text("Download"), 2)')
+    await this.page.click(':nth-match(button:has-text("Download"), 2)')
   }
 
   async signIn (username, password, isWaitAlert) {
@@ -49,7 +49,7 @@ class Commands {
     await this.page.waitForTimeout(500)
     await this.page.fill('[aria-label="Phone number or email"]', username)
     await this.page.fill('[aria-label="Password"]', password)
-    await this.page.click('button[role="button"]:has-text("Sign in")')
+    await this.page.click('button:has-text("Sign in")')
 
     if (isWaitAlert) {
       await this.page.locator('.q-notification__message >> text=Signed in').waitFor({ timeout: 40000 })
@@ -64,7 +64,7 @@ class Commands {
 
   async deleteUser (password) {
     // delete user start
-    await this.page.click('button[role="button"]:has-text("delete account")')
+    await this.page.click('button:has-text("delete account")')
     await this.page.fill('[aria-label="Password"]', password)
     await this.page.click('text=delete account >> ../..//Button[1]')
     // delete user end
@@ -84,7 +84,7 @@ class Commands {
       if (userID[i] >= 'A' && userID[i] <= 'Z') { newStr += userID[i].toLowerCase() } else { newStr += userID[i] }
     }
     userID = newStr
-    await this.page.click('button[role="button"]:has-text("Cancel")')
+    await this.page.click('button:has-text("Cancel")')
 
     return userID
   }
@@ -98,7 +98,7 @@ class Commands {
     await this.page.click('.q-card:nth-child(2) > .q-card__section:nth-child(1) > :nth-child(1)')
     await this.page.fill('[aria-label="Receipt Code"]', ID)
     await this.page.fill('[aria-label="Transfer Amount"]', amount)
-    await this.page.click('.q-form >> button[role="button"]:has-text("TRANSFER")')
+    await this.page.click('.q-form >> button:has-text("TRANSFER")')
     await this.page.locator(':nth-child(2) > .q-card').waitFor('hidden')
   }
 
@@ -119,7 +119,7 @@ class Commands {
         expect(changedAmountText).toBe(arguments[index])
       } else { await this.page.click('form >> :nth-match(div:has-text("' + arguments[index] + '"), 3)') }
     }
-    await this.page.click('button[role="button"]:has-text("Cancel")')
+    await this.page.click('button:has-text("Cancel")')
   }
 }
 

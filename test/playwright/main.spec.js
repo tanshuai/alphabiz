@@ -77,22 +77,22 @@ test('close set default', async () => {
 test('reset torrent status', async () => {
   await window.waitForLoadState()
   await commands.jumpPage('downloadingStatus')
-  if (await window.isEnabled('button[role="button"]:has-text("Remove all")')) {
-    await window.click('button[role="button"]:has-text("Remove all")')
+  if (await window.isEnabled('button:has-text("Remove all")')) {
+    await window.click('button:has-text("Remove all")')
     await window.click('[aria-label="Also delete files"]')
     await window.click('text=NOT NOW >> //following::*[1]')
   }
   await commands.jumpPage('uploadingStatus')
-  if (await window.isEnabled('button[role="button"]:has-text("Remove all")')) {
-    await window.click('button[role="button"]:has-text("Remove all")')
+  if (await window.isEnabled('button:has-text("Remove all")')) {
+    await window.click('button:has-text("Remove all")')
     await window.click('[aria-label="Also delete files"]')
     await window.click('[aria-label="Remove auto-upload files"]')
     await window.click('text=NOT NOW >> //following::*[1]')
   }
   await commands.jumpPage('downloadedStatus')
-  if (await window.isEnabled('button[role="button"]:has-text("Clear history")')) {
-    await window.click('button[role="button"]:has-text("Clear history")')
-    await window.click('button[role="button"]:has-text("Remove all")')
+  if (await window.isEnabled('button:has-text("Clear history")')) {
+    await window.click('button:has-text("Clear history")')
+    await window.click('button:has-text("Remove all")')
   }
   // dev mode
   // await commands.jumpPage('developmentLink')
@@ -203,7 +203,7 @@ test.describe('download ', () => {
         // 等待下载完成
         const DownloadStatus = await (await window.$(btCard + ' >> text=Status:')).innerText()
         //  判断 文件存在，下载完成
-        if (DownloadStatus === 'Status: Paused') await window.click(btCard + ' >> button[role="button"]:has-text("Resume")')
+        if (DownloadStatus === 'Status: Paused') await window.click(btCard + ' >> button:has-text("Resume")')
         try {
           await window.click(btCard + ' >> text=Status: Downloading', { timeout: 60000 })
         } catch (error) {
@@ -260,7 +260,7 @@ test.describe('download ', () => {
       }
       if (btDate.isStreaming !== 1) await commands.jumpPage('uploadingStatus')
       // 点击 Play 按钮
-      await window.click(btCard + ' >> button[role="button"]:has-text("play_arrowPLAY")')
+      await window.click(btCard + ' >> button:has-text("play_arrowPLAY")')
       // 点击播放列表的第一个文件，跳转到player页面
       await window.click('.q-list > .q-item:nth-child(1)')
 
@@ -270,7 +270,7 @@ test.describe('download ', () => {
       // 是否删除种子
       if (btDate.isDelete) {
         await commands.jumpPage('uploadingStatus')
-        await window.click(btCard + ' >> button[role="button"]:has-text("Delete")')
+        await window.click(btCard + ' >> button:has-text("Delete")')
         await window.click('[aria-label="Also delete files"]')
         await sleep(3000)
         await window.click('text=not now>> //following::Button[1]')
@@ -285,7 +285,7 @@ test.describe('download ', () => {
     await window.waitForLoadState()
     await window.screenshot({ path: `${ScreenshotsPath}taskStatus.png` })
     // 切换列表模式
-    const listMode = await window.locator('button[role="button"]:has-text("view_agenda")')
+    const listMode = await window.locator('button:has-text("view_agenda")')
     if (await listMode.isVisible()) {
       await listMode.click()
     }
@@ -336,7 +336,7 @@ test.describe('download ', () => {
     expect(closeIconText).toBe('close')
     await closeIcon.click()
     await window.waitForSelector('.q-card >> text=Delete task', { timeout: 10000 })
-    await window.locator('button[role="button"]:has-text("Not now")').click()
+    await window.locator('button:has-text("Not now")').click()
     // "更多"功能检查Download url
     await moreIcon.click()
     // const downloadURI = await window.locator('[aria-label="Download URI"]').innerText()
@@ -390,7 +390,7 @@ test.describe('download ', () => {
     const magnetText = await window.locator('//*[@aria-label="Download directory position"]/preceding::*[1]').inputValue()
     // console.log('magnetText:' + magnetText)
     expect(/alphabiz:\/\/The\+WIRED\+CD/.test(magnetText)).toBe(true)
-    await window.click('button[role="button"]:has-text("Cancel")')
+    await window.click('button:has-text("Cancel")')
     await sleep(1000)
     await window.reload()
   })
@@ -405,8 +405,8 @@ test.describe('upload', () => {
     // const btCard = 'text=' + btName + ' >> xpath=..//..//..//..//.. >> '
 
     await commands.jumpPage('homeLink')
-    // Click button[role="button"]:has-text("Upload torrent")
-    await window.click('button[role="button"]:has-text("Upload torrent")')
+    // Click button:has-text("Upload torrent")
+    await window.click('button:has-text("Upload torrent")')
 
     console.log(path.resolve(__dirname, '../cypress/fixtures/samples/ChinaCup.1080p.H264.AAC.mp4'))
     // await window.dispatchEvent('input[type="file"]', 'input', path.resolve(__dirname, '../cypress/fixtures/samples/ChinaCup.1080p.H264.AAC.mp4'))
@@ -441,7 +441,7 @@ test.describe('upload', () => {
     // await elementHandle.evaluate(node => node.setAttribute('files'))
     // await window.waitForTimeout(1000)
 
-    await window.click(':nth-match(button[role="button"]:has-text("Upload"), 2)')
+    await window.click(':nth-match(button:has-text("Upload"), 2)')
     await window.waitForTimeout(1000)
     await window.click('text=' + btName, { timeout: 5000 })
   })
