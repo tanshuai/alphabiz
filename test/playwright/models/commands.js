@@ -76,7 +76,7 @@ class Commands {
 
   async getID () {
     await this.page.click('.q-card:nth-child(2) > .q-card__section:nth-child(1) > :nth-child(2)')
-    let userID = (await this.page.locator('.col-grow > .q-btn > .q-btn__wrapper').innerText()).split('')
+    let userID = (await this.page.locator('input[type=text]').inputValue()).split('')
     // 将收款人id中的大写转为小写
     let newStr = ''
     // 通过for循环遍历数组
