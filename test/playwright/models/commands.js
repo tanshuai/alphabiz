@@ -39,7 +39,7 @@ class Commands {
   // home
   async downloadTorrent (magnet) {
     await this.downloadBtn.click()
-    await this.page.fill('input[type="text"]', magnet)
+    await this.page.fill('[aria-label="Download directory position"]  >> //preceding::*[1]', magnet)
     await this.page.fill('[aria-label="Download directory position"]', './test/download')
     await this.page.click(':nth-match(button[role="button"]:has-text("Download"), 2)')
   }

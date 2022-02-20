@@ -88,7 +88,7 @@ test('reset torrent status', async () => {
     await window.click('text=NOT NOW >> //following::*[1]')
   }
   await commands.jumpPage('downloadedStatus')
-  if (await window.isVisible('button[role="button"]:has-text("Clear history")')) {
+  if (await window.isEnabled('button[role="button"]:has-text("Clear history")')) {
     await window.click('button[role="button"]:has-text("Clear history")')
     await window.click('button[role="button"]:has-text("Remove all")')
   }
