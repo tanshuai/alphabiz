@@ -6,7 +6,7 @@ name: CI/CT for each push
 
 on:
   schedule:
-    - cron: "00 11 * * *"
+    - cron: "00 12 * * *"
   push:
     paths:
       - "**.js"
@@ -79,7 +79,7 @@ jobs:
       # 获取所以今天 作者为AlphabizTeam的commit message,正则:不匹配'[-]符号'前面的任意字符、不匹配空行
       - name: Get today all commit message
         run: |
-          export DESCRIBE=$(git log --reverse --after="${{ steps.vars.outputs.release-date }} 00:00" --before="${{ steps.vars.outputs.release-date }} 23:59" --author="AlphabizTeam" --pretty='format:%B' | perl -wnE'say for /(?!.*-)(?!\s).*\w+$/gm')
+          export DESCRIBE=$(cat test/github-describe/github-describe.txt)
           echo "$DESCRIBE"
           echo "DESCRIBE<<EOF" >> $GITHUB_ENV
           echo "$DESCRIBE" >> $GITHUB_ENV
@@ -124,15 +124,15 @@ jobs:
       #后面的step晚上运行
 
       - name: Run electron-packager
-        if: contains(steps.vars.outputs.current-hour, '11')
+        if: contains(steps.vars.outputs.current-hour, '12')
         run: yarn packager
 
       - name: Package for ${{ matrix.os }}-nightly-${{ steps.vars.outputs.commit-message }} Release 🗜️
-        if: contains(steps.vars.outputs.current-hour, '11')
+        if: contains(steps.vars.outputs.current-hour, '12')
         run: 7z a -t7z -mx=9 alphabiz-${{ matrix.os }}-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}.7z ./build/electron -xr!UnPackaged
 
       - name: Pack app 📦
-        if: contains(steps.vars.outputs.current-hour, '11')
+        if: contains(steps.vars.outputs.current-hour, '12')
         run: |
           export PATH=$PATH:/c/Program\ Files\ \(x86\)/WiX\ Toolset\ v3.11/bin
           export BUILD_VERSION=${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-date }}
@@ -140,7 +140,7 @@ jobs:
         shell: bash
 
       - name: Release ${{ matrix.os }}-nightly-${{ steps.vars.outputs.commit-message }}.7z to GitHub 📰
-        if: contains(steps.vars.outputs.current-hour, '11')
+        if: contains(steps.vars.outputs.current-hour, '12')
         uses: softprops/action-gh-release@v1
         with:
           prerelease: true
