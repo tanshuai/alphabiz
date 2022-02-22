@@ -55,10 +55,6 @@ test.afterAll(async () => {
   // await electronApp.close()
 })
 
-test('window has correct title', async () => {
-  const title = await window.title()
-  expect(title).toContain('Alphabiz')
-})
 test('close set default', async () => {
   await window.waitForLoadState()
   await sleep(1000)
@@ -77,14 +73,14 @@ test('close set default', async () => {
 test('reset torrent status', async () => {
   await window.waitForLoadState()
   await commands.jumpPage('downloadingStatus')
-  if (await window.isEnabled('button:has-text("Remove all")')) {
-    await window.click('button:has-text("Remove all")')
+  if (await window.isEnabled('button:has-text("Remove all") >> nth=0')) {
+    await window.click('button:has-text("Remove all") >> nth=0')
     await window.click('[aria-label="Also delete files"]')
     await window.click('text=NOT NOW >> //following::*[1]')
   }
   await commands.jumpPage('uploadingStatus')
-  if (await window.isEnabled('button:has-text("Remove all")')) {
-    await window.click('button:has-text("Remove all")')
+  if (await window.isEnabled('button:has-text("Remove all") >> nth=1')) {
+    await window.click('button:has-text("Remove all") >> nth=1')
     await window.click('[aria-label="Also delete files"]')
     await window.click('[aria-label="Remove auto-upload files"]')
     await window.click('text=NOT NOW >> //following::*[1]')
@@ -219,7 +215,7 @@ test.describe('download ', () => {
           await commands.jumpPage('downloadingStatus')
           await commands.downloadTorrent(btDate.magnetLink)
 
-          await window.click('text=' + btDate.btName, { timeout: 60000 })
+          await window.click('text=' + btDate.btName, { timeout: 30000 })
           // 等待 任务 加载 验证， 判断任务是 下载中
 
           await window.click(btCard + ' >> text=Status: Downloading', { timeout: 60000 })
@@ -365,7 +361,7 @@ test('table mode task lists', async () => {
     await window.waitForSelector('text=image poster.jpg')
     await sleep(500)
     // 退出卡片
-    await window.locator('text=PAUSE ALL').click({ force: true })
+    await window.locator('text=PAUSE ALL >> nth=1').click({ force: true })
     // downloaded状态栏
     await stopIcon.click()
     await commands.jumpPage('downloadedStatus')
