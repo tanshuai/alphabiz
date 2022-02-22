@@ -1,1 +1,1 @@
-Today's release description
+fix container action is only supported on Linux
