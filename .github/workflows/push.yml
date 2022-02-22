@@ -18,7 +18,6 @@ jobs:
   test-1:
     runs-on: ${{ matrix.os }}
     strategy:
-      max-parallel: 1
       matrix:
         # os: [windows-latest, macos-latest]
         os: [ubuntu-latest, windows-latest, macos-latest]
