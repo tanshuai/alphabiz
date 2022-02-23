@@ -255,7 +255,7 @@ test.describe('download ', () => {
       }
       if (btDate.isStreaming !== 1) await commands.jumpPage('uploadingStatus')
       // 点击 Play 按钮
-      await window.click(btCard + ' >> button:has-text("play_arrowPLAY")')
+      await window.click(btCard + ' >> button:has-text("play_circlePlay")')
       // 点击播放列表的第一个文件，跳转到player页面
       await window.click('.q-list > .q-item:nth-child(1)')
 
