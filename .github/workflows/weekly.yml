@@ -5,7 +5,7 @@ name: Backup Weekly
 
 on:
   schedule:
-    - cron:  '00 11 * * 6'
+    - cron:  '30 11 * * 6'
   push:
     paths:
       - '**/weekly.yml'
