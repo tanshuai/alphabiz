@@ -34,7 +34,6 @@ test.beforeAll(async () => {
   for (const win of windows) {
     if (await win.title() === 'Alphabiz') window = win
   }
-  console.log('windows title:' + await window.title())
   // new Pege Object Model
   commands = new Commands(window)
 })
@@ -110,7 +109,7 @@ test.describe('play video', () => {
     const progressControl = await window.locator('.vjs-progress-control')
     await expect(progressControl).toBeVisible()
   })
-  test('BluRay_type', async () => {
+  test('BluRay_mkv_type', async () => {
     const media = './test/samples/Test-Sample-Tenet.2020.IMAX.2160p.UHD.BluRay.x265.10bit.HDR.DTS-HD.MA.5.1202111171122322.mkv'
 
     if (await window.$('[data-cy="file-input"]') === null) await commands.jumpPage('playerLink')
@@ -356,9 +355,9 @@ test('table mode task lists', async () => {
     // expect(reg.test(filePathText)).toBe(true)
     // 检查文件夹树状结构
     await filePathElement.click()
-    await window.waitForSelector('text=audio_file 01 - Beastie Boys - Now Get Busy.mp3')
-    await window.waitForSelector('text=insert_drive_file README.md')
-    await window.waitForSelector('text=image poster.jpg')
+        await window.waitForSelector('text=01 - Beastie Boys - Now Get Busy.mp3')
+    await window.waitForSelector('text=insert_drive_file')
+    await window.waitForSelector('text=image')
     await sleep(500)
     // 退出卡片
     await window.locator('text=PAUSE ALL >> nth=1').click({ force: true })
