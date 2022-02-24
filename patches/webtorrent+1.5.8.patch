@@ -94,10 +94,107 @@ index 19cb5ff..8cd6538 100644
    }
  }
 diff --git a/node_modules/webtorrent/lib/torrent.js b/node_modules/webtorrent/lib/torrent.js
-index ac7cb97..4773e56 100644
+index ac7cb97..994eee3 100644
 --- a/node_modules/webtorrent/lib/torrent.js
 +++ b/node_modules/webtorrent/lib/torrent.js
-@@ -753,6 +753,8 @@ class Torrent extends EventEmitter {
+@@ -64,6 +64,37 @@ try {
+   TMP = path.join(typeof os.tmpdir === 'function' ? os.tmpdir() : '/', 'webtorrent')
+ }
+ 
++const toVerify = []
++let isVerifing = false
++/** @param { (cb: Function) => void } fn */
++const queueVerify = (fn, tr) => {
++  const callFn = () => {
++    isVerifing = true
++    if (tr) tr.waiting = false
++    // let client have time to do something
++    setTimeout(() => {
++      fn(() => {
++        isVerifing = false
++        const next = toVerify.shift()
++        if (typeof next === 'function') {
++          // console.log('Run next', toVerify.length)
++          next()
++        // } else {
++        //   console.log('Empty queue')
++        }
++      })
++    }, 1000)
++  }
++  if (tr) tr.waiting = true
++  if (isVerifing) {
++    toVerify.push(callFn)
++    // console.log('Queue', toVerify.length)
++  } else {
++    // console.log('Call')
++    callFn()
++  }
++}
++
+ class Torrent extends EventEmitter {
+   constructor (torrentId, client, opts) {
+     super()
+@@ -596,31 +627,39 @@ class Torrent extends EventEmitter {
+   }
+ 
+   _verifyPieces (cb) {
+-    parallelLimit(this.pieces.map((piece, index) => cb => {
+-      if (this.destroyed) return cb(new Error('torrent is destroyed'))
+-
+-      const getOpts = {}
+-      // Specify length for the last piece in case it is zero-padded
+-      if (index === this.pieces.length - 1) {
+-        getOpts.length = this.lastPieceLength
++    /** @param { Function } done */
++    const mission = (done) => {
++      const callDone = (...args) => {
++        done()
++        cb(...args)
+       }
+-      this.store.get(index, getOpts, (err, buf) => {
++      parallelLimit(this.pieces.map((piece, index) => cb => {
+         if (this.destroyed) return cb(new Error('torrent is destroyed'))
+ 
+-        if (err) return queueMicrotask(() => cb(null)) // ignore error
+-        sha1(buf, hash => {
++        const getOpts = {}
++        // Specify length for the last piece in case it is zero-padded
++        if (index === this.pieces.length - 1) {
++          getOpts.length = this.lastPieceLength
++        }
++        this.store.get(index, getOpts, (err, buf) => {
+           if (this.destroyed) return cb(new Error('torrent is destroyed'))
+ 
+-          if (hash === this._hashes[index]) {
+-            this._debug('piece verified %s', index)
+-            this._markVerified(index)
+-          } else {
+-            this._debug('piece invalid %s', index)
+-          }
+-          cb(null)
++          if (err) return queueMicrotask(() => cb(null)) // ignore error
++          sha1(buf, hash => {
++            if (this.destroyed) return cb(new Error('torrent is destroyed'))
++
++            if (hash === this._hashes[index]) {
++              this._debug('piece verified %s', index)
++              this._markVerified(index)
++            } else {
++              this._debug('piece invalid %s', index)
++            }
++            cb(null)
++          })
+         })
+-      })
+-    }), FILESYSTEM_CONCURRENCY, cb)
++      }), FILESYSTEM_CONCURRENCY, callDone)
++    }
++    queueVerify(mission, this)
+   }
+ 
+   rescanFiles (cb) {
+@@ -753,6 +792,8 @@ class Torrent extends EventEmitter {
      this._peers = null
      this._servers = null
      this._xsRequests = null
@@ -106,7 +203,7 @@ index ac7cb97..4773e56 100644
    }
  
    addPeer (peer) {
-@@ -1144,6 +1146,7 @@ class Torrent extends EventEmitter {
+@@ -1144,6 +1185,7 @@ class Torrent extends EventEmitter {
      })
  
      wire.once('close', () => {

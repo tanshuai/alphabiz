@@ -13,7 +13,11 @@ packager({
   out: './build/electron',
   appVersion: buildVersion,
   buildVersion: buildVersion,
-  extraResource: [path.resolve(__dirname, 'alphabiz-icon-1024.png'), path.resolve(__dirname, 'public/favicon.ico')],
+  extraResource: [
+    path.resolve(__dirname, 'alphabiz-icon-1024.png'),
+    path.resolve(__dirname, 'public/favicon.ico'),
+    path.resolve(__dirname, 'public/platform-assets/mac/trayiconTemplate.png')
+  ],
   icon: process.platform === 'darwin'
     ? path.resolve(__dirname, 'public/platform-assets/mac/app.icns')
     : path.resolve(__dirname, 'public/platform-assets/windows/icon.ico'),

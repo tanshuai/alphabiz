@@ -133,6 +133,29 @@ export const useAlphabizProtocol = (client, torrent) => {
       this._user = userInfo.user || ''
       this._subId = userInfo.sub || ''
       this.remoteSub = ''
+      // for client usage
+      this._wire._setThrottleGroup = level => this._setThrottleGroup(level)
+    }
+    onHandshake (infoHash, peerId) {
+      this._infoHash = infoHash
+      this._peerId = peerId
+      this._sendUserInfo()
+    }
+    _sendUserInfo () {
+      this._user = userInfo.user || ''
+      this._subId = userInfo.sub || ''
+      this._send({
+        ab_peer: '_ab_' + this._peerId,
+        ab_user: this._user,
+        ab_sub: this._subId
+      })
+    }
+    onExtendedHandshake (handshake) {
+      if (!handshake.m || !handshake.m[EXT_NAME]) {
+        console.error('Client does not support', EXT_NAME)
+      }
+    }
+    _initUpload () {
       wire.on('upload', bytes => {
         if (!this.remoteSub) return
         const subId = this.remoteSub
@@ -169,31 +192,10 @@ export const useAlphabizProtocol = (client, torrent) => {
           payedMap.set(subId + this._infoHash, left)
         }
       })
-      // for client usage
-      this._wire._setThrottleGroup = level => this._setThrottleGroup(level)
       torrent.on('done', () => {
         if (!this._wire.transactions) return
         this._send({ ab_task_done: this._wire.transactions.join('$') })
       })
-    }
-    onHandshake (infoHash, peerId) {
-      this._infoHash = infoHash
-      this._peerId = peerId
-      this._sendUserInfo()
-    }
-    _sendUserInfo () {
-      this._user = userInfo.user || ''
-      this._subId = userInfo.sub || ''
-      this._send({
-        ab_peer: '_ab_' + this._peerId,
-        ab_user: this._user,
-        ab_sub: this._subId
-      })
-    }
-    onExtendedHandshake (handshake) {
-      if (!handshake.m || !handshake.m[EXT_NAME]) {
-        console.error('Client does not support', EXT_NAME)
-      }
     }
     _onAbPeer (peerId, user, subId) {
       if (!peerId.startsWith('_ab_')) return
