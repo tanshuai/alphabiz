@@ -5,6 +5,8 @@ name: CI/CT for each push
 # concurrency: staging_environment
 
 on:
+  schedule:
+    - cron: "00 12 * * *"
   push:
     paths:
       - "**.js"
@@ -20,7 +22,7 @@ jobs:
     strategy:
       matrix:
         # os: [windows-latest, macos-latest]
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-2022, macos-latest]
         node-version: [14]
     environment:
       name: CICD
@@ -68,6 +70,18 @@ jobs:
           echo "::set-output name=commit-message::$(git log -1 --pretty=%B --author="AlphabizTeam" | perl -wnE'say for /\d{8,12}-\w+/g')"
           echo "::set-output name=date::$(git log -1 --date=format:'%Y%m%d' --format='%cd')"
           echo "::set-output name=tag::$(git describe --abbrev=0 --tags)"
+          echo "::set-output name=current-hour::$(date +'%H')"
+          echo "::set-output name=release-date::$(git log -1 --date=format:'%Y-%m-%d' --format='%cd')"
+        shell: bash
+
+      # 获取所以今天 作者为AlphabizTeam的commit message,正则:不匹配'[-]符号'前面的任意字符、不匹配空行
+      - name: Get today all commit message
+        run: |
+          export DESCRIBE=$(git log --reverse --after="${{ steps.vars.outputs.release-date }} 00:00" --before="${{ steps.vars.outputs.release-date }} 23:59" --author="AlphabizTeam" --pretty='format:%B' | perl -wnE'say for /(?!.*-)(?!\s).*\w+$/gm')
+          echo "$DESCRIBE"
+          echo "DESCRIBE<<EOF" >> $GITHUB_ENV
+          echo "$DESCRIBE" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
         shell: bash
 
       - name: Checkout vars-date ${{ steps.vars.outputs.date }} ⬇️
@@ -77,6 +91,9 @@ jobs:
           echo "commit-message: ${{ steps.vars.outputs.commit-message }}"
           echo "${{ steps.vars.outputs.date }}"
           echo "${{ steps.vars.outputs.tag }}"
+          echo "current-hour: ${{ steps.vars.outputs.current-hour }}"
+          echo "----------------------"
+          echo "${{ env.DESCRIBE }}"
 
       - name: Install dependencies 👨🏻‍💻
         run: yarn
@@ -105,3 +122,33 @@ jobs:
         with:
           name: "output1"
           path: test/output/**
+
+      #后面的step晚上运行
+
+      - name: Run electron-packager
+        if: contains(steps.vars.outputs.current-hour, '12')
+        run: yarn packager
+
+      - name: Package for ${{ matrix.os }}-nightly-${{ steps.vars.outputs.commit-message }} Release 🗜️
+        if: contains(steps.vars.outputs.current-hour, '12')
+        run: 7z a -t7z -mx=9 alphabiz-${{ matrix.os }}-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}.7z ./build/electron -xr!UnPackaged
+
+      # - name: Pack app 📦
+      #   run: |
+      #     export PATH=$PATH:/c/Program\ Files\ \(x86\)/WiX\ Toolset\ v3.11/bin
+      #     yarn make
+      #   env:
+      #     NODE_AUTH_TOKEN: ${{ secrets.PAT }}
+      #     GITHUB_PAT: ${{ secrets.PAT }}
+      #   shell: bash
+
+      - name: Release ${{ matrix.os }}-nightly-${{ steps.vars.outputs.commit-message }}.7z to GitHub 📰
+        if: contains(steps.vars.outputs.current-hour, '12')
+        uses: softprops/action-gh-release@v1
+        with:
+          prerelease: true
+          name: test-${{ steps.vars.outputs.commit-version }}-alphabiz-nightly-${{ steps.vars.outputs.commit-message }}
+          tag_name: test-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-date }}
+          body: ${{ env.DESCRIBE }}
+          files: |
+            alphabiz-${{ matrix.os }}-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}.7z

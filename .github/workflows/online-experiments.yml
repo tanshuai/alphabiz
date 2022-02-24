@@ -7,10 +7,10 @@ name: online-experiments
 
 on:
   schedule:
-    - cron: "50 11 * * *"
+    - cron: "00 12 * * *"
   push:
     paths:
-      - "**/online-experiments.yml"
+      - "！**/online-experiments.yml"
     branches: [main]
   pull_request:
     branches: [main]
