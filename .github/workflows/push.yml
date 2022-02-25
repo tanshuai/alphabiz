@@ -69,7 +69,7 @@ jobs:
           echo "::set-output name=commit::$(git log -1 --pretty=%B --author="Alphabiz-Team")"
           echo "::set-output name=commit-version::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /(?<=v)\d+\.\d+\.\d+/g')"
           echo "::set-output name=commit-date::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /(?<=-)\d{8,12}(?=-)/g')"
-          echo "::set-output name=commit-sha7::$(git log -1 --pretty=%B --author="AlphabizTeam" | perl -wnE'say for /(?<=-)\w{7}(?=-)/g')"
+          echo "::set-output name=commit-sha7::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /(?<=-)\w{7}(?=-)/g')"
           echo "::set-output name=commit-message::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /\d{8,12}-\w+/g')"
           echo "::set-output name=date::$(git log -1 --date=format:'%Y%m%d' --author="Alphabiz-Team" --format='%cd')"
           echo "::set-output name=tag::$(git describe --abbrev=0 --tags)"
@@ -77,9 +77,9 @@ jobs:
           echo "::set-output name=release-date::$(git log -1 --date=format:'%Y-%m-%d' --format='%cd' --author="Alphabiz-Team")"
           if [[ ${{ matrix.os }} = "ubuntu-latest" ]] ; \
           then echo "::set-output name=system::ubuntu" ; \
-          elif [[ ${{ matrix.os }} = "macos-latest"]] ; \
+          elif [[ ${{ matrix.os }} = "macos-latest" ]] ; \
           then echo "::set-output name=system::macos" ; \
-          elif [[ ${{ matrix.os }} = "windows-2022"]] ; \
+          elif [[ ${{ matrix.os }} = "windows-2022" ]] ; \
           then echo "::set-output name=system::windows" ; \
           fi
         shell: bash
@@ -97,7 +97,7 @@ jobs:
 
       - name: Checkout vars-date ${{ steps.vars.outputs.date }} ⬇️
         run: |
-          echo "system:${{ steps.vars.outputs.system }}"
+          echo "system: ${{ steps.vars.outputs.system }}"
           echo "commit: ${{ steps.vars.outputs.commit }}"
           echo "commit-version: ${{ steps.vars.outputs.commit-version }}"
           echo "commit-date: ${{ steps.vars.outputs.commit-date }}"
