@@ -156,7 +156,7 @@ jobs:
         with:
           prerelease: true
           name: alphabiz-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-sha7 }}
-          tag_name: alphabiz-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}
+          tag_name: ${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}
           body: ${{ env.DESCRIBE }}
           files: |
             alphabiz-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}-${{ steps.vars.outputs.system }}.7z
