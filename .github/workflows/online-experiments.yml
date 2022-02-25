@@ -53,9 +53,9 @@ jobs:
         id: vars
         run: |
           git fetch --prune --unshallow
-          echo "::set-output name=commit-version::$(git log -1 --pretty=%B --author="AlphabizTeam" | perl -wnE'say for /(?<=v)\d+\.\d+\.\d+/g')"
-          echo "::set-output name=commit-message::$(git log -1 --pretty=%B --author="AlphabizTeam" | perl -wnE'say for /\d{8,12}-\w+/g')"
-          echo "::set-output name=commit-date::$(git log -1 --pretty=%B --author="AlphabizTeam" | perl -wnE'say for /\d{8,12}/g')"
+          echo "::set-output name=commit-version::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /(?<=v)\d+\.\d+\.\d+/g')"
+          echo "::set-output name=commit-message::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /\d{8,12}-\w+/g')"
+          echo "::set-output name=commit-date::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /\d{8,12}/g')"
           echo "::set-output name=date::$(git log -1 --date=format:'%Y%m%d%H%M' --format='%cd')"
         shell: bash
 
@@ -157,9 +157,9 @@ jobs:
         id: vars
         run: |
           git fetch --prune --unshallow
-          echo "::set-output name=commit-version::$(git log -1 --pretty=%B --author="AlphabizTeam" | perl -wnE'say for /(?<=v)\d+\.\d+\.\d+/g')"
-          echo "::set-output name=commit-message::$(git log -1 --pretty=%B --author="AlphabizTeam" | perl -wnE'say for /\d{8,12}-\w+/g')"
-          echo "::set-output name=commit-date::$(git log -1 --pretty=%B --author="AlphabizTeam" | perl -wnE'say for /\d{8,12}/g')"
+          echo "::set-output name=commit-version::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /(?<=v)\d+\.\d+\.\d+/g')"
+          echo "::set-output name=commit-message::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /\d{8,12}-\w+/g')"
+          echo "::set-output name=commit-date::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /\d{8,12}/g')"
           echo "::set-output name=date::$(git log -1 --date=format:'%Y%m%d%H%M' --format='%cd')"
         shell: bash
 

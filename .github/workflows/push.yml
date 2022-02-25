@@ -66,18 +66,18 @@ jobs:
         id: vars
         run: |
           git fetch --prune --unshallow
-          echo "::set-output name=commit::$(git log -1 --pretty=%B --author="AlphabizTeam")"
-          echo "::set-output name=commit-version::$(git log -1 --pretty=%B --author="AlphabizTeam" | perl -wnE'say for /(?<=v)\d+\.\d+\.\d+/g')"
-          echo "::set-output name=commit-date::$(git log -1 --pretty=%B --author="AlphabizTeam" | perl -wnE'say for /(?<=-)\d{8,12}(?=-)/g')"
-          echo "::set-output name=commit-message::$(git log -1 --pretty=%B --author="AlphabizTeam" | perl -wnE'say for /\d{8,12}-\w+/g')"
-          echo "::set-output name=date::$(git log -1 --date=format:'%Y%m%d' --author="AlphabizTeam" --format='%cd')"
+          echo "::set-output name=commit::$(git log -1 --pretty=%B --author="Alphabiz-Team")"
+          echo "::set-output name=commit-version::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /(?<=v)\d+\.\d+\.\d+/g')"
+          echo "::set-output name=commit-date::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /(?<=-)\d{8,12}(?=-)/g')"
+          echo "::set-output name=commit-message::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /\d{8,12}-\w+/g')"
+          echo "::set-output name=date::$(git log -1 --date=format:'%Y%m%d' --author="Alphabiz-Team" --format='%cd')"
           echo "::set-output name=tag::$(git describe --abbrev=0 --tags)"
           echo "::set-output name=current-hour::$(date +'%H')"
-          echo "::set-output name=release-date::$(git log -1 --date=format:'%Y-%m-%d' --format='%cd' --author="AlphabizTeam")"
+          echo "::set-output name=release-date::$(git log -1 --date=format:'%Y-%m-%d' --format='%cd' --author="Alphabiz-Team")"
         shell: bash
 
-      # 获取所以今天 作者为AlphabizTeam的commit message,正则:不匹配'[-]符号'前面的任意字符、不匹配空行
-      # export DESCRIBE=$(git log --reverse --after="${{ steps.vars.outputs.release-date }} 00:00" --before="${{ steps.vars.outputs.release-date }} 23:59" --author="AlphabizTeam" --pretty='format:%B' | perl -wnE'say for /(?!.*-)(?!\s).*\w+$/gm')
+      # 获取所以今天 作者为Alphabiz-Team的commit message,正则:不匹配'[-]符号'前面的任意字符、不匹配空行
+      # export DESCRIBE=$(git log --reverse --after="${{ steps.vars.outputs.release-date }} 00:00" --before="${{ steps.vars.outputs.release-date }} 23:59" --author="Alphabiz-Team" --pretty='format:%B' | perl -wnE'say for /(?!.*-)(?!\s).*\w+$/gm')
       - name: Get today all commit message
         run: |
           export DESCRIBE=$(cat test/github-describe/github-describe.txt)
