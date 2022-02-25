@@ -5,3 +5,5 @@ Update nightly.yml
 Add user-email and  Better Look user-name
 fix #187
 rerun internal.yml
+fix make error,test make in ubuntu
+fix tag name、retry release
