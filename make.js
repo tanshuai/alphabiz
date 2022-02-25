@@ -1,9 +1,7 @@
 const { exec, execSync } = require('child_process')
 const { existsSync, copyFileSync, mkdirSync, unlinkSync } = require('fs')
 const { resolve } = require('path')
-const { version: pkgVersion } = require('./package.json')
-let { productName } = require('./package.json')
-productName = productName.toLocaleLowerCase()
+const { version: pkgVersion, productName } = require('./package.json')
 const readline = require('readline')
 const { copySync } = require('fs-extra')
 
@@ -73,7 +71,7 @@ const doPostmake = () => {
   const toMoves = []
   if (platform === 'win32') {
     const wixDir = resolve(outDir, `wix/${arch}`)
-    toMoves.push([resolve(wixDir, `${productName}.msi`), resolve(destDir, `${productName}-${version}.msi`)])
+    toMoves.push([resolve(wixDir, `${productName}.msi`), resolve(destDir, `${productName.toLowerCase()}-${version}.msi`)])
     const squirrelDir = resolve(outDir, `squirrel.windows/${arch}`)
     const files = [
       `${productName}-${pkgVersion} Setup.exe`,
@@ -82,19 +80,19 @@ const doPostmake = () => {
       'RELEASES'
     ]
     files.forEach(file => {
-      toMoves.push([resolve(squirrelDir, file), resolve(destDir, file.replace(' Setup', '').replace('-full', '').replace('-delta', '').replace(pkgVersion, version))])
+      toMoves.push([resolve(squirrelDir, file), resolve(destDir, file.replace(' Setup', '').replace(`${productName}`, `${productName.toLowerCase()}`).replace('-full', '').replace('-delta', '').replace(pkgVersion, version))])
     })
   } else if (platform === 'darwin') {
     // move darwin installers
     toMoves.push([
       resolve(outDir, `${productName}.dmg`),
-      resolve(destDir, `${productName}-${version}.dmg`)
+      resolve(destDir, `${productName.toLowerCase()}-${version}.dmg`)
     ])
   } else if (platform === 'linux') {
     // move linux installers
     toMoves.push([
       resolve(outDir, `deb/${arch}/${productName.toLowerCase()}_${pkgVersion}_${arch === 'x64' ? 'amd64' : arch}.deb`),
-      resolve(destDir, `${productName}-${version}.deb`)
+      resolve(destDir, `${productName.toLowerCase()}-${version}.deb`)
     ])
   }
   for (const [src, tar] of toMoves) {
