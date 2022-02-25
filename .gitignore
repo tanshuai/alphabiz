@@ -109,3 +109,4 @@ test-results/
 playwright-report/
 test/download/**
 test/output/**
+.DS_Store
