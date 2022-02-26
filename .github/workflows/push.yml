@@ -121,15 +121,17 @@ jobs:
         if: contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
           content=`cat ./release.json`
+          content="${content//'%'/'%25'}"
+          if [[ ${{ matrix.os }} = "macos-latest" ]] ; \
+          then content="${content//$'\n'/%0A}" ; \
+          else content="${content//$'\n'/'%0A'}" ; \
+          fi
+          content="${content//$'\r'/'%0D'}"
           echo "::set-output name=releaseJson::$content"
           echo "RELEASE_JSON<<EOF" >> $GITHUB_ENV
           echo "$content" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
         shell: bash
-
-        # content="${content//'%'/'%25'}"
-        # content="${content//$'\n'/'%0A'}"
-        # content="${content//$'\r'/'%0D'}"
 
       - name: Checkout release.json property
         if: contains(env.MODIFIED_FILE_LIST, 'release.json')
