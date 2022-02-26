@@ -1,19 +1,6 @@
-Add more versions information for developer mode
-Quasar, Vue & full platform info
-fix paste error in inputs
-Update nightly.yml
-Add user-email and  Better Look user-name
-fix #187
-rerun internal.yml
-fix make error,test make in ubuntu
-resolve #178
-fix: reload webtorrent window not init with maxTasks
-resolve #176
-use rAF instead of setTimeout
-fix tag name、retry release
-checkout download test in ci
-Update README.md
-run download test in ci
-disable devtools in stable production mode #175
-use requestAnimationFrame to update task list
-prompt dialog when user leave setting without save, resolve #177
+I18N folder Modified
+Reformat commit message
+disable devtools in production mode, add more info for torrent error, resolve #175
+Try to share paths, branches w/ both push & pull_request
+Disable pull_request triggers
+Share paths, branches w/ both on push & pull_request
