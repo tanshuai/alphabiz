@@ -8,13 +8,12 @@ on:
   schedule:
     - cron: "00 12 * * *"
   push:
+  pull_request:
     paths:
       - "**.js"
       - "**/push.yml"
       - "build/**"
       - "release.json"
-    branches: [main]
-  pull_request:
     branches: [main]
 #
 jobs:
