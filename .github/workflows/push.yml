@@ -158,6 +158,7 @@ jobs:
                 echo "commit-sha7: ${{ steps.nightly.outputs.commit-sha7 }}" ; \
                 echo "commit-message: ${{ steps.nightly.outputs.commit-message }}" ; \
           fi
+        shell: bash
 
       - name: Checkout release.json target tag
         if: contains(env.MODIFIED_FILE_LIST, 'release.json')
