@@ -55,18 +55,21 @@ test.afterAll(async () => {
 })
 
 test('close set default', async () => {
-  await window.waitForLoadState()
-  await sleep(2000)
-  const notification = await window.locator('.q-notification__message >> text=Alphabiz is not')
-  if (await notification.isVisible()) {
-    const alert = await notification.innerText()
-    console.log(alert)
-    const targetAlert = 'DON\'T SHOW AGAIN'
-    console.log(targetAlert)
-    if (/Alphabiz is not your default app for torrent and media/.test(alert)) {
-      await window.click('text=DON\'T SHOW AGAIN')
-    }
+  try {
+    await window.waitForSelector('text=Alphabiz is not your default app for', { timeout: 3000 })
+    await window.click('text=SHOW AGAIN')
+    console.log('dont show again')
     await notification.waitFor('hidden')
+  } catch (error) {
+  }
+})
+
+test('close auto update', async () => {
+  try {
+    await window.waitForSelector('text=UPDATE LATER', { timeout: 15000 })
+    await window.click('text=UPDATE LATER')
+    console.log('update later')
+  } catch (error) {
   }
 })
 
@@ -121,14 +124,6 @@ test.describe('play video', () => {
     const progressControl = await window.locator('.vjs-progress-control')
     await expect(progressControl).toBeVisible()
   })
-})
-test('close auto update', async () => {
-  await window.waitForLoadState()
-  await sleep(2000)
-  const unpdateLaterBtn = await window.locator('text=UPDATE LATER')
-  if (await unpdateLaterBtn.isVisible()) {
-    await unpdateLaterBtn.click()
-  }
 })
 test.describe('download ', () => {
   const btData = [
