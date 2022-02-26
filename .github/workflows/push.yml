@@ -100,22 +100,9 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
         shell: bash
 
-      - name: Checkout vars-date ${{ steps.vars.outputs.date }} ⬇️
-        run: |
-          echo "system: ${{ steps.vars.outputs.system }}"
-          echo "commit: ${{ steps.vars.outputs.commit }}"
-          echo "commit-version: ${{ steps.vars.outputs.commit-version }}"
-          echo "commit-date: ${{ steps.vars.outputs.commit-date }}"
-          echo "commit-sha7: ${{ steps.vars.outputs.commit-sha7 }}"
-          echo "commit-message: ${{ steps.vars.outputs.commit-message }}"
-          echo "${{ steps.vars.outputs.date }}"
-          echo "${{ steps.vars.outputs.tag }}"
-          echo "current-hour: ${{ steps.vars.outputs.current-hour }}"
-          echo "----------------------"
-          echo "MODIFIED_FILE_LIST: ${{ env.MODIFIED_FILE_LIST }}"
-          echo "----------------------"
-          echo "${{ env.DESCRIBE }}"
-
+      # if official release, run this step
+      # because json file Multiline
+      # need convert to a single line,then get property use fromJson().property
       - name: Get release.json property
         id: release
         if: contains(env.MODIFIED_FILE_LIST, 'release.json')
@@ -132,6 +119,38 @@ jobs:
           echo "$content" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
         shell: bash
+
+      # This step for unify the tag name
+      # nightly-release use tag_name: $packageJsonVersion-internal/nightly-$dateTime-$commitId
+      # official-release use tag_name: ./release.json property new-tag-name
+      - name: Unified Tag format
+        id: unify
+        run: |
+          if [[ ${{ steps.release.outputs.releaseJson }} ]] ; \
+          then echo "::set-output name=tag-name::${{ fromJson(steps.release.outputs.releaseJson).new-tag-name }}" \
+                    "::set-output name=release-name::${{ fromJson(steps.release.outputs.releaseJson).new-tag-name }}" ; \
+          else echo "::set-output name=tag-name::${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}" \
+                    "::set-output name=release-name::${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-sha7 }}" ;  \
+          fi
+        shell: bash
+
+      # this step checkout all output
+      - name: Checkout vars-date ${{ steps.vars.outputs.date }} ⬇️
+        run: |
+          echo "system: ${{ steps.vars.outputs.system }}"
+          echo "commit: ${{ steps.vars.outputs.commit }}"
+          echo "commit-version: ${{ steps.vars.outputs.commit-version }}"
+          echo "commit-date: ${{ steps.vars.outputs.commit-date }}"
+          echo "commit-sha7: ${{ steps.vars.outputs.commit-sha7 }}"
+          echo "commit-message: ${{ steps.vars.outputs.commit-message }}"
+          echo "${{ steps.vars.outputs.date }}"
+          echo "${{ steps.vars.outputs.tag }}"
+          echo "current-hour: ${{ steps.vars.outputs.current-hour }}"
+          echo "----------------------"
+          echo "MODIFIED_FILE_LIST: ${{ env.MODIFIED_FILE_LIST }}"
+          echo "----------------------"
+          echo "${{ steps.unify.outputs.tag-name }}"
+          echo "${{ steps.unify.outputs.release-name }}"
 
       - name: Checkout release.json property
         if: contains(env.MODIFIED_FILE_LIST, 'release.json')

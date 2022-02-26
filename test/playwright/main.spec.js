@@ -56,7 +56,7 @@ test.afterAll(async () => {
 
 test('close set default', async () => {
   await window.waitForLoadState()
-  await sleep(1000)
+  await sleep(2000)
   const notification = await window.locator('.q-notification__message >> text=Alphabiz is not')
   if (await notification.isVisible()) {
     const alert = await notification.innerText()
@@ -69,6 +69,7 @@ test('close set default', async () => {
     await notification.waitFor('hidden')
   }
 })
+
 test('reset torrent status', async () => {
   await window.waitForLoadState()
   await commands.jumpPage('downloadingStatus')
@@ -121,7 +122,14 @@ test.describe('play video', () => {
     await expect(progressControl).toBeVisible()
   })
 })
-
+test('close auto update', async () => {
+  await window.waitForLoadState()
+  await sleep(2000)
+  const unpdateLaterBtn = await window.locator('text=UPDATE LATER')
+  if (await unpdateLaterBtn.isVisible()) {
+    await unpdateLaterBtn.click()
+  }
+})
 test.describe('download ', () => {
   const btData = [
     {
