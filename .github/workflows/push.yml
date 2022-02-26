@@ -113,6 +113,8 @@ jobs:
           echo "current-hour: ${{ steps.vars.outputs.current-hour }}"
           echo "----------------------"
           echo "MODIFIED_FILE_LIST: ${{ env.MODIFIED_FILE_LIST }}"
+          echo "----------------------"
+          echo "${{ env.$DESCRIBE }}"
 
       - name: Get release.json property
         id: release
@@ -131,8 +133,8 @@ jobs:
       - name: Checkout release.json property
         if: contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
-          echo "target-tag-name: ${{fromJson(steps.set_var.outputs.releaseJson).target-tag-name}}"
-          echo "new-tag-name: ${{fromJson(steps.set_var.outputs.releaseJson).new-tag-name}}"
+          echo "target-tag-name: ${{fromJson(steps.release.outputs.releaseJson).target-tag-name}}"
+          echo "new-tag-name: ${{fromJson(steps.release.outputs.releaseJson).new-tag-name}}"
           echo "--------------------------"
           echo "${{ env.RELEASE_JSON }}"
 
