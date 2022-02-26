@@ -12,7 +12,7 @@ on:
       - "**.js"
       - "!**/push.yml"
       - "build/**"
-      - "release.json"
+      - "./release.json"
     branches: [main]
   pull_request:
     branches: [main]
