@@ -59,8 +59,8 @@ test('close set default', async () => {
     await window.waitForSelector('text=Alphabiz is not your default app for', { timeout: 3000 })
     await window.click('text=SHOW AGAIN')
     console.log('dont show again')
-    await notification.waitFor('hidden')
   } catch (error) {
+    console.log('no wait for btn[dont show again]')
   }
 })
 
@@ -70,6 +70,7 @@ test('close auto update', async () => {
     await window.click('text=UPDATE LATER')
     console.log('update later')
   } catch (error) {
+    console.log('no wait for btn[update later]')
   }
 })
 
