@@ -60,6 +60,8 @@ test('window has correct title', async () => {
   expect(title).toContain('Alphabiz')
 })
 test('close set default', async () => {
+  await window.waitForLoadState()
+  await sleep(1000)
   const notification = await window.locator('.q-notification__message >> text=Alphabiz is not')
   if (await notification.isVisible()) {
     const alert = await notification.innerText()
@@ -129,12 +131,15 @@ test.describe('download ', () => {
     {
       btName: 'uTorrent Web Tutorial Video',
       magnetLink: 'magnet:?xt=urn:btih:61b3b8856c4839edf51f5c2346599b6bec524145',
+      isStreaming: 0,
       isDelete: 0,
       fileType: 'folder'
     },
     {
       btName: 'The WIRED CD - Rip. Sample. Mash. Share',
-      magnetLink: 'magnet:?xt=urn:btih:a88fda5954e89178c372716a6a78b8180ed4dad3&dn=The+WIRED+CD+-+Rip.+Sample.+Mash.+Share&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&ws=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2F',
+      magnetLink: 'alphabiz://The+WIRED+CD+-+Rip.+Sample.+Mash.+Share/AaiP2llU6JF4w3Jxamp4uBgO1NrT&_Td6WFoAAAFpIt42AgAhARwAAAAQz1jM4AQ2AZRdABhgxG8IY8MSV1K_VKsx55jv8ahwgTX5jKB2up6HR8eDRb6BvCkztx6mgEb++b2k0T1kLtZV_Z3BAncfL9IZEXrCc2i3lZ1gwntqOdl5Y6U4ITwioxtrEFVVqgnT7fNc84aa4e4nbkoHiGnrIyjqiDO6Th6ghL6fgab+SzF6QoLdOc_CzeSlbolwRBY6XVrJDoXv0R2cuLjOd2K0fNlkoov1603Ml_lh_5EboBPwH+OOmSVNhU2VlV8_JhxjvAyuSH2BztiDRz1bVFkIdjxPR234SGYsuJpslus1CEnVW+bjTYwN6URFizlYFNVAeUEyN6RuAJBa8Zr5R9rTZj8ZZt9oSUK2igP7XtUePDYebMj3TjlP1dIp+i_HBQOtJ+Yd4zFcLi1aeQteo2DP694kshUMvyLM1ZBS6FdnwVLNCGFZ_TEBIhR73Nm2DXdas086dQFXAEOmjwprTaPyWwRqVrEXn9uuWDFUe8TbJYK6hQbfFdTCM8Mq4dNnAQqcepFfmbE4PAd+m7zOGXFARinVN+L_ZK16ADAA4uMAAawDtwgAAANYnWQ+MA2LAgAAAAABWVo=',
+      testName: 'alphabiz- ',
+      isStreaming: 0,
       isDelete: 0,
       fileType: 'folder'
     },
@@ -147,21 +152,15 @@ test.describe('download ', () => {
     {
       btName: 'bbb_sunflower_1080p_30fps_normal.mp4',
       magnetLink: 'alphabiz://bbb_sunflower_1080p_30fps_normal.mp4/AYhZSqrL3kDvPiUQxHN07AqjlsCO&_Td6WFoAAAFpIt42AgAhARwAAAAQz1jM4AMtAW1dABhgxG8IY8MSV1K_VKsx55jv8ahwgTX5jKB2up6HR8eDRb6BvCkztx6mgEb++b2O2b3K3oD_twGGSig+KBe78TiXxGleWSnbRlWB69ZvfD70oiEhlTlty+AtgRrH+kzx7fD910Bx9Uf4_7Js+dNII8l3GxJ4B175xFepPURPh6AnWzB9cVwPtgxmF4hSxh7Z_thhoZBH4KP2yrr9bIPbiBIfR4rnRGgQhoMYOe1vRpDVUFDC_y_tNp17fwwfvvvAj5elliGbJODzL4qEq_HB_lUhXHCZDoPbg1kCa8TfDkYL+2wWqViHW5YjR6DIxnlf8AAswdMmYa5OLaHRfCaqLtreJ_iohdSxAp2rckxS001Zp7ra+N_aIUxh9H3a96O2YBfWo_2PdmbBhT1A8s20u6d9cVtOTDvkpvOb8aiGcUn+swScBUm1SBP2DgoZJ6zeNvQcBQ9WKwD51ImdTrOxf2ShB64iMvUV0iO_3x3WAAAAAJcI4UEAAYUDrgYAAOI5sWM+MA2LAgAAAAABWVo=',
-      testName: 'alphabiz- ',
+      testName: 'Streaming alphabiz- ',
+      isStreaming: 1,
       isDelete: 0,
       fileType: 'video_file'
     },
     {
-      btName: 'sintel.mp4',
-      isStreaming: 1,
-      testName: 'Streaming ',
-      magnetLink: 'magnet:?xt=urn:btih:6a9759bffd5c0af65319979fb7832189f4f3c35d&dn=sintel.mp4&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&ws=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2Fsintel-1024-surround.mp4',
-      isDelete: 0
-    },
-    {
-      btName: 'sintel.mp4',
+      btName: 'bbb_sunflower_1080p_30fps_normal.mp4',
+      magnetLink: 'alphabiz://bbb_sunflower_1080p_30fps_normal.mp4/AYhZSqrL3kDvPiUQxHN07AqjlsCO&_Td6WFoAAAFpIt42AgAhARwAAAAQz1jM4AMtAW1dABhgxG8IY8MSV1K_VKsx55jv8ahwgTX5jKB2up6HR8eDRb6BvCkztx6mgEb++b2O2b3K3oD_twGGSig+KBe78TiXxGleWSnbRlWB69ZvfD70oiEhlTlty+AtgRrH+kzx7fD910Bx9Uf4_7Js+dNII8l3GxJ4B175xFepPURPh6AnWzB9cVwPtgxmF4hSxh7Z_thhoZBH4KP2yrr9bIPbiBIfR4rnRGgQhoMYOe1vRpDVUFDC_y_tNp17fwwfvvvAj5elliGbJODzL4qEq_HB_lUhXHCZDoPbg1kCa8TfDkYL+2wWqViHW5YjR6DIxnlf8AAswdMmYa5OLaHRfCaqLtreJ_iohdSxAp2rckxS001Zp7ra+N_aIUxh9H3a96O2YBfWo_2PdmbBhT1A8s20u6d9cVtOTDvkpvOb8aiGcUn+swScBUm1SBP2DgoZJ6zeNvQcBQ9WKwD51ImdTrOxf2ShB64iMvUV0iO_3x3WAAAAAJcI4UEAAYUDrgYAAOI5sWM+MA2LAgAAAAABWVo=',
       isStreaming: 0,
-      magnetLink: 'magnet:?xt=urn:btih:6a9759bffd5c0af65319979fb7832189f4f3c35d&dn=sintel.mp4&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&ws=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2Fsintel-1024-surround.mp4',
       isDelete: 0,
       fileType: 'video_file'
     }
@@ -171,8 +170,6 @@ test.describe('download ', () => {
       if (btDate.btName === 'uTorrent Web Tutorial Video') {
         test.setTimeout(60000 * 5)
       } else if (btDate.btName === 'The WIRED CD - Rip. Sample. Mash. Share') {
-        test.setTimeout(60000 * 10)
-      } else if (btDate.btName === 'sintel.mp4') {
         test.setTimeout(60000 * 10)
       } else if (btDate.btName === 'bbb_sunflower_1080p_30fps_normal.mp4') {
         test.setTimeout(60000 * 15)
@@ -188,8 +185,8 @@ test.describe('download ', () => {
       if (await window.$(btCard) == null) {
         await window.waitForTimeout(2000)
       }
-      // download sintel.mp4 下载中状态多等一会
-      if (btDate.btName === 'sintel.mp4' && btDate.isStreaming === 0) {
+      // download bbb_sunflower_1080p_30fps_normal.mp4 下载中状态多等一会
+      if (btDate.btName === 'bbb_sunflower_1080p_30fps_normal.mp4' && btDate.isStreaming === 0) {
         let waitTime = 0
         while (1) {
           if (await window.$(btCard) == null) {
@@ -251,8 +248,8 @@ test.describe('download ', () => {
           } else if (oldProgress < progressPercentage) timestamp = 0
 
           oldProgress = progressPercentage
-          if (btDate.btName === 'sintel.mp4' && btDate.isStreaming) {
-            if (progressPercentage > 30) break
+          if (btDate.isStreaming) {
+            if (progressPercentage > 20) break
           }
           if (progressPercentage === 100) break
 
@@ -279,18 +276,21 @@ test.describe('download ', () => {
       }
     })
   }
-  test.skip('table mode task lists', async () => {
+  test('table mode task lists', async () => {
     // 确保下载的全部种子都在做种状态
     // await commands.jumpPage('downloadedStatus')
 
     await commands.jumpPage('uploadingStatus')
     // 切换列表模式
-    await window.click('button[role="button"]:has-text("view_agenda")')
+    const listMode = await window.locator('button[role="button"]:has-text("view_agenda")')
+    if (await listMode.isVisible()) {
+      await listMode.click()
+    }
     // 验证文件类型图标
     await sleep(2000)
     // 截图验证
     await window.screenshot({ path: `${ScreenshotsPath}taskStatus.png` })
-    const bbbFileIcon = await window.locator('text=sintel.mp4 >> //preceding::*[1]').innerText()
+    const bbbFileIcon = await window.locator('text=bbb_sunflower_1080p_30fps_normal.mp4 >> //preceding::*[1]').innerText()
     expect(bbbFileIcon).toBe('video_file')
     const uTorrentFileIcon = await window.locator('text=uTorrent Web >> //preceding::*[1]').innerText()
     expect(uTorrentFileIcon).toBe('folder')
@@ -342,7 +342,7 @@ test.describe('download ', () => {
     await window.click('text=content_copy')
 
     // "更多"功能检查文件路径
-    const filePathElement = await window.locator('text=Files: >> //following::*[4]')
+    const filePathElement = await window.locator('text=play_arrowfolder')
     const filePathText = await filePathElement.innerText()
     const filePath = path.resolve(__dirname, '../download')
     // 字符串路径转为正则表达式
@@ -352,7 +352,9 @@ test.describe('download ', () => {
       else filePathReg += char
     }
     const reg = new RegExp(filePathReg + '\\\\The WIRED CD')
-    console.log('filePathText:' + filePathText)
+    expect(reg.test(filePathText)).toBe(true)
+    // console.log('reg:' + reg)
+    // console.log('filePathText:' + filePathText)
     // expect(reg.test(filePathText)).toBe(true)
     // 检查文件夹树状结构
     await filePathElement.click()
@@ -384,7 +386,7 @@ test.describe('download ', () => {
     await commands.downloadBtn.click()
     await sleep(1000)
     const magnetText = await window.locator('//*[@aria-label="Download directory position"]/preceding::*[1]').inputValue()
-    console.log('magnetText:' + magnetText)
+    // console.log('magnetText:' + magnetText)
     expect(/alphabiz:\/\/The\+WIRED\+CD/.test(magnetText)).toBe(true)
     await window.click('button[role="button"]:has-text("Cancel")')
     await sleep(1000)

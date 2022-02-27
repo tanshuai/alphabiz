@@ -15,11 +15,12 @@ describe('Landing', () => {
     cy.title().should('include', 'Alphabiz')
   })
   it('.should() - has version number with x.x.x format', () => {
-    cy.get('#version').contains(/^v\d+\.\d+\.\d+$/)
+    cy.get('#version').contains(/^v\d+\.\d+\.\d+/)
   })
   it('.should() - has correct version number', () => {
     cy.readFile('package.json').then((text) => {
-      cy.get('#version').should('have.text', 'v' + text.version)
+      const regex = new RegExp(`^v${text.version}`)
+      cy.get('#version').contains(regex)
     })
   })
   it.skip('.should() - has correct git commit id', () => {

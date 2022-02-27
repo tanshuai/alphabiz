@@ -2,8 +2,7 @@ const package = require('./package.json')
 const fs = require('fs')
 const { resolve } = require('path')
 const { default: rebuild } = require('electron-rebuild')
-const bVersion = require('./package.json').version
-const buildVersion = process.env.BUILD_VERSION || bVersion
+
 const { name, version, description, author, productName } = package
 
 // The .deb package requires a .desktop template, see here:
@@ -23,6 +22,7 @@ StartupNotify=true
 <% } %><% if (mimeType && mimeType.length) { %>MimeType=<%= mimeType.join(';') %>;
 <% } %>
 `)
+
 module.exports = {
   hooks: {
     packageAfterPrune: (conf, buildPath, electronVersion, platform, arch, callback) => {
@@ -91,6 +91,101 @@ module.exports = {
       electronPath: resolve(__dirname, 'node_modules/@zeeis/velectron/dist')
     }]
   ],
-  publishers: [],
-  buildIdentifier: 'Alphabiz'
+  makers: [
+    {
+      name: "@electron-forge/maker-squirrel",
+      config: {
+        name: productName,
+        productName,
+        author,
+        description,
+        version,
+        iconUrl: resolve(__dirname, 'public/favicon.ico'),
+        setupIcon: resolve(__dirname, 'public/favicon.ico'),
+        loadingGif: resolve(__dirname, 'public/platform-assets/windows/splash/InstallSplash.gif'),
+      }
+    },
+    {
+      name: '@electron-forge/maker-dmg',
+      config: {
+        name: productName,
+        title: `${productName}-${version} Setup`,
+        icon: resolve(__dirname, 'public/platform-assets/mac/volume-icon.icns'),
+        iconSize: 96,
+        overwrite: true,
+        background: resolve(__dirname, 'public/platform-assets/mac/background.png'),
+        contents: [
+          { x: 460, y: 256, type: 'link', path: '/Applications' },
+          { x: 200, y: 256, type: 'file', path: resolve(__dirname, 'out/Alphabiz-darwin-x64/Alphabiz.app') }
+        ]
+      }
+    },
+    // {
+    //   name: "@electron-forge/maker-zip",
+    //   platforms: [
+    //     "darwin"
+    //   ]
+    // },
+    {
+      name: "@electron-forge/maker-deb",
+      config: {
+        name: productName,
+        bin: productName,
+        genericName: productName,
+        categories: ['AudioVideo', 'Network', 'Utility'],
+        description,
+        productDescription: description,
+        version,
+        homepage: 'https://alpha.biz',
+        icon: resolve(__dirname, 'public/platform-assets/linux/512x512.png'),
+        mantainer: author,
+        // TODO: add file associations here
+        mimeType: ['audio/*', 'video/mp4', 'video/*', 'application/x-bittorrent'],
+        desktopTemplate: debDesktopTemplate
+      }
+    },
+    // {
+    //   name: "@electron-forge/maker-rpm",
+    //   config: {}
+    // },
+    {
+      name: "@electron-forge/maker-wix",
+      config: {
+        name: productName,
+        shortName: productName,
+        arch: 'x64',
+        description,
+        exe: productName,
+        manufacturer: 'Alphabiz Team',
+        shortcutFolderName: '',
+        programFilesFolderName: productName,
+        appIconPath: resolve(__dirname, 'public/platform-assets/windows/icon.ico'),
+        version,
+        ui: {
+          chooseDirectory: true,
+          images: {
+            background: resolve(__dirname, 'public/platform-assets/windows/splash/background_493x312.png'),
+            banner: resolve(__dirname, 'public/platform-assets/windows/splash/banner_493x58.png'),
+            exclamationIcon: resolve(__dirname, 'public/icons/favicon-32x32.png'),
+            infoIcon: resolve(__dirname, 'public/icons/favicon-32x32.png'),
+            newIcon: resolve(__dirname, 'public/icons/favicon-16x16.png'),
+            upIcon: resolve(__dirname, 'public/icons/favicon-16x16.png')
+          }
+        },
+        beforeCreate (wix) {
+          // console.log(wix.wixTemplate || wix)
+          // Remove appName tail created by wix
+          if (wix.wixTemplate) {
+            console.log(wix.uiTemplate)
+            wix.uiTemplate = wix.uiTemplate
+              .replace('<DialogRef Id="MsiRMFilesInUse" />', '<!-- <DialogRef Id="MsiRMFilesInUse" /> -->')
+            wix.wixTemplate = wix.wixTemplate
+              .replace('"{{ApplicationName}} (Machine - MSI)"','"{{ApplicationName}}"')
+              .replace('"{{ApplicationName}} (Machine)"','"{{ApplicationName}}"')
+          }
+        }
+      }
+    }
+  ],
+  publishers: []
 }
