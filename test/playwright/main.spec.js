@@ -66,7 +66,7 @@ test('close set default', async () => {
 
 test('close auto update', async () => {
   try {
-    await window.waitForSelector('text=UPDATE LATER', { timeout: 15000 })
+    await window.waitForSelector('text=UPDATE LATER', { timeout: 5000 })
     await window.click('text=UPDATE LATER')
     console.log('update later')
   } catch (error) {
@@ -103,7 +103,7 @@ test('reset torrent status', async () => {
 
 test.describe('play video', () => {
   test('avi_type', async () => {
-    const media = './test/samples/GoneNutty.avi'
+    const media = './test/cypress/fixtures/samples/GoneNutty.avi'
 
     await window.waitForLoadState()
     await commands.jumpPage('playerLink')
@@ -115,7 +115,7 @@ test.describe('play video', () => {
     await expect(progressControl).toBeVisible()
   })
   test('BluRay_mkv_type', async () => {
-    const media = './test/samples/Test-Sample-Tenet.2020.IMAX.2160p.UHD.BluRay.x265.10bit.HDR.DTS-HD.MA.5.1202111171122322.mkv'
+    const media = './test/cypress/fixtures/samples/Test-Sample-Tenet.2020.IMAX.2160p.UHD.BluRay.x265.10bit.HDR.DTS-HD.MA.5.1202111171122322.mkv'
 
     if (await window.$('[data-cy="file-input"]') === null) await commands.jumpPage('playerLink')
     // Upload

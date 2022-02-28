@@ -1,5 +1,5 @@
 /// <reference path="cypress" />
-/// <reference path="../support/index.d.ts" />
+/// <reference path="../../support/index.d.ts" />
 
 // Use `cy.dataCy` custom command for more robust tests
 // See https://docs.cypress.io/guides/references/best-practices.html#Selecting-Elements

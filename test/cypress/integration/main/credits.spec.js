@@ -1,5 +1,5 @@
 /// <reference path="cypress" />
-/// <reference path="../support/index.d.ts" />
+/// <reference path="../../support/index.d.ts" />
 ///
 let isSkip = false
 describe.skip('Credits', () => {
