@@ -55,7 +55,6 @@ test.afterAll(async () => {
 })
 
 test('close set default', async () => {
-  await window.click('div[role="toolbar"] button >> nth=1')
   try {
     await window.waitForSelector('text=Alphabiz is not your default app for', { timeout: 3000 })
     await window.click('text=SHOW AGAIN')
@@ -75,7 +74,7 @@ test('close auto update', async () => {
   }
 })
 
-test('reset torrent status', async () => {
+test.skip('reset torrent status', async () => {
   await window.waitForLoadState()
   await commands.jumpPage('downloadingStatus')
   if (await window.isEnabled('button:has-text("Remove all") >> nth=0')) {
@@ -167,7 +166,7 @@ test.describe('download ', () => {
     }
   ]
   for (const btDate of btData) {
-    test((btDate.testName ? btDate.testName : '') + btDate.btName, async () => {
+    test.skip((btDate.testName ? btDate.testName : '') + btDate.btName, async () => {
       if (btDate.btName === 'uTorrent Web Tutorial Video') {
         test.setTimeout(60000 * 5)
       } else if (btDate.btName === 'The WIRED CD - Rip. Sample. Mash. Share') {
@@ -277,7 +276,7 @@ test.describe('download ', () => {
       }
     })
   }
-test('table mode task lists', async () => {
+test.skip('table mode task lists', async () => {
     // 确保下载的全部种子都在做种状态
     // await commands.jumpPage('downloadedStatus')
 

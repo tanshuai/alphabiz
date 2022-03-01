@@ -49,13 +49,6 @@ jobs:
           echo "::set-output name=sha7::${GITHUB_SHA::7}"
         shell: bash
 
-      - name: screen resolution
-        run: |
-          system_profiler SPDisplaysDataType | grep Resolution
-          "/Library/Application Support/VMware Tools/vmware-resolutionSet" 2560 1440
-          system_profiler SPDisplaysDataType | grep Resolution
-        shell: bash
-
       - name: Checkout ${{ steps.slug.outputs.sha7 }} ⬇️
         uses: actions/checkout@v2
 
@@ -148,6 +141,7 @@ jobs:
       # this step checkout all output
       - name: Checkout vars-date ${{ steps.vars.outputs.date }} ⬇️
         run: |
+          echo "event_name: ${{ github.event_name }}"
           echo "system: ${{ steps.vars.outputs.system }}"
           echo "run workflow date: ${{ steps.vars.outputs.date }}"
           echo "current-hour: ${{ steps.vars.outputs.current-hour }}"
