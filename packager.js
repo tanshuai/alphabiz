@@ -8,6 +8,20 @@ const buildVersion = process.env.BUILD_VERSION || version
 const packagePath = path.resolve(__dirname, './package.json')
 const package = fs.readFileSync(packagePath)
 console.log(path.resolve(__dirname, 'alphabiz-icon-1024.png'))
+
+const beforeBuild = async () => {
+  console.log('run beforeBuild')
+  const pkg = JSON.parse(package)
+  pkg.version = buildVersion
+  console.log('Build version:', pkg.version)
+  fs.writeFileSync(packagePath, JSON.stringify(pkg, null, 2))
+  process.on('exit', () => {
+    fs.writeFileSync(packagePath, package)
+    console.log('Restored package.json before exit')
+  })
+}
+
+beforeBuild ()
 packager({
   dir: './build/electron/UnPackaged',
   out: './build/electron',

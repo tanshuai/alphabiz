@@ -7,8 +7,8 @@ name: CI/CT for each push
 on:
   schedule:
     - cron: "00 12 * * *"
-  push:
   pull_request:
+  push:
     paths:
       - "**.js"
       - "!**/push.yml"
@@ -52,7 +52,7 @@ jobs:
       - name: Checkout ${{ steps.slug.outputs.sha7 }} ⬇️
         uses: actions/checkout@v2
 
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Setup Node.js ${{ matrix.node-version }} 📮
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
@@ -131,10 +131,10 @@ jobs:
           if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
           then echo "::set-output name=tag-name::${{ fromJson(steps.release.outputs.releaseJson).new-tag-name }}" ; \
                echo "::set-output name=release-name::${{ fromJson(steps.release.outputs.releaseJson).new-tag-name }}" ; \
-               echo "::set-output name=build-version::${{ fromJson(steps.release.outputs.releaseJson).new-tag-name }}" ; \
-          else echo "::set-output name=tag-name::${{ steps.nightly.outputs.commit-version }}-nightly-${{ steps.nightly.outputs.commit-message }}" ; \
+               echo "::set-output name=package-name::${{ fromJson(steps.release.outputs.releaseJson).new-tag-name }}" ; \
+          else echo "::set-output name=tag-name::${{ steps.nightly.outputs.commit-version }}-nightly-${{ steps.nightly.outputs.commit-date }}" ; \
                echo "::set-output name=release-name::${{ steps.nightly.outputs.commit-version }}-nightly-${{ steps.nightly.outputs.commit-sha7 }}" ;  \
-               echo "::set-output name=build-version::${{ steps.nightly.outputs.commit-version }}-nightly-${{ steps.nightly.outputs.commit-date }}" ; \
+               echo "::set-output name=package-name::${{ steps.nightly.outputs.commit-version }}-nightly-${{ steps.nightly.outputs.commit-date }}-${{ steps.nightly.outputs.commit-sha7 }}" ; \
           fi
         shell: bash
 
@@ -149,7 +149,7 @@ jobs:
           echo "----------------------"
           echo "tag-name: ${{ steps.unify.outputs.tag-name }}"
           echo "release-name: ${{ steps.unify.outputs.release-name }}"
-          echo "build-version: ${{ steps.unify.outputs.build-version }}"
+          echo "package-name: ${{ steps.unify.outputs.package-name }}"
           echo "----------------------"
           if ${{ contains(steps.vars.outputs.current-hour, '12') || contains(env.MODIFIED_FILE_LIST, 'release.json') }} ;\
           then  echo "commit: ${{ steps.nightly.outputs.commit }}" ; \
@@ -200,23 +200,23 @@ jobs:
       - name: Run electron-packager
         if: contains(steps.vars.outputs.current-hour, '12') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
-          export BUILD_VERSION=${{ steps.unify.outputs.build-version }}
+          export BUILD_VERSION=${{ steps.unify.outputs.tag-name }}
           yarn packager
         shell: bash
 
       - name: Package for ${{ matrix.os }}-nightly-${{ steps.nightly.outputs.commit-message }} Release 🗜️
         if: contains(steps.vars.outputs.current-hour, '12') || contains(env.MODIFIED_FILE_LIST, 'release.json')
-        run: 7z a -t7z -mx=9 alphabiz-${{ steps.unify.outputs.tag-name }}-${{ steps.vars.outputs.system }}.7z ./build/electron -xr!UnPackaged
+        run: 7z a -t7z -mx=9 alphabiz-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }}.7z ./build/electron -xr!UnPackaged
 
       - name: Pack app 📦
         if: contains(steps.vars.outputs.current-hour, '12') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
           export PATH=$PATH:/c/Program\ Files\ \(x86\)/WiX\ Toolset\ v3.11/bin
-          export BUILD_VERSION=${{ steps.unify.outputs.build-version }}
+          export BUILD_VERSION=${{ steps.unify.outputs.tag-name }}
           yarn make
         shell: bash
 
-      - name: Release alphabiz-${{ steps.unify.outputs.tag-name }}-${{ steps.vars.outputs.system }}.7z to GitHub 📰
+      - name: Release alphabiz-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }}.7z to GitHub 📰
         if: contains(steps.vars.outputs.current-hour, '12') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         uses: softprops/action-gh-release@v1
         with:
@@ -225,5 +225,5 @@ jobs:
           tag_name: ${{ steps.unify.outputs.tag-name }}
           body: ${{ env.DESCRIBE }}
           files: |
-            alphabiz-${{ steps.unify.outputs.tag-name }}-${{ steps.vars.outputs.system }}.7z
+            alphabiz-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }}.7z
             ./out/installers/${{ steps.unify.outputs.build-version }}/**
