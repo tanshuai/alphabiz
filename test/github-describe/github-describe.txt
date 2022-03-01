@@ -7,3 +7,7 @@ aboutDialog, leftDrawer adjustment
 test merge internal.yml
 fix .yml format error
 internal.yml skip shell
+improve sort feature
+add negative button marginLeft
+adjust internal.yml
+try fix Unexpected symbol error
