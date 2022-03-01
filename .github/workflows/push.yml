@@ -49,6 +49,12 @@ jobs:
           echo "::set-output name=sha7::${GITHUB_SHA::7}"
         shell: bash
 
+      - name: screen resolution
+        run: |
+          system_profiler SPDisplaysDataType | grep Resolution
+          "/Library/Application Support/VMware Tools/vmware-resolutionSet" 2560 1440
+          system_profiler SPDisplaysDataType | grep Resolution
+
       - name: Checkout ${{ steps.slug.outputs.sha7 }} ⬇️
         uses: actions/checkout@v2
 
