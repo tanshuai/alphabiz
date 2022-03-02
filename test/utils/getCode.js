@@ -1,25 +1,63 @@
 // require('dotenv').config()
 const simpleParser = require('mailparser').simpleParser
 var MailListener = require('mail-listener2')
-const client = require('twilio')(process.env.PHONE_NUMBER_ACCOUNT, process.env.PHONE_NUMBER_TOKEN)
+
 function sleep (ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
+
+/**
+ * @function datestring
+ * @description Get specified format date [mmm dd ,yyyy]
+ * @return { string } datestring
+ */
+function datestring () {
+  const d = new Date()
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  const datestring = months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear()
+  return datestring
+}
+
+/**
+ * @function makeid
+ * @description  Generate email - [random number]@message.to
+ * @param length
+ * @return { string } email
+ */
+function makeid (length) {
+  var result = ''
+  var characters = 'abcdefghijklmnopqrstuvwxyz0123456789'
+  var charactersLength = characters.length
+  for (var i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength))
+  }
+  // console.log(result + '@message.to')
+  return result + '@message.to'
+}
+
 // 获取email
 // type: 1  =>  subject:email Verification        =>  mail.html
 // type: 0  =>  subject:email Invitation          =>  mail.text
-function mailListener (type, time) {
+/**
+ * @function mailListener
+ * @description IMAP connect email get email text
+ * @param { string } type 1:verification code 0: invitation code
+ * @param { date } time Date()
+ * @param { string } to email TO
+ * @return { string } verification/invitation code
+ */
+function mailListener (type, time, to) {
   return new Promise((resolve, reject) => {
     var mailListener = new MailListener({
-      username: process.env.EMAIL_USERNAME,
-      password: process.env.EMAIL_PASSWORD,
-      host: 'imap.exmail.qq.com',
+      username: process.env.GOOGLE_EMAIL_USERNAME,
+      password: process.env.GOOGLE_EMAIL_PASSWORD,
+      host: 'imap.gmail.com',
       port: 993,
       tls: true,
       connTimeout: 10000, // Default by node-imap
       authTimeout: 10000, // Default by node-imap,
       debug: null, // Or your custom function with only one incoming argument. Default: null
-      tlsOptions: { rejectUnauthorized: false },
+      tlsOptions: { servername: 'imap.gmail.com' },
       mailbox: 'INBOX', // mailbox to monitor
       searchFilter: ['UNSEEN'], // the search filter being used after an IDLE notification has been retrieved
       markSeen: true
@@ -33,38 +71,56 @@ function mailListener (type, time) {
     // 连接开始时
     mailListener.on('server:connected', function () {
       // console.log('imapConnected')
-      mailListener.imap.search(['UNSEEN'], function (err, list) {
+      mailListener.imap.search([['SINCE', datestring()]], function (err, list) {
         if (err) throw err
-        console.log('list:' + list.reverse())
+        // console.log('list:' + list.reverse())
         if (list.length !== 0) {
-          if (type === 1) {
-            mailListener.imap.addFlags(list, '\\Seen', function (err) {
-              if (err) {
-                console.log('error marking message read/SEEN')
-              }
-            })
-          }
-          var f = mailListener.imap.fetch(list.reverse(), { bodies: '' })
+          // if (type === 1) {
+          //   mailListener.imap.addFlags(list, '\\Seen', function (err) {
+          //     if (err) {
+          //       console.log('error marking message read/SEEN')
+          //     }
+          //   })
+          // }
+          var f = mailListener.imap.fetch(list, { bodies: '' })
           f.on('message', function (msg, seqno) {
             msg.on('body', function (stream, info) {
               simpleParser(stream).then(mail => {
                 if (err) throw err
-                // 点击获取邮件 时间之后 收到的邮件
-                if (!type || Date.parse(time) < Date.parse(mail.date)) {
-                  // console.log('subject:' + mail.subject)
-                  // console.log('time:' + mail.date)
-                  // console.log('html:' + mail.html)
-                  // console.log('text:' + mail.text)
-                  const str = (type ? mail.html : mail.text)
-                  // (verification|invitation)
-                  const codeType = (type ? 'Verification' : 'invitation')
-                  const codeword = (type ? 'Code' : 'code')
-                  const reg = new RegExp('(?<=\\bYour\\s' + codeType + '\\s' + codeword + '\\sis\\s)\\w+\\b')
-                  const code = reg.exec(str)
-                  console.log('code:' + code)
-                  if (code) { // if code != null
-                    resolve(code[0])
-                    mailListener.stop()
+                // 判断email to
+                const emailto = mail.to
+                // console.log('connected targetTo:' + to)
+                // console.log('connected to:' + emailto.text)
+                if (emailto.text === to) {
+                  // console.log('this is targetTo')
+                  // 点击获取邮件 时间之后 收到的邮件
+                  if (!type || Date.parse(time) < Date.parse(mail.date)) {
+                  // const headers = mail.headers
+                  // headers.forEach(function (item) {
+                  //   console.log(item.toString())
+                  // })
+                    // const emailto = mail.to
+                    // console.log(emailto.text)
+                    // console.log('subject:' + mail.subject)
+                    // console.log('time:' + mail.date)
+                    // console.log('html:' + mail.html)
+                    // console.log('text:' + mail.text)
+                    const str = (type ? mail.html : mail.text)
+                    // (verification|invitation)
+                    const codeType = (type ? 'Verification' : 'invitation')
+                    const codeword = (type ? 'Code' : 'code')
+                    const reg = new RegExp('(?<=\\bYour\\s' + codeType + '\\s' + codeword + '\\sis\\s)\\w+\\b')
+                    const code = reg.exec(str)
+                    console.log('code:' + code)
+                    if (code) { // if code != null
+                      // mailListener.imap.addFlags('1195', '\\Seen', function (err) {
+                      //   if (err) {
+                      //     console.log('error marking message read/SEEN')
+                      //   }
+                      // })
+                      resolve(code[0])
+                      mailListener.stop()
+                    }
                   }
                 }
               }).catch(err => {
@@ -88,36 +144,53 @@ function mailListener (type, time) {
     })
     // 新邮件到达时
     mailListener.on('mail', function (mail, seqno, attributes) {
-      var mailuid = attributes.uid
-      mailListener.imap.addFlags(mailuid, '\\Seen', function (err) {
-        if (err) {
-          console.log('error marking message read/SEEN')
-        }
-      })
-      // mail processing code goes here
-      if (Date.parse(time) < Date.parse(mail.date)) {
+      // var mailuid = attributes.uid
+      // mailListener.imap.addFlags(mailuid, '\\Seen', function (err) {
+      //   if (err) {
+      //     console.log('error marking message read/SEEN')
+      //   }
+      // })
+
+      // console.log('-----------------------')
+      // console.log(mail.to)
+      const emailto = mail.to
+      // console.log(emailto[0].address)
+      if (emailto[0].address === to) {
+        console.log('this is targetTo')
+        // mail processing code goes here
+        if (Date.parse(time) < Date.parse(mail.date)) {
         // console.log('subject:' + mail.subject)
         // console.log('time:' + mail.date)
         // console.log('html:' + mail.html)
         // console.log('text:' + mail.text)
-        const str = (type ? mail.html : mail.text)
-        // (verification|invitation)
-        const codeType = (type ? 'Verification' : 'invitation')
-        const codeword = (type ? 'Code' : 'code')
-        const reg = new RegExp('(?<=\\bYour\\s' + codeType + '\\s' + codeword + '\\sis\\s)\\w+\\b')
-        const code = reg.exec(str)
-        console.log('code:' + code)
-        if (code) { // if code = null
-          resolve(code[0])
-          mailListener.stop()
+          const str = (type ? mail.html : mail.text)
+          // (verification|invitation)
+          const codeType = (type ? 'Verification' : 'invitation')
+          const codeword = (type ? 'Code' : 'code')
+          const reg = new RegExp('(?<=\\bYour\\s' + codeType + '\\s' + codeword + '\\sis\\s)\\w+\\b')
+          const code = reg.exec(str)
+          console.log('code:' + code)
+          if (code) { // if code = null
+            resolve(code[0])
+            mailListener.stop()
+          }
         }
       }
     })
   })
 }
-// 获取sms
+
+/**
+ * @function getSMS
+ * @description connect twilio get sms text
+ * @param { string } type 1:verification code 0: invitation code
+ * @param { date } time Date()
+ * @return { string } verification/invitation code
+ */
 function getSMS (type, time) {
   return new Promise((resolve, reject) => {
+    const client = require('twilio')(process.env.PHONE_NUMBER_ACCOUNT, process.env.PHONE_NUMBER_TOKEN)
+
     client.messages.list({ limit: 5 }).then(messages => messages.forEach(m => {
       // console.log('body:' + m.body)
       // console.log('from:' + m.from)
@@ -137,17 +210,32 @@ function getSMS (type, time) {
     })
   })
 }
-async function getMailCode ({ type, time }) {
-  let res = await mailListener(type, time)
+
+/**
+ * @function getMailCode
+ * @description failed to get the email message and try again
+ * @param { string } type 1:verification code 0: invitation code
+ * @param { date } time Date()
+ * @param { string } to email TO
+ * @return { string } verification/invitation code
+ */
+async function getMailCode ({ type, time, to }) {
+  let res = await mailListener(type, time, to)
   // 如果未获取到邮件，等待5秒后，重新调用mailListener
   if (!res) {
     await sleep(5000)
     console.log('mailListener again')
-    res = await mailListener(type, time)
+    res = await mailListener(type, time, to)
   }
   return res
 }
-
+/**
+ * @function getSMSCode
+ * @description failed to get the sms message and try again
+ * @param { string } type 1:verification code 0: invitation code
+ * @param { date } time Date()
+ * @return { string } verification/invitation code
+ */
 async function getSMSCode ({ type, time }) {
   let res = await getSMS(type, time)
   // 如果未获取到短信，等待10秒后，重新调用getSMS
@@ -164,5 +252,6 @@ module.exports = {
   getSMS,
   getMailCode,
   getSMSCode,
-  sleep
+  sleep,
+  makeid
 }

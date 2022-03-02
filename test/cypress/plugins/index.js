@@ -13,32 +13,8 @@
 // the project's config changing)
 
 require('dotenv').config()
-const { mailListener, getSMS, sleep } = require('../../utils/getCode')
 
 module.exports = (on, config) => {
-  on('task', {
-    async getMail ({ type, time }) {
-      let res = await mailListener(type, time)
-      // 如果未获取到邮件，等待5秒后，重新调用mailListener
-      if (!res) {
-        await sleep(5000)
-        console.log('mailListener again')
-        res = await mailListener(type, time)
-      }
-      return res
-    },
-    async getSMS ({ type, time }) {
-      let res = await getSMS(type, time)
-      // 如果未获取到短信，等待10秒后，重新调用getSMS
-      if (!res) {
-        await sleep(10000)
-        console.log('getSMS again')
-        res = await getSMS(type, time)
-      }
-      console.log('code:' + res)
-      return res
-    }
-  })
   // copy any needed variables from process.env to config.env
   config.env.testEmail = process.env.EMAIL_USERNAME
   config.env.test1Email = process.env.TEST1_EMAIL
@@ -46,6 +22,7 @@ module.exports = (on, config) => {
   config.env.test3Email = process.env.TEST3_EMAIL
   config.env.test1PhoneNumber = process.env.TEST1_PHONE_NUMBER
   config.env.test2PhoneNumber = process.env.TEST2_PHONE_NUMBER
+  config.env.test3PhoneNumber = process.env.TEST3_PHONE_NUMBER
   config.env.password = process.env.TEST_PASSWORD
   config.env.resetPassword = process.env.TEST_RESET_PASSWORD
   // do not forget to return the changed config object!

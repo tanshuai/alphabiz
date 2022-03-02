@@ -47,7 +47,7 @@ describe('upload', () => {
     const version = await homePage.getAppVersion()
     console.log('version:' + version)
     // 验证版本格式
-    expect(version).toMatch(/^v\d+\.\d+\.\d+$/)
+    expect(version).toMatch(/^v\d+\.\d+\.\d+/)
     // 验证版本
     expect(version).toBe('v' + appPackage.version)
   })

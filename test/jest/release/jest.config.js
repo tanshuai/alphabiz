@@ -4,10 +4,5 @@ module.exports = {
   setupFilesAfterEnv: ['./jest.setup.js'],
   // testRunner: 'jest-jasmine2'
   testRunner: 'jest-circus/runner',
-  testTimeout: 60000,
-  preset: 'ts-jest',
-  transform: {
-    '^.+\\.(ts|tsx)?$': 'ts-jest',
-    "^.+\\.(js|jsx)$": "babel-jest",
-  }
+  testTimeout: 60000
 }

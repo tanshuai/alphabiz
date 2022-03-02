@@ -28,7 +28,7 @@ describe('upload', () => {
     expect(1).toBe(1)
   })
   it('upload seeding', async () => {
-    const uploadFilePath = path.resolve(__dirname, '../../samples/ChinaCup.1080p.H264.AAC.mp4')
+    const uploadFilePath = path.resolve(__dirname, '../../cypress/fixtures/samples/ChinaCup.1080p.H264.AAC.mp4')
     const torrentName = 'ChinaCup.1080p.H264.AAC.mp4'
     // 判断是否已经登录
     await homePage.jumpPage('accountLink')
@@ -36,7 +36,7 @@ describe('upload', () => {
     console.log('concerText:' + concerText)
     if ((/Want to Join/).test(concerText)) {
       // 未登录
-      await accountPage.signIn('+86' + process.env.TEST3_PHONE_NUMBER, process.env.TEST_PASSWORD, 1)
+      await accountPage.signIn('+8613530474220', process.env.TEST_PASSWORD, 1)
     } else {
       // 已登陆,等待拉取数据
       await client.$('//*[@Name="Settings"]').click()
@@ -66,13 +66,11 @@ describe('upload', () => {
     expect(taskStatus).toBe('Status: Seeding')
 
     // 等待种子上传(其他用户下载种子)
-    console.log('wait seed upload')
     await homePage.waitSeedUpload(torrentName)
 
     // const taskPeers = await homePage.getTaskPeers(torrentName, 60000 * 10)
     // taskPeers.click()
     // 等待积分增加变化
-    console.log('wait credit increase')
     await homePage.jumpPage('creditsLink')
     let changedCredit
     while (1) {
