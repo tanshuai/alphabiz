@@ -152,7 +152,7 @@ jobs:
           echo "release-name: ${{ steps.unify.outputs.release-name }}"
           echo "package-name: ${{ steps.unify.outputs.package-name }}"
           echo "----------------------"
-          if ${{ github.event_name == 'schedule' }} || contains(env.MODIFIED_FILE_LIST, 'release.json') }} ;\
+          if ${{ github.event_name == 'schedule' }} || contains(env.MODIFIED_FILE_LIST, 'release.json') ;\
           then  echo "commit: ${{ steps.nightly.outputs.commit }}" ; \
                 echo "commit-version: ${{ steps.nightly.outputs.commit-version }}" ; \
                 echo "commit-date: ${{ steps.nightly.outputs.commit-date }}" ; \
