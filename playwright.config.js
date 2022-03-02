@@ -4,7 +4,10 @@ require('dotenv').config()
 /** @type {import('@playwright/test').PlaywrightTestConfig} */
 const config = {
   // Look for test files in the "tests" directory, relative to this configuration file
-  testDir: 'test/playwright',
+  testDir: './',
+  testMatch: [
+    '**/playwright/**/*'
+  ],
   reporter: 'list',
   // Each test is given 30 seconds
   timeout: 60000,
@@ -16,7 +19,7 @@ const config = {
   retries: 2,
 
   // Limit the number of workers on CI, use default locally
-  workers: process.env.CI ? 1 : undefined,
+  workers: 1,
 
   use: {
     // Configure browser and context here
@@ -25,4 +28,6 @@ const config = {
   }
 }
 
+
+// module.exports = { config, electronMainPath }
 module.exports = config
