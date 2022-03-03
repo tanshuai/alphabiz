@@ -6,11 +6,11 @@ name: CI/CT for each push
 
 on:
   schedule:
-    - cron: "00 12 * * *"
+    - cron: "00 11 * * *"
   push:
     paths:
       - "**.js"
-      - "**/push.yml"
+      - "!**/push.yml"
       - "build/**"
     branches: [main]
   pull_request:
@@ -128,15 +128,15 @@ jobs:
       #后面的step晚上运行
 
       - name: Run electron-packager
-        # if: contains(steps.vars.outputs.current-hour, '12')
+        if: contains(steps.vars.outputs.current-hour, '11')
         run: yarn packager
 
       - name: Package for ${{ matrix.os }}-nightly-${{ steps.vars.outputs.commit-message }} Release 🗜️
-        # if: contains(steps.vars.outputs.current-hour, '12')
+        if: contains(steps.vars.outputs.current-hour, '11')
         run: 7z a -t7z -mx=9 alphabiz-${{ matrix.os }}-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}.7z ./build/electron -xr!UnPackaged
 
       - name: Pack app 📦
-        # if: contains(steps.vars.outputs.current-hour, '12')
+        if: contains(steps.vars.outputs.current-hour, '11')
         run: |
           if [[ "matrix.os" = "windows-2022" ]] ; \
           then export PATH=$PATH:/c/Program\ Files\ \(x86\)/WiX\ Toolset\ v3.11/bin ; \
@@ -149,7 +149,7 @@ jobs:
         shell: bash
 
       - name: Release ${{ matrix.os }}-nightly-${{ steps.vars.outputs.commit-message }}.7z to GitHub 📰
-        # if: contains(steps.vars.outputs.current-hour, '12')
+        if: contains(steps.vars.outputs.current-hour, '11')
         uses: softprops/action-gh-release@v1
         with:
           prerelease: true
