@@ -1,14 +1,6 @@
-remove old BasicSettings page
-skip test
-fix: has_meta use boolean which trans to string unexpectly
-don't open devtools immediately
-fix types in src-electron
-hide dev menu if devtools disabled #175
-apply new settings for webtorrent
-disable user-select
-add update-version.js、try push unpackaged、release
-fix #167
-fix #167
-refact: advance setting with new setting entries #175
-allow using github PAT via advance setting
-improve corner
+corner menu
+fix: upload tasks always regenerate ab uri
+remove old setting file
+separate version.json in build
+refact: set file associations with each extname #171 #142
+temporary recovery
