@@ -6,8 +6,6 @@ name: online-experiments
 # concurrency: staging_environment
 
 on:
-  schedule:
-    - cron: "00 12 * * *"
   push:
     paths:
       - "！**/online-experiments.yml"
