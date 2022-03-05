@@ -124,15 +124,15 @@ jobs:
 
       # This step for unify the tag name
       # nightly-release use tag_name: $packageJsonVersion-internal/nightly-$dateTime-$commitId
-      # official-release use tag_name: ./release.json property new-tag-name
+      # official-release use tag_name: ./release.json property newTagName
       - name: Unified Tag format
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         id: unify
         run: |
           if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
-          then echo "::set-output name=tag-name::${{ fromJson(steps.release.outputs.releaseJson).new-tag-name }}" ; \
-               echo "::set-output name=release-name::${{ fromJson(steps.release.outputs.releaseJson).new-tag-name }}" ; \
-               echo "::set-output name=package-name::${{ fromJson(steps.release.outputs.releaseJson).new-tag-name }}" ; \
+          then echo "::set-output name=tag-name::${{ fromJson(steps.release.outputs.releaseJson).newTagName }}" ; \
+               echo "::set-output name=release-name::${{ fromJson(steps.release.outputs.releaseJson).newTagName }}" ; \
+               echo "::set-output name=package-name::${{ fromJson(steps.release.outputs.releaseJson).newTagName }}" ; \
           else echo "::set-output name=tag-name::${{ steps.nightly.outputs.commit-version }}-nightly-${{ steps.nightly.outputs.commit-date }}" ; \
                echo "::set-output name=release-name::${{ steps.nightly.outputs.commit-version }}-nightly-${{ steps.nightly.outputs.commit-sha7 }}" ;  \
                echo "::set-output name=package-name::${{ steps.nightly.outputs.commit-version }}-nightly-${{ steps.nightly.outputs.commit-date }}-${{ steps.nightly.outputs.commit-sha7 }}" ; \
@@ -165,11 +165,11 @@ jobs:
       - name: Checkout release.json target tag
         if: contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
-          git checkout ${{ fromJson(steps.release.outputs.releaseJson).target-tag-name }}
+          git checkout ${{ fromJson(steps.release.outputs.releaseJson).targetTagName }}
           git show --name-only
           echo "--------------------------"
-          echo "target-tag-name: ${{ fromJson(steps.release.outputs.releaseJson).target-tag-name }}"
-          echo "new-tag-name: ${{ fromJson(steps.release.outputs.releaseJson).new-tag-name }}"
+          echo "targetTagName: ${{ fromJson(steps.release.outputs.releaseJson).targetTagName }}"
+          echo "newTagName: ${{ fromJson(steps.release.outputs.releaseJson).newTagName }}"
           echo "--------------------------"
           echo "${{ env.RELEASE_JSON }}"
         shell: bash

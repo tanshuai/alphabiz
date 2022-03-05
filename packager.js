@@ -4,21 +4,23 @@ const path = require('path')
 const { default: rebuild } = require('electron-rebuild')
 
 const version = require('./package.json').version
-const buildVersion = process.env.BUILD_VERSION || version
+const publicVersion = require('./public/version.json').version
+
+const buildVersion = publicVersion || version
 const packagePath = path.resolve(__dirname, './package.json')
 const package = fs.readFileSync(packagePath)
 console.log(path.resolve(__dirname, 'alphabiz-icon-1024.png'))
 
 const beforeBuild = async () => {
-  console.log('run beforeBuild')
-  const pkg = JSON.parse(package)
-  pkg.version = buildVersion
-  console.log('Build version:', pkg.version)
-  fs.writeFileSync(packagePath, JSON.stringify(pkg, null, 2))
-  process.on('exit', () => {
-    fs.writeFileSync(packagePath, package)
-    console.log('Restored package.json before exit')
-  })
+  // console.log('run beforeBuild')
+  // const pkg = JSON.parse(package)
+  // pkg.version = buildVersion
+  // console.log('Build version:', pkg.version)
+  // fs.writeFileSync(packagePath, JSON.stringify(pkg, null, 2))
+  // process.on('exit', () => {
+  //   fs.writeFileSync(packagePath, package)
+  //   console.log('Restored package.json before exit')
+  // })
 }
 
 beforeBuild ()
@@ -30,7 +32,8 @@ packager({
   extraResource: [
     path.resolve(__dirname, 'alphabiz-icon-1024.png'),
     path.resolve(__dirname, 'public/favicon.ico'),
-    path.resolve(__dirname, 'public/platform-assets/mac/trayiconTemplate.png')
+    path.resolve(__dirname, 'public/platform-assets/mac/trayiconTemplate.png'),
+    path.resolve(__dirname, 'public/version.json')
   ],
   icon: process.platform === 'darwin'
     ? path.resolve(__dirname, 'public/platform-assets/mac/app.icns')
