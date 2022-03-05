@@ -186,8 +186,8 @@ jobs:
           yarn unpackaged || (echo "===== yarn unpackaged Attempt: 2 ====" && yarn unpackaged)
         shell: bash
 
-      - name: E2E Test for Electron 🧪
-        run: yarn test:e2e:electron
+      # - name: E2E Test for Electron 🧪
+      #   run: yarn test:e2e:electron
 
       - name: E2E Test 🧪
         run: yarn test:e2e:ci
