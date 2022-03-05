@@ -135,7 +135,7 @@ jobs:
         run: |
           if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
           then echo "::set-output name=tag-name::${{ fromJson(steps.release.outputs.releaseJson).newTagName }}" ; \
-               echo "::set-output name=release-name::${{ fromJson(steps.release.outputs.releaseJson).newTagName }}" ; \
+               echo "::set-output name=release-name::$(echo '${{ fromJson(steps.release.outputs.releaseJson).newTagName }}' | grep -o -P '(^\d+.\d+.\d+(-nightly)*)' )-${{ steps.slug.outputs.sha7 }}" ; \
                echo "::set-output name=package-name::${{ fromJson(steps.release.outputs.releaseJson).newTagName }}" ; \
           else echo "::set-output name=tag-name::${{ steps.nightly.outputs.commit-version }}-nightly-${{ steps.nightly.outputs.commit-date }}" ; \
                echo "::set-output name=release-name::${{ steps.nightly.outputs.commit-version }}-nightly-${{ steps.nightly.outputs.commit-sha7 }}" ;  \

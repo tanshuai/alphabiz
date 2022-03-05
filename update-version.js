@@ -17,7 +17,21 @@ const content = {
     "sourceCommit": "",
     "version": ""
 }
-
+const getBuildTime = async () => {
+  return new Promise((resolve, reject) => {
+    exec('git log -1 --date=format:"%Y%m%d%H%M" --format="%cd"', (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`)
+      return
+    }
+    if (stderr) {
+      console.error(`Error from Git: ${stderr}`)
+      return
+    }
+    resolve(stdout.trim())
+    })
+  })
+}
 const getCommit = async () => {
   return new Promise((resolve, reject) => {
     exec('git rev-parse --short HEAD', (error, stdout, stderr) => {
@@ -36,7 +50,7 @@ const getCommit = async () => {
 const updateVersionJSON = async () => {
   // console.log(unpackagedVersionObj)
   content.packageVer = unpackagedVersionObj.packageVer
-  content.buildTime = unpackagedVersionObj.buildTime
+  content.buildTime = await getBuildTime()
   // 如果正式发布buildCommit 为触发正式发布的sha7
   if (!process.argv[3]) content.buildCommit = await getCommit()
   else content.buildCommit = process.argv[3]
