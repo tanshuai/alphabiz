@@ -11,7 +11,7 @@ on:
   push:
     paths:
       - "**.js"
-      - "**/push.yml"
+      - "!**/push.yml"
       - "build/**"
       - "release.json"
     branches: [main]
@@ -186,8 +186,12 @@ jobs:
           yarn unpackaged || (echo "===== yarn unpackaged Attempt: 2 ====" && yarn unpackaged)
         shell: bash
 
-      # - name: E2E Test for Electron 🧪
-      #   run: yarn test:e2e:electron
+      - name: E2E Test for Electron 🧪
+        run: |
+          export REPO=alphabiz
+          yarn test:e2e:electron
+          unset REPO
+        shell: bash
 
       - name: E2E Test 🧪
         run: yarn test:e2e:ci
@@ -204,6 +208,7 @@ jobs:
       - name: Run electron-packager
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
+          unset REPO
           export BUILD_VERSION=${{ steps.unify.outputs.tag-name }}
           yarn packager
         shell: bash
