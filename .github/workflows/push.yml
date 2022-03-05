@@ -1,4 +1,4 @@
-name: CI/CT for each push
+name: CI/CT for each push && nightly
 # env:
 #   name: staging_environment
 
@@ -220,6 +220,9 @@ jobs:
       - name: Pack app 📦
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
+          if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
+          then yarn node update-version.js ${{ steps.unify.outputs.tag-name }} ${{ steps.slug.outputs.sha7 }} ; \
+          fi
           export PATH=$PATH:/c/Program\ Files\ \(x86\)/WiX\ Toolset\ v3.11/bin
           export BUILD_VERSION=${{ steps.unify.outputs.tag-name }}
           yarn make
