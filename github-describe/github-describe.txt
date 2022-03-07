@@ -1,7 +1,8 @@
-fix get version in browser
-use private repo for internal channel
-fix select component keyname
-try release
-try fix public repo electron test
-refact: add default settings for web mode, add disk check option #171 #190
-Unify the Workflow file structure #8
+try update node-gyp version
+bug fix
+remove cached version.json
+try update node-gyp on push.yml
+add icon in control panel
+resolve #171
+use worker_threads for heavy works #199
+fix regex match release-name
