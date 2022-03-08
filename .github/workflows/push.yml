@@ -11,7 +11,7 @@ on:
   push:
     paths:
       - "**.js"
-      - "**/push.yml"
+      - "!**/push.yml"
       - "build/**"
       - "release.json"
     branches: [main]
@@ -81,7 +81,6 @@ jobs:
         run: |
           git fetch --prune --unshallow
           echo "::set-output name=date::$(git log -1 --date=format:'%Y%m%d' --author="Alphabiz-Team" --format='%cd')"
-          echo "::set-output name=current-hour::$(date +'%H')"
           echo "::set-output name=event-name::${{ github.event_name }}"
           if [[ ${{ matrix.os }} = "ubuntu-latest" ]] ; \
           then echo "::set-output name=system::ubuntu" ; \
@@ -100,27 +99,6 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
         shell: bash
 
-      - name: Get last commit date \ today all commit message
-        if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
-        id: nightly
-        run: |
-          echo "::set-output name=commit::$(git log -1 --pretty=%B --author="Alphabiz-Team")"
-          echo "::set-output name=commit-version::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /(?<=v)\d+\.\d+\.\d+/g')"
-          echo "::set-output name=commit-date::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /(?<=-)\d{8,12}(?=-)/g')"
-          echo "::set-output name=commit-sha7::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /(?<=-)\w{7}(?=\s)/g')"
-          echo "::set-output name=commit-message::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /\d{8,12}-\w+/g')"
-          export DESCRIBE=$(cat github-describe/github-describe.txt)
-          echo "$DESCRIBE"
-          echo "DESCRIBE<<EOF" >> $GITHUB_ENV
-          echo "$DESCRIBE" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
-          echo "contains(env.MODIFIED_FILE_LIST, 'release.json')"
-          echo "${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }}"
-        shell: bash
-
-      # 获取所以今天 作者为Alphabiz-Team的commit message,正则:不匹配'[-]符号'前面的任意字符、不匹配空行
-      # export DESCRIBE=$(git log --reverse --after="${{ steps.vars.outputs.release-date }} 00:00" --before="${{ steps.vars.outputs.release-date }} 23:59" --author="Alphabiz-Team" --pretty='format:%B' | perl -wnE'say for /(?!.*-)(?!\s).*\w+$/gm')
-
       # because json file Multiline
       # need convert to a single line,then get property use fromJson().property
       - name: Get release.json property
@@ -135,9 +113,35 @@ jobs:
           fi
           content="${content//$'\r'/'%0D'}"
           echo "::set-output name=releaseJson::$content"
-          echo "RELEASE_JSON<<EOF" >> $GITHUB_ENV
-          echo "$content" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Checkout release.json target tag
+        id: checkout
+        if: contains(env.MODIFIED_FILE_LIST, 'release.json')
+        run: |
+          git checkout ${{ fromJson(steps.release.outputs.releaseJson).targetTagName }}
+          git show --name-only
+          echo "--------------------------"
+          echo "::set-output name=target-tag-name::${{ fromJson(steps.release.outputs.releaseJson).targetTagName }}"
+          echo "::set-output name=new-tag-name::${{ fromJson(steps.release.outputs.releaseJson).newTagName }}"
+        shell: bash
+
+      # after git checkout
+      - name: Get last commit date \ today all commit message
+        if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
+        id: nightly
+        run: |
+          echo "::set-output name=commit-version::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /(?<=v)\d+\.\d+\.\d+/g')"
+          echo "::set-output name=commit-date::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /(?<=-)\d{8,12}(?=-)/g')"
+          echo "::set-output name=commit-sha7::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /(?<=-)\w{7}(?=\s)|^\w{7}(?=\s)/g')"
+          echo "::set-output name=commit-message::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /\d{8,12}-\w+/g')"
+          export DESCRIBE=$(cat github-describe/github-describe.txt)
+          echo "$DESCRIBE"
+          echo "DESCRIBE<<EOF" >> $GITHUB_ENV
+          echo "$DESCRIBE" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
+          echo "contains(env.MODIFIED_FILE_LIST, 'release.json')"
+          echo "${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }}"
         shell: bash
 
       # This step for unify the tag name
@@ -148,9 +152,12 @@ jobs:
         id: unify
         run: |
           if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
-          then echo "::set-output name=tag-name::${{ fromJson(steps.release.outputs.releaseJson).newTagName }}" ; \
-               echo "::set-output name=release-name::$(echo '${{ fromJson(steps.release.outputs.releaseJson).newTagName }}' | grep -o -P '(^\d+\.\d+\.\d+\-?\w*)' )-${{ steps.slug.outputs.sha7 }}" ; \
-               echo "::set-output name=package-name::${{ fromJson(steps.release.outputs.releaseJson).newTagName }}" ; \
+          then echo "::set-output name=tag-name::${{ steps.checkout.outputs.new-tag-name }}" ; \
+               if ${{ contains(steps.checkout.outputs.new-tag-name, 'nightly') }} ; \
+               then echo "::set-output name=release-name::$(echo '${{ steps.checkout.outputs.new-tag-name }}' | perl -wnE'say for /^\d+\.\d+\.\d+\-?\w*/g' )-${{ steps.nightly.outputs.commit-sha7 }}" ; \
+               else echo "::set-output name=release-name::${{ steps.checkout.outputs.new-tag-name }}" ; \
+               fi
+               echo "::set-output name=package-name::${{ steps.checkout.outputs.new-tag-name }}" ; \
           else echo "::set-output name=tag-name::${{ steps.nightly.outputs.commit-version }}-nightly-${{ steps.nightly.outputs.commit-date }}" ; \
                echo "::set-output name=release-name::${{ steps.nightly.outputs.commit-version }}-nightly-${{ steps.nightly.outputs.commit-sha7 }}" ;  \
                echo "::set-output name=package-name::${{ steps.nightly.outputs.commit-version }}-nightly-${{ steps.nightly.outputs.commit-date }}-${{ steps.nightly.outputs.commit-sha7 }}" ; \
@@ -164,33 +171,22 @@ jobs:
           echo "event.head_commit.message: ${{ github.event.head_commit.message }}"
           echo "system: ${{ steps.vars.outputs.system }}"
           echo "run workflow date: ${{ steps.vars.outputs.date }}"
-          echo "current-hour: ${{ steps.vars.outputs.current-hour }}"
           echo "----------------------"
           echo "MODIFIED_FILE_LIST: ${{ env.MODIFIED_FILE_LIST }}"
-          echo "----------------------"
-          echo "tag-name: ${{ steps.unify.outputs.tag-name }}"
-          echo "release-name: ${{ steps.unify.outputs.release-name }}"
-          echo "package-name: ${{ steps.unify.outputs.package-name }}"
-          echo "----------------------"
           if ${{ contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json') }};\
-          then  echo "commit: ${{ steps.nightly.outputs.commit }}" ; \
+          then  echo "----------------------" ; \
+                echo "tag-name: ${{ steps.unify.outputs.tag-name }}" ; \
+                echo "release-name: ${{ steps.unify.outputs.release-name }}" ; \
+                echo "package-name: ${{ steps.unify.outputs.package-name }}" ; \
+                echo "----------------------" ; \
                 echo "commit-version: ${{ steps.nightly.outputs.commit-version }}" ; \
                 echo "commit-date: ${{ steps.nightly.outputs.commit-date }}" ; \
                 echo "commit-sha7: ${{ steps.nightly.outputs.commit-sha7 }}" ; \
                 echo "commit-message: ${{ steps.nightly.outputs.commit-message }}" ; \
+                echo "----------------------" ; \
+                echo "target-tag-name: ${{ steps.checkout.outputs.target-tag-name }}" ; \
+                echo "new-tag-name: ${{ steps.checkout.outputs.new-tag-name }}" ; \
           fi
-        shell: bash
-
-      - name: Checkout release.json target tag
-        if: contains(env.MODIFIED_FILE_LIST, 'release.json')
-        run: |
-          git checkout ${{ fromJson(steps.release.outputs.releaseJson).targetTagName }}
-          git show --name-only
-          echo "--------------------------"
-          echo "targetTagName: ${{ fromJson(steps.release.outputs.releaseJson).targetTagName }}"
-          echo "newTagName: ${{ fromJson(steps.release.outputs.releaseJson).newTagName }}"
-          echo "--------------------------"
-          echo "${{ env.RELEASE_JSON }}"
         shell: bash
 
       - name: Install dependencies 👨🏻‍💻
@@ -206,7 +202,7 @@ jobs:
         shell: bash
 
       # - name: E2E Test for Electron 🧪
-      #   if: "!contains(github.event.head_commit.message, 'ci skip')"
+      #   if: "!contains(github.event.head_commit.message, 'skip e2e')"
       #   run: |
       #     export REPO=alphabiz
       #     yarn test:e2e:electron
@@ -214,7 +210,7 @@ jobs:
       #   shell: bash
 
       - name: E2E Test 🧪
-        if: "!contains(github.event.head_commit.message, 'ci skip')"
+        if: "!contains(github.event.head_commit.message, 'skip e2e')"
         run: yarn test:e2e:ci
 
       - name: Upload Test Results 🗃
@@ -237,7 +233,7 @@ jobs:
           yarn packager
         shell: bash
 
-      - name: Package for ${{ matrix.os }}-nightly-${{ steps.nightly.outputs.commit-message }} Release 🗜️
+      - name: Package for ${{ matrix.os }}-${{ steps.unify.outputs.package-name }} Release 🗜️
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: 7z a -t7z -mx=9 alphabiz-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }}.7z ./build/electron -xr!UnPackaged
 
