@@ -161,6 +161,7 @@ jobs:
       - name: Checkout vars-date ${{ steps.vars.outputs.date }} ⬇️
         run: |
           echo "event_name: ${{ steps.vars.outputs.event-name }}"
+          echo "event.head_commit.message: ${{ github.event.head_commit.message }}"
           echo "system: ${{ steps.vars.outputs.system }}"
           echo "run workflow date: ${{ steps.vars.outputs.date }}"
           echo "current-hour: ${{ steps.vars.outputs.current-hour }}"
@@ -205,6 +206,7 @@ jobs:
         shell: bash
 
       # - name: E2E Test for Electron 🧪
+      #   if: "!contains(github.event.head_commit.message, 'ci skip')"
       #   run: |
       #     export REPO=alphabiz
       #     yarn test:e2e:electron
@@ -212,6 +214,7 @@ jobs:
       #   shell: bash
 
       - name: E2E Test 🧪
+        if: "!contains(github.event.head_commit.message, 'ci skip')"
         run: yarn test:e2e:ci
 
       - name: Upload Test Results 🗃
