@@ -450,27 +450,45 @@ test.describe('upload', () => {
 })
 
 test.describe('account', () => {
-  const userInfo = [
-    {
-      nikename: 'test3',
-      username: process.env.EMAIL_USERNAME,
-      password: process.env.TEST_PASSWORD
-    },
-    {
-      nikename: 'test2',
-      username: '+86' + process.env.TEST3_PHONE_NUMBER,
-      password: process.env.TEST_PASSWORD
+  // const userInfo = [
+  //   {
+  //     nikename: 'test1',
+  //     username: process.env.TEST1_EMAIL
+  //   },
+  //   {
+  //     nikename: 'test2',
+  //     username: process.env.EMAIL_USERNAME
+  //   },
+  //   {
+  //     nikename: 'test3',
+  //     username: '+86' + process.env.TEST3_PHONE_NUMBER
+  //   }
+  // ]
+  test.skip('transfer - check bill details', async () => {
+    test.setTimeout(60000 * 1)
+    let from 
+    let to
+    if (process.platform === 'win32') {
+      from = 'test1'
+      to = 'test2'
+    } else if (process.platform === 'linux') {
+      from = 'test3'
+      to = 'test4'
+    } else {
+      from = 'test5'
+      to = 'test6'
     }
-  ]
-  test.skip('test3 to test2 transfer - check bill details', async () => {
-    test.setTimeout(60000 * 3)
+    
     // 转账人账号、密码
-    const transferee = userInfo[0].username
-    const transfereePassword = userInfo[0].password
+    // const transferee = userInfo[from].username
+    const transferee = from + process.env.TEST_EMAIL_DOMAIN
+    const transfereePassword = process.env.TEST_PASSWORD
     // 收款人账号、密码
-    const payee = userInfo[1].username
-    const payeePassword = userInfo[1].password
+    // const payee = userInfo[to].username
+    const payee = to + process.env.TEST_EMAIL_DOMAIN
+    const payeePassword = process.env.TEST_PASSWORD
     const transferAmount = 1
+    console.log('from-user:' + transferee + ',to-user:' + payee)
     // 如果应用已经登陆则退出登录状态
     const isHasAlert = await window.isVisible('div[role="alert"]:has-text("check_circleSigned out")')
     if (isHasAlert) {
@@ -480,6 +498,7 @@ test.describe('account', () => {
     // 登录收款人账号
     await commands.signIn(payee, payeePassword, 1)
     await commands.jumpPage('creditsLink')
+    // await window.waitForTimeout(10000)
     // 获取收款人id
     const payeeID = await commands.getID()
     // console.log('payeeID:' + payeeID)
@@ -488,10 +507,12 @@ test.describe('account', () => {
     const payeeAfterPoint = Number(payeePoint) + transferAmount
     // 退出收款人账号
     await commands.signOut()
+    await window.reload()
     await sleep(1000)
     // 登录付款人账号
     await commands.signIn(transferee, transfereePassword, 1)
     await commands.jumpPage('creditsLink')
+    // await window.waitForTimeout(10000)
     // 获取转账人id
     const transfereeID = await commands.getID()
     let transfereePoint = await window.locator('.text-right > div').innerText()
@@ -507,19 +528,21 @@ test.describe('account', () => {
     // 查看账单明细
     await commands.checkBillDetail(payeeID, 'Transfer', '-' + transferAmount, 'finish')
     // 断言积分变化是否正确
+    await sleep(2000)
+    await window.waitForLoadState()
     expect(await window.locator('.text-right > div').innerText()).toBe(transfereeAfterPoint.toString())
     // 退出付款人账号
     await commands.signOut()
-    await sleep(1000)
-    // 登录收款人账号
-    await commands.signIn(payee, payeePassword, 1)
-    await commands.jumpPage('creditsLink')
-    await sleep(2000)
-    // 查看账单
-    await commands.checkBillDetail(transfereeID, 'Transfer', '+' + transferAmount, 'finish')
-    // 断言积分变化是否正确
-    expect(await window.locator('.text-right > div').innerText()).toBe(payeeAfterPoint.toString())
-    await commands.signOut()
-    await sleep(1000)
+    // await sleep(1000)
+    // // 登录收款人账号
+    // await commands.signIn(payee, payeePassword, 1)
+    // await commands.jumpPage('creditsLink')
+    // await sleep(2000)
+    // // 查看账单
+    // await commands.checkBillDetail(transfereeID, 'Transfer', '+' + transferAmount, 'finish')
+    // // 断言积分变化是否正确
+    // expect(await window.locator('.text-right > div').innerText()).toBe(payeeAfterPoint.toString())
+    // await commands.signOut()
+    // await sleep(1000)
   })
 })

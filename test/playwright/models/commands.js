@@ -15,6 +15,8 @@ class Commands {
     this.advancedLink = page.locator('text=Advanced Advanced')
     this.developmentLink = page.locator('text=developer_modeDevelopment Developer Mode for Internal Use')
     this.accountLink = page.locator('.corner')
+    this.accountSignUp = page.locator('button:has-text("Sign up")')
+    this.accountMore = page.locator('button:has-text("more_horiz")')
     this.accountSettings = page.locator('[data-cy="account-settings-btn"]')
     // home
     this.downloadBtn = page.locator('button:has-text("Download")')
@@ -53,7 +55,7 @@ class Commands {
   }
 
   async signIn (username, password, isWaitAlert) {
-    if (await this.page.locator('[aria-label="Phone number or email"]').isHidden()) this.jumpPage('accountLink')
+    if (await this.page.locator('[aria-label="Phone number or email"]').isHidden()) this.jumpPage('accountSignUp')
     await this.page.waitForTimeout(500)
     await this.page.fill('[aria-label="Phone number or email"]', username)
     await this.page.fill('[aria-label="Password"]', password)
@@ -65,9 +67,10 @@ class Commands {
   }
 
   async signOut () {
-    await this.jumpPage('accountLink')
+    await this.jumpPage('accountMore')
     await this.page.click('text=Sign out')
     await this.page.locator('.q-notification__message >> text=Signed out').waitFor()
+    await this.page.evaluate(() => localStorage.clear())
   }
 
   // credits
