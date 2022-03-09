@@ -160,7 +160,7 @@ jobs:
                echo "::set-output name=package-name::${{ steps.checkout.outputs.new-tag-name }}" ; \
           else echo "::set-output name=tag-name::${{ steps.nightly.outputs.commit-version }}-nightly-${{ steps.nightly.outputs.commit-date }}" ; \
                echo "::set-output name=release-name::${{ steps.nightly.outputs.commit-version }}-nightly-${{ steps.nightly.outputs.commit-sha7 }}" ;  \
-               echo "::set-output name=package-name::${{ steps.nightly.outputs.commit-version }}-nightly-${{ steps.nightly.outputs.commit-date }}-${{ steps.nightly.outputs.commit-sha7 }}" ; \
+               echo "::set-output name=package-name::${{ steps.nightly.outputs.commit-version }}-nightly-${{ steps.nightly.outputs.commit-date }}" ; \
           fi
         shell: bash
 
