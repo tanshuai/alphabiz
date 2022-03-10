@@ -392,7 +392,7 @@ test.describe('download ', () => {
     await sleep(1000)
     const magnetText = await window.locator('//*[@aria-label="Download directory position"]/preceding::*[1]').inputValue()
     // console.log('magnetText:' + magnetText)
-    expect(/alphabiz:\/\/The\+WIRED\+CD/.test(magnetText)).toBe(true)
+    expect(/alphabiz:\/\/The%2BWIRED%2BCD/.test(magnetText)).toBe(true)
     await window.click('button:has-text("Cancel")')
     await sleep(1000)
     await window.reload()
