@@ -465,7 +465,7 @@ test.describe('account', () => {
   //     username: '+86' + process.env.TEST3_PHONE_NUMBER
   //   }
   // ]
-  test('transfer - check bill details', async () => {
+  test.skip('transfer - check bill details', async () => {
     test.setTimeout(60000 * 1)
     let from
     let to
