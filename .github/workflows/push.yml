@@ -6,12 +6,12 @@ name: CI/CT for each push && nightly
 
 on:
   schedule:
-    - cron: "00 2 * * *"
+    - cron: "00 12 * * *"
   pull_request:
   push:
     paths:
       - "**.js"
-      - "!**/push.yml"
+      - "**/push.yml"
       - "build/**"
       - "release.json"
     branches: [main]
