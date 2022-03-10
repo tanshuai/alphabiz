@@ -54,7 +54,7 @@ jobs:
       - name: Check commit date
         id: vars
         run: |
-          set TZ=UTC-8
-          git log -5 --date=format-local:"%Y%m%d%H%M" --format="%cd"
+          TZ=UTC-8 git log -10 --date=format-local:"%Y%m%d%H%M" --format="%cd"
           echo "--------------------------"
+
         shell: bash
