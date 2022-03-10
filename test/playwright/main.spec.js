@@ -76,9 +76,10 @@ test('close auto update', async () => {
   }
 })
 
-test.skip('reset torrent status', async () => {
+test('reset torrent status', async () => {
   await window.waitForLoadState()
   await commands.jumpPage('downloadingStatus')
+  if (process.platform === 'win32' && await commands.downloadingStatus.isVisible()) await commands.downloadBtn.click({ force: true })
   if (await window.isEnabled('button:has-text("Remove all") >> nth=0')) {
     await window.click('button:has-text("Remove all") >> nth=0')
     await window.click('[aria-label="Also delete files"]')
@@ -104,7 +105,7 @@ test.skip('reset torrent status', async () => {
 })
 
 test.describe('play video', () => {
-  test.skip('avi_type', async () => {
+  test('avi_type', async () => {
     const media = './test/cypress/fixtures/samples/GoneNutty.avi'
 
     await window.waitForLoadState()
@@ -116,7 +117,7 @@ test.describe('play video', () => {
     const progressControl = await window.locator('.vjs-progress-control')
     await expect(progressControl).toBeVisible()
   })
-  test.skip('BluRay_mkv_type', async () => {
+  test('BluRay_mkv_type', async () => {
     const media = './test/cypress/fixtures/samples/Test-Sample-Tenet.2020.IMAX.2160p.UHD.BluRay.x265.10bit.HDR.DTS-HD.MA.5.1202111171122322.mkv'
 
     if (await window.$('[data-cy="file-input"]') === null) await commands.jumpPage('playerLink')
@@ -169,7 +170,7 @@ test.describe('download ', () => {
     }
   ]
   for (const btDate of btData) {
-    test.skip((btDate.testName ? btDate.testName : '') + btDate.btName, async () => {
+    test((btDate.testName ? btDate.testName : '') + btDate.btName, async () => {
       if (btDate.btName === 'uTorrent Web Tutorial Video') {
         test.setTimeout(60000 * 5)
       } else if (btDate.btName === 'The WIRED CD - Rip. Sample. Mash. Share') {
@@ -279,7 +280,7 @@ test.describe('download ', () => {
       }
     })
   }
-  test.skip('table mode task lists', async () => {
+  test('table mode task lists', async () => {
     // 确保下载的全部种子都在做种状态
     // await commands.jumpPage('downloadedStatus')
 
@@ -464,9 +465,9 @@ test.describe('account', () => {
   //     username: '+86' + process.env.TEST3_PHONE_NUMBER
   //   }
   // ]
-  test.skip('transfer - check bill details', async () => {
+  test('transfer - check bill details', async () => {
     test.setTimeout(60000 * 1)
-    let from 
+    let from
     let to
     if (process.platform === 'win32') {
       from = 'test1'
@@ -478,7 +479,6 @@ test.describe('account', () => {
       from = 'test5'
       to = 'test6'
     }
-    
     // 转账人账号、密码
     // const transferee = userInfo[from].username
     const transferee = from + process.env.TEST_EMAIL_DOMAIN
@@ -488,7 +488,6 @@ test.describe('account', () => {
     const payee = to + process.env.TEST_EMAIL_DOMAIN
     const payeePassword = process.env.TEST_PASSWORD
     const transferAmount = 1
-    console.log('from-user:' + transferee + ',to-user:' + payee)
     // 如果应用已经登陆则退出登录状态
     const isHasAlert = await window.isVisible('div[role="alert"]:has-text("check_circleSigned out")')
     if (isHasAlert) {
