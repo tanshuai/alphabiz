@@ -199,13 +199,13 @@ jobs:
           yarn unpackaged || (echo "===== yarn unpackaged Attempt: 2 ====" && yarn unpackaged)
         shell: bash
 
-      # - name: E2E Test for Electron 🧪
-      #   if: "!contains(github.event.head_commit.message, 'skip e2e')"
-      #   run: |
-      #     export REPO=alphabiz
-      #     yarn test:e2e:electron
-      #     unset REPO
-      #   shell: bash
+      - name: E2E Test for Electron 🧪
+        if: "!contains(github.event.head_commit.message, 'skip e2e')"
+        run: |
+          export REPO=alphabiz
+          yarn test:e2e:electron
+          unset REPO
+        shell: bash
 
       - name: E2E Test 🧪
         if: "!contains(github.event.head_commit.message, 'skip e2e')"
