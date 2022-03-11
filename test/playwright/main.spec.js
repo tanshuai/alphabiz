@@ -78,8 +78,6 @@ test('close auto update', async () => {
 
 test('reset torrent status', async () => {
   await window.waitForLoadState()
-  await commands.jumpPage('downloadingStatus')
-  if (process.platform === 'win32' && await commands.downloadingStatus.isVisible()) await commands.downloadBtn.click({ force: true })
   if (await window.isEnabled('button:has-text("Remove all") >> nth=0')) {
     await window.click('button:has-text("Remove all") >> nth=0')
     await window.click('[aria-label="Also delete files"]')
@@ -465,7 +463,7 @@ test.describe('account', () => {
   //     username: '+86' + process.env.TEST3_PHONE_NUMBER
   //   }
   // ]
-  test.skip('transfer - check bill details', async () => {
+  test('transfer - check bill details', async () => {
     test.setTimeout(60000 * 1)
     let from
     let to
@@ -488,6 +486,8 @@ test.describe('account', () => {
     const payee = to + process.env.TEST_EMAIL_DOMAIN
     const payeePassword = process.env.TEST_PASSWORD
     const transferAmount = 1
+    await window.evaluate(() => localStorage.clear())
+    await window.reload()
     // 如果应用已经登陆则退出登录状态
     const isHasAlert = await window.isVisible('div[role="alert"]:has-text("check_circleSigned out")')
     if (isHasAlert) {
