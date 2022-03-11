@@ -1,12 +1,4 @@
-fix: alphabiz url download error
-fix encode error
-modify playwright test
-try run playwright test
-fix online-experiments.yml error
-fix playwright test error
-retry run playwright test
-fix alphabiz uri parse errors
-save sort options in local, fix devtools switch
-skip test、skip e2e for public repo
-use declare merging for settings
-skip e2e for public repo
+modify 7z command 、retry playwright test、skip e2e
+release、test 7z command line
+check disk usage after torrent ready, catch crash exceptions #190
+fix playwright test timeout error、skip e2e for public repo
