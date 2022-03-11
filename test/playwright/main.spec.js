@@ -100,6 +100,7 @@ test('reset torrent status', async () => {
   // await window.click('text=Torrent Config Store >> //following-sibling::Button[2]')
   // await window.locator('text=Successfully reset torrents').waitFor('visible')
 })
+
 test.describe('play video', () => {
   test('avi_type', async () => {
     const media = './test/samples/GoneNutty.avi'
@@ -188,6 +189,7 @@ test.describe('download ', () => {
       // download bbb_sunflower_1080p_30fps_normal.mp4 下载中状态多等一会
       if (btDate.btName === 'bbb_sunflower_1080p_30fps_normal.mp4' && btDate.isStreaming === 0) {
         let waitTime = 0
+        // await window.reload()
         while (1) {
           if (await window.$(btCard) == null) {
             waitTime += 3
@@ -196,7 +198,6 @@ test.describe('download ', () => {
           await window.waitForTimeout(3000)
         }
       }
-
       // 判断 任务 在downloading状态
       if (await window.$(btCard) !== null) {
         // 等待下载完成
@@ -265,7 +266,7 @@ test.describe('download ', () => {
 
       // should video can play
       await window.waitForSelector('.vjs-progress-control', { timeout: 40000 })
-      await window.reload()
+      // await window.reload()
       // 是否删除种子
       if (btDate.isDelete) {
         await commands.jumpPage('uploadingStatus')
@@ -450,67 +451,16 @@ test.describe('account', () => {
   const userInfo = [
     {
       nikename: 'test3',
-      username: process.env.TEST3_EMAIL,
-      password: process.env.TEST_PASSWORD,
-      resetPassword: process.env.TEST_RESET_PASSWORD
+      username: process.env.EMAIL_USERNAME,
+      password: process.env.TEST_PASSWORD
     },
     {
       nikename: 'test2',
-      username: process.env.TEST2_EMAIL,
+      username: '+86' + process.env.TEST3_PHONE_NUMBER,
       password: process.env.TEST_PASSWORD
     }
   ]
-  for (const user of userInfo) {
-    test.skip(user.nikename + ' sign up', async () => {
-      test.setTimeout(60000 * 10)
-      await window.waitForLoadState()
-      const isHasAlert = await window.isVisible('div[role="alert"]:has-text("check_circleSigned out")')
-      if (isHasAlert) {
-        await window.reload()
-      }
-      const newTime2 = new Date()
-      // await commands.jumpPage('accountLink')
-      await commands.signIn(user.username, user.password, 0)
-
-      const notification = await window.locator('.q-notification__message')
-      await notification.waitFor({ timeout: 40000 })
-      const alert = await notification.innerText()
-      console.log(alert)
-      if (/Incorrect username or password/.test(alert)) {
-        // sign up part 1
-        await window.click('button[role="button"]:has-text("Sign up")')
-        await window.click('text=Sign up by email')
-        await window.fill('[aria-label="Email"]', user.username)
-        await window.fill('[aria-label="Password"]', user.password)
-        await window.fill('[aria-label="Invitation code"]', '5EPD12NW3F')
-        await window.click('text=I accept')
-        await window.click('button[role="button"]:has-text("Next")')
-        // sign up part 2
-        await window.locator('[aria-label="Verification code"]').waitFor()
-        const verificationCode = await getMailCode({ type: 1, time: newTime2 })
-        await window.fill('[aria-label="Verification code"]', verificationCode)
-        await window.click('button[role="button"]:has-text("Finish")')
-        // wait alert
-        await window.click('div[role="alert"]:has-text("check_circleSigned up")')
-      } else if (/Signed in/.test(alert)) {
-      // 账号已经注册成功
-      }
-      await commands.signOut()
-    })
-  }
-  test.skip('new sign in', async () => {
-    test.setTimeout(60000 * 2)
-    await window.waitForLoadState()
-    // await commands.jumpPage('accountLink')
-    await commands.signIn('zyl@alpha.biz', process.env.TEST_PASSWORD, 1)
-    await window.locator('header:has-text("Account Settings")').waitFor({ timeout: 15000 })
-    await commands.jumpPage('creditsLink')
-    const credit = await commands.getCredit()
-    console.log('credit:' + credit)
-    await window.waitForTimeout(6000)
-    await commands.signOut()
-  })
-  test.skip('test3 to test2 transfer - check bill details', async () => {
+  test('test3 to test2 transfer - check bill details', async () => {
     test.setTimeout(60000 * 3)
     // 转账人账号、密码
     const transferee = userInfo[0].username
@@ -570,67 +520,4 @@ test.describe('account', () => {
     await commands.signOut()
     await sleep(1000)
   })
-  test.skip('test3 reset password', async () => {
-    // 查询重置账号
-    await commands.jumpPage('accountLink')
-    const newTime2 = new Date()
-    await sleep(1000)
-    await window.click('text=Reset password')
-    await sleep(1000)
-    await window.click('text=Find your account')
-    await window.fill('[aria-label="Phone number or email"]', userInfo[0].username)
-    await window.click('button[role="button"]:has-text("Search")')
-    // 验证信息
-    const verificationCode = await getMailCode({ type: 1, time: newTime2 })
-    await window.fill('[aria-label="Verification code"]', verificationCode)
-    await window.fill('[aria-label="Password"]', userInfo[0].resetPassword)
-    await window.fill('[aria-label="Re-enter password"]', userInfo[0].resetPassword)
-    await window.click('button[role="button"]:has-text("Submit")')
-    // 断言提示框成功弹出
-    await window.locator('.q-notification__message >> text=Password has been reset').waitFor({ timeout: 15000 })
-  })
-
-  for (const user of userInfo) {
-    test.skip(user.nikename + ' delete user', async () => {
-      await window.waitForLoadState()
-      const isHasAlert = await window.isVisible('div[role="alert"]')
-      if (isHasAlert) {
-        await window.reload()
-      }
-      await commands.signIn(user.username, user.password, 0)
-      const notification = await window.locator('.q-notification__message')
-      await notification.waitFor({ timeout: 40000 })
-      const alert = await notification.innerText()
-      if (/Incorrect username or password/.test(alert)) {
-        // 使用resetPassword登录
-        await window.reload()
-        await commands.signIn(user.username, user.resetPassword, 0)
-        const notification = await window.locator('.q-notification__message')
-        await notification.waitFor({ timeout: 40000 })
-        const alert = await notification.innerText()
-        if (/Incorrect username or password/.test(alert)) {
-          // 用户不存在
-        } else if (/Signed in/.test(alert)) {
-        // resetPassword登录成功，需要删除
-          await commands.jumpPage('accountLink', 'accountSettings')
-          // delete user
-          await commands.deleteUser(user.resetPassword)
-        }
-      } else if (/Signed in/.test(alert)) {
-        // password登录成功，需要删除
-        await commands.jumpPage('accountLink', 'accountSettings')
-        // delete user
-        await commands.deleteUser(user.password)
-      }
-      // 断言返回登录界面
-      // await window.click('text=Sign in')
-      if (await commands.accountLink.isHidden()) {
-        await commands.menuIcon.click()
-      }
-      const concerText = await commands.accountLink.innerText()
-
-      // console.log('concerText:' + concerText)
-      expect(concerText).toBe('account_circle\nWant to Join?\nSign up')
-    })
-  }
 })
