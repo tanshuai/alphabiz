@@ -53,7 +53,7 @@ module.exports = {
       rebuild({
         buildPath,
         arch,
-        electronVersion: '11.5.0'
+        electronVersion: '17.0.0'
       })
         .then(() => {
           console.log('Rebuilt native module')
