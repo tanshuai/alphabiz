@@ -24,6 +24,7 @@ jobs:
         # os: [windows-latest, macos-latest]
         os: [ubuntu-latest, windows-2022, macos-latest]
         node-version: [14]
+      fail-fast: false
     environment:
       name: CICD
     env:
@@ -117,7 +118,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: "output1"
+          name: "${{ matrix.os }}-output"
           path: test/output/**
 
       #后面的step晚上运行
