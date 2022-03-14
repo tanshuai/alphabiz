@@ -460,7 +460,7 @@ test.describe('account', () => {
       password: process.env.TEST_PASSWORD
     }
   ]
-  test('test3 to test2 transfer - check bill details', async () => {
+  test.skip('test3 to test2 transfer - check bill details', async () => {
     test.setTimeout(60000 * 3)
     // 转账人账号、密码
     const transferee = userInfo[0].username
