@@ -1,4 +1,5 @@
-modify 7z command 、retry playwright test、skip e2e
-release、test 7z command line
-check disk usage after torrent ready, catch crash exceptions #190
-fix playwright test timeout error、skip e2e for public repo
+test retry fail step on online-experiments、skip macos-self-hosted
+fix timeout error
+fix timeout error
+torrent-manager: use maps instead of arrays
+Update internal.yml
