@@ -52,9 +52,9 @@ test.afterEach(async ({}, testInfo) => {
 test.afterAll(async () => {
   // // Exit app.
   // await window.evaluate(() => localStorage.clear())
-
   // await electronApp.close()
 })
+
 test('close Automatically check for update', async () => {
   await commands.jumpPage('advancedLink')
   if (await window.isChecked('[aria-label="Automatically\\ check\\ for\\ update"]')) {
