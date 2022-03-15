@@ -60,6 +60,7 @@ test('close Automatically check for update', async () => {
   if (await window.isChecked('[aria-label="Automatically\\ check\\ for\\ update"]')) {
     await window.click('[aria-label="Automatically\\ check\\ for\\ update"]')
     await window.click('button:has-text("Save & Apply")')
+    await window.locator('.q-notification__message >> text=Save preferences successfully').waitFor({ timeout: 20000 })
   }
   if (process.platform === 'win32') await sleep(400)
   await commands.jumpPage('downloadingStatus')
@@ -217,15 +218,18 @@ test.describe('download ', () => {
           await window.click(btCard + ' >> text=Status: Downloading', { timeout: 60000 })
         } catch (error) {
           await commands.jumpPage('uploadingStatus')
+          await window.locator('button:has-text("search")').click({ force: true })
           await window.click(btCard + ' >> text=Status: Seeding', { timeout: 30000 })
         }
       } else {
         // 判断 任务 在seeding状态
         await commands.jumpPage('uploadingStatus')
+        await window.locator('button:has-text("search")').click({ force: true })
         await window.waitForTimeout(1000)
         if (await window.$(btCard) === null) {
           // 任务不存在  bt未开始下载
           await commands.jumpPage('downloadingStatus')
+          await window.locator('button:has-text("search")').click({ force: true })
           await commands.downloadTorrent(btDate.magnetLink)
           try {
             await window.click('text=' + btDate.btName, { timeout: 30000 })
@@ -271,7 +275,10 @@ test.describe('download ', () => {
           }
         }
       }
-      if (btDate.isStreaming !== 1) await commands.jumpPage('uploadingStatus')
+      if (btDate.isStreaming !== 1) {
+        await commands.jumpPage('uploadingStatus')
+        await window.locator('button:has-text("search")').click({ force: true })
+      }
       // 点击 Play 按钮
       await window.click(btCard + ' >> button:has-text("play_circlePlay")')
       // 点击播放列表的第一个文件，跳转到player页面
