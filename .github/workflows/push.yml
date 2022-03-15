@@ -1,4 +1,4 @@
-name: CI/CT for each push && nightly
+name: CI/CT/CD
 # env:
 #   name: staging_environment
 
