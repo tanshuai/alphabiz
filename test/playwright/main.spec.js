@@ -28,7 +28,7 @@ test.beforeAll(async () => {
   // Get the first window that the app opens, wait if necessary.
   window = await electronApp.firstWindow()
 
-  await window.waitForTimeout(10000)
+  await window.waitForTimeout(6000)
   // should main window
   windows = electronApp.windows()
 
@@ -74,7 +74,7 @@ test('close set default', async () => {
   }
 })
 
-test('close auto update', async () => {
+test.skip('close auto update', async () => {
   try {
     await window.waitForSelector('text=UPDATE LATER', { timeout: 8000 })
     await window.click('text=UPDATE LATER')
@@ -111,7 +111,7 @@ test('reset torrent status', async () => {
 })
 
 test.describe('play video', () => {
-  test.skip('avi_type', async () => {
+  test('avi_type', async () => {
     const media = './test/cypress/fixtures/samples/GoneNutty.avi'
 
     await window.waitForLoadState()
@@ -123,7 +123,7 @@ test.describe('play video', () => {
     const progressControl = await window.locator('.vjs-progress-control')
     await expect(progressControl).toBeVisible()
   })
-  test.skip('BluRay_mkv_type', async () => {
+  test('BluRay_mkv_type', async () => {
     const media = './test/cypress/fixtures/samples/Test-Sample-Tenet.2020.IMAX.2160p.UHD.BluRay.x265.10bit.HDR.DTS-HD.MA.5.1202111171122322.mkv'
 
     if (await window.$('[data-cy="file-input"]') === null) await commands.jumpPage('playerLink')
