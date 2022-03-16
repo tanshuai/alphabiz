@@ -1,8 +1,1 @@
-fix: #196
-fix: #197
-fix ask-associate error
-try fix auto update、download test
-restore player test
-try push once commit to public repo
-fix push.yml error
-fix download test
+fix bugs of sorting and uploadSpeed
