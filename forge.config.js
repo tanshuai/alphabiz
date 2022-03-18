@@ -160,6 +160,12 @@ module.exports = {
         shortcutFolderName: '',
         programFilesFolderName: productName,
         appIconPath: resolve(__dirname, 'public/platform-assets/windows/icon.ico'),
+        /**
+         * This code is randomly generate by [uuid](https://www.npmjs.com/package/uuid).
+         * The Windows MSI installer uses it to upgrade an existed software.
+         * Do NOT change this unless you know what will happen.
+        */
+        upgradeCode: '4d8a65aa-fc5b-421c-94ab-cb722ef737e2',
         version,
         ui: {
           chooseDirectory: true,
@@ -176,7 +182,7 @@ module.exports = {
           // console.log(wix.wixTemplate || wix)
           // Remove appName tail created by wix
           if (wix.wixTemplate) {
-            console.log(wix.uiTemplate)
+            // console.log(wix.uiTemplate)
             wix.uiTemplate = wix.uiTemplate
               .replace('<DialogRef Id="MsiRMFilesInUse" />', '<!-- <DialogRef Id="MsiRMFilesInUse" /> -->')
             wix.wixTemplate = wix.wixTemplate
