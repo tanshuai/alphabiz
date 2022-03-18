@@ -141,10 +141,8 @@ jobs:
         include:
           - test: 1
             os: windows-2022
-
           - test: 2
             os: windows-2022
-
     environment:
       name: CICD
     env:
@@ -176,6 +174,19 @@ jobs:
           echo "::set-output name=sha7::${GITHUB_SHA::7}"
           echo "test-2"
         shell: bash
+
+      - name: Checkout ⬇️
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js ${{ matrix.node-version }} 📮
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "yarn"
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@zeeis"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PAT }}
 
       - name: update node-gyp on windows to support Visual Studio 2019
         if: matrix.os == 'windows-2022'
