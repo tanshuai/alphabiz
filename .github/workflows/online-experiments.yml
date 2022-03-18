@@ -17,7 +17,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     outputs:
       output1: ${{ steps.vars.outputs.tag-name }}
-      output2: ${{ steps.check.outputs.isRunAppium }}
     strategy:
       matrix:
         # os: [ubuntu-latest, windows-latest, macos-latest]
@@ -65,15 +64,6 @@ jobs:
         id: check
         run: |
           echo "${{ steps.vars.outputs.tag-name }}"
-          if [[ ${{ steps.vars.outcome }} = "success" ]] ; \
-          then echo "::set-output name=isRunAppium::0" ; \
-          else echo "::set-output name=isRunAppium::1" ; \
-          fi
-        shell: bash
-
-      - name: Check isRunAppium = ${{ steps.check.outputs.isRunAppium }}
-        run: |
-          echo "${{ steps.check.outputs.isRunAppium }}"
         shell: bash
 
       - name: Setup Node.js ${{ matrix.node-version }} 📮
@@ -140,7 +130,6 @@ jobs:
 
   appium-test:
     needs: build-1
-    if: needs.build-1.outputs.output2
     timeout-minutes: 60
     runs-on: ${{ matrix.os }}
     strategy:
@@ -194,6 +183,9 @@ jobs:
         run: |
           npm install --global node-gyp@8.4.1
           npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
+
+      - name: Install dependencies 👨🏻‍💻
+        run: yarn
 
       - name: Install Alphabiz
         run: |
