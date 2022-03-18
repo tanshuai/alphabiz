@@ -11,7 +11,7 @@ on:
   push:
     paths:
       - "**.js"
-      - "!**/push.yml"
+      - "**/push.yml"
       - "build/**"
       - "release.json"
     branches: [main]
@@ -19,6 +19,9 @@ on:
 jobs:
   test-1:
     runs-on: ${{ matrix.os }}
+    outputs:
+      output1: ${{ steps.unify.outputs.tag-name }}
+      output2: ${{ steps.check.outputs.isRunAppium }}
     strategy:
       matrix:
         # os: [windows-latest, macos-latest]
@@ -169,6 +172,7 @@ jobs:
 
       # this step checkout all output
       - name: Checkout vars-date ${{ steps.vars.outputs.date }} ⬇️
+        id: check
         run: |
           echo "event_name: ${{ steps.vars.outputs.event-name }}"
           echo "event.head_commit.message: ${{ github.event.head_commit.message }}"
@@ -178,6 +182,10 @@ jobs:
           echo "run workflow date: ${{ steps.vars.outputs.date }}"
           echo "----------------------"
           echo "MODIFIED_FILE_LIST: ${{ env.MODIFIED_FILE_LIST }}"
+          if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
+          then echo "::set-output name=isRunAppium::1" ; \
+          else echo "::set-output name=isRunAppium::0" ; \
+          fi
           if ${{ contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json') }};\
           then  echo "----------------------" ; \
                 echo "tag-name: ${{ steps.unify.outputs.tag-name }}" ; \
@@ -196,7 +204,7 @@ jobs:
 
       - name: Install dependencies 👨🏻‍💻
         uses: nick-fields/retry@v2
-        with: 
+        with:
           timeout_seconds: 600
           max_attempts: 2
           shell: bash
@@ -205,7 +213,7 @@ jobs:
 
       - name: Install UnPackaged 👨🏻‍💻
         uses: nick-fields/retry@v2
-        with: 
+        with:
           timeout_seconds: 600
           max_attempts: 2
           shell: bash
@@ -235,9 +243,7 @@ jobs:
 
       - name: Run electron-packager
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
-        id: packager
         run: |
-          unset REPO
           if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
           then if ${{ contains(steps.checkout.outputs.new-tag-name, 'nightly') }} ; \
                then yarn node update-version.js ${{ steps.unify.outputs.tag-name }} ${{ steps.slug.outputs.sha7 }} ; \
@@ -247,25 +253,6 @@ jobs:
           export BUILD_VERSION=${{ steps.unify.outputs.tag-name }}
           yarn packager
         shell: bash
-
-      - name: Install winappdriver.msi
-        if: matrix.os == 'windows-2022' && steps.packager.outcome == 'success' && !contains(github.event.head_commit.message, 'skip e2e')
-        run: |
-          Invoke-WebRequest "https://github.com/microsoft/WinAppDriver/releases/download/v1.2.1/WindowsApplicationDriver_1.2.1.msi" -OutFIle "C:\WindowsApplicationDriver_1.2.1.msi"
-          Start-Process msiexec -ArgumentList "/quiet","/x","{087BBF93-D9E3-4D27-BDBE-9C702E0066FC}" -Verb runAs -Wait
-          Start-Process msiexec -ArgumentList "/quiet","/i","C:\WindowsApplicationDriver_1.2.1.msi" -Verb runAs -Wait
-          Start-Sleep -s 5
-        shell: powershell
-
-      - name: Run appium
-        if: matrix.os == 'windows-2022' && steps.packager.outcome == 'success' && !contains(github.event.head_commit.message, 'skip e2e')
-        run: |
-          Start-Process PowerShell -ArgumentList "yarn test:appium"
-          Start-Sleep -s 10
-
-      - name: e2e test for release 🧪
-        if: matrix.os == 'windows-2022' && steps.packager.outcome == 'success' && !contains(github.event.head_commit.message, 'skip e2e')
-        run: yarn test:release
 
       - name: Package for ${{ matrix.os }}-${{ steps.unify.outputs.package-name }} Release 🗜️
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
@@ -290,3 +277,101 @@ jobs:
           files: |
             alphabiz-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }}.7z
             ./out/installers/${{ steps.unify.outputs.build-version }}/**
+
+  appium-test:
+    needs: test-1
+    if: (contains(github.event_name, 'schedule') || contains(needs.build-1.outputs.output2, '1')) && "!contains(github.event.head_commit.message, 'skip e2e')"
+    timeout-minutes: 60
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        test: [1, 2]
+        node-version: [14]
+        os: [windows-2022]
+        include:
+          - test: 1
+            os: windows-2022
+          - test: 2
+            os: windows-2022
+    environment:
+      name: CICD
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.PAT }}
+      GITHUB_PAT: ${{ secrets.PAT }}
+      EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
+      EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+      PHONE_NUMBER_ACCOUNT: ${{ secrets.PHONE_NUMBER_ACCOUNT }}
+      PHONE_NUMBER_TOKEN: ${{ secrets.PHONE_NUMBER_TOKEN }}
+      TEST1_EMAIL: ${{ secrets.TEST1_EMAIL }}
+      TEST2_EMAIL: ${{ secrets.TEST2_EMAIL }}
+      TEST3_EMAIL: ${{ secrets.TEST3_EMAIL }}
+      TEST1_PHONE_NUMBER: ${{ secrets.TEST1_PHONE_NUMBER }}
+      TEST2_PHONE_NUMBER: ${{ secrets.TEST2_PHONE_NUMBER }}
+      TEST3_PHONE_NUMBER: ${{ secrets.TEST3_PHONE_NUMBER }}
+      TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+      TEST_RESET_PASSWORD: ${{ secrets.TEST_RESET_PASSWORD }}
+    steps:
+      - name: test-1 Get short SHA 🔑
+        if: matrix.test == '1'
+        run: |
+          echo "::set-output name=sha7::${GITHUB_SHA::7}"
+          echo "test-1"
+          echo "isRunAppium: ${{needs.build-1.outputs.output2}}"
+        shell: bash
+
+      - name: test-2 Get short SHA 🔑
+        if: matrix.test == '2'
+        run: |
+          echo "::set-output name=sha7::${GITHUB_SHA::7}"
+          echo "test-2"
+          echo "isRunAppium: ${{needs.build-1.outputs.output2}}"
+        shell: bash
+
+      - name: Checkout ⬇️
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js ${{ matrix.node-version }} 📮
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "yarn"
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@zeeis"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PAT }}
+
+      - name: update node-gyp on windows to support Visual Studio 2019
+        shell: powershell
+        run: |
+          npm install --global node-gyp@8.4.1
+          npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
+
+      - name: Get message
+        run: |
+          git fetch --prune --unshallow
+        shell: bash
+
+      - name: Install dependencies 👨🏻‍💻
+        run: yarn
+
+      - name: Install Alphabiz
+        run: |
+          curl -L https://github.com/tanshuai/alphabiz/releases/download/${{needs.build-1.outputs.output1}}/alphabiz-${{needs.build-1.outputs.output1}}-windows.7z > alphabiz.7z
+          7z x alphabiz.7z
+        shell: bash
+
+      - name: Install winappdriver.msi
+        run: |
+          Invoke-WebRequest "https://github.com/microsoft/WinAppDriver/releases/download/v1.2.1/WindowsApplicationDriver_1.2.1.msi" -OutFIle "C:\WindowsApplicationDriver_1.2.1.msi"
+          Start-Process msiexec -ArgumentList "/quiet","/x","{087BBF93-D9E3-4D27-BDBE-9C702E0066FC}" -Verb runAs -Wait
+          Start-Process msiexec -ArgumentList "/quiet","/i","C:\WindowsApplicationDriver_1.2.1.msi" -Verb runAs -Wait
+          Start-Sleep -s 5
+        shell: powershell
+
+      - name: Run appium
+        run: |
+          Start-Process PowerShell -ArgumentList "yarn test:appium"
+          Start-Sleep -s 10
+
+      - name: e2e test for release 🧪
+        run: yarn test:release
