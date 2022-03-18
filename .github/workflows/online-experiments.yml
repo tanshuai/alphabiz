@@ -17,8 +17,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        # os: [ubuntu-latest, windows-latest, macos-self-hosted]
-        os: [ubuntu-latest, windows-2022, macos-latest]
+        # os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [windows-2022]
         node-version: [14]
     environment:
       name: CICD
@@ -81,40 +81,89 @@ jobs:
           npm install --global node-gyp@8.4.1
           npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
 
-      - name: Install dependencies 👨🏻‍💻
-        run: |
-          yarn || (echo "===== yarn Attempt: 2 ====" && yarn)
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.PAT }}
-          GITHUB_PAT: ${{ secrets.PAT }}
+      # - name: Install dependencies 👨🏻‍💻
+      #   run: |
+      #     yarn || (echo "===== yarn Attempt: 2 ====" && yarn)
+      #   env:
+      #     NODE_AUTH_TOKEN: ${{ secrets.PAT }}
+      #     GITHUB_PAT: ${{ secrets.PAT }}
 
-      - name: Install UnPackaged 👨🏻‍💻
+      # - name: Install UnPackaged 👨🏻‍💻
+      #   run: |
+      #     yarn unpackaged || (echo "===== yarn unpackaged Attempt: 2 ====" && yarn unpackaged)
+      #   shell: bash
+
+      # - name: Run electron-packager
+      #   if: contains(github.event.head_commit.message, 'run packager')
+      #   id: packager
+      #   run: |
+      #     yarn packager
+      #   shell: bash
+
+      # - name: Install winappdriver.msi
+      #   if: matrix.os == 'windows-2022' && steps.packager.outcome == 'success'
+      #   run: |
+      #     Invoke-WebRequest "https://github.com/microsoft/WinAppDriver/releases/download/v1.2.1/WindowsApplicationDriver_1.2.1.msi" -OutFIle "C:\WindowsApplicationDriver_1.2.1.msi"
+      #     Start-Process msiexec -ArgumentList "/quiet","/x","{087BBF93-D9E3-4D27-BDBE-9C702E0066FC}" -Verb runAs -Wait
+      #     Start-Process msiexec -ArgumentList "/quiet","/i","C:\WindowsApplicationDriver_1.2.1.msi" -Verb runAs -Wait
+      #     Start-Sleep -s 5
+      #   shell: powershell
+
+      # - name: Run appium
+      #   if: matrix.os == 'windows-2022' && steps.packager.outcome == 'success'
+      #   run: |
+      #     Start-Process PowerShell -ArgumentList "yarn test:appium"
+      #     Start-Sleep -s 10
+
+      # - name: Run release test 🧪
+      #   if: matrix.os == 'windows-2022' && steps.packager.outcome == 'success'
+      #   run: yarn test:release
+
+  test-1:
+    needs: build-1
+    timeout-minutes: 60
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # os: [ubuntu-latest, windows-latest, macos-self-hosted]
+        build: [1, 2]
+        node-version: [14]
+        os: [windows-2022, windows-2022]
+        include:
+          - build: 1
+            os: windows-2022
+
+          - build: 2
+            os: windows-2022
+
+    environment:
+      name: CICD
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.PAT }}
+      GITHUB_PAT: ${{ secrets.PAT }}
+      EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
+      EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+      PHONE_NUMBER_ACCOUNT: ${{ secrets.PHONE_NUMBER_ACCOUNT }}
+      PHONE_NUMBER_TOKEN: ${{ secrets.PHONE_NUMBER_TOKEN }}
+      TEST1_EMAIL: ${{ secrets.TEST1_EMAIL }}
+      TEST2_EMAIL: ${{ secrets.TEST2_EMAIL }}
+      TEST3_EMAIL: ${{ secrets.TEST3_EMAIL }}
+      TEST1_PHONE_NUMBER: ${{ secrets.TEST1_PHONE_NUMBER }}
+      TEST2_PHONE_NUMBER: ${{ secrets.TEST2_PHONE_NUMBER }}
+      TEST3_PHONE_NUMBER: ${{ secrets.TEST3_PHONE_NUMBER }}
+      TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+      TEST_RESET_PASSWORD: ${{ secrets.TEST_RESET_PASSWORD }}
+    steps:
+      - name: build-1 Get short SHA 🔑
+        id: slug
+        if: matrix.build == '1'
         run: |
-          yarn unpackaged || (echo "===== yarn unpackaged Attempt: 2 ====" && yarn unpackaged)
+          echo "::set-output name=sha7::${GITHUB_SHA::7}"
         shell: bash
 
-      - name: Run electron-packager
-        if: contains(github.event.head_commit.message, 'run packager')
-        id: packager
+      - name: build-2 Get short SHA 🔑
+        id: slug
+        if: matrix.build == '2'
         run: |
-          yarn packager
+          echo "::set-output name=sha7::${GITHUB_SHA::7}"
         shell: bash
-
-      - name: Install winappdriver.msi
-        if: matrix.os == 'windows-2022' && steps.packager.outcome == 'success'
-        run: |
-          Invoke-WebRequest "https://github.com/microsoft/WinAppDriver/releases/download/v1.2.1/WindowsApplicationDriver_1.2.1.msi" -OutFIle "C:\WindowsApplicationDriver_1.2.1.msi"
-          Start-Process msiexec -ArgumentList "/quiet","/x","{087BBF93-D9E3-4D27-BDBE-9C702E0066FC}" -Verb runAs -Wait
-          Start-Process msiexec -ArgumentList "/quiet","/i","C:\WindowsApplicationDriver_1.2.1.msi" -Verb runAs -Wait
-          Start-Sleep -s 5
-        shell: powershell
-
-      - name: Run appium
-        if: matrix.os == 'windows-2022' && steps.packager.outcome == 'success'
-        run: |
-          Start-Process PowerShell -ArgumentList "yarn test:appium"
-          Start-Sleep -s 10
-
-      - name: Run release test 🧪
-        if: matrix.os == 'windows-2022' && steps.packager.outcome == 'success'
-        run: yarn test:release
