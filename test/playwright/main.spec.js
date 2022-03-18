@@ -55,7 +55,7 @@ test.afterAll(async () => {
   // await electronApp.close()
 })
 
-test('close Automatically check for update', async () => {
+test.skip('close Automatically check for update', async () => {
   await commands.jumpPage('advancedLink')
   if (await window.isChecked('[aria-label="Automatically\\ check\\ for\\ update"]')) {
     await window.click('[aria-label="Automatically\\ check\\ for\\ update"]')
@@ -75,9 +75,9 @@ test('close set default', async () => {
   }
 })
 
-test.skip('close auto update', async () => {
+test('close auto update', async () => {
   try {
-    await window.waitForSelector('text=UPDATE LATER', { timeout: 8000 })
+    await window.waitForSelector('text=UPDATE LATER', { timeout: 20000 })
     await window.click('text=UPDATE LATER')
     console.log('update later')
   } catch (error) {
