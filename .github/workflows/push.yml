@@ -77,6 +77,7 @@ jobs:
         shell: bash
 
       # 获取所以今天 作者为AlphabizTeam的commit message,正则:不匹配'[-]符号'前面的任意字符、不匹配空行
+      # export DESCRIBE=$(git log --reverse --after="${{ steps.vars.outputs.release-date }} 00:00" --before="${{ steps.vars.outputs.release-date }} 23:59" --author="AlphabizTeam" --pretty='format:%B' | perl -wnE'say for /(?!.*-)(?!\s).*\w+$/gm')
       - name: Get today all commit message
         run: |
           export DESCRIBE=$(cat test/github-describe/github-describe.txt)
