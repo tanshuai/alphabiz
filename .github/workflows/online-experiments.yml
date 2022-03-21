@@ -68,7 +68,7 @@ jobs:
         run: |
           TZ=UTC-8 git log -10 --date=format-local:"%Y%m%d%H%M" --format="%cd"
           echo "--------------------------"
-          echo "::set-output name=tag-name::0.1.0-nightly-202203171916"
+          echo "::set-output name=tag-name::0.1.0-nightly-202203191916"
           if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
           then echo "::set-output name=isRunAppium::1" ; \
           else echo "::set-output name=isRunAppium::0" ; \
@@ -232,20 +232,20 @@ jobs:
 
       - name: Download msi and exe
         run: |
-          curl -L https://github.com/tanshuai/alphabiz/releases/download/0.1.0-nightly-202203181916/alphabiz-0.1.0-nightly-202203182016.exe > C:/Alphabiz.exe
-          curl -L https://github.com/tanshuai/alphabiz/releases/download/0.1.0-nightly-202203181916/alphabiz-0.1.0-nightly-202203182016.msi > C:/Alphabiz.msi
+          curl -L https://github.com/tanshuai/alphabiz/releases/download/${{needs.build-1.outputs.output1}}/alphabiz-${{needs.build-1.outputs.output1}}.exe > C:/alphabiz.exe
+          curl -L https://github.com/tanshuai/alphabiz/releases/download/${{needs.build-1.outputs.output1}}/alphabiz-${{needs.build-1.outputs.output1}}.msi > C:/alphabiz.msi
         shell: bash
 
       - name: Install alphabiz.exe
         run: |
-          Start-Process -FilePath "C:\Alphabiz.exe" -ArgumentList '/S','/v','/qn' -passthru
+          Start-Process -FilePath "C:\alphabiz.exe" -ArgumentList '/S','/v','/qn' -passthru
           Start-Sleep -s 20
           taskkill /f /im Alphabiz.exe
         shell: powershell
 
       - name: Install alphabiz.msi
         run: |
-          Start-Process msiexec -ArgumentList "/quiet","/i","C:\Alphabiz.msi"
+          Start-Process msiexec -ArgumentList "/quiet","/i","C:\alphabiz.msi"
         shell: powershell
 
       - name: Install winappdriver.msi
