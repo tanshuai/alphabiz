@@ -103,6 +103,8 @@ dist
 # TernJS port file
 .tern-port
 
+public/version.json
+
 # build/
 *.torrent
 test-results/

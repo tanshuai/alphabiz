@@ -70,18 +70,21 @@ const updateVersionJSON = async () => {
   // console.log(unpackagedVersionObj)
   content.packageVer = unpackagedVersionObj.packageVer
   content.buildTime = await getBuildTime()
-  // 如果正式发布buildCommit 为触发正式发布的sha7
-  if (!process.argv[3]) content.buildCommit = await getCommit()
-  else content.buildCommit = process.argv[3]
+  content.channel = 'nightly'
   content.sourceCommit = await getSourceCommit()
-  // 如果正式发布,则从argv传入新的tagname format: node update-version.js [newTagName] [newSHA7]
-  if (!process.argv[2]){
-    content.channel = 'nightly'
+  // 如果正式发布,则从argv传入新的tagname format: node update-version.js --newTag [newTagName] --SHA7 [newSHA7] --buildTime [buildTime]
+  const argv = require('minimist')(process.argv.slice(2))
+  console.log(argv)
+  if(process.argv.includes('--buildTime')) content.buildTime = argv.buildTime
+  // 如果正式发布buildCommit 为触发正式发布的sha7
+  if(process.argv.includes('--SHA7')) content.buildCommit = argv.SHA7
+  else content.buildCommit = await getCommit()
+  // get newTag
+  if(!process.argv.includes('--newTag')) {
     content.version = content.packageVer + '-' + content.channel + '-' + content.buildTime
   } else {
     if (process.argv.includes('--stable')) content.channel = 'stable'
-    else content.channel = 'nightly'
-    content.version = process.argv[2]
+    content.version = argv.newTag
   }
   const data = JSON.stringify(content, null, 2)
   fs.writeFileSync(versionJSON, data)
