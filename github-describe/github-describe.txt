@@ -1,1 +1,7 @@
-fix: #204
+Add Electron Process Argv to Dev Mode to debug various version of OS
+fix: #202
+account settings: use scroll area
+fast release
+try release
+fix os.name error
+fix playwright download test / skip workflow
