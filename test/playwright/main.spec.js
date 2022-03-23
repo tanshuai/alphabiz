@@ -55,16 +55,6 @@ test.afterAll(async () => {
   // await electronApp.close()
 })
 
-test.skip('close Automatically check for update', async () => {
-  await commands.jumpPage('advancedLink')
-  if (await window.isChecked('[aria-label="Automatically\\ check\\ for\\ update"]')) {
-    await window.click('[aria-label="Automatically\\ check\\ for\\ update"]')
-    await window.click('button:has-text("Save & Apply")')
-    await window.locator('.q-notification__message >> text=Save preferences successfully').waitFor({ timeout: 20000 })
-  }
-  if (process.platform === 'win32') await sleep(400)
-  await commands.jumpPage('downloadingStatus')
-})
 test('close set default', async () => {
   try {
     await window.waitForSelector('text=Alphabiz is not your default app for', { timeout: 3000 })
@@ -83,6 +73,17 @@ test('close auto update', async () => {
   } catch (error) {
     console.log('no wait for btn[update later]')
   }
+})
+
+test('close Automatically check for update', async () => {
+  await commands.jumpPage('advancedLink')
+  if (await window.isChecked('[aria-label="Automatically\\ check\\ for\\ update"]')) {
+    await window.click('[aria-label="Automatically\\ check\\ for\\ update"]')
+    await window.click('button:has-text("Save & Apply")')
+    await window.locator('.q-notification__message >> text=Save preferences successfully').waitFor({ timeout: 20000 })
+  }
+  if (process.platform === 'win32') await sleep(400)
+  await commands.jumpPage('downloadingStatus')
 })
 
 test('reset torrent status', async () => {
@@ -232,11 +233,11 @@ test.describe('download ', () => {
           await window.locator('button:has-text("search")').click({ force: true })
           await commands.downloadTorrent(btDate.magnetLink)
           try {
-            await window.click('text=' + btDate.btName, { timeout: 30000 })
+            await window.click('text=' + btDate.btName, { timeout: 20000 })
             // 等待 任务 加载 验证， 判断任务是 下载中
             await window.click(btCard + ' >> text=Status: Downloading', { timeout: 60000 })
           } catch (error) {
-            console.log('no wait for btn[update later]')
+            console.log('The seed download is complete')
           }
         }
       }
