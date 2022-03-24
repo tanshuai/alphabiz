@@ -85,7 +85,7 @@ jobs:
         id: vars
         run: |
           git fetch --prune --unshallow
-          echo "::set-output name=date::$(git log -1 --date=format:'%Y%m%d' --author="Alphabiz-Team" --format='%cd')"
+          echo "::set-output name=date::$(TZ=UTC-8 git log -1 --date=format-local:"%Y%m%d%H%M" --format="%cd")"
           echo "::set-output name=event-name::${{ github.event_name }}"
           echo "::set-output name=download-tag::$(git describe --tags --abbrev=0)"
           if [[ ${{ matrix.os }} = "ubuntu-latest" ]] ; \
@@ -141,7 +141,6 @@ jobs:
         id: nightly
         run: |
           echo "::set-output name=commit-version::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /(?<=v)\d+\.\d+\.\d+/g')"
-          echo "::set-output name=commit-date::$(TZ=UTC-8 git log -1 --date=format-local:"%Y%m%d%H%M" --format="%cd")"
           echo "::set-output name=commit-sha7::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /(?<=-)\w{7}(?=\s)|^\w{7}(?=\s)/g')"
           echo "::set-output name=commit-message::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /\d{8,12}-\w+/g')"
           export DESCRIBE=$(cat github-describe/github-describe.txt)
@@ -165,9 +164,9 @@ jobs:
                else echo "::set-output name=release-name::${{ steps.checkout.outputs.new-tag-name }}" ; \
                fi
                echo "::set-output name=package-name::${{ steps.checkout.outputs.new-tag-name }}" ; \
-          else echo "::set-output name=tag-name::${{ steps.nightly.outputs.commit-version }}-nightly-${{ steps.nightly.outputs.commit-date }}" ; \
+          else echo "::set-output name=tag-name::${{ steps.nightly.outputs.commit-version }}-nightly-${{ steps.vars.outputs.date }}" ; \
                echo "::set-output name=release-name::${{ steps.nightly.outputs.commit-version }}-nightly-${{ steps.nightly.outputs.commit-sha7 }}" ;  \
-               echo "::set-output name=package-name::${{ steps.nightly.outputs.commit-version }}-nightly-${{ steps.nightly.outputs.commit-date }}" ; \
+               echo "::set-output name=package-name::${{ steps.nightly.outputs.commit-version }}-nightly-${{ steps.vars.outputs.date }}" ; \
           fi
         shell: bash
 
@@ -194,7 +193,6 @@ jobs:
                 echo "package-name: ${{ steps.unify.outputs.package-name }}" ; \
                 echo "----------------------" ; \
                 echo "commit-version: ${{ steps.nightly.outputs.commit-version }}" ; \
-                echo "commit-date: ${{ steps.nightly.outputs.commit-date }}" ; \
                 echo "commit-sha7: ${{ steps.nightly.outputs.commit-sha7 }}" ; \
                 echo "commit-message: ${{ steps.nightly.outputs.commit-message }}" ; \
                 echo "----------------------" ; \
@@ -247,10 +245,10 @@ jobs:
         run: |
           if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
           then if ${{ contains(steps.checkout.outputs.new-tag-name, 'nightly') }} ; \
-               then yarn node update-version.js --newTag ${{ steps.unify.outputs.tag-name }} --SHA7 ${{ steps.slug.outputs.sha7 }} --buildTime ${{ steps.nightly.outputs.commit-date }} ; \
-               else yarn node update-version.js --newTag ${{ steps.unify.outputs.tag-name }} --SHA7 ${{ steps.slug.outputs.sha7 }} --buildTime ${{ steps.nightly.outputs.commit-date }} --stable; \
+               then yarn node update-version.js --newTag ${{ steps.unify.outputs.tag-name }} --SHA7 ${{ steps.slug.outputs.sha7 }} --buildTime ${{ steps.vars.outputs.date }} ; \
+               else yarn node update-version.js --newTag ${{ steps.unify.outputs.tag-name }} --SHA7 ${{ steps.slug.outputs.sha7 }} --buildTime ${{ steps.vars.outputs.date }} --stable; \
                fi
-          else yarn node update-version.js --buildTime ${{ steps.nightly.outputs.commit-date }} ; \
+          else yarn node update-version.js --buildTime ${{ steps.vars.outputs.date }} ; \
           fi
           yarn packager
         shell: bash
