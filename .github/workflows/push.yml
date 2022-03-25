@@ -11,7 +11,7 @@ on:
   push:
     paths:
       - "**.js"
-      - "**/push.yml"
+      - "!**/push.yml"
       - "build/**"
       - "release.json"
     branches: [main]
@@ -370,9 +370,8 @@ jobs:
 
       - name: Install Alphabiz.exe
         run: |
-          Start-Process -FilePath "C:\Alphabiz.exe" -ArgumentList '/S','/v','/qn' -passthru
-          Start-Sleep -s 25
-          taskkill /f /im Alphabiz.exe
+          Start-Process -FilePath "C:\Alphabiz.exe" -Verb runAs -ArgumentList '/s','/v"/qn"'
+          Start-Sleep -s 30
         shell: powershell
 
       - name: Install Alphabiz.msi
@@ -392,12 +391,17 @@ jobs:
           Start-Process PowerShell -ArgumentList "yarn test:appium"
           Start-Sleep -s 10
 
+      - name: Kill process after install app
+        run: |
+          taskkill //F //IM Alphabiz.exe  || (echo "app is ready")
+        shell: bash
+
       - name: E2E appium test for msi 🧪
         run: |
           export APP_TYPE=msi
           yarn test:release
           unset APP_TYPE
-          taskkill //F //IM Alphabiz.exe
+          taskkill //F //IM Alphabiz.exe || (echo "app is ready")
         shell: bash
 
       - name: E2E appium test for exe 🧪
@@ -405,8 +409,15 @@ jobs:
           export APP_TYPE=exe
           yarn test:release
           unset APP_TYPE
-          taskkill //F //IM Alphabiz.exe
+          taskkill //F //IM Alphabiz.exe || (echo "app is ready")
         shell: bash
 
       - name: E2E appium test for 7z 🧪
         run: yarn test:release
+
+      - name: Upload Test Results 🗃
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: "appium-test-${{ matrix.test }}-output"
+          path: test/output/**
