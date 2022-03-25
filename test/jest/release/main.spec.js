@@ -3,7 +3,6 @@
 // /* eslint-disable jest/no-focused-tests */
 /* eslint-disable jest/no-disabled-tests */
 const wdio = require('webdriverio')
-const { exec } = require('child_process')
 const path = require('path')
 const fs = require('fs')
 
@@ -36,22 +35,6 @@ describe('upload', () => {
     // await sleep(2000)
     // await client.saveScreenshot('test/output/release/screenshot.png')
     await client.deleteSession()
-    const closeApp = async () => {
-      return new Promise((resolve, reject) => {
-        exec('taskkill /f /im Alphabiz.exe', (error, stdout, stderr) => {
-          if (error) {
-            reject(console.error(`exec error: ${error}`))
-            return
-          }
-          if (stderr) {
-            console.error(`Error from Git: ${stderr}`)
-            return
-          }
-          resolve(console.log('close App'))
-        })
-      })
-    }
-    await closeApp()
   })
   it('title', async () => {
     const windowTitle = await client.getTitle()

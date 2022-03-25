@@ -270,6 +270,7 @@ jobs:
           export APP_TYPE=msi
           yarn test:release
           unset APP_TYPE
+          taskkill //F //IM Alphabiz.exe  || (echo "app is ready")
         shell: bash
 
       - name: e2e appium test for exe 🧪
@@ -277,6 +278,7 @@ jobs:
           export APP_TYPE=exe
           yarn test:release
           unset APP_TYPE
+          taskkill //F //IM Alphabiz.exe  || (echo "app is ready")
         shell: bash
 
       - name: e2e appium test for 7z 🧪
