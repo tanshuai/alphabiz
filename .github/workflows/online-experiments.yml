@@ -82,10 +82,6 @@ jobs:
           echo "isRunAppium: ${{ steps.vars.outputs.isRunAppium }}"
         shell: bash
 
-      - name: test command line fail
-        run: |
-          taskkill //F //IM Alphabiz.exe  || (echo "app is ready")
-        shell: bash
       # - name: Setup Node.js ${{ matrix.node-version }} 📮
       #   uses: actions/setup-node@v2
       #   with:
@@ -264,12 +260,16 @@ jobs:
           Start-Process PowerShell -ArgumentList "yarn test:appium"
           Start-Sleep -s 10
 
+      - name: Kill process after install app
+        run: |
+          taskkill //F //IM Alphabiz.exe  || (echo "app is ready")
+        shell: bash
+
       - name: e2e appium test for msi 🧪
         run: |
           export APP_TYPE=msi
           yarn test:release
           unset APP_TYPE
-          taskkill //F //IM Alphabiz.exe  || (echo "app is ready")
         shell: bash
 
       - name: e2e appium test for exe 🧪
@@ -277,7 +277,6 @@ jobs:
           export APP_TYPE=exe
           yarn test:release
           unset APP_TYPE
-          taskkill //F //IM Alphabiz.exe  || (echo "app is ready")
         shell: bash
 
       - name: e2e appium test for 7z 🧪
