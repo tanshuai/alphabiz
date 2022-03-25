@@ -1,5 +1,2 @@
 modify appium test \ skip workflow
 synchronize appium test code \ skip workflow
-fix #206
-resolve #208
-fix pause-all error
