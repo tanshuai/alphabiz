@@ -1,1 +1,27 @@
 fix container action is only supported on Linux
+alphabiz button: add dense, fab content alignment
+update task num after list updated
+improve alphabiz button
+apply alphabiz button; ui adjustment
+ui adjustment
+skip downloading BitComet padding files, resolve #184
+index: use fab button
+add `stop-all-uploading` and fix bug
+use alphabiz button
+add markdown for ToS, resolve #172
+add file progress in file-tree
+remove unused keys
+add stop all uploading
+add protect codes in torrentManager
+fix: paste event not emit outside tab
+allow download torrents in folder, resolve #174
+Update push.yml
+1. Formalize user-name and user-email
+2. Disable unused Upload Test Results
+Update push.yml
+Disable max-parallel: 1
+fix test error、add appium download test #179
+Update push.yml
+Try to fix error
+Update push.yml
+Try to fix user-name error
