@@ -1,5 +1,5 @@
 const { exec, execSync } = require('child_process')
-const { existsSync, copyFileSync, mkdirSync, unlinkSync } = require('fs')
+const { existsSync, copyFileSync, mkdirSync, unlinkSync, readFileSync, writeFileSync } = require('fs')
 const { resolve } = require('path')
 const { productName } = require('./package.json')
 const publicVersion = require('./public/version.json').version
@@ -11,7 +11,6 @@ const version = publicVersion || pkgVersion
 console.log(`version: ${version}`)
 
 const { platform, arch } = process
-
 const symlinkDir = require('symlink-dir')
 
 const doMake = async () => {
@@ -37,8 +36,7 @@ const doMake = async () => {
      */
     // execSync(`cp -r "${packageDir}/" "${resolve(__dirname, 'out')}/"`)
     copySync(packageDir, destDir, { recursive: true })
-  }
-  else await symlinkDir(packageDir, destDir)
+  } else await symlinkDir(packageDir, destDir)
   console.log(`Executing: \x1b[32myarn ${arg}\x1b[0m`)
   const prefix = `\x1b[32m  * make \x1b[0m`
   const res = exec(`yarn ${arg}`)
@@ -106,6 +104,17 @@ const doPostmake = () => {
 }
 
 if (process.argv.includes('--make')) {
+  // modify package.json version for Update the installation package version
+  const packagePath = resolve(__dirname, './package.json')
+  const packageObj = readFileSync(packagePath)
+  const pkg = JSON.parse(packageObj)
+  pkg.version = pkgVersion
+  writeFileSync(packagePath, JSON.stringify(pkg, null, 2))
+  process.on('exit', () => {
+    writeFileSync(packagePath, packageObj)
+    console.log('Restored package.json before exit')
+  })
+  
   doMake()
 } else if (process.argv.includes('--postmake')) {
   doPostmake()

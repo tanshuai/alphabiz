@@ -3,7 +3,9 @@ const fs = require('fs')
 const { resolve } = require('path')
 const { default: rebuild } = require('electron-rebuild')
 
-const { name, version, description, author, productName } = package
+const { name, description, author, productName } = package
+const version = require('./public/version.json').packageVer
+const icoPath = resolve(__dirname, 'public/platform-assets/windows/icon.ico')
 
 // The .deb package requires a .desktop template, see here:
 // node_modules/electron-installer-debian/resources/desktop.ejs
@@ -182,12 +184,22 @@ module.exports = {
           // console.log(wix.wixTemplate || wix)
           // Remove appName tail created by wix
           if (wix.wixTemplate) {
-            // console.log(wix.uiTemplate)
+            const iconTemplate = `\n<Icon Id="icon.ico" SourceFile="${icoPath}"/>`
+              + `\n<Property Id="ARPPRODUCTICON" Value="icon.ico" />`
+            // console.log(wix.getRegistryKeys)
+            const _getRegistryKeys = wix.getRegistryKeys
+            wix.getRegistryKeys = (function getRegistryKeys (...args) {
+              const registry = _getRegistryKeys.bind(wix)(...args)
+              const icon = registry.find(i => i.id === 'UninstallDisplayIcon')
+              if (icon) icon.value = icoPath
+              return registry
+            }).bind(wix)
             wix.uiTemplate = wix.uiTemplate
               .replace('<DialogRef Id="MsiRMFilesInUse" />', '<!-- <DialogRef Id="MsiRMFilesInUse" /> -->')
             wix.wixTemplate = wix.wixTemplate
               .replace('"{{ApplicationName}} (Machine - MSI)"','"{{ApplicationName}}"')
               .replace('"{{ApplicationName}} (Machine)"','"{{ApplicationName}}"')
+              .replace('</Product>', iconTemplate +'\n</Product>')
           }
         }
       }
