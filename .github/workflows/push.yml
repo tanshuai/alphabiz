@@ -155,7 +155,7 @@ jobs:
           echo "::set-output name=versionJson::$content"
         shell: bash
 
-      - nmae: Checkout unpackaged/version.json
+      - name: Checkout unpackaged/version.json
         id: versionJson
         run: |
           echo "::set-output name=package-version::${{ fromJson(steps.unpackaged.outputs.versionJson).packageVer }}"
