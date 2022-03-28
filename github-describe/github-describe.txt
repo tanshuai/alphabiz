@@ -1,2 +1,4 @@
-fix internal output path
-retry run internal.yml
+fix event name error
+fast release
+fix #223, fix #225
+feedback: add category options, i18n and open external url for github issue #15
