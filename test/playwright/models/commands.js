@@ -15,7 +15,7 @@ class Commands {
     this.advancedLink = page.locator('text=AdvancedAdvanced')
     this.developmentLink = page.locator('text=developer_modeDevelopment Developer Mode for Internal Use')
     this.accountLink = page.locator('.corner')
-    this.accountSignUp = page.locator('button:has-text("Sign up")')
+    this.accountSignUp = page.locator('button:has-text("Sign in")')
     this.accountMore = page.locator('button:has-text("more_horiz")')
     this.accountSettings = page.locator('[data-cy="account-settings-btn"]')
     // home
@@ -59,7 +59,7 @@ class Commands {
     await this.page.waitForTimeout(500)
     await this.page.fill('[aria-label="Phone number or email"]', username)
     await this.page.fill('[aria-label="Password"]', password)
-    await this.page.click('button:has-text("Sign in")')
+    await this.page.click('.q-card >> button:has-text("Sign in")')
 
     if (isWaitAlert) {
       await this.page.locator('.q-notification__message >> text=Signed in').waitFor({ timeout: 40000 })
