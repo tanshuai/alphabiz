@@ -1,7 +1,7 @@
 /// <reference path="cypress" />
 /// <reference path="../../support/index.d.ts" />
 
-describe.skip('Player', () => {
+describe('Player', () => {
   beforeEach(() => {
     cy.visit('/')
     cy.get('[aria-label="Menu"]').click()

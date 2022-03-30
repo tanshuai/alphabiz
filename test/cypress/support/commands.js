@@ -66,7 +66,7 @@ Cypress.Commands.add('restoreLocalStorage', () => {
 // jump page command
 Cypress.Commands.add('toSignIn', () => {
   cy.get('[aria-label="Menu"]').click()
-  cy.get('.corner > .q-item').click()
+  cy.get('.left-drawer-header').contains('Sign in').click()
   // cy.location('pathname', { timeout: 10000 }).should('eq', '/account')
   cy.get('.q-card', { timeout: 3000 }).should('be.visible')
 })
@@ -77,6 +77,7 @@ Cypress.Commands.add('toCredits', () => {
   cy.get('.q-linear-progress__model', { timeout: 10000 }).should('not.exist')
 })
 
+// cacheSession = true => call session()
 // cacheSession = true => call session()
 Cypress.Commands.add('signIn', (username, password, { cacheSession = true } = {}) => {
   const login = () => {
@@ -92,7 +93,7 @@ Cypress.Commands.add('signIn', (username, password, { cacheSession = true } = {}
     }
     cy.contains('Phone number or email').type('{selectall}{backspace}').type(user)
     cy.contains('Password').type('{selectall}{backspace}').type(Cypress.env(password))
-    cy.get('.q-btn__content').contains('Sign in').click()
+    cy.get('.q-card__actions').contains('Sign in').click()
     // wait page jump
     cy.get('.q-notification__message', { timeout: 40000 }).should('be.visible').then($header => {
       const text = $header.text()
@@ -101,13 +102,13 @@ Cypress.Commands.add('signIn', (username, password, { cacheSession = true } = {}
         /Pending sign-in attempt already in progress/.test(text)) {
         cy.log('text is There is a problem with the network')
         cy.get('.q-notification__message', { timeout: 30000 }).should('not.be.visible')
-        cy.get('.q-btn__content').contains('Sign in').click()
+        cy.get('.q-card__actions').contains('Sign in').click()
       } else {
         cy.log('text is not network')
       }
     })
     cy.get('.q-notification__message', { timeout: 30000 }).should('have.text', 'Signed in')
-    cy.contains('Lv.', { timeout: 12000 }).click()
+    cy.contains('more_horiz', { timeout: 20000 }).click()
     cy.get('[data-cy=account-settings-btn]').click()
     // cy.location('pathname', { timeout: 30000 }).should('eq', '/account/settings')
     // sign in end
@@ -123,7 +124,7 @@ Cypress.Commands.add('signIn', (username, password, { cacheSession = true } = {}
           user = '+1' + Cypress.env(username)
         }
         cy.get('[aria-label="Menu"]').click()
-        cy.contains('Lv.', { timeout: 12000 }).click()
+        cy.contains('more_horiz', { timeout: 20000 }).click()
         cy.get('[data-cy=account-settings-btn]').click()
         // cy.location('pathname', { timeout: 12000 }).should('eq', '/account/settings')
         cy.get('.account-setting__verification').contains(user)
@@ -131,7 +132,7 @@ Cypress.Commands.add('signIn', (username, password, { cacheSession = true } = {}
     })
     cy.visit('/')
     cy.get('[aria-label="Menu"]').click()
-    cy.contains('Lv.', { timeout: 12000 }).click()
+    cy.contains('more_horiz', { timeout: 20000 }).click()
     cy.get('[data-cy=account-settings-btn]').click()
     // cy.location('pathname', { timeout: 12000 }).should('eq', '/account/settings')
   } else {
@@ -151,14 +152,14 @@ Cypress.Commands.add('signOut', () => {
 
 Cypress.Commands.add('getAccountStatus', () => {
   cy.sleep(1000)
-  cy.get('.corner > .q-item').then(($el) => {
+  cy.get('.left-drawer-header').then(($el) => {
     const isVisible = Cypress.dom.isVisible($el)
     cy.log('isVisible' + isVisible)
     if (!isVisible) {
       cy.get('[aria-label="Menu"]').click()
     } // true
   })
-  cy.get('.corner > .q-item').then(($div) => {
+  cy.get('.left-drawer-header').then(($div) => {
     const text = $div.text()
     cy.log(text)
     // cy.log(/Lv/.test(text))
