@@ -6,8 +6,8 @@ class AccountPage {
   get signInText () { return this.page.$('//Text[@Name="Sign in"]') }
   get username () { return this.page.$('//Edit[@Name="Phone number or email"]') }
   get password () { return this.page.$('//Edit[@Name="Password"]') }
-  get signInBtn () { return this.page.$('//Button[@Name="SIGN IN"]') }
-  get accountSettingsTitle () { return this.page.$('//Text[@Name="Account Settings"]') }
+  get signInBtn () { return this.page.$('//Button[@Name="SIGN UP"]/preceding-sibling::Button[1]') }
+  get accountSettingsTitle () { return this.page.$('//Text[@Name="Account"]') }
   get signOutBtn () { return this.page.$('//*[@Name="Sign out"]') }
 
   async signIn (username, password, isWaitAlert) {
@@ -24,7 +24,6 @@ class AccountPage {
         timeout: 40000,
         timeoutMsg: 'signInCard is hidden'
       })
-      await this.page.$('//*[@Name="Settings"]').click()
       await this.accountSettingsTitle.waitForDisplayed()
     }
   }
