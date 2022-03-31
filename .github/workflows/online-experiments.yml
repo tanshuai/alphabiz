@@ -8,7 +8,7 @@ name: online-experiments
 on:
   push:
     paths:
-      - "!**/online-experiments.yml"
+      - "**/online-experiments.yml"
     branches: [main]
 
 jobs:
