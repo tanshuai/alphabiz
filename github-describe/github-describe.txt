@@ -1,15 +1,13 @@
-add button in development page to increase creadits
-update doc: amplify-deploy
-fix[sign in]btn error
-run e2e test
-add submit label
-fix #231
-fix #226
+disable invitation feature
+fix get version.json path error in dev \ skip workflow
+enable feature: create invitation code after sign up
 update docs
-amplify pull
-ban local IP
-disable test api; config correct client id for cognito module;
-fix cypress test \ skep e2e
-trigger e2e test
-add twitter feedback #15
-update docs
+fix get path in dev
+fix: #229
+Update amplify-deploy.md
+skip invitation code test、fix checkBillDetail error \ skip workflow
+hide corner menu item: invite
+disable oauth feature
+fix credits download test \ skip workflow
+add byteMap for ab peers
+only show ab button when peers have resource, resolve #212
