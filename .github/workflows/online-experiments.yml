@@ -68,7 +68,7 @@ jobs:
         run: |
           TZ=UTC-8 git log -10 --date=format-local:"%Y%m%d%H%M" --format="%cd"
           echo "--------------------------"
-          echo "::set-output name=tag-name::0.1.0-nightly-202203241113"
+          echo "::set-output name=tag-name::0.1.0-nightly-202203301916"
           if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
           then echo "::set-output name=isRunAppium::1" ; \
           else echo "::set-output name=isRunAppium::0" ; \
@@ -230,23 +230,6 @@ jobs:
           7z x alphabiz.7z
         shell: bash
 
-      - name: Download msi and exe
-        run: |
-          curl -L https://github.com/tanshuai/alphabiz/releases/download/${{needs.build-1.outputs.output1}}/alphabiz-${{needs.build-1.outputs.output1}}.exe > C:/alphabiz.exe
-          curl -L https://github.com/tanshuai/alphabiz/releases/download/${{needs.build-1.outputs.output1}}/alphabiz-${{needs.build-1.outputs.output1}}.msi > C:/alphabiz.msi
-        shell: bash
-
-      - name: Install alphabiz.exe
-        run: |
-          Start-Process -FilePath "C:\Alphabiz.exe" -Verb runAs -ArgumentList '/s','/v"/qn"'
-          Start-Sleep -s 30
-        shell: powershell
-
-      - name: Install alphabiz.msi
-        run: |
-          Start-Process msiexec -ArgumentList "/quiet","/i","C:\alphabiz.msi"
-        shell: powershell
-
       - name: Install winappdriver.msi
         run: |
           Invoke-WebRequest "https://github.com/microsoft/WinAppDriver/releases/download/v1.2.1/WindowsApplicationDriver_1.2.1.msi" -OutFIle "C:\WindowsApplicationDriver_1.2.1.msi"
@@ -259,6 +242,43 @@ jobs:
         run: |
           Start-Process PowerShell -ArgumentList "yarn test:appium"
           Start-Sleep -s 10
+
+      - name: e2e appium test for 7z 🧪
+        run: |
+          yarn test:release
+          taskkill //F //IM Alphabiz.exe || (echo "app is ready")
+        shell: bash
+
+      - name: e2e appium creditDownload test for 7z 🧪
+        if: matrix.test == '1'
+        run: |
+          yarn test:release:creditsDownload
+          taskkill //F //IM Alphabiz.exe || (echo "app is ready")
+        shell: bash
+
+      - name: e2e appium creditUpload test for 7z 🧪
+        if: matrix.test == '2'
+        run: |
+          yarn test:release:creditsUpload
+          taskkill //F //IM Alphabiz.exe || (echo "app is ready")
+        shell: bash
+
+      - name: Download msi and exe
+        run: |
+          curl -L https://github.com/tanshuai/alphabiz/releases/download/${{needs.build-1.outputs.output1}}/alphabiz-${{needs.build-1.outputs.output1}}.exe > C:/alphabiz.exe
+          curl -L https://github.com/tanshuai/alphabiz/releases/download/${{needs.build-1.outputs.output1}}/alphabiz-${{needs.build-1.outputs.output1}}.msi > C:/alphabiz.msi
+        shell: bash
+
+      - name: Install alphabiz.msi
+        run: |
+          Start-Process msiexec -ArgumentList "/quiet","/i","C:\alphabiz.msi"
+        shell: powershell
+
+      - name: Install alphabiz.exe
+        run: |
+          Start-Process -FilePath "C:\Alphabiz.exe" -Verb runAs -ArgumentList '/s','/v"/qn"'
+          Start-Sleep -s 30
+        shell: powershell
 
       - name: Kill process after install app
         run: |
@@ -282,10 +302,6 @@ jobs:
           sleep 10s
           taskkill //F //IM Alphabiz.exe || (echo "app is ready")
         shell: bash
-
-      - name: e2e appium test for 7z 🧪
-        run: |
-          yarn test:release
 
       - name: Upload Test Results 🗃
         if: always()
