@@ -1,13 +1,13 @@
-disable invitation feature
-fix get version.json path error in dev \ skip workflow
-enable feature: create invitation code after sign up
-update docs
-fix get path in dev
-fix: #229
-Update amplify-deploy.md
-skip invitation code test、fix checkBillDetail error \ skip workflow
-hide corner menu item: invite
-disable oauth feature
-fix credits download test \ skip workflow
-add byteMap for ab peers
-only show ab button when peers have resource, resolve #212
+fix upload error
+test auto push public resources
+adjust the sequence of steps
+fix #233
+fix creditsUpload test error
+add replaces for linux build
+destroy tray before quit, show folder instead of install in linux #217
+fix: control-panel icon error
+try fix #235
+modify appium test check file-selector
+fix appium test when windows too small
+updater: use dialog panel instead of $q.loading #235
+add Table: Task
