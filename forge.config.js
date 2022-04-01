@@ -191,7 +191,8 @@ module.exports = {
             wix.getRegistryKeys = (function getRegistryKeys (...args) {
               const registry = _getRegistryKeys.bind(wix)(...args)
               const icon = registry.find(i => i.id === 'UninstallDisplayIcon')
-              if (icon) icon.value = icoPath
+              if (icon) icon.value = '[APPLICATIONROOTDIRECTORY]Alphabiz.exe'
+              console.log(icon, registry.find)
               return registry
             }).bind(wix)
             wix.uiTemplate = wix.uiTemplate
