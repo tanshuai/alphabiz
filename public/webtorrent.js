@@ -480,7 +480,7 @@ const seedTorrent = (token, files, options, isAutoUpload = false, callback = nul
       skipVerify: options.progress === 1,
       announce: [...(options.trackers || []), ...WEBTORRENT_ANNOUCEMENT]
     })
-  } else if (options.isSeeding && options.torrentPath) {
+  } else if (options.isSeeding && options.torrentPath && fs.existsSync(options.torrentPath)) {
     tr = client.add(options.torrentPath, {
       path: options.path || options.downloadDirectory,
       store: FSChunkStore,
