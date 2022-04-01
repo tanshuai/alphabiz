@@ -123,7 +123,9 @@ class HomePage {
 
   async seedsStopAndSeed (torrentName) {
     // stop种子
-    await this.jumpPage('uploadingStatusTab')
+    if (!await this.page.$('//Text[@Name="Uploading"]').isDisplayed()) {
+      await this.jumpPage('uploadingStatusTab')
+    }
     if (await this.getTask(torrentName) !== null) {
       await this.page.$('//Text[@Name="' + torrentName + '"]/following-sibling::Button[@Name="STOP"]').click()
     }
