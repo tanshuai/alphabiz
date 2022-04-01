@@ -60,7 +60,7 @@ describe('download', () => {
     await homePage.jumpPage('creditsLink')
     if (await client.$('//*[@Name="SIGN IN"]').isDisplayed()) {
       // 未登录
-      await accountPage.signIn(process.env.EMAIL_USERNAME, process.env.TEST_PASSWORD, 1)
+      await accountPage.signIn(process.env.TEST2_EMAIL, process.env.TEST_PASSWORD, 1)
     } else {
       // 已登陆,等待拉取数据
       // await client.$('//*[@Name="Settings"]').click()
@@ -124,7 +124,7 @@ describe('download', () => {
     await homePage.jumpPage('uploadingStatusTab')
     await client.$('//Text[@Name="' + torrentName + '"]').waitForDisplayed({ timeout: 60000 * 4 })
     const taskStatus = await homePage.getTaskStatus(torrentName)
+    await sleep(10000)
     expect(taskStatus).toBe('Status: Seeding')
-    expect(1).toBe(1)
   })
 })
