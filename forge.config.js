@@ -25,6 +25,34 @@ StartupNotify=true
 <% } %>
 `)
 
+// patch-package throws error if dependency is optional.
+// We can do nothing with it, so we have to patch manually.
+const controlTemplate = `<% if (name) { %>Package: <%= name %>
+<% } %><% if (version) { %>Version: <%= version %><% if (revision) { %>-<%= revision %><% } %>
+<% } %><% if (section) { %>Section: <%= section %>
+<% } %><% if (priority) { %>Priority: <%= priority %>
+<% } %><% if (arch) { %>Architecture: <%= arch %>
+<% } %><% if (depends && depends.length) { %>Depends: <%= depends.join(', ') %>
+<% } %><% if (recommends && recommends.length) { %>Recommends: <%= recommends.join(', ') %>
+<% } %><% if (suggests && suggests.length) { %>Suggests: <%= suggests.join(', ') %>
+<% } %><% if (enhances && enhances.length) { %>Enhances: <%= enhances.join(', ') %>
+<% } %><% if (preDepends && preDepends.length) { %>Pre-Depends: <%= preDepends.join(', ') %>
+<% } %><% if (size) { %>Installed-Size: <%= size %>
+<% } %><% if (maintainer) { %>Maintainer: <%= maintainer %>
+<% } %><% if (name) { %>Provides: <%= name %>
+<% } %><% if (name) { %>Conflicts: <%= name %>
+<% } %><% if (name) { %>Replaces: <%= name %>
+<% } %><% if (homepage) { %>Homepage: <%= homepage %>
+<% } %><% if (description) { %>Description: <%= description %>
+<% } %><% if (productDescription) { %><%= productDescription %><% } %>
+`
+if (process.platform === 'linux') {
+  fs.writeFileSync(
+    resolve(__dirname, 'node_modules/electron-installer-debian/resources/control.ejs'),
+    controlTemplate
+  )
+}
+
 module.exports = {
   hooks: {
     packageAfterPrune: (conf, buildPath, electronVersion, platform, arch, callback) => {
