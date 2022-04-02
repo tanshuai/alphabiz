@@ -7,7 +7,7 @@ const fs = require('fs')
 const electronMainPath = require('../../test.config.js').electronMainPath
 const { Commands } = require('./models/commands')
 const { sleep } = require('../utils/getCode')
-
+const { calculation } = require('../utils/calculation')
 let window, windows, electronApp, commands
 const ScreenshotsPath = 'test/output/playwright/main.spec/'
 
@@ -549,7 +549,7 @@ test.describe('account', () => {
     // 断言积分变化是否正确
     await sleep(2000)
     await window.waitForLoadState()
-    expect(await window.locator('.text-right > div').innerText()).toBe(transfereeAfterPoint.toString())
+    expect(await window.locator('.text-right > div').innerText()).toBe(calculation('reduce', transfereePoint, transferAmount).toString())
     // 退出付款人账号
     await commands.signOut()
     // await sleep(1000)
