@@ -470,7 +470,7 @@ const seedTorrent = (token, files, options, isAutoUpload = false, callback = nul
   }
   let tr = null
   if (options.infoHash && !options.upload && options.files.length) {
-    console.log('[seed] add torrent')
+    console.log('[seed] add torrent with token')
     console.log(options)
     tr = client.add(options.token || options.origin || options.infoHash, {
       path: options.path || options.downloadDirectory,
@@ -481,6 +481,7 @@ const seedTorrent = (token, files, options, isAutoUpload = false, callback = nul
       announce: [...(options.trackers || []), ...WEBTORRENT_ANNOUCEMENT]
     })
   } else if (options.isSeeding && options.torrentPath && fs.existsSync(options.torrentPath)) {
+    console.log('[seed] add torrent with torrentPath')
     tr = client.add(options.torrentPath, {
       path: options.path || options.downloadDirectory,
       store: FSChunkStore,
@@ -488,7 +489,8 @@ const seedTorrent = (token, files, options, isAutoUpload = false, callback = nul
       skipVerify: true,
       announce: [...(options.trackers || []), ...WEBTORRENT_ANNOUCEMENT]
     })
-  } else if (options.isSeeding && options.magnetURI) {
+  } else if (options.isSeeding && options.magnetURI && !options.isUploadByFiles) {
+    console.log('[seed] add torrent with magnetURI')
     tr = client.add(options.magnetURI, {
       path: options.path || options.downloadDirectory,
       store: FSChunkStore,
@@ -499,6 +501,7 @@ const seedTorrent = (token, files, options, isAutoUpload = false, callback = nul
     tr.upload = true
     tr.isSeeding = true
   } else {
+    console.log('[seed] Seed torrent with files')
     tr = client.seed(files, {
       ...options,
       store: FSChunkStore,
@@ -507,6 +510,7 @@ const seedTorrent = (token, files, options, isAutoUpload = false, callback = nul
       // announce to default list only
       announce: [...WEBTORRENT_ANNOUCEMENT]
     })
+    tr.isUploadByFiles = true
   }
   info('seedTorrent', options, tr, files)
   if (options.name) tr.name = options.name

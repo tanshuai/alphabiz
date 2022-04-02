@@ -67,6 +67,7 @@ const responseTorrentProps = [
   // seeding file
   'file', 'magnetURI',
   'isAutoUpload',
+  'isUploadByFiles',
   // timers
   'createdTime',
   'completedTime',
