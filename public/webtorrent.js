@@ -362,6 +362,7 @@ const addTorrent = (token, conf, cb) => {
       store: FSChunkStore,
       storeCacheSlots: 10,
       strategy: 'sequential',
+      maxWebConns: client.maxConns,
       // skipVerify: true,
       announce: [...(conf.trackers || []), ...WEBTORRENT_ANNOUCEMENT]
     })
@@ -478,6 +479,7 @@ const seedTorrent = (token, files, options, isAutoUpload = false, callback = nul
       storeCacheSlots: 10,
       strategy: 'sequential',
       skipVerify: options.progress === 1,
+      maxWebConns: client.maxConns,
       announce: [...(options.trackers || []), ...WEBTORRENT_ANNOUCEMENT]
     })
   } else if (options.isSeeding && options.torrentPath && fs.existsSync(options.torrentPath)) {
@@ -487,6 +489,7 @@ const seedTorrent = (token, files, options, isAutoUpload = false, callback = nul
       store: FSChunkStore,
       storeCacheSlots: 10,
       skipVerify: true,
+      maxWebConns: client.maxConns,
       announce: [...(options.trackers || []), ...WEBTORRENT_ANNOUCEMENT]
     })
   } else if (options.isSeeding && options.magnetURI && !options.isUploadByFiles) {
@@ -496,6 +499,7 @@ const seedTorrent = (token, files, options, isAutoUpload = false, callback = nul
       store: FSChunkStore,
       storeCacheSlots: 10,
       skipVerify: true,
+      maxWebConns: client.maxConns,
       announce: [...(options.trackers || []), ...WEBTORRENT_ANNOUCEMENT]
     })
     tr.upload = true
@@ -507,6 +511,7 @@ const seedTorrent = (token, files, options, isAutoUpload = false, callback = nul
       store: FSChunkStore,
       storeCacheSlots: 10,
       skipVerify: true,
+      maxWebConns: client.maxConns,
       // announce to default list only
       announce: [...WEBTORRENT_ANNOUCEMENT]
     })
@@ -811,13 +816,13 @@ const stopServer = () => {
     uploadSpeed,
     downloadSpeed,
     maximumConnectionsNum,
-    dhtPort,
-    torrentPort,
+    DHTlistenPort,
+    BTlistenPort,
     payedUserShareRate
   }) => {
     // old versions use string, but now number
-    dhtPort = parseInt(dhtPort)
-    torrentPort = parseInt(torrentPort)
+    const dhtPort = parseInt(DHTlistenPort)
+    const torrentPort = parseInt(BTlistenPort)
     info('Set client', {
       uploadSpeed,
       downloadSpeed,
