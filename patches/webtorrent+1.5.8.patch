@@ -1,5 +1,5 @@
 diff --git a/node_modules/webtorrent/index.js b/node_modules/webtorrent/index.js
-index 3e07d04..ff17701 100644
+index 3e07d04..5c871bc 100644
 --- a/node_modules/webtorrent/index.js
 +++ b/node_modules/webtorrent/index.js
 @@ -98,7 +98,10 @@ class WebTorrent extends EventEmitter {
@@ -9,7 +9,7 @@ index 3e07d04..ff17701 100644
 -      up: new ThrottleGroup({ rate: Math.max(this._uploadLimit, 0), enabled: this._uploadLimit >= 0 })
 +      // upload groups
 +      low: new ThrottleGroup({ rate: 51200, enabled: true }),
-+      mid: new ThrottleGroup({ rate: Math.max(this._uploadLimit * 0.3, 0), enabled: this._uploadLimit >= 0 }),
++      mid: new ThrottleGroup({ rate: Math.max(this._uploadLimit * 0.3, this._uploadLimit > 0 ? 0 : 300000), enabled: true }),
 +      high: new ThrottleGroup({ rate: Math.max(this._uploadLimit * 0.7, 0), enabled: this._uploadLimit >= 0 })
      }
  
@@ -32,7 +32,7 @@ index 3e07d04..ff17701 100644
 +    if (this._uploadLimit < 0) {
 +      this.throttleGroups.high.setEnabled(false)
 +      this.throttleGroups.mid.setEnabled(true)
-+      this.throttleGroups.mid.setRate(307200)
++      this.throttleGroups.mid.setRate(300000)
 +      return
 +    }
 +    this.throttleGroups.high.setEnabled(true)
@@ -94,10 +94,10 @@ index 19cb5ff..8cd6538 100644
    }
  }
 diff --git a/node_modules/webtorrent/lib/torrent.js b/node_modules/webtorrent/lib/torrent.js
-index ac7cb97..994eee3 100644
+index ac7cb97..db16993 100644
 --- a/node_modules/webtorrent/lib/torrent.js
 +++ b/node_modules/webtorrent/lib/torrent.js
-@@ -64,6 +64,37 @@ try {
+@@ -64,6 +64,54 @@ try {
    TMP = path.join(typeof os.tmpdir === 'function' ? os.tmpdir() : '/', 'webtorrent')
  }
  
@@ -110,7 +110,9 @@ index ac7cb97..994eee3 100644
 +    if (tr) tr.waiting = false
 +    // let client have time to do something
 +    setTimeout(() => {
++      console.log('Verifying', tr.name || tr.origin || tr.token || tr.infoHash)
 +      fn(() => {
++        if (!isVerifing) return
 +        isVerifing = false
 +        const next = toVerify.shift()
 +        if (typeof next === 'function') {
@@ -122,7 +124,22 @@ index ac7cb97..994eee3 100644
 +      })
 +    }, 1000)
 +  }
-+  if (tr) tr.waiting = true
++  if (tr) {
++    tr.waiting = true
++    tr.once('close', () => {
++      const index = toVerify.findIndex(i => i === callFn)
++      if (index !== -1) {
++        toVerify.splice(index, 1)
++        isVerifing = false
++        if (toVerify.length) {
++          const next = toVerify.shift()
++          if (typeof next === 'function') {
++            next()
++          }
++        }
++      }
++    })
++  }
 +  if (isVerifing) {
 +    toVerify.push(callFn)
 +    // console.log('Queue', toVerify.length)
@@ -135,7 +152,7 @@ index ac7cb97..994eee3 100644
  class Torrent extends EventEmitter {
    constructor (torrentId, client, opts) {
      super()
-@@ -596,31 +627,39 @@ class Torrent extends EventEmitter {
+@@ -596,31 +644,39 @@ class Torrent extends EventEmitter {
    }
  
    _verifyPieces (cb) {
@@ -194,7 +211,7 @@ index ac7cb97..994eee3 100644
    }
  
    rescanFiles (cb) {
-@@ -753,6 +792,8 @@ class Torrent extends EventEmitter {
+@@ -753,6 +809,8 @@ class Torrent extends EventEmitter {
      this._peers = null
      this._servers = null
      this._xsRequests = null
@@ -203,7 +220,7 @@ index ac7cb97..994eee3 100644
    }
  
    addPeer (peer) {
-@@ -1144,6 +1185,7 @@ class Torrent extends EventEmitter {
+@@ -1144,6 +1202,7 @@ class Torrent extends EventEmitter {
      })
  
      wire.once('close', () => {
