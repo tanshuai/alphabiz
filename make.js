@@ -1,7 +1,9 @@
 const { exec, execSync } = require('child_process')
 const { existsSync, copyFileSync, mkdirSync, unlinkSync } = require('fs')
 const { resolve } = require('path')
-const { version: pkgVersion, productName } = require('./package.json')
+const { version: pkgVersion } = require('./package.json')
+let { productName } = require('./package.json')
+productName = productName.toLocaleLowerCase()
 const readline = require('readline')
 const { copySync } = require('fs-extra')
 
@@ -71,7 +73,7 @@ const doPostmake = () => {
   const toMoves = []
   if (platform === 'win32') {
     const wixDir = resolve(outDir, `wix/${arch}`)
-    toMoves.push([resolve(wixDir, `${productName}.msi`), resolve(destDir, `${productName}-${version}-install.msi`)])
+    toMoves.push([resolve(wixDir, `${productName}.msi`), resolve(destDir, `${productName}-${version}.msi`)])
     const squirrelDir = resolve(outDir, `squirrel.windows/${arch}`)
     const files = [
       `${productName}-${pkgVersion} Setup.exe`,
@@ -80,7 +82,7 @@ const doPostmake = () => {
       'RELEASES'
     ]
     files.forEach(file => {
-      toMoves.push([resolve(squirrelDir, file), resolve(destDir, file.replace(' Setup', '-setup').replace(pkgVersion, version))])
+      toMoves.push([resolve(squirrelDir, file), resolve(destDir, file.replace(' Setup', '').replace('-full', '').replace('-delta', '').replace(pkgVersion, version))])
     })
   } else if (platform === 'darwin') {
     // move darwin installers

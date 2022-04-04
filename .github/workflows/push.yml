@@ -145,8 +145,8 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           prerelease: true
-          name: test-${{ steps.vars.outputs.commit-version }}-alphabiz-nightly-${{ steps.vars.outputs.commit-message }}
-          tag_name: test-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}
+          name: alphabiz-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}
+          tag_name: alphabiz-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}
           body: ${{ env.DESCRIBE }}
           files: |
             alphabiz-${{ matrix.os }}-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}.7z
