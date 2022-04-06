@@ -243,26 +243,31 @@ jobs:
           Start-Process PowerShell -ArgumentList "yarn test:appium"
           Start-Sleep -s 10
 
-      - name: Kill process after install app
-        run: |
-          taskkill //F //IM Alphabiz.exe || (echo "app is ready")
-        shell: bash
-
       - name: e2e appium creditDownload test for 7z 🧪
         if: matrix.test == '1'
-        run: |
-          yarn test:release
-          sleep 10s
-          taskkill //F //IM Alphabiz.exe || (echo "app is ready")
-        shell: bash
+        uses: nick-fields/retry@v2
+        with:
+          timeout_seconds: 1200
+          max_attempts: 2
+          shell: bash
+          retry_on: error
+          command: |
+            taskkill //F //IM Alphabiz.exe || (echo "app is ready")
+            sleep 10s
+            yarn test:release
 
       - name: e2e appium creditUpload test for 7z 🧪
         if: matrix.test == '2'
-        run: |
-          yarn test:release
-          sleep 10s
-          taskkill //F //IM Alphabiz.exe || (echo "app is ready")
-        shell: bash
+        uses: nick-fields/retry@v2
+        with:
+          timeout_seconds: 1200
+          max_attempts: 2
+          shell: bash
+          retry_on: error
+          command: |
+            taskkill //F //IM Alphabiz.exe || (echo "app is ready")
+            sleep 10s
+            yarn test:release
 
       - name: Download msi and exe
         run: |
@@ -281,28 +286,33 @@ jobs:
           Start-Sleep -s 30
         shell: powershell
 
-      - name: Kill process after install app
-        run: |
-          taskkill //F //IM Alphabiz.exe || (echo "app is ready")
-        shell: bash
-
       - name: e2e appium test for msi 🧪
-        run: |
-          export APP_TYPE=msi
-          yarn test:release
-          unset APP_TYPE
-          sleep 10s
-          taskkill //F //IM Alphabiz.exe || (echo "app is ready")
-        shell: bash
+        uses: nick-fields/retry@v2
+        with:
+          timeout_seconds: 1200
+          max_attempts: 2
+          shell: bash
+          retry_on: error
+          command: |
+            taskkill //F //IM Alphabiz.exe || (echo "app is ready")
+            sleep 10s
+            export APP_TYPE=msi
+            yarn test:release
+            unset APP_TYPE
 
       - name: e2e appium test for exe 🧪
-        run: |
-          export APP_TYPE=exe
-          yarn test:release
-          unset APP_TYPE
-          sleep 10s
-          taskkill //F //IM Alphabiz.exe || (echo "app is ready")
-        shell: bash
+        uses: nick-fields/retry@v2
+        with:
+          timeout_seconds: 1200
+          max_attempts: 2
+          shell: bash
+          retry_on: error
+          command: |
+            taskkill //F //IM Alphabiz.exe || (echo "app is ready")
+            sleep 10s
+            export APP_TYPE=exe
+            yarn test:release
+            unset APP_TYPE
 
       - name: Upload Test Results 🗃
         if: always()
