@@ -15,6 +15,9 @@ const { BasicPage } = require('./Pages/BasicPage')
 const obj = require('./TestEnvironment')
 const { sleep } = require('../../utils/getCode')
 
+const outputFile = process.env.APP_TYPE === 'exe' ? '/exe' : process.env.APP_TYPE === 'msi' ? '/msi' : '/7z'
+const outputPath = path.resolve(__dirname, '../../output/release' + outputFile)
+
 let client, homePage, accountPage, creditsPage, developmentPage, basicPage
 jest.setTimeout(60000 * 15)
 
@@ -28,12 +31,6 @@ describe('upload', () => {
     basicPage = new BasicPage(client)
   }, 60000)
   afterAll(async () => {
-    // var dir = '../../output/release'
-    // if (!fs.existsSync(dir)) {
-    //   fs.mkdirSync(dir, { recursive: true })
-    // }
-    // await sleep(2000)
-    // await client.saveScreenshot('test/output/release/screenshot.png')
     await client.deleteSession()
   })
   it('title', async () => {
@@ -42,13 +39,14 @@ describe('upload', () => {
     expect(windowTitle).toBe('Alphabiz')
     // const appTitle = await homePage.getAppTitle()
     // expect(appTitle).toBe('Alphabiz')
+    console.log('outputPath:' + outputPath)
     // 判断该路径是否存在，若不存在，则创建
-    var dir = '../../output/release'
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true })
+
+    if (!fs.existsSync(outputPath)) {
+      fs.mkdirSync(outputPath, { recursive: true })
     }
     await sleep(2000)
-    await client.saveScreenshot('test/output/release/screenshot.png')
+    await client.saveScreenshot(outputPath + '/homePage.png')
   })
   it('version number', async () => {
     const version = await homePage.getAppVersion()
@@ -70,7 +68,7 @@ describe('upload', () => {
   it('Switch to Simplified Chinese', async () => {
     await homePage.jumpPage('settingsLink', 'basicLink')
     await basicPage.switchLanguages('english', 'simplifiedChinese')
-    await client.saveScreenshot('test/output/release/basic-language-simplifiedChinese.png')
+    await client.saveScreenshot(outputPath + '/basic-language-simplifiedChinese.png')
     expect(await homePage.getPageTitle()).toBe('基础设置')
   })
 })
