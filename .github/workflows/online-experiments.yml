@@ -251,7 +251,7 @@ jobs:
       - name: e2e appium creditDownload test for 7z 🧪
         if: matrix.test == '1'
         run: |
-          yarn test:release:creditsDownload
+          yarn test:release
           sleep 10s
           taskkill //F //IM Alphabiz.exe || (echo "app is ready")
         shell: bash
@@ -259,7 +259,7 @@ jobs:
       - name: e2e appium creditUpload test for 7z 🧪
         if: matrix.test == '2'
         run: |
-          yarn test:release:creditsUpload
+          yarn test:release
           sleep 10s
           taskkill //F //IM Alphabiz.exe || (echo "app is ready")
         shell: bash
