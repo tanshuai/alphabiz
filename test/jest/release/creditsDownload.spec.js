@@ -4,6 +4,7 @@ const path = require('path')
 const fs = require('fs')
 
 const { sleep } = require('../../utils/getCode')
+const { calculation } = require('../../utils/calculation')
 const { HomePage } = require('./Pages/HomePage')
 const { AccountPage } = require('./Pages/AccountPage')
 const { CreditsPage } = require('./Pages/CreditsPage')
@@ -93,7 +94,8 @@ describe('download', () => {
         // 查看积分减少变化
         await homePage.jumpPage('creditsLink')
         const changedCredit = await creditsPage.checkCredits()
-        if (Number(initialCredit) + 1 <= Number(changedCredit)) console.log('success!')
+        console.log('changedCredit:' + changedCredit)
+        if (calculation('reduce', initialCredit, changedCredit) >= 0.001) console.log('success!')
       } catch (error) {
         // 未出现，结束测试
         console.log('tast end')
@@ -120,7 +122,8 @@ describe('download', () => {
         // 查看积分减少变化
         await homePage.jumpPage('creditsLink')
         const changedCredit = await creditsPage.checkCredits()
-        if (Number(initialCredit) + 2 <= Number(changedCredit)) console.log('success!')
+        console.log('changedCredit:' + changedCredit)
+        if (calculation('reduce', initialCredit, changedCredit) >= 0.001) console.log('success!')
       }
     }
     // // 等待种子下载完成
