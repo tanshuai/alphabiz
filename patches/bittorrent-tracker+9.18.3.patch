@@ -1,0 +1,363 @@
+diff --git a/node_modules/bittorrent-tracker/client.js b/node_modules/bittorrent-tracker/client.js
+index c091c31..9d65376 100644
+--- a/node_modules/bittorrent-tracker/client.js
++++ b/node_modules/bittorrent-tracker/client.js
+@@ -76,50 +76,59 @@ class Client extends EventEmitter {
+     // remove duplicates by converting to Set and back
+     announce = Array.from(new Set(announce))
+ 
+-    const webrtcSupport = this._wrtc !== false && (!!this._wrtc || Peer.WEBRTC_SUPPORT)
++    this._createTracker = this._createTracker.bind(this)
++    /**
++     * @type { Array<HTTPTracker|UDPTracker|WebSocketTracker> }
++     */
++    this._trackers = announce
++      .map(this._createTracker)
++      .filter(Boolean)
++  }
+ 
++  /**
++   * @function _createTracker
++   * @param { string } announceUrl
++   * @returns { HTTPTracker | UDPTracker | WebSocketTracker }
++   */
++  _createTracker (announceUrl) {
+     const nextTickWarn = err => {
+       queueMicrotask(() => {
+         this.emit('warning', err)
+       })
+     }
++    const webrtcSupport = this._wrtc !== false && (!!this._wrtc || Peer.WEBRTC_SUPPORT)
++    let parsedUrl
++    try {
++      parsedUrl = common.parseUrl(announceUrl)
++    } catch (err) {
++      nextTickWarn(new Error(`Invalid tracker URL: ${announceUrl}`))
++      return null
++    }
+ 
+-    this._trackers = announce
+-      .map(announceUrl => {
+-        let parsedUrl
+-        try {
+-          parsedUrl = common.parseUrl(announceUrl)
+-        } catch (err) {
+-          nextTickWarn(new Error(`Invalid tracker URL: ${announceUrl}`))
+-          return null
+-        }
+-
+-        const port = parsedUrl.port
+-        if (port < 0 || port > 65535) {
+-          nextTickWarn(new Error(`Invalid tracker port: ${announceUrl}`))
+-          return null
+-        }
+-
+-        const protocol = parsedUrl.protocol
+-        if ((protocol === 'http:' || protocol === 'https:') &&
+-            typeof HTTPTracker === 'function') {
+-          return new HTTPTracker(this, announceUrl)
+-        } else if (protocol === 'udp:' && typeof UDPTracker === 'function') {
+-          return new UDPTracker(this, announceUrl)
+-        } else if ((protocol === 'ws:' || protocol === 'wss:') && webrtcSupport) {
+-          // Skip ws:// trackers on https:// sites because they throw SecurityError
+-          if (protocol === 'ws:' && typeof window !== 'undefined' &&
+-              window.location.protocol === 'https:') {
+-            nextTickWarn(new Error(`Unsupported tracker protocol: ${announceUrl}`))
+-            return null
+-          }
+-          return new WebSocketTracker(this, announceUrl)
+-        } else {
+-          nextTickWarn(new Error(`Unsupported tracker protocol: ${announceUrl}`))
+-          return null
+-        }
+-      })
+-      .filter(Boolean)
++    const port = parsedUrl.port
++    if (port < 0 || port > 65535) {
++      nextTickWarn(new Error(`Invalid tracker port: ${announceUrl}`))
++      return null
++    }
++
++    const protocol = parsedUrl.protocol
++    if ((protocol === 'http:' || protocol === 'https:') &&
++      typeof HTTPTracker === 'function') {
++      return new HTTPTracker(this, announceUrl)
++    } else if (protocol === 'udp:' && typeof UDPTracker === 'function') {
++      return new UDPTracker(this, announceUrl)
++    } else if ((protocol === 'ws:' || protocol === 'wss:') && webrtcSupport) {
++      // Skip ws:// trackers on https:// sites because they throw SecurityError
++      if (protocol === 'ws:' && typeof window !== 'undefined' &&
++        window.location.protocol === 'https:') {
++        nextTickWarn(new Error(`Unsupported tracker protocol: ${announceUrl}`))
++        return null
++      }
++      return new WebSocketTracker(this, announceUrl)
++    } else {
++      nextTickWarn(new Error(`Unsupported tracker protocol: ${announceUrl}`))
++      return null
++    }
+   }
+ 
+   /**
+diff --git a/node_modules/bittorrent-tracker/lib/client/http-tracker.js b/node_modules/bittorrent-tracker/lib/client/http-tracker.js
+index 6fcea8d..482a179 100644
+--- a/node_modules/bittorrent-tracker/lib/client/http-tracker.js
++++ b/node_modules/bittorrent-tracker/lib/client/http-tracker.js
+@@ -50,7 +50,7 @@ class HTTPTracker extends Tracker {
+     if (this._trackerId) params.trackerid = this._trackerId
+ 
+     this._request(this.announceUrl, params, (err, data) => {
+-      if (err) return this.client.emit('warning', err)
++      if (err) return this.client.emit('warning', err, this.announceUrl)
+       this._onAnnounceResponse(data)
+     })
+   }
+@@ -59,7 +59,7 @@ class HTTPTracker extends Tracker {
+     if (this.destroyed) return
+ 
+     if (!this.scrapeUrl) {
+-      this.client.emit('error', new Error(`scrape not supported ${this.announceUrl}`))
++      this.client.emit('error', new Error(`scrape not supported ${this.announceUrl}`), this.announceUrl)
+       return
+     }
+ 
+@@ -70,7 +70,7 @@ class HTTPTracker extends Tracker {
+       info_hash: infoHashes
+     }
+     this._request(this.scrapeUrl, params, (err, data) => {
+-      if (err) return this.client.emit('warning', err)
++      if (err) return this.client.emit('warning', err, this.announceUrl)
+       this._onScrapeResponse(data)
+     })
+   }
+@@ -167,7 +167,7 @@ class HTTPTracker extends Tracker {
+       const warning = data['warning message']
+       if (warning) {
+         debug(`warning from ${requestUrl} (${warning})`)
+-        self.client.emit('warning', new Error(warning))
++        self.client.emit('warning', new Error(warning), this.announceUrl)
+       }
+ 
+       debug(`response from ${requestUrl}`)
+@@ -190,7 +190,7 @@ class HTTPTracker extends Tracker {
+       announce: this.announceUrl,
+       infoHash: common.binaryToHex(data.info_hash)
+     })
+-    this.client.emit('update', response)
++    this.client.emit('update', response, this.announceUrl)
+ 
+     let addrs
+     if (Buffer.isBuffer(data.peers)) {
+@@ -198,15 +198,15 @@ class HTTPTracker extends Tracker {
+       try {
+         addrs = compact2string.multi(data.peers)
+       } catch (err) {
+-        return this.client.emit('warning', err)
++        return this.client.emit('warning', err, this.announceUrl)
+       }
+       addrs.forEach(addr => {
+-        this.client.emit('peer', addr)
++        this.client.emit('peer', addr, this.announceUrl)
+       })
+     } else if (Array.isArray(data.peers)) {
+       // tracker returned normal response
+       data.peers.forEach(peer => {
+-        this.client.emit('peer', `${peer.ip}:${peer.port}`)
++        this.client.emit('peer', `${peer.ip}:${peer.port}`, this.announceUrl)
+       })
+     }
+ 
+@@ -215,10 +215,10 @@ class HTTPTracker extends Tracker {
+       try {
+         addrs = compact2string.multi6(data.peers6)
+       } catch (err) {
+-        return this.client.emit('warning', err)
++        return this.client.emit('warning', err, this.announceUrl)
+       }
+       addrs.forEach(addr => {
+-        this.client.emit('peer', addr)
++        this.client.emit('peer', addr, this.announceUrl)
+       })
+     } else if (Array.isArray(data.peers6)) {
+       // tracker returned normal response
+@@ -226,7 +226,7 @@ class HTTPTracker extends Tracker {
+         const ip = /^\[/.test(peer.ip) || !/:/.test(peer.ip)
+           ? peer.ip /* ipv6 w/ brackets or domain name */
+           : `[${peer.ip}]` /* ipv6 without brackets */
+-        this.client.emit('peer', `${ip}:${peer.port}`)
++        this.client.emit('peer', `${ip}:${peer.port}`, this.announceUrl)
+       })
+     }
+   }
+@@ -238,7 +238,7 @@ class HTTPTracker extends Tracker {
+ 
+     const keys = Object.keys(data)
+     if (keys.length === 0) {
+-      this.client.emit('warning', new Error('invalid scrape response'))
++      this.client.emit('warning', new Error('invalid scrape response'), this.announceUrl)
+       return
+     }
+ 
+@@ -249,11 +249,11 @@ class HTTPTracker extends Tracker {
+         announce: this.announceUrl,
+         infoHash: common.binaryToHex(infoHash)
+       })
+-      this.client.emit('scrape', response)
++      this.client.emit('scrape', response, this.announceUrl)
+     })
+   }
+ }
+ 
+-HTTPTracker.prototype.DEFAULT_ANNOUNCE_INTERVAL = 30 * 60 * 1000 // 30 minutes
++HTTPTracker.prototype.DEFAULT_ANNOUNCE_INTERVAL = 3 * 60 * 1000 // 3 minutes
+ 
+ module.exports = HTTPTracker
+diff --git a/node_modules/bittorrent-tracker/lib/client/udp-tracker.js b/node_modules/bittorrent-tracker/lib/client/udp-tracker.js
+index 65d97e4..84eb778 100644
+--- a/node_modules/bittorrent-tracker/lib/client/udp-tracker.js
++++ b/node_modules/bittorrent-tracker/lib/client/udp-tracker.js
+@@ -168,7 +168,7 @@ class UDPTracker extends Tracker {
+         if (err.message) err.message += ` (${self.announceUrl})`
+       } catch (ignoredErr) {}
+       // errors will often happen if a tracker is offline, so don't treat it as fatal
+-      self.client.emit('warning', err)
++      self.client.emit('warning', err, self.announceUrl)
+     }
+ 
+     function onSocketMessage (msg) {
+@@ -204,16 +204,16 @@ class UDPTracker extends Tracker {
+             announce: self.announceUrl,
+             complete: msg.readUInt32BE(16),
+             incomplete: msg.readUInt32BE(12)
+-          })
++          }, self.announceUrl)
+ 
+           let addrs
+           try {
+             addrs = compact2string.multi(msg.slice(20))
+           } catch (err) {
+-            return self.client.emit('warning', err)
++            return self.client.emit('warning', err, self.announceUrl)
+           }
+           addrs.forEach(addr => {
+-            self.client.emit('peer', addr)
++            self.client.emit('peer', addr, self.announceUrl)
+           })
+ 
+           break
+@@ -236,7 +236,7 @@ class UDPTracker extends Tracker {
+               complete: msg.readUInt32BE(8 + (i * 12)),
+               downloaded: msg.readUInt32BE(12 + (i * 12)),
+               incomplete: msg.readUInt32BE(16 + (i * 12))
+-            })
++            }, self.announceUrl)
+           }
+ 
+           break
+@@ -246,7 +246,7 @@ class UDPTracker extends Tracker {
+           if (self.destroyed) return
+ 
+           if (msg.length < 8) return onError(new Error('invalid error message'))
+-          self.client.emit('warning', new Error(msg.slice(8).toString()))
++          self.client.emit('warning', new Error(msg.slice(8).toString()), self.announceUrl)
+ 
+           break
+         }
+@@ -302,7 +302,7 @@ class UDPTracker extends Tracker {
+   }
+ }
+ 
+-UDPTracker.prototype.DEFAULT_ANNOUNCE_INTERVAL = 30 * 60 * 1000 // 30 minutes
++UDPTracker.prototype.DEFAULT_ANNOUNCE_INTERVAL = 3 * 60 * 1000 // 3 minutes
+ 
+ function genTransactionId () {
+   return randombytes(4)
+diff --git a/node_modules/bittorrent-tracker/lib/client/websocket-tracker.js b/node_modules/bittorrent-tracker/lib/client/websocket-tracker.js
+index 1573cfd..37ddfb3 100644
+--- a/node_modules/bittorrent-tracker/lib/client/websocket-tracker.js
++++ b/node_modules/bittorrent-tracker/lib/client/websocket-tracker.js
+@@ -214,7 +214,7 @@ class WebSocketTracker extends Tracker {
+     try {
+       data = JSON.parse(data)
+     } catch (err) {
+-      this.client.emit('warning', new Error('Invalid tracker response'))
++      this.client.emit('warning', new Error('Invalid tracker response'), this.announceUrl)
+       return
+     }
+ 
+@@ -247,10 +247,10 @@ class WebSocketTracker extends Tracker {
+     )
+ 
+     const failure = data['failure reason']
+-    if (failure) return this.client.emit('warning', new Error(failure))
++    if (failure) return this.client.emit('warning', new Error(failure), this.announceUrl)
+ 
+     const warning = data['warning message']
+-    if (warning) this.client.emit('warning', new Error(warning))
++    if (warning) this.client.emit('warning', new Error(warning), this.announceUrl)
+ 
+     const interval = data.interval || data['min interval']
+     if (interval) this.setInterval(interval * 1000)
+@@ -266,7 +266,7 @@ class WebSocketTracker extends Tracker {
+         announce: this.announceUrl,
+         infoHash: common.binaryToHex(data.info_hash)
+       })
+-      this.client.emit('update', response)
++      this.client.emit('update', response, this.announceUrl)
+     }
+ 
+     let peer
+@@ -286,7 +286,7 @@ class WebSocketTracker extends Tracker {
+         if (this._trackerId) params.trackerid = this._trackerId
+         this._send(params)
+       })
+-      this.client.emit('peer', peer)
++      this.client.emit('peer', peer, this.announceUrl)
+       peer.signal(data.offer)
+     }
+ 
+@@ -295,7 +295,7 @@ class WebSocketTracker extends Tracker {
+       peer = this.peers[offerId]
+       if (peer) {
+         peer.id = common.binaryToHex(data.peer_id)
+-        this.client.emit('peer', peer)
++        this.client.emit('peer', peer, this.announceUrl)
+         peer.signal(data.answer)
+ 
+         clearTimeout(peer.trackerTimeout)
+@@ -312,7 +312,7 @@ class WebSocketTracker extends Tracker {
+ 
+     const keys = Object.keys(data)
+     if (keys.length === 0) {
+-      this.client.emit('warning', new Error('invalid scrape response'))
++      this.client.emit('warning', new Error('invalid scrape response'), this.announceUrl)
+       return
+     }
+ 
+@@ -323,7 +323,7 @@ class WebSocketTracker extends Tracker {
+         announce: this.announceUrl,
+         infoHash: common.binaryToHex(infoHash)
+       })
+-      this.client.emit('scrape', response)
++      this.client.emit('scrape', response, this.announceUrl)
+     })
+   }
+ 
+@@ -337,7 +337,7 @@ class WebSocketTracker extends Tracker {
+     if (this.destroyed) return
+     this.destroy()
+     // errors will often happen if a tracker is offline, so don't treat it as fatal
+-    this.client.emit('warning', err)
++    this.client.emit('warning', err, this.announceUrl)
+     this._startReconnectTimer()
+   }
+ 
+@@ -420,7 +420,7 @@ class WebSocketTracker extends Tracker {
+     // Handle peer 'error' events that are fired *before* the peer is emitted in
+     // a 'peer' event.
+     function onError (err) {
+-      self.client.emit('warning', new Error(`Connection error: ${err.message}`))
++      self.client.emit('warning', new Error(`Connection error: ${err.message}`), self.announceUrl)
+       peer.destroy()
+     }
+ 
