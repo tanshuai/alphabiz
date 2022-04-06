@@ -120,6 +120,13 @@ const torrentToJson = (tr, deltaTime, speeder) => {
   o.byteMap = tr.byteMap
   // console.log(o.byteMap)
 
+  // trackers
+  if (tr.trackerMap) {
+    o.trackerList = [...tr.trackerMap.values()]
+  } else {
+    o.trackerList = []
+  }
+
   o.connections = tr.wires.map(/** @param { import('../src/types').Wire } wire */wire => {
     // if (!wire.remoteAddress) return
     let level = 'low'
@@ -190,8 +197,70 @@ const getLocalIPList = () => {
   return [...list]
 }
 
+/**
+ * @function parseTrackerWarning
+ * @param { string } str tracker error message
+ * @returns { string }
+ */
+const parseTrackerWarning = str => {
+  if (typeof str === 'string' && str.includes('(')) {
+    return str.substring(0, str.indexOf('(')).trim()
+  }
+  return str
+}
+
+/**
+ * @function addTracker
+ * @param { Torrent } tr
+ * @param { string } url
+ */
+const addTracker = (tr, url) => {
+  if (!tr.discovery || !tr.discovery.tracker) return
+  const client = tr.discovery.tracker
+  if (client._trackers.find(i => i.announceUrl === url)) return
+  if (!client._createTracker) return
+  try {
+    const tracker = client._createTracker(url)
+    if (!tracker) return
+    client._trackers.push(tracker)
+    tracker.setInterval()
+    tracker.announce(client._defaultAnnounceOpts())
+  } catch (e) {
+    console.error('addTracker error', e)
+  }
+}
+
+/**
+ * @function removeTracker
+ * @param { Torrent } tr
+ * @param { string } url
+ * @param { () => void } [cb]
+ */
+const removeTracker = (tr, url, cb) => {
+  if (!tr.discovery || !tr.discovery.tracker) return cb()
+  const trackers = tr.discovery.tracker._trackers
+  const index = trackers.findIndex(i => i.announceUrl === url)
+  if (index === -1) return cb()
+  const found = trackers[index]
+  if (found && found.destroy) {
+    found.destroy((...args) => {
+      // check again for index since this is async
+      const index = trackers.findIndex(i => i.announceUrl === url)
+      if (index !== -1) trackers.splice(index, 1)
+      if (typeof cb === 'function') {
+        cb(...args)
+      }
+    })
+  } else {
+    cb()
+  }
+}
+
 export default {
   torrentToJson,
   getLocalIPList,
-  getPieceMap
+  getPieceMap,
+  parseTrackerWarning,
+  addTracker,
+  removeTracker
 }
