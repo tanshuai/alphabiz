@@ -18,8 +18,8 @@ export const opts = {
     browserName: '',
     platformName: 'Windows',
     deviceName: 'WindowsPC',
-    appWaitDuration: 60000,
-    createSessionTimeout: 60000,
+    appWaitDuration: 20000,
+    createSessionTimeout: 20000,
     app: AlphabizAppPath
   },
   logLevel: 'error'

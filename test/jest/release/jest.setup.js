@@ -6,5 +6,5 @@
 //   specStarted: result => jasmine.currentTest = result,
 //   specDone: result => jasmine.currentTest = result
 // })
-jest.setTimeout(60000)
+jest.setTimeout(20000)
 // jest.retryTimes(1)
