@@ -260,7 +260,7 @@ jobs:
           command: |
             taskkill //F //IM Alphabiz.exe || (echo "app is ready")
             sleep 10s
-            yarn test:release:creditDownload
+            yarn test:release:creditsDownload
 
       - name: e2e appium creditUpload test for 7z 🧪
         if: matrix.test == '2'
@@ -273,7 +273,7 @@ jobs:
           command: |
             taskkill //F //IM Alphabiz.exe || (echo "app is ready")
             sleep 10s
-            yarn test:release:creditUpload
+            yarn test:release:creditsUpload
 
       - name: Download msi and exe
         run: |
