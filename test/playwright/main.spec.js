@@ -303,7 +303,8 @@ test.describe('download ', () => {
     // await commands.jumpPage('downloadedStatus')
 
     await commands.jumpPage('uploadingStatus')
-    await window.waitForLoadState()
+    // await window.waitForLoadState()
+    await sleep(4000)
     await window.screenshot({ path: `${ScreenshotsPath}taskStatus.png` })
     // 切换列表模式
     const listMode = await window.locator('button:has-text("view_agenda")')
@@ -360,25 +361,9 @@ test.describe('download ', () => {
     await window.locator('button:has-text("Not now")').click()
     // "更多"功能检查Download url
     await moreIcon.click()
-    // const downloadURI = await window.locator('[aria-label="Download URI"]').innerText()
-    // console.log('The WIRED CD downloadURI:' + downloadURI)
     await window.click('text=content_copy')
-
     // // "更多"功能检查文件路径
     const filePathElement = await window.locator('text=play_arrowfolder')
-    // const filePathText = await filePathElement.innerText()
-    // const filePath = path.resolve(__dirname, '../download')
-    // // 字符串路径转为正则表达式
-    // let filePathReg = ''
-    // for (const char of filePath) {
-    //   if (char === '\\') filePathReg += '\\' + char
-    //   else filePathReg += char
-    // }
-    // const reg = new RegExp(filePathReg + '\\\\The WIRED CD')
-    // expect(reg.test(filePathText)).toBe(true)
-    // console.log('reg:' + reg)
-    // console.log('filePathText:' + filePathText)
-    // expect(reg.test(filePathText)).toBe(true)
     // 检查文件夹树状结构
     await filePathElement.click()
     await window.waitForSelector('text=01 - Beastie Boys - Now Get Busy.mp3')
@@ -386,7 +371,7 @@ test.describe('download ', () => {
     await window.waitForSelector('text=image')
     await sleep(500)
     // 退出卡片
-    await window.locator('text=PAUSE ALL >> nth=1').click({ force: true })
+    await window.locator('header >> text=Uploading').click({ force: true })
     // downloaded状态栏
     await stopIcon.click()
     await commands.jumpPage('downloadedStatus')
