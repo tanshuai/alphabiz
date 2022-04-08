@@ -52,6 +52,25 @@ export const getByteMap = (tr) => {
   return ret
 }
 
+const calcPieces = (tr, wire) => {
+  const pieceLength = tr.pieceLength
+  const length = tr.length
+  const pieceNum = Math.ceil(length / pieceLength)
+  /** @type {{ buffer: Uint8Array }} */
+  const peerPieces = wire.peerPieces
+  if (!peerPieces.buffer) return { progress: 0, buffer: null }
+  let has = 0
+  for (const bitField of peerPieces.buffer) {
+    const hasBits = bitField.toString(2).split('').filter(i => i === '1').length
+    has += hasBits
+  }
+  return {
+    progress: has / pieceNum,
+    has,
+    length
+  }
+}
+
 const responseTorrentProps = [
   'infoHash', 'name',
   'paused', 'length',
@@ -157,6 +176,7 @@ const torrentToJson = (tr, deltaTime, speeder) => {
         }
       })
     }
+    const { progress, buffer } = calcPieces(tr, wire)
     return {
       id: wire.peerId,
       address: wire.remoteAddress,
@@ -171,7 +191,9 @@ const torrentToJson = (tr, deltaTime, speeder) => {
       transactions: wire.transactions,
       remoteGroup: wire.remoteGroup,
       downloaded: wire.downloaded,
-      level
+      level,
+      progress,
+      buffer
     }
   })
   o.connections.sort((a, b) => {
