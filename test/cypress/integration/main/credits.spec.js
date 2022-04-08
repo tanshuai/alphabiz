@@ -31,16 +31,17 @@ describe('Credits', () => {
   it('test1 to test2 transfer - check bill details', () => {
     let from
     let to
-    if (process.platform === 'win32') {
+    if (Cypress.platform === 'win32') {
       from = 'test2'
       to = 'test1'
-    } else if (process.platform === 'linux') {
+    } else if (Cypress.platform === 'linux') {
       from = 'test4'
       to = 'test3'
     } else {
       from = 'test6'
       to = 'test5'
     }
+    cy.log('Cypress.platform: ' + Cypress.platform)
     // 转账人账号 转账人密码
     const transferee = from + Cypress.env('testEmailDomain')
     const transfereePassword = 'password'
