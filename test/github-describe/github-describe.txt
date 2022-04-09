@@ -1,25 +1,7 @@
-ui adjustment
-bug fix
-fast release after fix bug、modify gmail
-fixed: ListItem progressbar color, input paste; #154
-fixed: #152
-try run playwright download test in ci
-test set-output、modify Installation program name
-retry test set-output
-fix scripts error
-slower update when task num > 100
-Update online-experiments.yml
-dont save trackers
-enable auto reload webtorrent page after crashed
-update trayIcon for macos
-remove test codes, skip quitting if webtorrent window crashed
-use local data for all torrents
-add trayicon resource for macos
-fix trayicon in production mode, resolve #182
-remove invalid css
-add movie.csv
-download test in ci
-remove some caches
-add waiting-for-verify status, i18, close #183
-bug fixed
-add download multiline magnet test、modify workflow
+Add more versions information for developer mode
+Quasar, Vue & full platform info
+fix paste error in inputs
+Update nightly.yml
+Add user-email and  Better Look user-name
+fix #187
+rerun internal.yml
