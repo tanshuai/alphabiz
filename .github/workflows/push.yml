@@ -69,11 +69,19 @@ jobs:
           echo "::set-output name=commit::$(git log -1 --pretty=%B --author="Alphabiz-Team")"
           echo "::set-output name=commit-version::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /(?<=v)\d+\.\d+\.\d+/g')"
           echo "::set-output name=commit-date::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /(?<=-)\d{8,12}(?=-)/g')"
+          echo "::set-output name=commit-sha7::$(git log -1 --pretty=%B --author="AlphabizTeam" | perl -wnE'say for /(?<=-)\w{7}(?=-)/g')"
           echo "::set-output name=commit-message::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /\d{8,12}-\w+/g')"
           echo "::set-output name=date::$(git log -1 --date=format:'%Y%m%d' --author="Alphabiz-Team" --format='%cd')"
           echo "::set-output name=tag::$(git describe --abbrev=0 --tags)"
           echo "::set-output name=current-hour::$(date +'%H')"
           echo "::set-output name=release-date::$(git log -1 --date=format:'%Y-%m-%d' --format='%cd' --author="Alphabiz-Team")"
+          if [[ ${{ matrix.os }} = "ubuntu-latest" ]] ; \
+          then echo "::set-output name=system::ubuntu" ; \
+          else if [[ ${{ matrix.os }} = "macos-latest"]] ; \
+          then echo "::set-output name=system::macos" ; \
+          else if [[ ${{ matrix.os }} = "windows-2022"]] ; \
+          then echo "::set-output name=system::windows" ; \
+          fi
         shell: bash
 
       # 获取所以今天 作者为Alphabiz-Team的commit message,正则:不匹配'[-]符号'前面的任意字符、不匹配空行
@@ -89,9 +97,11 @@ jobs:
 
       - name: Checkout vars-date ${{ steps.vars.outputs.date }} ⬇️
         run: |
+          echo "system:${{ steps.vars.outputs.system }}"
           echo "commit: ${{ steps.vars.outputs.commit }}"
           echo "commit-version: ${{ steps.vars.outputs.commit-version }}"
           echo "commit-date: ${{ steps.vars.outputs.commit-date }}"
+          echo "commit-sha7: ${{ steps.vars.outputs.commit-sha7 }}"
           echo "commit-message: ${{ steps.vars.outputs.commit-message }}"
           echo "${{ steps.vars.outputs.date }}"
           echo "${{ steps.vars.outputs.tag }}"
@@ -130,7 +140,7 @@ jobs:
 
       - name: Package for ${{ matrix.os }}-nightly-${{ steps.vars.outputs.commit-message }} Release 🗜️
         if: contains(steps.vars.outputs.current-hour, '12')
-        run: 7z a -t7z -mx=9 alphabiz-${{ matrix.os }}-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}.7z ./build/electron -xr!UnPackaged
+        run: 7z a -t7z -mx=9 alphabiz-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}-${{ steps.vars.outputs.system }}.7z ./build/electron -xr!UnPackaged
 
       - name: Pack app 📦
         if: contains(steps.vars.outputs.current-hour, '12')
@@ -140,14 +150,14 @@ jobs:
           yarn make
         shell: bash
 
-      - name: Release ${{ matrix.os }}-nightly-${{ steps.vars.outputs.commit-message }}.7z to GitHub 📰
+      - name: Release alphabiz-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}-${{ steps.vars.outputs.system }}.7z to GitHub 📰
         if: contains(steps.vars.outputs.current-hour, '12')
         uses: softprops/action-gh-release@v1
         with:
           prerelease: true
-          name: alphabiz-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}
+          name: alphabiz-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-sha7 }}
           tag_name: alphabiz-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}
           body: ${{ env.DESCRIBE }}
           files: |
-            alphabiz-${{ matrix.os }}-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}.7z
+            alphabiz-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}-${{ steps.vars.outputs.system }}.7z
             ./out/installers/${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-date }}/**

@@ -110,3 +110,7 @@ playwright-report/
 test/download/**
 test/output/**
 .DS_Store
+build/**/node_modules
+build/electron/Alphabiz-win32-x64/**
+build/electron/**/yarn.lock
+out/
