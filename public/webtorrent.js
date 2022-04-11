@@ -288,6 +288,17 @@ const updateTorrent = (once = false) => {
 }
 queueTimeout(updateTorrent, 1000)
 
+let queueUpdate = null
+const forceUpdateTorrent = () => {
+  if (queueUpdate) {
+    clearTimeout(queueUpdate)
+    queueUpdate = setTimeout(() => {
+      queueUpdate = null
+      updateTorrent(true)
+    }, 100)
+  }
+}
+
 const onDone = (tr) => {
   if (tr.upload) return
   tr.isSeeding = true
@@ -345,7 +356,7 @@ const onInfoHash = (infoHash, tr, conf, isSeeding) => {
     }
   } else ipcRenderer.send('webtorrent-infohash', infoHash, { ...conf, isSeeding })
   infoHashes.push(infoHash)
-  updateTorrent(true)
+  forceUpdateTorrent()
 }
 /**
  * @function addListeners
@@ -524,7 +535,7 @@ const stopTorrent = infoHash => {
   if (infoHashes.includes(infoHash)) {
     infoHashes.splice(infoHashes.indexOf(infoHash), 1)
   }
-  updateTorrent(true)
+  forceUpdateTorrent()
 }
 /**
  * @param { string } infoHash
@@ -557,7 +568,7 @@ const deleteTorrent = (infoHash, destroyStore) => {
   while (infoHashes.includes(infoHash)) {
     infoHashes.splice(infoHashes.indexOf(infoHash), 1)
   }
-  updateTorrent(true)
+  forceUpdateTorrent()
 }
 /**
  * @param { string } token
