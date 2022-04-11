@@ -77,9 +77,9 @@ jobs:
           echo "::set-output name=release-date::$(git log -1 --date=format:'%Y-%m-%d' --format='%cd' --author="Alphabiz-Team")"
           if [[ ${{ matrix.os }} = "ubuntu-latest" ]] ; \
           then echo "::set-output name=system::ubuntu" ; \
-          else if [[ ${{ matrix.os }} = "macos-latest"]] ; \
+          elif [[ ${{ matrix.os }} = "macos-latest"]] ; \
           then echo "::set-output name=system::macos" ; \
-          else if [[ ${{ matrix.os }} = "windows-2022"]] ; \
+          elif [[ ${{ matrix.os }} = "windows-2022"]] ; \
           then echo "::set-output name=system::windows" ; \
           fi
         shell: bash
