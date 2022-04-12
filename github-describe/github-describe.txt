@@ -1,5 +1,7 @@
-update nickname tooltip
-test update node-gyp
-test not config node-gyp
-modify experiment workflow
-fix #252 and fix #253
+Tidy Locales by Add Vue Locale
+support payDataFinish
+i18n message
+Update CustomMessage.js
+fix sms bug
+enable test token
+modify match verification code
