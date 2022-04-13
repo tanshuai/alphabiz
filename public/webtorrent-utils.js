@@ -177,9 +177,17 @@ const torrentToJson = (tr, deltaTime, speeder) => {
       })
     }
     const { progress, buffer } = calcPieces(tr, wire)
+    let address = wire.remoteAddress
+    if (!address) {
+      const peer = tr._peers[wire.peerId]
+      if (peer && peer.type === 'webrtc') {
+        const _address = peer.conn?._pc?.currentRemoteDescription?.sdp?.match(/c=IN\sIP\d\s(.*)/)?.[1]
+        if (_address) address = _address
+      }
+    }
     return {
       id: wire.peerId,
-      address: wire.remoteAddress,
+      address,
       isAbPeer: wire._is_alphabiz_peer_,
       hasMeta: wire.remote_has_meta,
       hasResource,
