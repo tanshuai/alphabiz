@@ -1,0 +1,92 @@
+diff --git a/node_modules/electron-wix-msi/lib/creator.js b/node_modules/electron-wix-msi/lib/creator.js
+index 93195c1..ab2d64f 100644
+--- a/node_modules/electron-wix-msi/lib/creator.js
++++ b/node_modules/electron-wix-msi/lib/creator.js
+@@ -50,7 +50,8 @@ class MSICreator {
+         this.wxsFile = '';
+         this.arch = 'x86';
+         this.files = [];
+-        this.specialFiles = [];
++        // console.log('\n', options.specialFiles || [], '\n')
++        this.specialFiles = options.specialFiles || [];
+         this.directories = [];
+         this.registry = [];
+         this.components = [];
+@@ -78,7 +79,7 @@ class MSICreator {
+         this.windowsCompliantVersion = (0, version_util_1.getWindowsCompliantVersion)(options.version);
+         this.arch = options.arch || 'x86';
+         this.defaultInstallMode = options.defaultInstallMode || 'perMachine';
+-        this.productCode = (0, uuid_1.v4)().toUpperCase();
++        this.productCode = options.productCode || (0, uuid_1.v4)().toUpperCase();
+         this.rebootMode = options.rebootMode || 'ReallySuppress';
+         this.installLevel = options.installLevel || 2;
+         this.bundled = options.bundled || false;
+@@ -106,12 +107,17 @@ class MSICreator {
+             const registry = this.getRegistryKeys();
+             const specialFiles = yield this.getSpecialFiles();
+             this.files = files;
+-            this.specialFiles = specialFiles;
++            this.specialFiles = this.specialFiles.length ? this.specialFiles : specialFiles;
++            // console.log(this.specialFiles, specialFiles)
+             this.directories = directories;
+             this.registry = registry;
+             this.tree = yield this.getTree();
+             const { wxsContent, wxsFile } = yield this.createWxs();
+             this.wxsFile = wxsFile;
++            this.wxsContext = {
++                files, specialFiles, directories, registry, wxsFile,
++                tree: this.tree
++            }
+             const supportBinaries = this.specialFiles.filter((f) => f.path.endsWith('.exe')).map((f) => f.path);
+             return { wxsContent, wxsFile, supportBinaries };
+         });
+@@ -126,9 +132,9 @@ class MSICreator {
+                 console.warn(`for information on how to install the Wix toolkit, which is required.\n`);
+                 throw new Error(`Could not find light.exe or candle.exe`);
+             }
+-            else {
+-                console.log(`electron-wix-msi: Using light.exe (${light.version}) and candle.exe (${candle.version})`);
+-            }
++            // else {
++            //     console.log(`electron-wix-msi: Using light.exe (${light.version}) and candle.exe (${candle.version})`);
++            // }
+             if (!this.wxsFile) {
+                 throw new Error(`wxsFile not found. Did you run create() yet?`);
+             }
+@@ -372,8 +378,9 @@ class MSICreator {
+         });
+     }
+     getFileComponent(file, indent) {
+-        const guid = (0, uuid_1.v4)();
+-        const componentId = this.getComponentId(file.path);
++        const guid = file.guid || (0, uuid_1.v4)();
++        const lid = file.guid ? file.guid.toLowerCase() : undefined
++        const componentId = this.getComponentId(file.path, lid);
+         const xml = (0, replace_1.replaceInString)(this.fileComponentTemplate, {
+             '<!-- {{I}} -->': (0, lodash_1.padStart)('', indent),
+             '{{ComponentId}}': componentId,
+@@ -412,14 +419,14 @@ class MSICreator {
+         });
+         return xml;
+     }
+-    getComponentId(filePath) {
++    getComponentId(filePath, customUuid) {
+         const pathId = filePath
+             .replace(this.appDirectory, '')
+             .replace(/^\\|\//g, '');
+         const pathPart = pathId.length > 34
+             ? path.basename(filePath).slice(0, 34)
+             : pathId;
+-        const uniqueId = `_${pathPart}_${(0, uuid_1.v4)()}`;
++        const uniqueId = `_${pathPart}_${customUuid || (0, uuid_1.v4)()}`;
+         return uniqueId.replace(/[^A-Za-z0-9_\.]/g, '_');
+     }
+     getSpecialFiles() {
+@@ -436,6 +443,7 @@ class MSICreator {
+                     featureAffinity: 'autoUpdate'
+                 });
+             }
++            specialFiles.forEach(file => file.guid = uuid_1.v4().toUpperCase())
+             return specialFiles;
+         });
+     }
