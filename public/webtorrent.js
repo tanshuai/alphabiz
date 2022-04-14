@@ -341,7 +341,7 @@ const onMetadata = (tr, conf) => {
 const onWire = (wire, tr) => {
   wire.use(useAlphabizProtocol(client, tr))
   if (wire.type === 'webrtc') {
-    console.log('onwire', wire.remoteAddress, wire.peerId)
+    // console.log('onwire', wire.remoteAddress, wire.peerId)
     const setAddress = () => {
       if (wire.remoteAddress) return
       const peer = tr._peers[wire.peerId]
