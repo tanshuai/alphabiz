@@ -10,8 +10,9 @@ on:
   push:
     paths:
       - "**.js"
-      - "**/push.yml"
+      - "!**/push.yml"
       - "build/**"
+      - "release.json"
     branches: [main]
   pull_request:
     branches: [main]
@@ -82,6 +83,10 @@ jobs:
           elif [[ ${{ matrix.os }} = "windows-2022" ]] ; \
           then echo "::set-output name=system::windows" ; \
           fi
+          export MODIFIED_FILE_LIST=$(git show --pretty="format:" --name-only)
+          echo "MODIFIED_FILE_LIST<<EOF" >> $GITHUB_ENV
+          echo "$MODIFIED_FILE_LIST" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
         shell: bash
 
       # 获取所以今天 作者为Alphabiz-Team的commit message,正则:不匹配'[-]符号'前面的任意字符、不匹配空行
@@ -107,7 +112,29 @@ jobs:
           echo "${{ steps.vars.outputs.tag }}"
           echo "current-hour: ${{ steps.vars.outputs.current-hour }}"
           echo "----------------------"
-          echo "${{ env.DESCRIBE }}"
+          echo "MODIFIED_FILE_LIST: ${{ env.MODIFIED_FILE_LIST }}"
+
+      - name: Get release.json property
+        id: release
+        if: contains(env.MODIFIED_FILE_LIST, 'release.json')
+        run: |
+          content=`cat ./release.json`
+          content="${content//'%'/'%25'}"
+          content="${content//$'\n'/'%0A'}"
+          content="${content//$'\r'/'%0D'}"
+          echo "::set-output name=releaseJson::$content"
+          echo "RELEASE_JSON<<EOF" >> $GITHUB_ENV
+          echo "$content" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Checkout release.json property
+      if: contains(env.MODIFIED_FILE_LIST, 'release.json')
+        run: |
+          echo "target-tag-name: ${{fromJson(steps.set_var.outputs.releaseJson).target-tag-name}}"
+          echo "new-tag-name: ${{fromJson(steps.set_var.outputs.releaseJson).new-tag-name}}"
+          echo "--------------------------"
+          echo "${{ env.RELEASE_JSON }}"
 
       - name: Install dependencies 👨🏻‍💻
         run: yarn
