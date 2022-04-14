@@ -10,7 +10,20 @@ const { sleep } = require('../utils/getCode')
 const { calculation } = require('../utils/calculation')
 let window, windows, electronApp, commands
 const ScreenshotsPath = 'test/output/playwright/main.spec/'
-
+let from
+let to
+if (process.platform === 'win32') {
+  from = 'test1'
+  to = 'test2'
+} else if (process.platform === 'linux') {
+  from = 'test3'
+  to = 'test4'
+} else {
+  from = 'test5'
+  to = 'test6'
+}
+from = from + process.env.TEST_EMAIL_DOMAIN
+to = to + process.env.TEST_EMAIL_DOMAIN
 test.beforeAll(async () => {
   // Launch Electron app.
   electronApp = await electron.launch({
@@ -65,7 +78,7 @@ test('close set default', async () => {
   }
 })
 
-test('close auto update', async () => {
+test.skip('close auto update', async () => {
   try {
     await window.waitForSelector('text=UPDATE LATER', { timeout: 20000 })
     await window.click('text=UPDATE LATER')
@@ -75,7 +88,7 @@ test('close auto update', async () => {
   }
 })
 
-test('close Automatically check for update', async () => {
+test.skip('close Automatically check for update', async () => {
   await commands.jumpPage('advancedLink')
   if (await window.isChecked('[aria-label="Automatically\\ check\\ for\\ update"]')) {
     await window.click('[aria-label="Automatically\\ check\\ for\\ update"]')
@@ -88,6 +101,9 @@ test('close Automatically check for update', async () => {
 
 test('reset torrent status', async () => {
   await window.waitForLoadState()
+  await commands.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
+  await commands.jumpPage('downloadingStatus')
+  await window.locator('button:has-text("search")').click({ force: true })
   if (await window.isEnabled('button:has-text("Remove all") >> nth=0')) {
     await window.click('button:has-text("Remove all") >> nth=0')
     await window.click('[aria-label="Also delete files"]')
@@ -105,11 +121,6 @@ test('reset torrent status', async () => {
     await window.click('button:has-text("Clear history")')
     await window.click('text=NOT NOW >> //following::*[1]')
   }
-  // dev mode
-  // await commands.jumpPage('developmentLink')
-  // await window.click('text=Dev Info')
-  // await window.click('text=Torrent Config Store >> //following-sibling::Button[2]')
-  // await window.locator('text=Successfully reset torrents').waitFor('visible')
 })
 
 test.describe('play video', () => {
@@ -179,6 +190,7 @@ test.describe('download ', () => {
   ]
   for (const btDate of btData) {
     test((btDate.testName ? btDate.testName : '') + btDate.btName, async () => {
+      await commands.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
       if (btDate.btName === 'uTorrent Web Tutorial Video') {
         test.setTimeout(60000 * 5)
       } else if (btDate.btName === 'The WIRED CD - Rip. Sample. Mash. Share') {
@@ -302,7 +314,7 @@ test.describe('download ', () => {
     test('table mode task lists', async () => {
     // 确保下载的全部种子都在做种状态
     // await commands.jumpPage('downloadedStatus')
-
+      await commands.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
       await commands.jumpPage('uploadingStatus')
       // await window.waitForLoadState()
       await sleep(4000)
@@ -340,21 +352,21 @@ test.describe('download ', () => {
       expect(/(\d+(\.\d+)?\s?(KB|MB)?|-)/.test(uploadSpeed)).toBe(true)
       // 检查任务图标
       // stop 图标
-      const stopIcon = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::*[5]/Button[1]')
+      const stopIcon = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::Button[1]')
       const stopIconText = await stopIcon.innerText()
       expect(stopIconText).toBe('stop')
       // file_open 图标
-      const fileOpenIcon = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::*[5]/Button[2]').innerText()
+      const fileOpenIcon = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::Button[2]').innerText()
       expect(fileOpenIcon).toBe('file_open')
       // folder 图标
-      const fileIcon = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::*[5]/Button[3]').innerText()
+      const fileIcon = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::Button[3]').innerText()
       expect(fileIcon).toBe('folder')
       // more... 图标
-      const moreIcon = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::*[5]/Button[4]')
+      const moreIcon = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::Button[4]')
       const moreIconText = await moreIcon.innerText()
       expect(moreIconText).toBe('more_horiz')
       // close 图标
-      const closeIcon = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::*[5]/Button[5]')
+      const closeIcon = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::Button[5]')
       const closeIconText = await closeIcon.innerText()
       expect(closeIconText).toBe('close')
       await closeIcon.click()
@@ -472,25 +484,13 @@ test.describe('account', () => {
   // ]
   test('transfer - check bill details', async () => {
     test.setTimeout(60000 * 5)
-    let from
-    let to
-    if (process.platform === 'win32') {
-      from = 'test1'
-      to = 'test2'
-    } else if (process.platform === 'linux') {
-      from = 'test3'
-      to = 'test4'
-    } else {
-      from = 'test5'
-      to = 'test6'
-    }
     // 转账人账号、密码
     // const transferee = userInfo[from].username
-    const transferee = from + process.env.TEST_EMAIL_DOMAIN
+    const transferee = from
     const transfereePassword = process.env.TEST_PASSWORD
     // 收款人账号、密码
     // const payee = userInfo[to].username
-    const payee = to + process.env.TEST_EMAIL_DOMAIN
+    const payee = to
     const payeePassword = process.env.TEST_PASSWORD
     const transferAmount = 1
     await window.evaluate(() => localStorage.clear())
