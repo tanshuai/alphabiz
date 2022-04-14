@@ -6,4 +6,14 @@ Add user-email and  Better Look user-name
 fix #187
 rerun internal.yml
 fix make error,test make in ubuntu
+resolve #178
+fix: reload webtorrent window not init with maxTasks
+resolve #176
+use rAF instead of setTimeout
 fix tag name、retry release
+checkout download test in ci
+Update README.md
+run download test in ci
+disable devtools in stable production mode #175
+use requestAnimationFrame to update task list
+prompt dialog when user leave setting without save, resolve #177
