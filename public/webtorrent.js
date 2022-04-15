@@ -404,10 +404,21 @@ const addListeners = (tr, conf = {}, isSeeding = false) => {
       // init map
       tr.discovery._announce.forEach(url => {
         tr.trackerMap.set(url, { status: 'connecting' })
+        if (!url.startsWith('ws')) {
+          if (url.match(/(\d{1,3}\.){3}\d{1,3}/)) {
+            // ipv4 only
+            return
+          }
+          tr.trackerMap.set(url + '@6', { status: 'connecting' })
+        }
       })
-      tr.discovery.tracker.on('warning', (error, url) => {
-        verbose('tracker warning', url, error.message)
+      tr.discovery.tracker.on('warning', (error, url, family) => {
+        verbose('tracker warning', url, error.message, family)
         if (!url) return console.warn('No emitted url', error)
+        if (family === 6) {
+          // console.log('ipv6 tracker error', url)
+          url = url + '@6'
+        }
         tr.trackerMap.set(url, {
           status: 'error',
           message: utils.parseTrackerWarning(error.message)
@@ -416,9 +427,13 @@ const addListeners = (tr, conf = {}, isSeeding = false) => {
       // tr.discovery.tracker.on('peer', (...args) => {
       //   console.log('tracker peer', args)
       // })
-      tr.discovery.tracker.on('update', (info, url) => {
+      tr.discovery.tracker.on('update', (info, url, family) => {
         verbose('tracker update', url, info)
         if (!url) return console.warn('No emitted url', info)
+        if (family === 6) {
+          // console.log('ipv6 tracker', url)
+          url = url + '@6'
+        }
         tr.trackerMap.set(url, {
           status: 'updated',
           info
