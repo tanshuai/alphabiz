@@ -68,7 +68,7 @@ jobs:
         run: |
           TZ=UTC-8 git log -10 --date=format-local:"%Y%m%d%H%M" --format="%cd"
           echo "--------------------------"
-          echo "::set-output name=tag-name::0.1.0-nightly-202204081916"
+          echo "::set-output name=tag-name::0.1.0-nightly-202204151014"
           if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
           then echo "::set-output name=isRunAppium::1" ; \
           else echo "::set-output name=isRunAppium::0" ; \
