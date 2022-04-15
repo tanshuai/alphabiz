@@ -70,7 +70,8 @@ class Commands {
   async signOut () {
     await this.jumpPage('accountMore')
     await this.page.click('text=Sign out')
-    if (!await this.SignOutAnywayBtn.isVisible()) { await this.SignOutAnywayBtn.click() }
+    await this.page.waitForTimeout(1000)
+    if (await this.SignOutAnywayBtn.isVisible()) { await this.SignOutAnywayBtn.click() }
     await this.page.locator('.q-notification__message >> text=Signed out').waitFor()
     await this.page.evaluate(() => localStorage.clear())
   }
