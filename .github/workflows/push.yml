@@ -129,7 +129,7 @@ jobs:
         shell: bash
 
       - name: Checkout release.json property
-      if: contains(env.MODIFIED_FILE_LIST, 'release.json')
+        if: contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
           echo "target-tag-name: ${{fromJson(steps.set_var.outputs.releaseJson).target-tag-name}}"
           echo "new-tag-name: ${{fromJson(steps.set_var.outputs.releaseJson).new-tag-name}}"
