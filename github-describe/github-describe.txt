@@ -1,5 +1,10 @@
-fix #259
+append error notifications
+add test group
+trigger push workflow
+add user group
 adjust e2e test
-remove onwire log
-fix #264
-force user to login, popup login panel if user is not logged in #257
+handle reCaptcha challenge failed
+fix dialog background blur
+fix credits test sign out error
+connect to both ipv4 and ipv6, resolve #250
+queue tasks if user is not login, resolve #261 #263
