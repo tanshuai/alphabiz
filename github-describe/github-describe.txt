@@ -1,10 +1,17 @@
-append error notifications
-add test group
-trigger push workflow
-add user group
-adjust e2e test
-handle reCaptcha challenge failed
-fix dialog background blur
-fix credits test sign out error
-connect to both ipv4 and ipv6, resolve #250
-queue tasks if user is not login, resolve #261 #263
+try fix sign out test in macos
+fix sign out in macos
+fix playwright test
+trigger account test workflow
+trigger internal workflow
+check for update everyday, resolve #266
+Upgrade GitHub Actions from v2 to v3
+Update account-test.yml
+cache: 'yarn'
+yarn global add node-gyp@8.4.1
+show progress for file verify
+Update account-test.yml
+Try node v16
+Just repeat run workflow again manually
+Repeat run workflow with yarn cached
+try output manifest.txt
+add security encryptions and options, resolve #254
