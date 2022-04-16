@@ -513,7 +513,6 @@ test.describe('account', () => {
     const payeeAfterPoint = Number(payeePoint) + transferAmount
     // 退出收款人账号
     await commands.signOut()
-    await window.reload()
     await sleep(1000)
     // 登录付款人账号
     await commands.signIn(transferee, transfereePassword, 1)
