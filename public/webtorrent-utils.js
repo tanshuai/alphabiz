@@ -162,7 +162,7 @@ const torrentToJson = (tr, deltaTime, speeder) => {
       const tracker = tr.trackerMap.get(_url)
       if (tracker && tracker.status !== 'error') return false
       return true
-    }).sort((a, b) => a.url.localeCompare(b.url))
+    })
   } else {
     o.trackerList = []
   }
@@ -222,13 +222,17 @@ const torrentToJson = (tr, deltaTime, speeder) => {
       downloaded: wire.downloaded,
       level,
       progress,
-      buffer
+      buffer,
+      // Only TCP wires will send encrypted data, ended with _cryptoHandshakeDone = true
+      secure: wire._cryptoHandshakeDone
     }
   })
   o.connections.sort((a, b) => {
     if (!a.address || !a.address.localeCompare) return 0
     return a.address.localeCompare(b.address)
   })
+
+  if (tr.verifyStatus) o.verifyStatus = tr.verifyStatus
   return o
 }
 
