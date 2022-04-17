@@ -114,7 +114,7 @@ jobs:
           echo "----------------------"
           echo "MODIFIED_FILE_LIST: ${{ env.MODIFIED_FILE_LIST }}"
           echo "----------------------"
-          echo "${{ env.$DESCRIBE }}"
+          echo "${{ env.DESCRIBE }}"
 
       - name: Get release.json property
         id: release
