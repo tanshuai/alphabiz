@@ -1,0 +1,33 @@
+diff --git a/node_modules/bittorrent-protocol/index.js b/node_modules/bittorrent-protocol/index.js
+index 722878a..dc0f396 100644
+--- a/node_modules/bittorrent-protocol/index.js
++++ b/node_modules/bittorrent-protocol/index.js
+@@ -39,6 +39,8 @@ function xor (a, b) {
+   return a
+ }
+ 
++let _bittorrent_pe_ = null
++
+ class Request {
+   constructor (piece, offset, length, callback) {
+     this.piece = piece
+@@ -126,8 +128,17 @@ class Wire extends stream.Duplex {
+ 
+     this._peEnabled = peEnabled
+     if (peEnabled) {
+-      this._dh = crypto.createDiffieHellman(DH_PRIME, 'hex', DH_GENERATOR) // crypto object used to generate keys/secret
+-      this._myPubKey = this._dh.generateKeys('hex') // my DH public key
++      if (_bittorrent_pe_ && _bittorrent_pe_._dh && _bittorrent_pe_._myPubKey) {
++        this._dh = _bittorrent_pe_._dh
++        this._myPubKey = _bittorrent_pe_._myPubKey
++      } else {
++        this._dh = crypto.createDiffieHellman(DH_PRIME, 'hex', DH_GENERATOR) // crypto object used to generate keys/secret
++        this._myPubKey = this._dh.generateKeys('hex') // my DH public key
++        _bittorrent_pe_ = {
++          _dh: this._dh,
++          _myPubKey: this._myPubKey
++        }
++      }
+     } else {
+       this._myPubKey = null
+     }
