@@ -12,6 +12,7 @@ on:
     paths:
       - "**.js"
       - "**/push.yml"
+      - "!patches/**"
       - "!public/**"
       - "!test/**"
       - "build/**"
