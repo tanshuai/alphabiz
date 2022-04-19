@@ -126,7 +126,7 @@ jobs:
       - name: Unified Tag format
         id: unify
         run: |
-          if [[ ${{ steps.release.outputs.releaseJson }} ]] ; \
+          if [[ ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ]] ; \
           then echo "::set-output name=tag-name::${{ fromJson(steps.release.outputs.releaseJson).new-tag-name }}" \
                     "::set-output name=release-name::${{ fromJson(steps.release.outputs.releaseJson).new-tag-name }}" ; \
           else echo "::set-output name=tag-name::${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}" \
