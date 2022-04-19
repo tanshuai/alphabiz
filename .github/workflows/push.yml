@@ -127,10 +127,12 @@ jobs:
         id: unify
         run: |
           if [[ ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ]] ; \
-          then echo "::set-output name=tag-name::${{ fromJson(steps.release.outputs.releaseJson).new-tag-name }}" \
-                    "::set-output name=release-name::${{ fromJson(steps.release.outputs.releaseJson).new-tag-name }}" ; \
-          else echo "::set-output name=tag-name::${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}" \
-                    "::set-output name=release-name::${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-sha7 }}" ;  \
+          then echo "::set-output name=tag-name::${{ fromJson(steps.release.outputs.releaseJson).new-tag-name }}" ; \
+               echo "::set-output name=release-name::${{ fromJson(steps.release.outputs.releaseJson).new-tag-name }}" ; \
+               echo "::set-output name=build-version::${{ fromJson(steps.release.outputs.releaseJson).new-tag-name }}" ; \
+          else echo "::set-output name=tag-name::${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}" ; \
+               echo "::set-output name=release-name::${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-sha7 }}" ;  \
+               ceho "::set-output name=build-version::${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-date }}"
           fi
         shell: bash
 
@@ -149,12 +151,16 @@ jobs:
           echo "----------------------"
           echo "MODIFIED_FILE_LIST: ${{ env.MODIFIED_FILE_LIST }}"
           echo "----------------------"
-          echo "${{ steps.unify.outputs.tag-name }}"
-          echo "${{ steps.unify.outputs.release-name }}"
+          echo "tag-name: ${{ steps.unify.outputs.tag-name }}"
+          echo "release-name: ${{ steps.unify.outputs.release-name }}"
+          echo "build-version: ${{ steps.unify.outputs.build-version }}"
 
-      - name: Checkout release.json property
+      - name: Checkout release.json target tag
         if: contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
+          git checkout ${{ fromJson(steps.release.outputs.releaseJson).target-tag-name }}
+          git show --name-only
+          echo "--------------------------"
           echo "target-tag-name: ${{ fromJson(steps.release.outputs.releaseJson).target-tag-name }}"
           echo "new-tag-name: ${{ fromJson(steps.release.outputs.releaseJson).new-tag-name }}"
           echo "--------------------------"
@@ -184,32 +190,32 @@ jobs:
           name: "${{ matrix.os }}-output"
           path: test/output/**
 
-      #后面的step晚上运行
+      #后面的step晚上运行 或 正式发布
 
       - name: Run electron-packager
-        if: contains(steps.vars.outputs.current-hour, '12')
+        if: contains(steps.vars.outputs.current-hour, '12') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: yarn packager
 
       - name: Package for ${{ matrix.os }}-nightly-${{ steps.vars.outputs.commit-message }} Release 🗜️
-        if: contains(steps.vars.outputs.current-hour, '12')
-        run: 7z a -t7z -mx=9 alphabiz-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}-${{ steps.vars.outputs.system }}.7z ./build/electron -xr!UnPackaged
+        if: contains(steps.vars.outputs.current-hour, '12') || contains(env.MODIFIED_FILE_LIST, 'release.json')
+        run: 7z a -t7z -mx=9 alphabiz-${{ steps.unify.outputs.tag-name }}-${{ steps.vars.outputs.system }}.7z ./build/electron -xr!UnPackaged
 
       - name: Pack app 📦
-        if: contains(steps.vars.outputs.current-hour, '12')
+        if: contains(steps.vars.outputs.current-hour, '12') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
           export PATH=$PATH:/c/Program\ Files\ \(x86\)/WiX\ Toolset\ v3.11/bin
-          export BUILD_VERSION=${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-date }}
+          export BUILD_VERSION=${{ steps.unify.outputs.build-version }}
           yarn make
         shell: bash
 
-      - name: Release alphabiz-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}-${{ steps.vars.outputs.system }}.7z to GitHub 📰
-        if: contains(steps.vars.outputs.current-hour, '12')
+      - name: Release alphabiz-${{ steps.unify.outputs.tag-name }}-${{ steps.vars.outputs.system }}.7z to GitHub 📰
+        if: contains(steps.vars.outputs.current-hour, '12') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         uses: softprops/action-gh-release@v1
         with:
           prerelease: true
-          name: alphabiz-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-sha7 }}
-          tag_name: ${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}
+          name: alphabiz-${{ steps.unify.outputs.release-name }}
+          tag_name: ${{ steps.unify.outputs.tag-name }}
           body: ${{ env.DESCRIBE }}
           files: |
-            alphabiz-${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-message }}-${{ steps.vars.outputs.system }}.7z
-            ./out/installers/${{ steps.vars.outputs.commit-version }}-nightly-${{ steps.vars.outputs.commit-date }}/**
+            alphabiz-${{ steps.unify.outputs.tag-name }}-${{ steps.vars.outputs.system }}.7z
+            ./out/installers/${{ steps.unify.outputs.build-version }}/**
