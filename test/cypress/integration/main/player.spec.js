@@ -3,11 +3,11 @@
 
 describe('Player', () => {
   beforeEach(() => {
+  })
+  it('.should() - 判断可播放的文件 是否 正常播放', () => {
     cy.signIn('test1' + Cypress.env('testEmailDomain'), 'password')
     cy.get('[aria-label="Menu"]').click()
     cy.contains('Player').click()
-  })
-  it('.should() - 判断可播放的文件 是否 正常播放', () => {
     const media = 'samples/Embedded.Subtitles.Sample.Princess.Mononoke.1080p.H264.AAC.DualAudio.5.1.BDrip.mkv'
     cy.fixture(media, 'binary')
       .then(Cypress.Blob.binaryStringToBlob)
@@ -28,6 +28,9 @@ describe('Player', () => {
       .should('have.prop', 'duration', 39.795)
   })
   it('.should() - 判断不可播放的文件 是否 不能播放', () => {
+    cy.signIn('test1' + Cypress.env('testEmailDomain'), 'password')
+    cy.get('[aria-label="Menu"]').click()
+    cy.contains('Player').click()
     const media = 'samples/GoneNutty.avi'
     cy.fixture(media, 'binary')
       .then(Cypress.Blob.binaryStringToBlob)

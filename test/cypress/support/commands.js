@@ -81,6 +81,15 @@ Cypress.Commands.add('toMoreHoriz', () => {
   cy.contains('more_horiz', { timeout: 20000 }).click()
   cy.get('[data-cy=account-settings-btn]').click()
 })
+Cypress.Commands.add('toBasic', () => {
+  cy.get('[aria-label="Menu"]').click()
+  cy.contains('Basic').then(($element) => {
+    if (!$element.is(':visible')) {
+      cy.contains('Settings').click()
+    }
+  })
+  cy.contains('Basic').click()
+})
 // cacheSession = true => call session()
 // cacheSession = true => call session()
 Cypress.Commands.add('signIn', (username, password, { cacheSession = true } = {}) => {
@@ -103,19 +112,19 @@ Cypress.Commands.add('signIn', (username, password, { cacheSession = true } = {}
     cy.contains('Password').type('{selectall}{backspace}').type(Cypress.env(password))
     cy.get('.q-card__actions').contains('Sign in').click()
     // wait page jump
-    cy.get('.q-notification__message', { timeout: 40000 }).should('be.visible').then($header => {
+    cy.get('.q-notification__message', { timeout: 60000 }).should('be.visible').then($header => {
       const text = $header.text()
       cy.log(text)
       if (/There is a problem with the network, please try again later/.test(text) ||
         /Pending sign-in attempt already in progress/.test(text)) {
         cy.log('text is There is a problem with the network')
-        cy.get('.q-notification__message', { timeout: 30000 }).should('not.be.visible')
+        cy.get('.q-notification__message', { timeout: 60000 }).should('not.be.visible')
         cy.get('.q-card__actions').contains('Sign in').click()
       } else {
         cy.log('text is not network')
       }
     })
-    cy.get('.q-notification__message', { timeout: 30000 }).should('have.text', 'Signed in')
+    cy.get('.q-notification__message', { timeout: 60000 }).should('have.text', 'Signed in')
     cy.toMoreHoriz()
     // cy.location('pathname', { timeout: 30000 }).should('eq', '/account/settings')
     // sign in end
