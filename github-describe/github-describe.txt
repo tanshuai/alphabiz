@@ -1,5 +1,8 @@
+fix: disable-force-login not apply to watcher
+fix playwright test
+fix force-login error, disable income secure option, change network diagnotic styles, close #275
 run internal test
-fix: #269
-fix #273
-fix #272
-improve sourceIp api
+Update account-test.yml
+improve backend interface, add message timer
+modify cpyress test
+Update ForgotPassword.vue
