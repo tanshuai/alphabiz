@@ -151,7 +151,7 @@ jobs:
           echo "release-name: ${{ steps.unify.outputs.release-name }}"
           echo "build-version: ${{ steps.unify.outputs.build-version }}"
           echo "----------------------"
-          if [[ contains(steps.vars.outputs.current-hour, '12') || contains(env.MODIFIED_FILE_LIST, 'release.json') ]] ;\
+          if [[ ${{ contains(steps.vars.outputs.current-hour, '12') || contains(env.MODIFIED_FILE_LIST, 'release.json') }} ]] ;\
           then  echo "commit: ${{ steps.nightly.outputs.commit }}" ; \
                 echo "commit-version: ${{ steps.nightly.outputs.commit-version }}" ; \
                 echo "commit-date: ${{ steps.nightly.outputs.commit-date }}" ; \
