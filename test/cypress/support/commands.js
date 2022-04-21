@@ -108,8 +108,8 @@ Cypress.Commands.add('signIn', (username, password, { cacheSession = true } = {}
     } else {
       user = '+1' + Cypress.env(username)
     }
-    cy.contains('Phone number or email').type('{selectall}{backspace}').type(user)
-    cy.contains('Password').type('{selectall}{backspace}').type(Cypress.env(password))
+    cy.contains('Phone number or email').type('{selectall}{backspace}').type(user, { log: false })
+    cy.contains('Password').type('{selectall}{backspace}').type(Cypress.env(password), { log: false })
     cy.get('.q-card__actions').contains('Sign in').click()
     // wait page jump
     cy.get('.q-notification__message', { timeout: 60000 }).should('be.visible').then($header => {
