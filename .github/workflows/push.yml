@@ -29,8 +29,11 @@ jobs:
     strategy:
       matrix:
         # os: [windows-latest, macos-latest]
-        os: [ubuntu-latest, windows-2022, macos-latest]
+        os: [ubuntu-latest, macos-latest]
         node-version: [14]
+        include:
+          - os: windows-latest
+            node-version: 16
       fail-fast: false
     environment:
       name: CICD
@@ -61,6 +64,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Setup Node.js ${{ matrix.node-version }} 📮
+        if: matrix.os != 'windows-latest'
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
@@ -70,19 +74,15 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PAT }}
 
-      - name: update node-gyp on Linux and macOS
-        if: matrix.os != 'windows-2022'
-        shell: bash
-        run: |
-          npm install --global node-gyp@8.4.1
-          npm config set node_gyp $(npm prefix -g)/lib/node_modules/node-gyp/bin/node-gyp.js
-
-      - name: update node-gyp on windows to support Visual Studio 2019
-        if: matrix.os == 'windows-2022'
-        shell: powershell
-        run: |
-          npm install --global node-gyp@8.4.1
-          npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
+      - name: Setup Node.js ${{ matrix.node-version }} no cache 📮
+        if: matrix.os == 'windows-latest'
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@zeeis"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PAT }}
 
       - name: Get message
         id: vars
@@ -97,7 +97,7 @@ jobs:
           elif [[ ${{ matrix.os }} = "macos-latest" ]] ; \
           then echo "::set-output name=system::macos" ; \
                echo "::set-output name=package::Alphabiz-darwin-x64" ; \
-          elif [[ ${{ matrix.os }} = "windows-2022" ]] ; \
+          elif [[ ${{ matrix.os }} = "windows-latest" ]] ; \
           then echo "::set-output name=system::windows" ; \
                echo "::set-output name=package::Alphabiz-win32-x64" ; \
           fi
@@ -315,12 +315,12 @@ jobs:
       matrix:
         test: [1, 2]
         node-version: [14]
-        os: [windows-2022]
+        os: [windows-latest]
         include:
           - test: 1
-            os: windows-2022
+            os: windows-latest
           - test: 2
-            os: windows-2022
+            os: windows-latest
     environment:
       name: CICD
     env:
