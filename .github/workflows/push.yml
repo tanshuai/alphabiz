@@ -28,7 +28,6 @@ jobs:
       output2: ${{ steps.check.outputs.isRunAppium }}
     strategy:
       matrix:
-        # os: [windows-latest, macos-latest]
         os: [ubuntu-latest, macos-latest]
         node-version: [14]
         include:
