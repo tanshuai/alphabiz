@@ -1,4 +1,8 @@
-fix #273
-hidden message in log
-improve backend interface, refactor table: Invitation
-improve backend interface
+update backend
+i18n, verificationField require, fix cognito attrs error
+Update Cognito.js
+remove legacy components
+update message timer
+update i18n
+Update credits.ts
+add gql interface: user, public
