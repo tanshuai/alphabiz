@@ -63,25 +63,12 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Setup Node.js ${{ matrix.node-version }} 📮
-        if: matrix.os != 'windows-latest'
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
           cache: "yarn"
           registry-url: "https://npm.pkg.github.com"
           scope: "@zeeis"
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.PAT }}
-
-      - name: Setup Node.js ${{ matrix.node-version }} no cache 📮
-        if: matrix.os == 'windows-latest'
-        uses: actions/setup-node@v2
-        with:
-          node-version: ${{ matrix.node-version }}
-          registry-url: "https://npm.pkg.github.com"
-          scope: "@zeeis"
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.PAT }}
 
       - name: Get message
         id: vars
@@ -225,7 +212,7 @@ jobs:
                 echo "new-tag-name: ${{ steps.checkout.outputs.new-tag-name }}" ; \
           fi
         shell: bash
-
+      
       - name: Install dependencies 👨🏻‍💻
         uses: nick-fields/retry@v2
         with:
@@ -234,6 +221,10 @@ jobs:
           shell: bash
           retry_on: error
           command: yarn
+          on_retry_command: |
+            if [[ ${{ matrix.os }} = "windows-latest" ]] ; \
+            then rm -rf C:/Users/runneradmin/AppData/Local/node-gyp/ ; \
+            fi
 
       - name: Install UnPackaged 👨🏻‍💻
         uses: nick-fields/retry@v2
@@ -243,6 +234,10 @@ jobs:
           shell: bash
           retry_on: error
           command: yarn unpackaged
+          on_retry_command: |
+            if [[ ${{ matrix.os }} = "windows-latest" ]] ; \
+            then rm -rf C:/Users/runneradmin/AppData/Local/node-gyp/ ; \
+            fi
 
       - name: E2E Test for Electron 🧪
         if: "!contains(github.event.head_commit.message, 'skip e2e')"
