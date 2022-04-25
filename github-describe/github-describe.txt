@@ -1,16 +1,2 @@
-simplify the setup-node
-add scope
-Update account-test.yml
-try manual install nodejs
-try clear node-gyp cache
-Update account-test.yml
-add retry_command when install fail
-try add cache
-rerun account test workflow
-parallel workflow
-trigger workflow 1
-trigger workflow 2
-run e2e test
-run internal workflow
-modify account test case
-fix: #276
+test condition run
+retry on_retry_command
