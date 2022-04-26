@@ -124,13 +124,20 @@ jobs:
 
       - name: test if
         run: |
-          if contains(env.MODIFIED_FILE_LIST, 'release.json') ; \
+          if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
           then echo "True" ; \
                echo "True2" ; \
                echo "True3" ; \
           else echo "False" ; \
                echo "False2" ; \
                echo "False3" ; \
+          fi
+          if ${{ contains(steps.vars.outputs.current-hour, '1') || contains(env.MODIFIED_FILE_LIST, 'release.json') }} ;\
+          then  echo "commit: ${{ steps.nightly.outputs.commit }}" ; \
+                echo "commit-version: ${{ steps.nightly.outputs.commit-version }}" ; \
+                echo "commit-date: ${{ steps.nightly.outputs.commit-date }}" ; \
+                echo "commit-sha7: ${{ steps.nightly.outputs.commit-sha7 }}" ; \
+                echo "commit-message: ${{ steps.nightly.outputs.commit-message }}" ; \
           fi
 
       # This step for unify the tag name
@@ -144,9 +151,11 @@ jobs:
           then echo "::set-output name=tag-name::${{ fromJson(steps.release.outputs.releaseJson).new-tag-name }}" ; \
                echo "::set-output name=release-name::${{ fromJson(steps.release.outputs.releaseJson).new-tag-name }}" ; \
                echo "::set-output name=build-version::${{ fromJson(steps.release.outputs.releaseJson).new-tag-name }}" ; \
-          else echo "::set-output name=tag-name::${{ steps.nightly.outputs.commit-version }}-nightly-${{ steps.nightly.outputs.commit-message }}" ; \
+          fi
+          if ${{ contains(steps.vars.outputs.current-hour, '1') }} ; \
+          then echo "::set-output name=tag-name::${{ steps.nightly.outputs.commit-version }}-nightly-${{ steps.nightly.outputs.commit-message }}" ; \
                echo "::set-output name=release-name::${{ steps.nightly.outputs.commit-version }}-nightly-${{ steps.nightly.outputs.commit-sha7 }}" ;  \
-               ceho "::set-output name=build-version::${{ steps.nightly.outputs.commit-version }}-nightly-${{ steps.nightly.outputs.commit-date }}"
+               ceho "::set-output name=build-version::${{ steps.nightly.outputs.commit-version }}-nightly-${{ steps.nightly.outputs.commit-date }}" ; \
           fi
         shell: bash
 
