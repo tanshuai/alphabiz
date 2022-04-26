@@ -95,6 +95,8 @@ jobs:
           echo "DESCRIBE<<EOF" >> $GITHUB_ENV
           echo "$DESCRIBE" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
+          echo "contains(env.MODIFIED_FILE_LIST, 'release.json')"
+          echo "${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }}"
         shell: bash
 
       # 获取所以今天 作者为Alphabiz-Team的commit message,正则:不匹配'[-]符号'前面的任意字符、不匹配空行
@@ -119,6 +121,17 @@ jobs:
           echo "$content" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
         shell: bash
+
+      - name: test if
+        run: |
+          if contains(env.MODIFIED_FILE_LIST, 'release.json') ; \
+          then echo "True" ; \
+               echo "True2" ; \
+               echo "True3" ; \
+          else echo "False" ; \
+               echo "False2" ; \
+               echo "False3" ; \
+          fi
 
       # This step for unify the tag name
       # nightly-release use tag_name: $packageJsonVersion-internal/nightly-$dateTime-$commitId
