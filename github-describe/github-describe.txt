@@ -1,6 +1,6 @@
-jump to default player when playing
-api gun database, library api
-fix GunModule, add library page
-app title & left menu of library i18n
-get install player in mac
-fix args error
+add light、dark screenshots
+Prevent build TypeScript error TS2305  from GUN module
+trigger push workflow
+resource editor
+ResourceEditor
+fix show splash error
