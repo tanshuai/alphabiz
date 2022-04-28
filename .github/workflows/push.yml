@@ -102,12 +102,11 @@ jobs:
       # 获取所以今天 作者为Alphabiz-Team的commit message,正则:不匹配'[-]符号'前面的任意字符、不匹配空行
       # export DESCRIBE=$(git log --reverse --after="${{ steps.vars.outputs.release-date }} 00:00" --before="${{ steps.vars.outputs.release-date }} 23:59" --author="Alphabiz-Team" --pretty='format:%B' | perl -wnE'say for /(?!.*-)(?!\s).*\w+$/gm')
 
-      # if official release, run this step
       # because json file Multiline
       # need convert to a single line,then get property use fromJson().property
       - name: Get release.json property
         id: release
-        if: contains(env.MODIFIED_FILE_LIST, 'release.json')
+        if: contains(steps.vars.outputs.current-hour, '1') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
           content=`cat ./release.json`
           content="${content//'%'/'%25'}"
@@ -122,24 +121,6 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
         shell: bash
 
-      - name: test if
-        run: |
-          if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
-          then echo "True" ; \
-               echo "True2" ; \
-               echo "True3" ; \
-          else echo "False" ; \
-               echo "False2" ; \
-               echo "False3" ; \
-          fi
-          if ${{ contains(steps.vars.outputs.current-hour, '1') || contains(env.MODIFIED_FILE_LIST, 'release.json') }} ;\
-          then  echo "commit: ${{ steps.nightly.outputs.commit }}" ; \
-                echo "commit-version: ${{ steps.nightly.outputs.commit-version }}" ; \
-                echo "commit-date: ${{ steps.nightly.outputs.commit-date }}" ; \
-                echo "commit-sha7: ${{ steps.nightly.outputs.commit-sha7 }}" ; \
-                echo "commit-message: ${{ steps.nightly.outputs.commit-message }}" ; \
-          fi
-
       # This step for unify the tag name
       # nightly-release use tag_name: $packageJsonVersion-internal/nightly-$dateTime-$commitId
       # official-release use tag_name: ./release.json property new-tag-name
@@ -151,9 +132,7 @@ jobs:
           then echo "::set-output name=tag-name::${{ fromJson(steps.release.outputs.releaseJson).new-tag-name }}" ; \
                echo "::set-output name=release-name::${{ fromJson(steps.release.outputs.releaseJson).new-tag-name }}" ; \
                echo "::set-output name=build-version::${{ fromJson(steps.release.outputs.releaseJson).new-tag-name }}" ; \
-          fi
-          if ${{ contains(steps.vars.outputs.current-hour, '1') }} ; \
-          then echo "::set-output name=tag-name::${{ steps.nightly.outputs.commit-version }}-nightly-${{ steps.nightly.outputs.commit-message }}" ; \
+          else echo "::set-output name=tag-name::${{ steps.nightly.outputs.commit-version }}-nightly-${{ steps.nightly.outputs.commit-message }}" ; \
                echo "::set-output name=release-name::${{ steps.nightly.outputs.commit-version }}-nightly-${{ steps.nightly.outputs.commit-sha7 }}" ;  \
                ceho "::set-output name=build-version::${{ steps.nightly.outputs.commit-version }}-nightly-${{ steps.nightly.outputs.commit-date }}" ; \
           fi
