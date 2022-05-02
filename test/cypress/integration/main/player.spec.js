@@ -1,5 +1,5 @@
 /// <reference path="cypress" />
-/// <reference path="../support/index.d.ts" />
+/// <reference path="../../support/index.d.ts" />
 
 describe('Player', () => {
   beforeEach(() => {
@@ -8,7 +8,7 @@ describe('Player', () => {
     cy.contains('Player').click()
   })
   it('.should() - 判断可播放的文件 是否 正常播放', () => {
-    const media = '../../samples/Embedded.Subtitles.Sample.Princess.Mononoke.1080p.H264.AAC.DualAudio.5.1.BDrip.mkv'
+    const media = 'samples/Embedded.Subtitles.Sample.Princess.Mononoke.1080p.H264.AAC.DualAudio.5.1.BDrip.mkv'
     cy.fixture(media, 'binary')
       .then(Cypress.Blob.binaryStringToBlob)
       .then(fileContent => {
@@ -28,7 +28,7 @@ describe('Player', () => {
       .should('have.prop', 'duration', 39.795)
   })
   it('.should() - 判断不可播放的文件 是否 不能播放', () => {
-    const media = '../../samples/GoneNutty.avi'
+    const media = 'samples/GoneNutty.avi'
     cy.fixture(media, 'binary')
       .then(Cypress.Blob.binaryStringToBlob)
       .then(fileContent => {

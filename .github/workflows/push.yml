@@ -199,7 +199,10 @@ jobs:
 
       - name: Run electron-packager
         if: contains(steps.vars.outputs.current-hour, '12') || contains(env.MODIFIED_FILE_LIST, 'release.json')
-        run: yarn packager
+        run: |
+          export BUILD_VERSION=${{ steps.unify.outputs.build-version }}
+          yarn packager
+        shell: bash
 
       - name: Package for ${{ matrix.os }}-nightly-${{ steps.nightly.outputs.commit-message }} Release 🗜️
         if: contains(steps.vars.outputs.current-hour, '12') || contains(env.MODIFIED_FILE_LIST, 'release.json')

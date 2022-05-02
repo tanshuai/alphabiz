@@ -1,5 +1,5 @@
 /// <reference path="cypress" />
-/// <reference path="../support/index.d.ts" />
+/// <reference path="../../support/index.d.ts" />
 
 describe('LanguageSelection', () => {
   beforeEach(() => {
