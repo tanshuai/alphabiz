@@ -1,6 +1,8 @@
-I18N folder Modified
-Reformat commit message
-disable devtools in production mode, add more info for torrent error, resolve #175
-Try to share paths, branches w/ both push & pull_request
-Disable pull_request triggers
-Share paths, branches w/ both on push & pull_request
+bug fixed: #152
+fix push error
+bug fix
+export modules with name
+ui adjustment
+#181 credits page loading
+Bump url-parse from 1.5.7 to 1.5.10
+refact: use typescript for type annotations
