@@ -11,7 +11,7 @@ on:
   push:
     paths:
       - "**.js"
-      - "**/push.yml"
+      - "!**/push.yml"
       - "!patches/**"
       - "!public/**"
       - "!test/**"
@@ -299,7 +299,6 @@ jobs:
     timeout-minutes: 60
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
       matrix:
         test: [1, 2]
         node-version: [14]
