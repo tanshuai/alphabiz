@@ -21,8 +21,9 @@
     "test:release:creditsUpload": "jest test/jest/release/creditsUpload.spec.js --c=./test/jest/release/jest.config.js",
     "test:release:creditsDownload": "jest test/jest/release/creditsDownload.spec.js --c=./test/jest/release/jest.config.js",
     "make": "node make.js --make",
-    "make:win": "yarn make:squirrel && yarn make:msi",
+    "make:win": "yarn make:squirrel && yarn make:msi && yarn make:appx",
     "make:squirrel": "electron-forge make --skip-package --targets @electron-forge/maker-squirrel",
+    "make:appx": "electron-forge make --skip-package --targets @electron-forge/maker-appx",
     "make:msi": "node ./wix/make.js",
     "make:dmg": "electron-forge make --skip-package --targets @electron-forge/maker-dmg",
     "make:deb": "electron-forge make --skip-package --targets @electron-forge/maker-deb",
@@ -39,6 +40,7 @@
   "devDependencies": {
     "@babel/preset-env": "^7.16.8",
     "@electron-forge/cli": "^6.0.0-beta.63",
+    "@electron-forge/maker-appx": "^6.0.0-beta.63",
     "@electron-forge/maker-deb": "^6.0.0-beta.63",
     "@electron-forge/maker-dmg": "^6.0.0-beta.63",
     "@electron-forge/maker-rpm": "^6.0.0-beta.63",

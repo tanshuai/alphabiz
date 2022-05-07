@@ -23,7 +23,7 @@ const beforeBuild = async () => {
   // })
 }
 
-beforeBuild ()
+beforeBuild()
 packager({
   dir: './build/electron/UnPackaged',
   out: './build/electron',
@@ -52,7 +52,7 @@ packager({
       const src = path.resolve(__dirname, 'node_modules', dep)
       const dest = path.resolve(buildPath, 'node_modules', dep)
       if (!fs.existsSync(src)) return console.error('not found', src)
-      console.log('--- COPY ---\n', src, '\n', dest, '\n--- COPY END ---')
+      // console.log('--- COPY ---\n', src, '\n', dest, '\n--- COPY END ---')
       if (fs.existsSync(dest)) fs.rmSync(dest, { recursive: true })
       const copyRecursive = (src, dest) => {
         if (fs.statSync(src).isDirectory()) {
@@ -72,16 +72,16 @@ packager({
     callback()
   }],
   afterCopy: [(buildPath, electronVersion, platform, arch, callback) => {
-          rebuild({
-            buildPath,
-            arch,
-            electronVersion: '17.0.0'
-          })
-            .then(() => {
-              console.log('Rebuilt native module')
-              callback()
-            })
-            .catch(e => callback(e))
+    rebuild({
+      buildPath,
+      arch,
+      electronVersion: '17.0.0'
+    })
+      .then(() => {
+        console.log('Rebuilt native module')
+        callback()
+      })
+      .catch(e => callback(e))
   }],
   // downloader for our velectron build
   download: {
