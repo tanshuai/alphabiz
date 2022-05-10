@@ -11,3 +11,5 @@ improve sort feature
 add negative button marginLeft
 adjust internal.yml
 try fix Unexpected symbol error
+fix make error、try fast-release skip e2e test
+fix yml format error
