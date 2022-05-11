@@ -55,6 +55,7 @@ test.afterAll(async () => {
 })
 
 test('close set default', async () => {
+  await window.click('div[role="toolbar"] button >> nth=1')
   try {
     await window.waitForSelector('text=Alphabiz is not your default app for', { timeout: 3000 })
     await window.click('text=SHOW AGAIN')
