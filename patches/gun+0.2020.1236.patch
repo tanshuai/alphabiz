@@ -1,8 +1,17 @@
 diff --git a/node_modules/gun/gun.js b/node_modules/gun/gun.js
-index 5db12d4..610f1e3 100644
+index 5db12d4..98c8c2a 100644
 --- a/node_modules/gun/gun.js
 +++ b/node_modules/gun/gun.js
-@@ -1692,10 +1692,12 @@
+@@ -1686,16 +1686,22 @@
+ 
+ 			var wire = mesh.wire || opt.wire;
+ 			mesh.wire = opt.wire = open;
++
++      console.log('%cGunPatch:enable', 'background-color: gainsboro; padding: 2px 8px;')
++
+ 			function open(peer){ try{
+ 				if(!peer || !peer.url){ return wire && wire(peer) }
+ 				var url = peer.url.replace(/^http/, 'ws');
  				var wire = peer.wire = new opt.WebSocket(url);
  				wire.onclose = function(){
  					opt.mesh.bye(peer);
@@ -12,6 +21,7 @@ index 5db12d4..610f1e3 100644
  				};
  				wire.onerror = function(error){
 -					reconnect(peer);
++          console.log('wire.onerror', error)
 +          // disable internal reconnect
 +					// reconnect(peer);
  				};
