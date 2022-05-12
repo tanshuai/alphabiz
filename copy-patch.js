@@ -6,7 +6,6 @@ const path = require('path')
 
 const copyModule = async () => {
   ['webtorrent',
-    'bittorrent-tracker',
     'gun',
     'torrent-discovery', // this builds with self-dep bittorrent-tracker
     '@videojs'].forEach(dep => {
