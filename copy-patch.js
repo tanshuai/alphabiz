@@ -6,7 +6,9 @@ const path = require('path')
 
 const copyModule = async () => {
   ['webtorrent',
+    'bittorrent-tracker',
     'gun',
+    'torrent-discovery', // this builds with self-dep bittorrent-tracker
     '@videojs'].forEach(dep => {
       const src = path.resolve(__dirname, 'node_modules', dep)
       const dest = path.resolve(__dirname, 'build/electron/UnPackaged/node_modules', dep)
