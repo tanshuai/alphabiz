@@ -11,7 +11,7 @@ on:
   push:
     paths:
       - "**.js"
-      - "**/push.yml"
+      - "!**/push.yml"
       - "build/**"
       - "release.json"
     branches: [main]
@@ -174,13 +174,15 @@ jobs:
         shell: bash
 
       - name: Install dependencies 👨🏻‍💻
-        run: yarn
+        run: |
+          yarn || (echo "===== yarn Attempt: 2 ====" && yarn)
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PAT }}
           GITHUB_PAT: ${{ secrets.PAT }}
 
       - name: Install UnPackaged 👨🏻‍💻
-        run: yarn unpackaged
+        run: |
+          yarn unpackaged || (echo "===== yarn unpackaged Attempt: 2 ====" && yarn unpackaged)
         shell: bash
 
       - name: E2E Test for Electron 🧪
