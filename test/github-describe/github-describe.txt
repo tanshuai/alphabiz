@@ -5,7 +5,11 @@ Update fast-release.yml
 put application bar on top
 aboutDialog, leftDrawer adjustment
 test merge internal.yml
+send has_meta for ab peers
+send `delete-all` event
+apply ts-based vuex store
 fix .yml format error
+remove unuse file
 internal.yml skip shell
 improve sort feature
 add negative button marginLeft
@@ -13,3 +17,6 @@ adjust internal.yml
 try fix Unexpected symbol error
 fix make error、try fast-release skip e2e test
 fix yml format error
+fixed: #165
+Application bar background color
+modify internal.yml
