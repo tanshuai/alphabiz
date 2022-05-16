@@ -1,1 +1,5 @@
-support automatic update
+only use geoip in electron mode
+ui adjustment
+fix #283
+resolve #284
+add panel: peers
