@@ -1,5 +1,7 @@
-only use geoip in electron mode
-ui adjustment
-fix #283
-resolve #284
-add panel: peers
+show peer ip address
+fix: invalid package error
+add `launch app after install` option for wix-msi, resolve #295
+auto kill application when installing, resolve #279
+add more relay peers
+add test codes
+add language option and about to login page, resolve #282
