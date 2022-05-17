@@ -1,5 +1,5 @@
 diff --git a/node_modules/bittorrent-protocol/index.js b/node_modules/bittorrent-protocol/index.js
-index 722878a..64365fe 100644
+index 722878a..e9ece60 100644
 --- a/node_modules/bittorrent-protocol/index.js
 +++ b/node_modules/bittorrent-protocol/index.js
 @@ -39,6 +39,8 @@ function xor (a, b) {
@@ -31,22 +31,79 @@ index 722878a..64365fe 100644
      } else {
        this._myPubKey = null
      }
-@@ -148,11 +159,13 @@ class Wire extends stream.Duplex {
+@@ -148,6 +159,7 @@ class Wire extends stream.Duplex {
      this.on('finish', this._onFinish)
      this._debug('type:', this.type)
  
--    if (this.type === 'tcpIncoming' && this._peEnabled) {
--      // If we are not the initiator, we should wait to see if the client begins
--      // with PE/MSE handshake or the standard bittorrent handshake.
--      this._determineHandshakeType()
--    } else if (this.type === 'tcpOutgoing' && this._peEnabled && retries === 0) {
 +    // The incoming peer decryption causes app crash, skip it
-+    // if (this.type === 'tcpIncoming' && this._peEnabled) {
-+    //   // If we are not the initiator, we should wait to see if the client begins
-+    //   // with PE/MSE handshake or the standard bittorrent handshake.
-+    //   this._determineHandshakeType()
-+    // }
-+    if (this.type === 'tcpOutgoing' && this._peEnabled && retries === 0) {
-       this._parsePe2()
-     } else {
-       this._parseHandshake(null)
+     if (this.type === 'tcpIncoming' && this._peEnabled) {
+       // If we are not the initiator, we should wait to see if the client begins
+       // with PE/MSE handshake or the standard bittorrent handshake.
+@@ -246,6 +258,7 @@ class Wire extends stream.Duplex {
+   }
+ 
+   sendPe1 () {
++    // console.log('sendPe1')
+     if (this._peEnabled) {
+       const padALen = Math.floor(Math.random() * 513)
+       const padA = randombytes(padALen)
+@@ -254,12 +267,14 @@ class Wire extends stream.Duplex {
+   }
+ 
+   sendPe2 () {
++    // console.log('sendPe2')
+     const padBLen = Math.floor(Math.random() * 513)
+     const padB = randombytes(padBLen)
+     this._push(Buffer.concat([Buffer.from(this._myPubKey, 'hex'), padB]))
+   }
+ 
+   sendPe3 (infoHash) {
++    console.log('sendPe3')
+     this.setEncrypt(this._sharedSecret, infoHash)
+ 
+     const hash1Buffer = Buffer.from(sha1.sync(Buffer.from(this._utfToHex('req1') + this._sharedSecret, 'hex')), 'hex')
+@@ -284,6 +299,7 @@ class Wire extends stream.Duplex {
+   }
+ 
+   sendPe4 (infoHash) {
++    console.log('sendPe4')
+     this.setEncrypt(this._sharedSecret, infoHash)
+ 
+     const padDLen = randombytes(2).readUInt16BE(0) % 512
+@@ -692,24 +708,28 @@ class Wire extends stream.Duplex {
+   }
+ 
+   _onPe1 (pubKeyBuffer) {
++    // console.log('onPe1')
+     this._peerPubKey = pubKeyBuffer.toString('hex')
+     this._sharedSecret = this._dh.computeSecret(this._peerPubKey, 'hex', 'hex')
+     this.emit('pe1')
+   }
+ 
+   _onPe2 (pubKeyBuffer) {
++    // console.log('onPe2')
+     this._peerPubKey = pubKeyBuffer.toString('hex')
+     this._sharedSecret = this._dh.computeSecret(this._peerPubKey, 'hex', 'hex')
+     this.emit('pe2')
+   }
+ 
+   _onPe3 (hashesXorBuffer) {
++    // console.log('onPe3')
+     const hash3 = sha1.sync(Buffer.from(this._utfToHex('req3') + this._sharedSecret, 'hex'))
+     const sKeyHash = xor(Buffer.from(hash3, 'hex'), hashesXorBuffer).toString('hex')
+     this.emit('pe3', sKeyHash)
+   }
+ 
+   _onPe3Encrypted (vcBuffer, peerProvideBuffer) {
++    console.log('onPe3Enc')
+     if (!vcBuffer.equals(VC)) {
+       this._debug('Error: verification constant did not match')
+       this.destroy()
+@@ -730,6 +750,7 @@ class Wire extends stream.Duplex {
+   }
+ 
+   _onPe4 (peerSelectBuffer) {
++    // console.log('onPe4')
+     this._encryptionMethod = peerSelectBuffer.readUInt8(3)
+     if (!CRYPTO_PROVIDE.includes(this._encryptionMethod)) {
+       this._debug('Error: peer selected invalid crypto method')
