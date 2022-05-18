@@ -14,6 +14,8 @@ const uuid = require('uuid')
 const productCode = uuid.v4().toUpperCase()
 const Wix = require('electron-wix-msi/lib/creator')
 
+const appDirectoryRootPath = require('../test.config.js').appDirectoryRootPath
+
 const isTesting = !!process.env.WIX_TEST
 // Write logs in one line, disabled when testing
 /** @param { string[] } strs */
@@ -51,7 +53,7 @@ const exitWith = code => {
 const { name, version, description, author, productName } = require('../package.json')
 const WiSubStg = resolve(__dirname, 'WiSubStg.vbs')
 const WiLangId = resolve(__dirname, 'WiLangId.vbs')
-const appDirectory = resolve(__dirname, `../build/electron/${productName}-win32-x64`)
+const appDirectory = resolve(__dirname, `../${appDirectoryRootPath}/electron/${productName}-win32-x64`)
 const outputDirectory = resolve(__dirname, '../out/make/wix/', process.arch)
 
 const ensureDirectory = async () => {
@@ -81,7 +83,7 @@ const wixTemplate = readFileSync(resolve(__dirname, 'template.xml'))
  * @typedef CultureOption
  * @property { number } code
  * @property { string } lang
- * 
+ *
  * @typedef MakeResult
  * @property { CultureOption } culture
  * @property { string } msiFile
@@ -155,8 +157,8 @@ const makeCulture = async (culture, asBase = false) => {
 
   // Customize templates
   maker.wixTemplate = wixTemplate
-    // .replace('{{LanguageCode}}', culture.code)
-  maker.uiTemplate = maker.uiTemplate.replace('<DialogRef Id="MsiRMFilesInUse" />', '<!-- <DialogRef Id="MsiRMFilesInUse" /> -->')
+  // .replace('{{LanguageCode}}', culture.code)
+  // maker.uiTemplate = maker.uiTemplate.replace('<DialogRef Id="MsiRMFilesInUse" />', '<!-- <DialogRef Id="MsiRMFilesInUse" /> -->')
 
   // Change registry data for icon in control panel
   const _getRegistryKeys = maker.getRegistryKeys
