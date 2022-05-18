@@ -302,12 +302,12 @@ queueTimeout(updateTorrent, 1000)
 
 let queueUpdate = null
 const forceUpdateTorrent = () => {
-  if (queueUpdate) {
-    clearTimeout(queueUpdate)
+  if (!queueUpdate) {
+    // clearTimeout(queueUpdate)
     queueUpdate = setTimeout(() => {
-      queueUpdate = null
-      updateTorrent(true)
-    }, 100)
+      queueUpdate = null;
+    }, 500)
+    updateTorrent(true)
   }
 }
 
