@@ -1,7 +1,6 @@
-show peer ip address
-fix: invalid package error
-add `launch app after install` option for wix-msi, resolve #295
-auto kill application when installing, resolve #279
-add more relay peers
-add test codes
-add language option and about to login page, resolve #282
+sync wix file
+update torrent immediately #280 #286
+fix #274
+change scroll area #278
+try fix stucks with encrypted connections #290
+support set host peer; fix searching bug
