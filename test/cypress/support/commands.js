@@ -68,11 +68,11 @@ Cypress.Commands.add('toSignIn', () => {
   cy.get('[aria-label="Menu"]').click()
   cy.get('.corner > .q-item').click()
   // cy.location('pathname', { timeout: 10000 }).should('eq', '/account')
-  cy.get('.q-card').should('be.visible')
+  cy.get('.q-card', { timeout: 3000 }).should('be.visible')
 })
 Cypress.Commands.add('toCredits', () => {
   cy.get('[aria-label="Menu"]').click()
-  cy.get(':nth-child(4) > .q-item').click()
+  cy.get('.q-drawer__content').contains('Credits').click()
   cy.get('.q-linear-progress__model', { timeout: 10000 }).should('be.visible')
   cy.get('.q-linear-progress__model', { timeout: 10000 }).should('not.exist')
 })
@@ -85,8 +85,8 @@ Cypress.Commands.add('signIn', (username, password, { cacheSession = true } = {}
     cy.toSignIn()
     // sign in start
     let user
-    if (/@/.test(Cypress.env(username))) {
-      user = Cypress.env(username)
+    if (/@/.test(username)) {
+      user = username
     } else {
       user = '+1' + Cypress.env(username)
     }
@@ -116,11 +116,17 @@ Cypress.Commands.add('signIn', (username, password, { cacheSession = true } = {}
     cy.session([username, password], login, {
       validate () {
         cy.visit('/')
+        let user
+        if (/@/.test(username)) {
+          user = username
+        } else {
+          user = '+1' + Cypress.env(username)
+        }
         cy.get('[aria-label="Menu"]').click()
         cy.contains('Lv.', { timeout: 12000 }).click()
         cy.get('[data-cy=account-settings-btn]').click()
         // cy.location('pathname', { timeout: 12000 }).should('eq', '/account/settings')
-        cy.get('.account-setting__verification').contains(Cypress.env(username))
+        cy.get('.account-setting__verification').contains(user)
       }
     })
     cy.visit('/')
@@ -160,21 +166,6 @@ Cypress.Commands.add('getAccountStatus', () => {
   })
 })
 
-Cypress.Commands.add('deleteUser', (password) => {
-  // delete user start
-  cy.get('.q-btn__wrapper > .q-btn__content').contains('delete account').click()
-  cy.get('.q-card', { timeout: 10000 }).should('be.visible').then($el => {
-    cy.get('[aria-label="Password"]').type('{selectall}{backspace}').type(Cypress.env(password))
-
-    cy.get('.q-card').contains('Submit').click()
-  })
-  cy.location('pathname', { timeout: 15000 }).should('eq', '/')
-  // cy.contains('Want to Join?', { timeout: 12000 })
-  cy.get('.q-notification__message', { timeout: 10000 }).contains('Deleted')
-  cy.log('删除成功')
-  // delete user end
-})
-
 // credits command
 Cypress.Commands.add('transfer', (ID, amount) => {
   // 转账 start
@@ -186,7 +177,7 @@ Cypress.Commands.add('transfer', (ID, amount) => {
       if ($input.val() === '') cy.get('[aria-label="Receipt Code"]').type(ID)
     })
     cy.get('[aria-label="Transfer Amount"]').type(amount)
-    cy.get('.primary > .q-btn__wrapper').click()
+    cy.get('.bg-primary > .q-btn__wrapper').click()
   })
   // 等待 q-card 退出
   cy.get('.q-dialog__inner > .q-card', { timeout: 20000 }).should('not.exist')

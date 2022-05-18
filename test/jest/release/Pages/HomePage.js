@@ -22,14 +22,18 @@ class HomePage {
   get uploadingStatusTab () { return this.page.$('//*[starts-with(@Name,"Uploading (")]') }
   get downloadedStatusTab () { return this.page.$('//*[starts-with(@Name,"Downloaded (")]') }
   // 下载bt功能
-  get downloadTorrentBtn () { return this.page.$('//Button[@Name="DOWNLOAD"]') }
-  get downloadMagnetEdit () { return this.page.$('//Edit[@Name="Download directory position"]/preceding::*[1]') }
-  get downloadDirectoryEdit () { return this.page.$('//Edit[@Name="Download directory position"]') }
-  get confirmDownloadBtn () { return this.page.$('//Button[@Name="CANCEL"]/following-sibling::Button[@Name="DOWNLOAD"]') }
+  get downloadTorrentBtn () { return this.page.$('[name="DOWNLOAD"]') }
+  get downloadMagnetEdit () { return this.page.$('/Pane[@Name="Alphabiz"]//Edit[@Name="Download directory position"]/preceding::*[1]') }
+  get downloadDirectoryEdit () { return this.page.$('/Pane[@Name="Alphabiz"]//Edit[@Name="Download directory position"]') }
+  // get confirmDownloadBtn () { return this.page.$('//Button[@Name="CANCEL"]/following-sibling::Button[@Name="DOWNLOAD"]') }
+  get confirmDownloadBtn () { return this.page.$('/Pane[@Name="Alphabiz"]//Button[@Name="CANCEL"]/following-sibling::Button[@Name="DOWNLOAD"]') }
+  // get cancelDownloadBtn () { return this.page.$('//Button[@Name="CANCEL"]') }
+  get cancelDownloadBtn () { return this.page.$('/Pane[@Name="Alphabiz"]//Button[@Name="CANCEL"]') }
+
   // 任务卡片信息
 
   // 上传bt功能
-  get uploadTorrentBtn () { return this.page.$('//Button[@Name="UPLOAD"]') }
+  get uploadTorrentBtn () { return this.page.$('[name="UPLOAD"]') }
   get torrentFileBtn () { return this.page.$('//*[@Name="Torrent file"]') }
   get fileNameEdit () { return this.page.$('//ComboBox[@ClassName="ComboBox"]/Edit[@ClassName="Edit" and @Name="File name:"]') }
   get confirmUploadBtn () { return this.page.$('//Button[@Name="CANCEL"]/following-sibling::Button[@Name="UPLOAD"]') }
@@ -67,8 +71,10 @@ class HomePage {
     // const backSpaces = new Array(text.length).fill('\uE003')
     // await sleep(1000)
     // await this.downloadDirectoryEdit.setValue(backSpaces)
-    await sleep(1000)
-    await this.downloadDirectoryEdit.setValue(directory)
+    // await sleep(1000)
+    if (directory) {
+      await this.downloadDirectoryEdit.setValue(directory)
+    }
     await this.confirmDownloadBtn.click()
   }
 
@@ -138,23 +144,15 @@ class HomePage {
   // status = 1  ->  wait display
   // status = 0  ->  wait hidden
   async waitTaskPeers (torrentName, timeout, status) {
-    let isWaitHidden
     const taskPeers = await this.page.$('//Text[@Name="' + torrentName + '"]/following-sibling::Button[starts-with(@Name,"PEERS:")]')
     console.log('waitTaskPeers')
     await this.page.$('//Text[@Name="' + torrentName + '"]').click()
-    if (!status) {
-      isWaitHidden = await taskPeers.isDisplayed()
-    }
-    console.log('isWaitHidden:' + isWaitHidden)
-    if (status || isWaitHidden) {
-      console.log('wait peer')
-      await taskPeers.waitUntil(async function () {
-        return (status ? (await this.isDisplayed()) === true : (await this.isEnabled()) === false)
-      }, {
-        timeout: timeout,
-        timeoutMsg: 'timeout'
-      })
-    }
+    await taskPeers.waitUntil(async function () {
+      return (status ? (await this.isDisplayed()) === true : (await this.isEnabled()) === false)
+    }, {
+      timeout: timeout,
+      timeoutMsg: 'timeout'
+    })
   }
 
   async getTaskStatus (torrentName) {

@@ -1,8 +1,7 @@
-const path = require('path')
+// const path = require('path')
+const AlphabizAppPath = require('../../../test.config.js').AlphabizAppPath
 
-const AlphabizAppId = path.resolve(__dirname, '../../../electron/Alphabiz-win32-x64/Alphabiz.exe')
-// 'C:/alphabiz/electron/Alphabiz-win32-x64/Alphabiz.exe'
-
+// const AlphabizAppPath = path.resolve(__dirname, '../../../dist/electron/Alphabiz-win32-x64/Alphabiz.exe')
 export const opts = {
   path: '/wd/hub',
   port: 4723,
@@ -12,7 +11,7 @@ export const opts = {
     deviceName: 'WindowsPC',
     appWaitDuration: 60000,
     createSessionTimeout: 60000,
-    app: AlphabizAppId
+    app: AlphabizAppPath
   },
   logLevel: 'error'
   // afterTest: function (test) {

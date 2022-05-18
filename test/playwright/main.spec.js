@@ -4,8 +4,9 @@ const { test, expect } = require('@playwright/test')
 const path = require('path')
 const fs = require('fs')
 
+const electronMainPath = require('../../test.config.js').electronMainPath
 const { Commands } = require('./models/commands')
-const { getMailCode, sleep } = require('../utils/getCode')
+const { sleep } = require('../utils/getCode')
 
 let window, windows, electronApp, commands
 const ScreenshotsPath = 'test/output/playwright/main.spec/'
@@ -15,7 +16,7 @@ test.beforeAll(async () => {
   electronApp = await electron.launch({
     args: [
       '--inspect=5858',
-      'build/electron/UnPackaged/electron-main.js'
+      electronMainPath
     ]
   })
   // Evaluation expression in the Electron context.
@@ -32,6 +33,7 @@ test.beforeAll(async () => {
   windows = electronApp.windows()
 
   for (const win of windows) {
+    console.log(await win.title())
     if (await win.title() === 'Alphabiz') window = win
   }
   // new Pege Object Model
@@ -74,7 +76,7 @@ test('close auto update', async () => {
   }
 })
 
-test.skip('reset torrent status', async () => {
+test('reset torrent status', async () => {
   await window.waitForLoadState()
   await commands.jumpPage('downloadingStatus')
   if (await window.isEnabled('button:has-text("Remove all") >> nth=0')) {
@@ -126,6 +128,7 @@ test.describe('play video', () => {
     await expect(progressControl).toBeVisible()
   })
 })
+
 test.describe('download ', () => {
   const btData = [
     {
@@ -166,7 +169,7 @@ test.describe('download ', () => {
     }
   ]
   for (const btDate of btData) {
-    test.skip((btDate.testName ? btDate.testName : '') + btDate.btName, async () => {
+    test((btDate.testName ? btDate.testName : '') + btDate.btName, async () => {
       if (btDate.btName === 'uTorrent Web Tutorial Video') {
         test.setTimeout(60000 * 5)
       } else if (btDate.btName === 'The WIRED CD - Rip. Sample. Mash. Share') {
@@ -276,7 +279,7 @@ test.describe('download ', () => {
       }
     })
   }
-test.skip('table mode task lists', async () => {
+  test('table mode task lists', async () => {
     // 确保下载的全部种子都在做种状态
     // await commands.jumpPage('downloadedStatus')
 
@@ -359,7 +362,7 @@ test.skip('table mode task lists', async () => {
     // expect(reg.test(filePathText)).toBe(true)
     // 检查文件夹树状结构
     await filePathElement.click()
-        await window.waitForSelector('text=01 - Beastie Boys - Now Get Busy.mp3')
+    await window.waitForSelector('text=01 - Beastie Boys - Now Get Busy.mp3')
     await window.waitForSelector('text=insert_drive_file')
     await window.waitForSelector('text=image')
     await sleep(500)

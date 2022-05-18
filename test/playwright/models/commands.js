@@ -44,7 +44,12 @@ class Commands {
     await this.downloadBtn.click()
     await this.page.fill('[aria-label="Download directory position"]  >> //preceding::*[1]', magnet)
     await this.page.fill('[aria-label="Download directory position"]', './test/download')
-    await this.page.click(':nth-match(button:has-text("Download"), 2)')
+    await this.page.click('.q-card >> button:has-text("Download")')
+    await this.page.waitForTimeout(300)
+    if (!(await this.page.locator('.q-card >> button:has-text("Cancel")').isHidden())) {
+      await this.page.click('.q-card >> button:has-text("Cancel")')
+    }
+    await this.page.waitForTimeout(300)
   }
 
   async signIn (username, password, isWaitAlert) {
@@ -63,16 +68,6 @@ class Commands {
     await this.jumpPage('accountLink')
     await this.page.click('text=Sign out')
     await this.page.locator('.q-notification__message >> text=Signed out').waitFor()
-  }
-
-  async deleteUser (password) {
-    // delete user start
-    await this.page.click('button:has-text("delete account")')
-    await this.page.fill('[aria-label="Password"]', password)
-    await this.page.click('text=delete account >> ../..//Button[1]')
-    // delete user end
-    // 断言已删除的提示框弹出
-    await this.page.click('div[role="alert"]:has-text("check_circleDeleted")')
   }
 
   // credits
