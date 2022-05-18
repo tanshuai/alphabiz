@@ -5,4 +5,11 @@ const AlphabizAppEXEPath = (process.env.HOME + '/AppData/Local/Alphabiz/Alphabiz
 const AlphabizAppMSIPath = 'C:/Program Files/Alphabiz/Alphabiz.exe'
 const electronMainPath = 'build/electron/UnPackaged/electron-main.js'
 
-module.exports = { electronMainPath, AlphabizAppPath, AlphabizAppMSIPath, AlphabizAppEXEPath }
+const appDirectoryRootPath = 'build'
+module.exports = {
+  electronMainPath,
+  AlphabizAppPath,
+  AlphabizAppMSIPath,
+  AlphabizAppEXEPath,
+  appDirectoryRootPath
+}
