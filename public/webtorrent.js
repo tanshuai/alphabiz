@@ -302,12 +302,12 @@ queueTimeout(updateTorrent, 1000)
 
 let queueUpdate = null
 const forceUpdateTorrent = () => {
-  if (!queueUpdate) {
-    // clearTimeout(queueUpdate)
+  if (queueUpdate) {
+    clearTimeout(queueUpdate)
     queueUpdate = setTimeout(() => {
       queueUpdate = null;
-    }, 500)
-    updateTorrent(true)
+      updateTorrent(true)
+    }, 100)
   }
 }
 
@@ -526,6 +526,33 @@ const addTorrent = (token, conf, cb) => {
       locked.delete(conf.token)
       if (cb) cb(tr)
     })
+    if (conf.verifiedPieces) {
+      tr.once('metadata', () => {
+        // If torrent is larger than 200MB, skip verifying downloaded
+        // pieces. This makes webtorrent init much more faster.
+        // It is dangerous, but useful if we add so many torrents.
+        if (tr.length < 200_000_000) return
+        let ctr = 0
+        conf.verifiedPieces.forEach(range => {
+          // tr._markVerified(index)
+          // If range is an array of [start, end]
+          if (Array.isArray(range)) {
+            const [start, end] = range
+            // The first and last pieces are verified. But for security
+            // reason, we skip these pieces in range.
+            for (let i = start + 1; i < end; i++) {
+              tr._markVerified(i)
+              ctr++
+            }
+          } else {
+            // ... or is a number
+            tr._markVerified(range)
+            ctr++
+          }
+        })
+        console.log('mark verified', conf.verifiedPieces, ctr)
+      })
+    }
   }
   if (client.get(conf.infoHash)) {
     client.remove(conf.infoHash, add)
@@ -893,6 +920,15 @@ const stopServer = () => {
     if (!file.length) return ipcRenderer.send('seed-error')
     if (!token) token = Math.random().toString().substr(2)
     return seedTorrent(token, file, options)
+  })
+  ipcRenderer.on('seed-torrents', (e, confs) => {
+    console.log(`Seed ${confs.length} torrents`)
+    confs.forEach(conf => {
+      let { file, token, ...options } = conf
+      if (!file) file = conf.files.map(i => i.path)
+      if (!token) token = Math.random().toString().substring(2)
+      seedTorrent(token, file, { ...conf })
+    })
   })
   ipcRenderer.on('autoupload-files', async (e, files) => {
     info('autoupload files', files)
