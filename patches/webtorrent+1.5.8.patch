@@ -296,7 +296,7 @@ index 19cb5ff..9bc5480 100644
    }
  }
 diff --git a/node_modules/webtorrent/lib/torrent.js b/node_modules/webtorrent/lib/torrent.js
-index ac7cb97..0d8bbca 100644
+index ac7cb97..95ab3fa 100644
 --- a/node_modules/webtorrent/lib/torrent.js
 +++ b/node_modules/webtorrent/lib/torrent.js
 @@ -64,6 +64,56 @@ try {
@@ -365,7 +365,7 @@ index ac7cb97..0d8bbca 100644
    }
  
    _getMetadataFromServer () {
-@@ -596,31 +648,45 @@ class Torrent extends EventEmitter {
+@@ -596,31 +648,46 @@ class Torrent extends EventEmitter {
    }
  
    _verifyPieces (cb) {
@@ -391,6 +391,7 @@ index ac7cb97..0d8bbca 100644
 +      parallelLimit(this.pieces.map((piece, index) => cb => {
 +        this.verifyStatus.current++
          if (this.destroyed) return cb(new Error('torrent is destroyed'))
++        if (piece === null) return cb(null)
  
 -        if (err) return queueMicrotask(() => cb(null)) // ignore error
 -        sha1(buf, hash => {
@@ -430,7 +431,7 @@ index ac7cb97..0d8bbca 100644
    }
  
    rescanFiles (cb) {
-@@ -753,6 +819,8 @@ class Torrent extends EventEmitter {
+@@ -753,6 +820,8 @@ class Torrent extends EventEmitter {
      this._peers = null
      this._servers = null
      this._xsRequests = null
@@ -439,7 +440,7 @@ index ac7cb97..0d8bbca 100644
    }
  
    addPeer (peer) {
-@@ -893,6 +961,7 @@ class Torrent extends EventEmitter {
+@@ -893,6 +962,7 @@ class Torrent extends EventEmitter {
     * peer that has already sent a handshake.
     */
    _addIncomingPeer (peer) {
@@ -447,7 +448,7 @@ index ac7cb97..0d8bbca 100644
      if (this.destroyed) return peer.destroy(new Error('torrent is destroyed'))
      if (this.paused) return peer.destroy(new Error('torrent is paused'))
  
-@@ -1144,6 +1213,7 @@ class Torrent extends EventEmitter {
+@@ -1144,6 +1214,7 @@ class Torrent extends EventEmitter {
      })
  
      wire.once('close', () => {
