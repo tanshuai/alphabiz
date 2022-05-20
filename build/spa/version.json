@@ -1,8 +1,8 @@
 {
   "packageVer": "0.1.1",
   "channel": "internal",
-  "buildTime": "202205201127",
-  "buildCommit": "ed641ddb",
-  "sourceCommit": "ed641ddb",
-  "version": "0.1.1-internal-202205201127"
+  "buildTime": "202205201623",
+  "buildCommit": "7ad5afdc",
+  "sourceCommit": "7ad5afdc",
+  "version": "0.1.1-internal-202205201623"
 }
