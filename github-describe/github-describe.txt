@@ -1,3 +1,2 @@
-update patches
-fix audio file prompt
-modify electron download test
+fix subtitle menu i18n
+add windows medie player
