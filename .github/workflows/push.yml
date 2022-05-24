@@ -68,6 +68,7 @@ jobs:
           git fetch --prune --unshallow
           echo "::set-output name=date::$(git log -1 --date=format:'%Y%m%d' --author="Alphabiz-Team" --format='%cd')"
           echo "::set-output name=current-hour::$(date +'%H')"
+          echo "::set-output name=event-name::${{ github.event_name }}"
           if [[ ${{ matrix.os }} = "ubuntu-latest" ]] ; \
           then echo "::set-output name=system::ubuntu" ; \
           elif [[ ${{ matrix.os }} = "macos-latest" ]] ; \
@@ -82,7 +83,7 @@ jobs:
         shell: bash
 
       - name: Get last commit date \ today all commit message
-        if: ${{ github.event_name == 'schedule' }} || contains(env.MODIFIED_FILE_LIST, 'release.json')
+        if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         id: nightly
         run: |
           echo "::set-output name=commit::$(git log -1 --pretty=%B --author="Alphabiz-Team")"
@@ -106,7 +107,7 @@ jobs:
       # need convert to a single line,then get property use fromJson().property
       - name: Get release.json property
         id: release
-        if: ${{ github.event_name == 'schedule' }} || contains(env.MODIFIED_FILE_LIST, 'release.json')
+        if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
           content=`cat ./release.json`
           content="${content//'%'/'%25'}"
@@ -125,7 +126,7 @@ jobs:
       # nightly-release use tag_name: $packageJsonVersion-internal/nightly-$dateTime-$commitId
       # official-release use tag_name: ./release.json property new-tag-name
       - name: Unified Tag format
-        if: ${{ github.event_name == 'schedule' }} || contains(env.MODIFIED_FILE_LIST, 'release.json')
+        if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         id: unify
         run: |
           if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
@@ -141,7 +142,7 @@ jobs:
       # this step checkout all output
       - name: Checkout vars-date ${{ steps.vars.outputs.date }} ⬇️
         run: |
-          echo "event_name: ${{ github.event_name }}"
+          echo "event_name: ${{ steps.vars.outputs.event-name }}"
           echo "system: ${{ steps.vars.outputs.system }}"
           echo "run workflow date: ${{ steps.vars.outputs.date }}"
           echo "current-hour: ${{ steps.vars.outputs.current-hour }}"
@@ -152,7 +153,7 @@ jobs:
           echo "release-name: ${{ steps.unify.outputs.release-name }}"
           echo "package-name: ${{ steps.unify.outputs.package-name }}"
           echo "----------------------"
-          if ${{ github.event_name == 'schedule' || contains(env.MODIFIED_FILE_LIST, 'release.json') }};\
+          if ${{ contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json') }};\
           then  echo "commit: ${{ steps.nightly.outputs.commit }}" ; \
                 echo "commit-version: ${{ steps.nightly.outputs.commit-version }}" ; \
                 echo "commit-date: ${{ steps.nightly.outputs.commit-date }}" ; \
@@ -201,18 +202,18 @@ jobs:
       #后面的step晚上运行 或 正式发布
 
       - name: Run electron-packager
-        if: ${{ github.event_name == 'schedule' }} || contains(env.MODIFIED_FILE_LIST, 'release.json')
+        if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
           export BUILD_VERSION=${{ steps.unify.outputs.tag-name }}
           yarn packager
         shell: bash
 
       - name: Package for ${{ matrix.os }}-nightly-${{ steps.nightly.outputs.commit-message }} Release 🗜️
-        if: ${{ github.event_name == 'schedule' }} || contains(env.MODIFIED_FILE_LIST, 'release.json')
+        if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: 7z a -t7z -mx=9 alphabiz-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }}.7z ./build/electron -xr!UnPackaged
 
       - name: Pack app 📦
-        if: ${{ github.event_name == 'schedule' }} || contains(env.MODIFIED_FILE_LIST, 'release.json')
+        if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
           export PATH=$PATH:/c/Program\ Files\ \(x86\)/WiX\ Toolset\ v3.11/bin
           export BUILD_VERSION=${{ steps.unify.outputs.tag-name }}
@@ -220,7 +221,7 @@ jobs:
         shell: bash
 
       - name: Release alphabiz-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }}.7z to GitHub 📰
-        if: ${{ github.event_name == 'schedule' }} || contains(env.MODIFIED_FILE_LIST, 'release.json')
+        if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         uses: softprops/action-gh-release@v1
         with:
           prerelease: true
