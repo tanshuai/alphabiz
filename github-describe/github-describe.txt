@@ -1,2 +1,3 @@
-fix subtitle menu i18n
-add windows medie player
+add system default player
+adjust playwright test
+add playwright test page object
