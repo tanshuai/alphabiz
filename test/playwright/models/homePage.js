@@ -34,8 +34,9 @@ class HomePage {
     // more card
     this.copyUrlBtn = page.locator('[role="presentation"]:has-text("content_copy")')
     this.copyShareUrlBtn = page.locator('[role="presentation"]:has-text("share")')
-    this.fileTreeBtn = page.locator('text=Files: >> //following::*[4]')
+    this.fileTreeBtn = page.locator('text=play_arrowfolder')
     // delete card
+    this.deleteCard = page.locator('.q-card >> text=Delete task')
     this.deleteFileChk = page.locator('[aria-label="Also delete files"]')
     this.removeAutoUploadFilesChk = page.locator('[aria-label="Remove auto-upload files"]')
     this.notNowBtn = page.locator('button:has-text("Not now")')
@@ -54,14 +55,18 @@ class HomePage {
     this.uploadAllBtn = page.locator('button:has-text("Upload all")')
   }
 
+  getCard (btName) {
+    const btCard = 'text=' + btName + ' >> xpath=..//..//..//..//..'
+    return this.page.locator(btCard).first()
+  }
+
   getCardEle (btName, target, status) {
     const btCard = 'text=' + btName + ' >> xpath=..//..//..//..//..'
     return this.page.locator(btCard + ' >> ' + this.cardElementObj[target] + (status || '')).first()
   }
 
-  getListBtn (btName, target) {
-    const btCard = 'text=' + btName + ' >> xpath=..//..//..//..//..'
-    return this.page.locator(btCard + ' >> ' + this.listElementObj[target])
+  getListEle (btName, target) {
+    return this.page.locator('text=' + btName + ' >> ' + this.listElementObj[target])
   }
 
   // home
