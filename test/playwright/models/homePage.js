@@ -19,6 +19,7 @@ class HomePage {
       processText: '.progress-text',
       statusText: 'text=Status: '
     }
+    this.firstFileBtn = page.locator('.q-list > .q-item:nth-child(1)')
     // listmode
     this.listElementObj = {
       fileIcon: '//preceding::*[1]',
@@ -34,7 +35,7 @@ class HomePage {
     // more card
     this.copyUrlBtn = page.locator('[role="presentation"]:has-text("content_copy")')
     this.copyShareUrlBtn = page.locator('[role="presentation"]:has-text("share")')
-    this.fileTreeBtn = page.locator('text=play_arrowfolder')
+    this.fileTreeBtn = page.locator('.file-tree')
     // delete card
     this.deleteCard = page.locator('.q-card >> text=Delete task')
     this.deleteFileChk = page.locator('[aria-label="Also delete files"]')
