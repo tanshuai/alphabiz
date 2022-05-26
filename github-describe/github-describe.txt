@@ -1,3 +1,7 @@
-add system default player
-adjust playwright test
-add playwright test page object
+add playwright card mode test
+fix get alert error
+fix jump page error
+adjust playwright task test
+add waiting time for macos
+add download test、run online-ex workflow
+fix scripts download
