@@ -290,110 +290,141 @@ test.describe('download ', () => {
       }
     })
   }
-  if (process.platform !== 'darwin') {
-    test('table mode task lists', async () => {
-      // 确保下载的全部种子都在做种状态
-      // await basePage.jumpPage('downloadedStatus')
-      await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
-      await basePage.jumpPage('uploadingStatus')
-      // await window.waitForLoadState()
-      await sleep(4000)
-      await window.screenshot({ path: `${ScreenshotsPath}taskStatus.png` })
-      // 切换列表模式
-      const listMode = await homePage.toggleListModeBtn
-      if (await listMode.isVisible()) {
-        await listMode.click()
-      }
-      // 验证文件类型图标
-      await sleep(2000)
-      // 截图验证
-      const bbbFileIcon = await homePage.getListEle('bbb_sunflower_1080p_30fps_normal.mp4', 'fileIcon').innerText()
-      // const bbbFileIcon = await window.locator('text=bbb_sunflower_1080p_30fps_normal.mp4 >> //preceding::*[1]').innerText()
-      expect(bbbFileIcon).toBe('video_file')
-      const uTorrentFileIcon = await homePage.getListEle('uTorrent Web', 'fileIcon').innerText()
-      expect(uTorrentFileIcon).toBe('folder')
-      // uploading状态栏
-      // 双击文件名播放文件
-      await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share').click({ clickCount: 2 })
-      // should video can play
-      await playerPage.controlBar.waitFor({ timeout: 10000 })
-      await basePage.jumpPage('uploadingStatus')
-      await sleep(1000)
-      // 文件大小
-      const fileSize = await homePage.getListEle('The WIRED CD - Rip. Sample. Mash. Share', 'fileSize').innerText()
-      // expect(fileSize).toBe('56.07 MB')
-      expect(/\d+\.\d+\s(MB|GB)/.test(fileSize)).toBe(true)
-      // 完成时间格式 hh:mm:ss格式 非当日任务显示yesterday或yy-mm-dd格式
-      const time = await homePage.getListEle('The WIRED CD - Rip. Sample. Mash. Share', 'completedTime').innerText()
-      expect(/(\d{1,2}:\d{1,2}:\d{1,2}|Yesterday|\d{1,2}-\d{1,2}-\d{1,2})/.test(time)).toBe(true)
-      // 上传速度: (上传中) 单位KB/s或MB/s
-      const uploadSpeed = await homePage.getListEle('The WIRED CD - Rip. Sample. Mash. Share', 'uploadSpeed').innerText()
-      // console.log('uploadSpeed:' + uploadSpeed)
-      expect(/(\d+(\.\d+)?\s?(KB|MB)?|-)/.test(uploadSpeed)).toBe(true)
-      // 检查任务图标
-      // stop 图标
-      const stopIcon = await homePage.getListEle('The WIRED CD - Rip. Sample. Mash. Share', 'oneBtn')
-      const stopIconText = await stopIcon.innerText()
-      expect(stopIconText).toBe('stop')
-      // file_open 图标
-      const fileOpenIcon = await homePage.getListEle('The WIRED CD - Rip. Sample. Mash. Share', 'twoBtn').innerText()
-      expect(fileOpenIcon).toBe('file_open')
-      // folder 图标
-      const fileIcon = await homePage.getListEle('The WIRED CD - Rip. Sample. Mash. Share', 'threeBtn').innerText()
-      expect(fileIcon).toBe('folder')
-      // more... 图标
-      const moreIcon = await homePage.getListEle('The WIRED CD - Rip. Sample. Mash. Share', 'fourBtn')
-      const moreIconText = await moreIcon.innerText()
-      expect(moreIconText).toBe('more_horiz')
-      // close 图标
-      const closeIcon = await homePage.getListEle('The WIRED CD - Rip. Sample. Mash. Share', 'fiveBtn')
-      const closeIconText = await closeIcon.innerText()
-      expect(closeIconText).toBe('close')
-      await closeIcon.click()
-      await homePage.deleteCard.waitFor({ timeout: 10000 })
-      await homePage.notNowBtn.click()
-      // "更多"功能检查Download url
-      await moreIcon.click()
-      await homePage.copyUrlBtn.click()
-      // // "更多"功能检查文件路径
-      const filePathElement = await homePage.fileTreeBtn
-      // 检查文件夹树状结构
-      await filePathElement.click()
-      await filePathElement.locator('text=01 - Beastie Boys - Now Get Busy.mp3').waitFor()
-      await filePathElement.locator('text=insert_drive_file').waitFor()
-      await filePathElement.locator('text=image').waitFor()
-      await sleep(500)
-      // 退出卡片
-      await basePage.headerTitle.click({ force: true })
-      // // downloaded状态栏
-      // await stopIcon.click()
-      // await basePage.jumpPage('downloadedStatus')
-      // const theWoredCD = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share')
-      // await theWoredCD.waitFor('visible')
-      // await sleep(500)
-      // // 检查任务图标
-      // const uploadIcon = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::*[4]/Button[1]')
-      // const uploadIconText = await uploadIcon.innerText()
-      // expect(uploadIconText).toBe('cloud_upload')
-      // await sleep(500)
-      // await uploadIcon.click()
-      // await theWoredCD.waitFor('hidden')
-      // await sleep(500)
-      // await basePage.jumpPage('uploadingStatus')
-      // await sleep(500)
-      // await theWoredCD.waitFor('visible')
-      // // // 验证magnet被复制到剪贴板
-      // await basePage.jumpPage('downloadingStatus')
-      // await homePage.downloadBtn.click()
-      // await sleep(1000)
-      // const magnetText = await window.locator('//*[@aria-label="Download directory position"]/preceding::*[1]').inputValue()
-      // // console.log('magnetText:' + magnetText)
-      // expect(/alphabiz:\/\//.test(magnetText)).toBe(true)
-      // await window.click('button:has-text("Cancel")')
-      await sleep(1000)
-      await window.reload()
-    })
-  }
+  test('card mode task list', async () => {
+    await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
+    await basePage.jumpPage('uploadingStatus')
+    await sleep(1000)
+    await window.screenshot({ path: `${ScreenshotsPath}card-mode-taskStatus.png` })
+    const cardMode = await homePage.toggleCardModeBtn
+    if (await cardMode.isVisible()) {
+      await cardMode.click()
+    }
+    // stop 功能
+    await homePage.getCardEle(btData[1].btName, 'stopBtn').click()
+    await homePage.getCard(btData[1].btName).waitFor('hidden')
+    await basePage.jumpPage('downloadedStatus')
+    await homePage.getCard(btData[1].btName).waitFor('visible')
+    await sleep(2000)
+    await homePage.getCardEle(btData[1].btName, 'seedBtn').click()
+    await homePage.getCard(btData[1].btName).waitFor('hidden')
+    await basePage.jumpPage('uploadingStatus')
+    await homePage.getCard(btData[1].btName).waitFor('visible')
+    // play 功能
+    await homePage.getCardEle(btData[1].btName, 'playBtn').click()
+    await homePage.firstFileBtn.waitFor()
+    // delete 功能
+    await homePage.getCardEle(btData[1].btName, 'deleteBtn').click()
+    await homePage.deleteCard.waitFor()
+    await homePage.deleteFileChk.waitFor()
+    await homePage.notNowBtn.click()
+    // more.. 功能
+    await homePage.getCardEle(btData[1].btName, 'moreBtn').click()
+    // 检查文件路径
+    const filePathElement = await homePage.fileTreeBtn
+    // 检查文件夹树状结构
+    await filePathElement.click()
+    await filePathElement.locator('text=01 - Beastie Boys - Now Get Busy.mp3').waitFor()
+    await filePathElement.locator('text=insert_drive_file').waitFor()
+    await filePathElement.locator('text=image').waitFor()
+    await sleep(500)
+    // 退出卡片
+    await basePage.headerTitle.click({ force: true })
+  })
+  // if (process.platform !== 'darwin') {
+  test('table mode task list', async () => {
+    // 确保下载的全部种子都在做种状态
+    // await basePage.jumpPage('downloadedStatus')
+    await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
+    await basePage.jumpPage('uploadingStatus')
+    // await window.waitForLoadState()
+    await sleep(1000)
+    await window.screenshot({ path: `${ScreenshotsPath}table-mode-taskStatus.png` })
+    // 切换列表模式
+    const listMode = await homePage.toggleListModeBtn
+    if (await listMode.isVisible()) {
+      await listMode.click()
+    }
+    // 验证文件类型图标
+    const bbbFileIcon = await homePage.getListEle(btData[2].btName, 'fileIcon').innerText()
+    expect(bbbFileIcon).toBe('video_file')
+    const uTorrentFileIcon = await homePage.getListEle('uTorrent Web', 'fileIcon').innerText()
+    expect(uTorrentFileIcon).toBe('folder')
+    // 双击文件名播放文件
+    await window.locator(`text=${btData[1].btName}`).click({ clickCount: 2 })
+    // should video can play
+    await playerPage.controlBar.waitFor({ timeout: 10000 })
+    await basePage.jumpPage('uploadingStatus')
+    await sleep(1000)
+    // 文件大小
+    const fileSize = await homePage.getListEle(btData[1].btName, 'fileSize').innerText()
+    // expect(fileSize).toBe('56.07 MB')
+    expect(/\d+\.\d+\s(MB|GB)/.test(fileSize)).toBe(true)
+    // 完成时间格式 hh:mm:ss格式 非当日任务显示yesterday或yy-mm-dd格式
+    const time = await homePage.getListEle(btData[1].btName, 'completedTime').innerText()
+    expect(/(\d{1,2}:\d{1,2}:\d{1,2}|Yesterday|\d{1,2}-\d{1,2}-\d{1,2})/.test(time)).toBe(true)
+    // 上传速度: (上传中) 单位KB/s或MB/s
+    const uploadSpeed = await homePage.getListEle(btData[1].btName, 'uploadSpeed').innerText()
+    // console.log('uploadSpeed:' + uploadSpeed)
+    expect(/(\d+(\.\d+)?\s?(KB|MB)?|-)/.test(uploadSpeed)).toBe(true)
+    // 检查任务图标
+    // stop 图标
+    const stopIcon = await homePage.getListEle(btData[1].btName, 'stopBtn')
+    await stopIcon.waitFor()
+    // file_open 图标
+    const fileOpenIcon = await homePage.getListEle(btData[1].btName, 'fileOpenBtn')
+    await fileOpenIcon.waitFor()
+    // folder 图标
+    const fileIcon = await homePage.getListEle(btData[1].btName, 'folderBtn')
+    await fileIcon.waitFor()
+    // more... 图标
+    const moreIcon = await homePage.getListEle(btData[1].btName, 'moreBtn')
+    await moreIcon.waitFor()
+    // close 图标
+    const closeIcon = await homePage.getListEle(btData[1].btName, 'closeBtn')
+    await closeIcon.waitFor()
+    await closeIcon.click()
+    await homePage.deleteCard.waitFor({ timeout: 10000 })
+    await homePage.notNowBtn.click()
+    // "更多"功能检查Download url
+    await moreIcon.click()
+    await homePage.copyUrlBtn.click()
+    await homePage.copySuccessAlert.waitFor('visible')
+    // "更多"功能检查文件路径
+    const filePathElement = await homePage.fileTreeBtn
+    // 检查文件夹树状结构
+    await filePathElement.click()
+    await filePathElement.locator('text=01 - Beastie Boys - Now Get Busy.mp3').waitFor()
+    await filePathElement.locator('text=insert_drive_file').waitFor()
+    await filePathElement.locator('text=image').waitFor()
+    await sleep(500)
+    // 退出卡片
+    await basePage.headerTitle.click({ force: true })
+    // downloaded状态栏
+    await stopIcon.click()
+    await stopIcon.waitFor('hidden')
+    await basePage.jumpPage('downloadedStatus')
+    const theWoredCD = await window.locator(`text=${btData[1].btName}`)
+    await theWoredCD.waitFor('visible')
+    // // 检查任务图标
+    const uploadIcon = await homePage.getListEle(btData[1].btName, 'seedBtn')
+    await uploadIcon.waitFor()
+    await sleep(2000)
+    await uploadIcon.click()
+    await theWoredCD.waitFor('hidden')
+    await basePage.jumpPage('uploadingStatus')
+    await theWoredCD.waitFor('visible')
+    // // // 验证magnet被复制到剪贴板
+    // await basePage.jumpPage('downloadingStatus')
+    // await homePage.downloadBtn.click()
+    // await sleep(1000)
+    // const magnetText = await window.locator('//*[@aria-label="Download directory position"]/preceding::*[1]').inputValue()
+    // // console.log('magnetText:' + magnetText)
+    // expect(/alphabiz:\/\//.test(magnetText)).toBe(true)
+    // await window.click('button:has-text("Cancel")')
+    // await sleep(5000)
+    await window.reload()
+  })
+  // }
 })
 
 test.describe('upload', () => {
@@ -462,7 +493,7 @@ test.describe('account', () => {
   //     username: '+86' + process.env.TEST3_PHONE_NUMBER
   //   }
   // ]
-  test.only('transfer - check bill details', async () => {
+  test('transfer - check bill details', async () => {
     test.setTimeout(60000 * 5)
     // 转账人账号、密码
     // const transferee = userInfo[from].username

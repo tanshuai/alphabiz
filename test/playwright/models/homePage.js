@@ -22,15 +22,16 @@ class HomePage {
     this.firstFileBtn = page.locator('.q-list > .q-item:nth-child(1)')
     // listmode
     this.listElementObj = {
-      fileIcon: '//preceding::*[1]',
-      fileSize: '//following::*[2]',
-      completedTime: '//following::*[3]',
-      uploadSpeed: '//following::*[4]',
-      oneBtn: '//following::Button[1]',
-      twoBtn: '//following::Button[2]',
-      threeBtn: '//following::Button[3]',
-      fourBtn: '//following::Button[4]',
-      fiveBtn: '//following::Button[5]'
+      fileIcon: '.name-icon',
+      fileSize: '.text-grey',
+      completedTime: '//td[2]',
+      uploadSpeed: '//td[3]',
+      stopBtn: 'button:has-text("stop")',
+      seedBtn: 'button:has-text("cloud_upload")',
+      fileOpenBtn: 'button:has-text("file_open")',
+      folderBtn: 'button:has-text("folder")',
+      moreBtn: 'button:has-text("more_horiz")',
+      closeBtn: 'button:has-text("close")'
     }
     // more card
     this.copyUrlBtn = page.locator('[role="presentation"]:has-text("content_copy")')
@@ -54,6 +55,8 @@ class HomePage {
     // downloaded
     this.clearHistoryBtn = page.locator('button:has-text("Clear history")')
     this.uploadAllBtn = page.locator('button:has-text("Upload all")')
+    // alert
+    this.copySuccessAlert = page.locator('[role="alert"]:has-hext("URI is successfully copied to your clipboard")')
   }
 
   getCard (btName) {
@@ -67,7 +70,7 @@ class HomePage {
   }
 
   getListEle (btName, target) {
-    return this.page.locator('text=' + btName + ' >> ' + this.listElementObj[target])
+    return this.page.locator(`.list-item-tr:has-text("${btName}")` + ' >> ' + this.listElementObj[target])
   }
 
   // home
