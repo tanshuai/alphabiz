@@ -28,6 +28,38 @@ if (process.platform === 'win32') {
 }
 from = from + process.env.TEST_EMAIL_DOMAIN
 to = to + process.env.TEST_EMAIL_DOMAIN
+const btData = [
+  {
+    btName: 'uTorrent Web Tutorial Video',
+    magnetLink: 'magnet:?xt=urn:btih:61b3b8856c4839edf51f5c2346599b6bec524145',
+    isStreaming: 0,
+    isDelete: 0,
+    fileType: 'folder'
+  },
+  {
+    btName: 'The WIRED CD - Rip. Sample. Mash. Share',
+    magnetLink: 'alphabiz://The+WIRED+CD+-+Rip.+Sample.+Mash.+Share/AaiP2llU6JF4w3Jxamp4uBgO1NrT&_Td6WFoAAAFpIt42AgAhARwAAAAQz1jM4AQ2AZRdABhgxG8IY8MSV1K_VKsx55jv8ahwgTX5jKB2up6HR8eDRb6BvCkztx6mgEb++b2k0T1kLtZV_Z3BAncfL9IZEXrCc2i3lZ1gwntqOdl5Y6U4ITwioxtrEFVVqgnT7fNc84aa4e4nbkoHiGnrIyjqiDO6Th6ghL6fgab+SzF6QoLdOc_CzeSlbolwRBY6XVrJDoXv0R2cuLjOd2K0fNlkoov1603Ml_lh_5EboBPwH+OOmSVNhU2VlV8_JhxjvAyuSH2BztiDRz1bVFkIdjxPR234SGYsuJpslus1CEnVW+bjTYwN6URFizlYFNVAeUEyN6RuAJBa8Zr5R9rTZj8ZZt9oSUK2igP7XtUePDYebMj3TjlP1dIp+i_HBQOtJ+Yd4zFcLi1aeQteo2DP694kshUMvyLM1ZBS6FdnwVLNCGFZ_TEBIhR73Nm2DXdas086dQFXAEOmjwprTaPyWwRqVrEXn9uuWDFUe8TbJYK6hQbfFdTCM8Mq4dNnAQqcepFfmbE4PAd+m7zOGXFARinVN+L_ZK16ADAA4uMAAawDtwgAAANYnWQ+MA2LAgAAAAABWVo=',
+    testName: 'alphabiz- ',
+    isStreaming: 0,
+    isDelete: 0,
+    fileType: 'folder'
+  },
+  {
+    btName: 'bbb_sunflower_1080p_30fps_normal.mp4',
+    magnetLink: 'alphabiz://bbb_sunflower_1080p_30fps_normal.mp4/AYhZSqrL3kDvPiUQxHN07AqjlsCO&_Td6WFoAAAFpIt42AgAhARwAAAAQz1jM4AMtAW1dABhgxG8IY8MSV1K_VKsx55jv8ahwgTX5jKB2up6HR8eDRb6BvCkztx6mgEb++b2O2b3K3oD_twGGSig+KBe78TiXxGleWSnbRlWB69ZvfD70oiEhlTlty+AtgRrH+kzx7fD910Bx9Uf4_7Js+dNII8l3GxJ4B175xFepPURPh6AnWzB9cVwPtgxmF4hSxh7Z_thhoZBH4KP2yrr9bIPbiBIfR4rnRGgQhoMYOe1vRpDVUFDC_y_tNp17fwwfvvvAj5elliGbJODzL4qEq_HB_lUhXHCZDoPbg1kCa8TfDkYL+2wWqViHW5YjR6DIxnlf8AAswdMmYa5OLaHRfCaqLtreJ_iohdSxAp2rckxS001Zp7ra+N_aIUxh9H3a96O2YBfWo_2PdmbBhT1A8s20u6d9cVtOTDvkpvOb8aiGcUn+swScBUm1SBP2DgoZJ6zeNvQcBQ9WKwD51ImdTrOxf2ShB64iMvUV0iO_3x3WAAAAAJcI4UEAAYUDrgYAAOI5sWM+MA2LAgAAAAABWVo=',
+    testName: 'Streaming alphabiz- ',
+    isStreaming: 1,
+    isDelete: 0,
+    fileType: 'video_file'
+  },
+  {
+    btName: 'bbb_sunflower_1080p_30fps_normal.mp4',
+    magnetLink: 'alphabiz://bbb_sunflower_1080p_30fps_normal.mp4/AYhZSqrL3kDvPiUQxHN07AqjlsCO&_Td6WFoAAAFpIt42AgAhARwAAAAQz1jM4AMtAW1dABhgxG8IY8MSV1K_VKsx55jv8ahwgTX5jKB2up6HR8eDRb6BvCkztx6mgEb++b2O2b3K3oD_twGGSig+KBe78TiXxGleWSnbRlWB69ZvfD70oiEhlTlty+AtgRrH+kzx7fD910Bx9Uf4_7Js+dNII8l3GxJ4B175xFepPURPh6AnWzB9cVwPtgxmF4hSxh7Z_thhoZBH4KP2yrr9bIPbiBIfR4rnRGgQhoMYOe1vRpDVUFDC_y_tNp17fwwfvvvAj5elliGbJODzL4qEq_HB_lUhXHCZDoPbg1kCa8TfDkYL+2wWqViHW5YjR6DIxnlf8AAswdMmYa5OLaHRfCaqLtreJ_iohdSxAp2rckxS001Zp7ra+N_aIUxh9H3a96O2YBfWo_2PdmbBhT1A8s20u6d9cVtOTDvkpvOb8aiGcUn+swScBUm1SBP2DgoZJ6zeNvQcBQ9WKwD51ImdTrOxf2ShB64iMvUV0iO_3x3WAAAAAJcI4UEAAYUDrgYAAOI5sWM+MA2LAgAAAAABWVo=',
+    isStreaming: 0,
+    isDelete: 0,
+    fileType: 'video_file'
+  }
+]
 test.beforeAll(async () => {
   // Launch Electron app.
   electronApp = await electron.launch({
@@ -138,38 +170,6 @@ test.describe('play video', () => {
 })
 
 test.describe('download ', () => {
-  const btData = [
-    {
-      btName: 'uTorrent Web Tutorial Video',
-      magnetLink: 'magnet:?xt=urn:btih:61b3b8856c4839edf51f5c2346599b6bec524145',
-      isStreaming: 0,
-      isDelete: 0,
-      fileType: 'folder'
-    },
-    {
-      btName: 'The WIRED CD - Rip. Sample. Mash. Share',
-      magnetLink: 'alphabiz://The+WIRED+CD+-+Rip.+Sample.+Mash.+Share/AaiP2llU6JF4w3Jxamp4uBgO1NrT&_Td6WFoAAAFpIt42AgAhARwAAAAQz1jM4AQ2AZRdABhgxG8IY8MSV1K_VKsx55jv8ahwgTX5jKB2up6HR8eDRb6BvCkztx6mgEb++b2k0T1kLtZV_Z3BAncfL9IZEXrCc2i3lZ1gwntqOdl5Y6U4ITwioxtrEFVVqgnT7fNc84aa4e4nbkoHiGnrIyjqiDO6Th6ghL6fgab+SzF6QoLdOc_CzeSlbolwRBY6XVrJDoXv0R2cuLjOd2K0fNlkoov1603Ml_lh_5EboBPwH+OOmSVNhU2VlV8_JhxjvAyuSH2BztiDRz1bVFkIdjxPR234SGYsuJpslus1CEnVW+bjTYwN6URFizlYFNVAeUEyN6RuAJBa8Zr5R9rTZj8ZZt9oSUK2igP7XtUePDYebMj3TjlP1dIp+i_HBQOtJ+Yd4zFcLi1aeQteo2DP694kshUMvyLM1ZBS6FdnwVLNCGFZ_TEBIhR73Nm2DXdas086dQFXAEOmjwprTaPyWwRqVrEXn9uuWDFUe8TbJYK6hQbfFdTCM8Mq4dNnAQqcepFfmbE4PAd+m7zOGXFARinVN+L_ZK16ADAA4uMAAawDtwgAAANYnWQ+MA2LAgAAAAABWVo=',
-      testName: 'alphabiz- ',
-      isStreaming: 0,
-      isDelete: 0,
-      fileType: 'folder'
-    },
-    {
-      btName: 'bbb_sunflower_1080p_30fps_normal.mp4',
-      magnetLink: 'alphabiz://bbb_sunflower_1080p_30fps_normal.mp4/AYhZSqrL3kDvPiUQxHN07AqjlsCO&_Td6WFoAAAFpIt42AgAhARwAAAAQz1jM4AMtAW1dABhgxG8IY8MSV1K_VKsx55jv8ahwgTX5jKB2up6HR8eDRb6BvCkztx6mgEb++b2O2b3K3oD_twGGSig+KBe78TiXxGleWSnbRlWB69ZvfD70oiEhlTlty+AtgRrH+kzx7fD910Bx9Uf4_7Js+dNII8l3GxJ4B175xFepPURPh6AnWzB9cVwPtgxmF4hSxh7Z_thhoZBH4KP2yrr9bIPbiBIfR4rnRGgQhoMYOe1vRpDVUFDC_y_tNp17fwwfvvvAj5elliGbJODzL4qEq_HB_lUhXHCZDoPbg1kCa8TfDkYL+2wWqViHW5YjR6DIxnlf8AAswdMmYa5OLaHRfCaqLtreJ_iohdSxAp2rckxS001Zp7ra+N_aIUxh9H3a96O2YBfWo_2PdmbBhT1A8s20u6d9cVtOTDvkpvOb8aiGcUn+swScBUm1SBP2DgoZJ6zeNvQcBQ9WKwD51ImdTrOxf2ShB64iMvUV0iO_3x3WAAAAAJcI4UEAAYUDrgYAAOI5sWM+MA2LAgAAAAABWVo=',
-      testName: 'Streaming alphabiz- ',
-      isStreaming: 1,
-      isDelete: 0,
-      fileType: 'video_file'
-    },
-    {
-      btName: 'bbb_sunflower_1080p_30fps_normal.mp4',
-      magnetLink: 'alphabiz://bbb_sunflower_1080p_30fps_normal.mp4/AYhZSqrL3kDvPiUQxHN07AqjlsCO&_Td6WFoAAAFpIt42AgAhARwAAAAQz1jM4AMtAW1dABhgxG8IY8MSV1K_VKsx55jv8ahwgTX5jKB2up6HR8eDRb6BvCkztx6mgEb++b2O2b3K3oD_twGGSig+KBe78TiXxGleWSnbRlWB69ZvfD70oiEhlTlty+AtgRrH+kzx7fD910Bx9Uf4_7Js+dNII8l3GxJ4B175xFepPURPh6AnWzB9cVwPtgxmF4hSxh7Z_thhoZBH4KP2yrr9bIPbiBIfR4rnRGgQhoMYOe1vRpDVUFDC_y_tNp17fwwfvvvAj5elliGbJODzL4qEq_HB_lUhXHCZDoPbg1kCa8TfDkYL+2wWqViHW5YjR6DIxnlf8AAswdMmYa5OLaHRfCaqLtreJ_iohdSxAp2rckxS001Zp7ra+N_aIUxh9H3a96O2YBfWo_2PdmbBhT1A8s20u6d9cVtOTDvkpvOb8aiGcUn+swScBUm1SBP2DgoZJ6zeNvQcBQ9WKwD51ImdTrOxf2ShB64iMvUV0iO_3x3WAAAAAJcI4UEAAYUDrgYAAOI5sWM+MA2LAgAAAAABWVo=',
-      isStreaming: 0,
-      isDelete: 0,
-      fileType: 'video_file'
-    }
-  ]
   for (const btDate of btData) {
     test((btDate.testName ? btDate.testName : '') + btDate.btName, async () => {
       await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
@@ -290,11 +290,29 @@ test.describe('download ', () => {
       }
     })
   }
-  test('card mode task list', async () => {
+})
+test.describe('task', () => {
+  test.beforeEach(async () => {
     await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
+    await window.waitForLoadState()
     await basePage.jumpPage('uploadingStatus')
     await homePage.searchBtn.click({ force: true })
-    await sleep(1000)
+    try {
+      for (const bt of btData) {
+        await homePage.getCard(bt.btName).waitFor('visible')
+      }
+    } catch {
+      await basePage.jumpPage('downloadedStatus')
+      await homePage.uploadAllBtn.click()
+      await basePage.jumpPage('uploadingStatus')
+      for (const bt of btData) {
+        await homePage.getCard(bt.btName).waitFor('visible')
+      }
+    }
+    await window.waitForLoadState()
+    await sleep(2000)
+  })
+  test('card mode task list', async () => {
     await window.screenshot({ path: `${ScreenshotsPath}card-mode-taskStatus.png` })
     const cardMode = await homePage.toggleCardModeBtn
     if (await cardMode.isVisible()) {
@@ -305,7 +323,7 @@ test.describe('download ', () => {
     await homePage.getCard(btData[1].btName).waitFor('hidden')
     await basePage.jumpPage('downloadedStatus')
     await homePage.getCard(btData[1].btName).waitFor('visible')
-    await sleep(2000)
+    await sleep(3000)
     await homePage.getCardEle(btData[1].btName, 'seedBtn').click()
     await homePage.getCard(btData[1].btName).waitFor('hidden')
     await basePage.jumpPage('uploadingStatus')
@@ -332,12 +350,6 @@ test.describe('download ', () => {
     await basePage.headerTitle.click({ force: true })
   })
   test('table mode task list', async () => {
-    // 确保下载的全部种子都在做种状态
-    await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
-    await basePage.jumpPage('uploadingStatus')
-    await homePage.searchBtn.click({ force: true })
-    // await window.waitForLoadState()
-    await sleep(1000)
     await window.screenshot({ path: `${ScreenshotsPath}table-mode-taskStatus.png` })
     // 切换列表模式
     const listMode = await homePage.toggleListModeBtn
@@ -425,9 +437,6 @@ test.describe('download ', () => {
     // await window.reload()
   })
   test('pause all', async () => {
-    await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
-    await basePage.jumpPage('uploadingStatus')
-    await homePage.searchBtn.click({ force: true })
     for (const bt of btData) {
       await homePage.getCard(bt.btName).waitFor('visible')
     }
