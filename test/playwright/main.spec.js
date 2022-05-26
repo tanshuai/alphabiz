@@ -229,7 +229,7 @@ test.describe('download ', () => {
             await window.click('text=' + btDate.btName, { timeout: 20000 })
             // 等待 任务 加载 验证， 判断任务是 下载中
             let time
-            btDate.btName.includes('uTorrent') ? time = 20000 : time = 60000
+            btDate.btName.includes('uTorrent') ? time = 15000 : time = 60000
             await homePage.getCardEle(btDate.btName, 'statusText', 'Downloading').click({ timeout: time })
           } catch (error) {
             console.log('The seed download is complete')
