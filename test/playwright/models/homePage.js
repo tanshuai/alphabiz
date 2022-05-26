@@ -56,7 +56,7 @@ class HomePage {
     this.clearHistoryBtn = page.locator('button:has-text("Clear history")')
     this.uploadAllBtn = page.locator('button:has-text("Upload all")')
     // alert
-    this.copySuccessAlert = page.locator('[role="alert"]:has-hext("URI is successfully copied to your clipboard")')
+    this.copySuccessAlert = page.locator('[role="alert"]:has-text("URI is successfully copied to your clipboard")')
   }
 
   getCard (btName) {
