@@ -56,6 +56,13 @@ jobs:
             cache: "yarn"
             registry-url: "https://npm.pkg.github.com"
             scope: "@zeeis"
+        
+        - name: Get message
+          id: vars
+          run: |
+            git fetch --prune --unshallow
+          shell: bash
+        
         - name: Install dependencies 👨🏻‍💻
           uses: nick-fields/retry@v2
           with:
