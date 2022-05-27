@@ -86,9 +86,8 @@ class HomePage {
     await this.magnetTarea.fill(magnet)
     await this.dirInput.fill('./test/download')
     await this.cardDownloadBtn.click()
-    try {
-      await this.downloadCard.waitFor('hidden')
-    } catch {
+    await this.page.waitForTimeout(2000)
+    if (await this.cardCancelBtn.isVisible()) {
       await this.cardCancelBtn.click()
     }
     await this.page.waitForTimeout(1000)
