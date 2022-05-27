@@ -34,6 +34,12 @@ class HomePage {
       moreBtn: 'button:has-text("more_horiz")',
       closeBtn: 'button:has-text("close")'
     }
+    // download card
+    this.downloadCard = page.locator('.q-card:has-text("Download directory")')
+    this.magnetTarea = page.locator('.q-card >> textarea')
+    this.dirInput = page.locator('[aria-label="Download directory position"]')
+    this.cardDownloadBtn = page.locator('.q-card >> button:has-text("Download")')
+    this.cardCancelBtn = page.locator('.q-card >> button:has-text("Cancel")')
     // more card
     this.moreCard = page.locator('.q-card:has-text("Download U")')
     this.copyUrlBtn = page.locator('[role="presentation"]:has-text("content_copy")')
@@ -77,14 +83,16 @@ class HomePage {
   // home
   async downloadTorrent (magnet) {
     await this.downloadBtn.click()
-    await this.page.fill('[aria-label="Download directory position"]  >> //preceding::*[1]', magnet)
-    await this.page.fill('[aria-label="Download directory position"]', './test/download')
-    await this.page.click('.q-card >> button:has-text("Download")')
-    await this.page.waitForTimeout(300)
-    if (!(await this.page.locator('.q-card >> button:has-text("Cancel")').isHidden())) {
-      await this.page.click('.q-card >> button:has-text("Cancel")')
+    await this.magnetTarea.fill(magnet)
+    await this.dirInput.fill('./test/download')
+    await this.cardDownloadBtn.click()
+    try {
+      await this.downloadCard.waitFor('hidden')
+    } catch {
+      await this.cardCancelBtn.click()
     }
-    await this.page.waitForTimeout(300)
+    await this.page.waitForTimeout(1000)
+    await this.page.waitForLoadState()
   }
 
   async waitForAllHidden (locator, timeout = 10000) {
