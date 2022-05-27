@@ -1,7 +1,5 @@
-add playwright card mode test
-fix get alert error
-fix jump page error
-adjust playwright task test
-add waiting time for macos
-add download test、run online-ex workflow
-fix scripts download
+fix card mode get element error
+playwright test replace sleep
+fix: #294
+add wating time for macos
+fix subtitle menu i18n
