@@ -1,8 +1,8 @@
 {
   "packageVer": "0.1.0",
-  "buildType": "nightly/internal/dev",
-  "buildTime": "202203011833",
-  "buildCommit": "b0d7f71",
-  "sourceCommit": "b0d7f71",
-  "version": "0.1.0-internal-202203011833-b0d7f71"
+  "channel": "fast",
+  "buildTime": "202203031518",
+  "buildCommit": "d462114",
+  "sourceCommit": "d462114",
+  "version": "0.1.0-internal-202203031500"
 }
