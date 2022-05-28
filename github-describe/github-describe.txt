@@ -1,5 +1,6 @@
-fix card mode get element error
-playwright test replace sleep
-fix: #294
-add wating time for macos
-fix subtitle menu i18n
+fix syntax error
+download test add waiting time
+add Timeout for macos
+fix player test error
+fix electron player test error
+fix drop file player、fix open system default player
