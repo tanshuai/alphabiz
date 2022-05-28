@@ -141,27 +141,28 @@ test.skip('reset torrent status', async () => {
 })
 
 test.describe('play video', () => {
-  test('avi_type', async () => {
+  test.beforeEach(async () => {
+    if (process.platform === 'darwin') test.setTimeout(60000 * 5)
     await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
-    const media = './test/cypress/fixtures/samples/GoneNutty.avi'
-
     await window.waitForLoadState()
     await basePage.jumpPage('playerLink')
+  })
+  test('avi_type', async () => {
+    const media = './test/cypress/fixtures/samples/GoneNutty.avi'
     // Upload
     await playerPage.fileInput.setInputFiles(media)
     await window.waitForLoadState()
+    await playerPage.bigPlayBtn.waitFor('hidden')
     // should video can play
     const progressControl = await playerPage.controlBar
     await expect(progressControl).toBeVisible()
   })
   test('BluRay_mkv_type', async () => {
-    await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
     const media = './test/cypress/fixtures/samples/Test-Sample-Tenet.2020.IMAX.2160p.UHD.BluRay.x265.10bit.HDR.DTS-HD.MA.5.1202111171122322.mkv'
-
-    if (!await playerPage.fileInput.isEnabled()) await basePage.jumpPage('playerLink')
     // Upload
     await playerPage.fileInput.setInputFiles(media)
     await window.waitForLoadState()
+    await playerPage.bigPlayBtn.waitFor('hidden')
     // should video can play
     const progressControl = await playerPage.controlBar
     await expect(progressControl).toBeVisible()
