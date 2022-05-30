@@ -1,13 +1,14 @@
-Add store: downloader
-improve index sub menu
-fixed:  applicationTItle
-Separate playwright test
-Separate cypress test
-separate jest、appium test、try share code to public
-try fix build-spa error
-fixed: #166
-Upgrade version display sample
-skip error test
-remove unused vars
-refact: rewrite settings, impl basic-setting #171
-tmp remove duplicate codes
+remove old BasicSettings page
+skip test
+fix: has_meta use boolean which trans to string unexpectly
+don't open devtools immediately
+fix types in src-electron
+hide dev menu if devtools disabled #175
+apply new settings for webtorrent
+disable user-select
+add update-version.js、try push unpackaged、release
+fix #167
+fix #167
+refact: advance setting with new setting entries #175
+allow using github PAT via advance setting
+improve corner
