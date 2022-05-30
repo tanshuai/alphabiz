@@ -124,13 +124,13 @@ for (const tg of taskGroup) {
       await window.waitForTimeout(5000)
     })
     test('wait finish', async () => {
-      test.setTimeout(60000 * 60)
+      test.setTimeout(60000 * 120)
       // 确认添加了5个任务，等待任务完成
       const allCard = await homePage.allCard
       const downloadNum = await allCard.count()
       console.log(`${tg.groupName} downloadNum: ` + downloadNum)
       // expect(downloadNum).toBe(5)
-      await homePage.waitForAllHidden(allCard, 60000 * 60)
+      await homePage.waitForAllHidden(allCard, 60000 * 120)
     })
     test('check task', async () => {
       await basePage.jumpPage('uploadingStatus')
