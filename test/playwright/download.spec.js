@@ -110,7 +110,11 @@ for (const tg of taskGroup) {
       }
     })
     test('add task', async () => {
-      if (process.platform === 'darwin') test.setTimeout(60000 * 10)
+      if (process.platform === 'darwin') {
+        test.setTimeout(60000 * 10)
+      } else {
+        test.setTimeout(60000 * 5)
+      }
       await basePage.jumpPage('downloadingStatus')
       await homePage.searchBtn.click({ force: true })
       const val = await parseCSV('test/samples/Movie list.csv')
@@ -124,13 +128,28 @@ for (const tg of taskGroup) {
       await window.waitForTimeout(5000)
     })
     test('wait finish', async () => {
-      test.setTimeout(60000 * 120)
+      const timeout = 120 * 60000
+      test.setTimeout(timeout)
       // 确认添加了5个任务，等待任务完成
       const allCard = await homePage.allCard
       const downloadNum = await allCard.count()
       console.log(`${tg.groupName} downloadNum: ` + downloadNum)
       // expect(downloadNum).toBe(5)
-      await homePage.waitForAllHidden(allCard, 60000 * 120)
+      await homePage.waitForAllHidden(allCard, timeout, 30000)
+      // let waitTime = 0
+      // while (1) {
+      //   if (waitTime >= timeout) break
+      //   const allCardStatus = await allCard.evaluateAll(elements => elements.map(element => element.hidden))
+      //   // console.log('allCardStatus', allCardStatus)
+      //   if (!allCardStatus.includes(false)) {
+      //     console.log('all task card hidden! wait task end!')
+      //     await window.waitForTimeout(3000)
+      //     break
+      //   }
+      //   await window.waitForTimeout(30000)
+      //   waitTime += 30
+      // }
+      // expect(waitTime).toBeLessThan(timeout)
     })
     test('check task', async () => {
       await basePage.jumpPage('uploadingStatus')
