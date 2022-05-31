@@ -1,8 +1,8 @@
 {
   "packageVer": "0.1.1",
   "channel": "internal",
-  "buildTime": "202205301821",
-  "buildCommit": "b6fc581c",
-  "sourceCommit": "b6fc581c",
-  "version": "0.1.1-internal-202205301821"
+  "buildTime": "202205310925",
+  "buildCommit": "ca3b94bd",
+  "sourceCommit": "ca3b94bd",
+  "version": "0.1.1-internal-202205310925"
 }
