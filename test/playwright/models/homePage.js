@@ -67,6 +67,7 @@ class HomePage {
     this.uploadAllBtn = page.locator('button:has-text("Upload all")')
     // alert
     this.copySuccessAlert = page.locator('[role="alert"]:has-text("URI is successfully copied to your clipboard")')
+    this.taskExistAlert = page.locator('[role="alert"]:has-text("Task already exists")')
   }
 
   getCard (btName) {
@@ -83,7 +84,7 @@ class HomePage {
   }
 
   // home
-  async downloadTorrent (magnet) {
+  async downloadTorrent (magnet, isWaitAlert = 0) {
     await this.downloadBtn.click()
     if (process.platform === 'darwin') await this.page.waitForTimeout(2000)
     await this.magnetTarea.fill(magnet)
@@ -91,6 +92,7 @@ class HomePage {
     await this.dirInput.fill('./test/download')
     if (process.platform === 'darwin') await this.page.waitForTimeout(5000)
     await this.cardDownloadBtn.click()
+    if (isWaitAlert) await this.taskExistAlert.waitFor()
     await this.page.waitForTimeout(2000)
     if (await this.cardCancelBtn.isVisible()) {
       await this.cardCancelBtn.click()

@@ -296,6 +296,7 @@ test.describe('task', () => {
     if (process.platform === 'darwin') test.setTimeout(60000 * 5)
     await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
     await window.waitForLoadState()
+    await window.waitForTimeout(1000)
     await basePage.jumpPage('uploadingStatus')
     await homePage.searchBtn.click({ force: true })
     // 确保切换到卡片模式
@@ -489,6 +490,11 @@ test.describe('task', () => {
     for (const bt of btData) {
       await homePage.getCard(bt.btName).waitFor('visible')
     }
+  })
+  test('repetitive task', async () => {
+    await basePage.jumpPage('downloadingStatus')
+    await homePage.searchBtn.click({ force: true })
+    await homePage.downloadTorrent(btData[0].magnetLink, 1)
   })
   test('delete task', async () => {
     const btName = [
