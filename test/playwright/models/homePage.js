@@ -4,6 +4,8 @@ class HomePage {
   constructor (page) {
     this.page = page
     this.searchBtn = page.locator('button:has-text("search")')
+    this.searchInput = page.locator('label input[type="text"]')
+    this.searchCloseBtn = page.locator('label i:has-text("close")')
     this.toggleListModeBtn = page.locator('button:has-text("view_agenda")')
     this.toggleCardModeBtn = page.locator('button:has-text("view_list")')
     this.sortBtn = page.locator('button:has-text("sort")')
