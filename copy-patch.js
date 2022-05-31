@@ -47,10 +47,10 @@ const deleteVersionJSON = async () => {
 
 if (process.argv.includes('--pre')) {
   console.log('run copy-patch.js --pre')
-  copyVersionJSON()
+  // copyVersionJSON()
   copyModule()
 } else if (process.argv.includes('--post')) {
   console.log('run copy-patch.js --post')
-  deleteVersionJSON()
+  // deleteVersionJSON()
 }
 
