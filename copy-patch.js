@@ -3,7 +3,7 @@
 // then run the playwright test, effective download function
 const fs = require('fs')
 const path = require('path')
-const copy = async () => {
+const copyModule = async () => {
   ['webtorrent', '@videojs'].forEach(dep => {
     const src = path.resolve(__dirname, 'node_modules', dep)
     const dest = path.resolve(__dirname, 'build/electron/UnPackaged/node_modules', dep)
@@ -25,4 +25,12 @@ const copy = async () => {
     copyRecursive(src, dest)
   })
 }
-copy()
+const copyVersionJSON = async () => {
+  const src = path.resolve(__dirname, 'public/version.json')
+  const dest = path.resolve(__dirname, 'node_modules/@zeeis/velectron/dist/resources/version.json')
+  // console.log('src:' + src)
+  // console.log('dest:' + dest)
+  fs.copyFileSync(src, dest)
+}
+copyVersionJSON()
+copyModule()

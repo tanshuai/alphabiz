@@ -1,11 +1,13 @@
 const { exec, execSync } = require('child_process')
 const { existsSync, copyFileSync, mkdirSync, unlinkSync } = require('fs')
 const { resolve } = require('path')
-const { version: pkgVersion, productName } = require('./package.json')
+const { productName } = require('./package.json')
+const publicVersion = require('./public/version.json').version
+const pkgVersion = require('./public/version.json').packageVer
 const readline = require('readline')
 const { copySync } = require('fs-extra')
 
-const version = process.env.BUILD_VERSION || pkgVersion
+const version = publicVersion || pkgVersion
 console.log(`version: ${version}`)
 
 const { platform, arch } = process
