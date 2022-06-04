@@ -3,6 +3,7 @@
 // then run the playwright test, effective download function
 const fs = require('fs')
 const path = require('path')
+
 const copyModule = async () => {
   ['webtorrent', '@videojs'].forEach(dep => {
     const src = path.resolve(__dirname, 'node_modules', dep)
@@ -27,10 +28,24 @@ const copyModule = async () => {
 }
 const copyVersionJSON = async () => {
   const src = path.resolve(__dirname, 'public/version.json')
-  const dest = path.resolve(__dirname, 'node_modules/@zeeis/velectron/dist/resources/version.json')
+  const dest = path.resolve(__dirname, 'version.json')
   // console.log('src:' + src)
   // console.log('dest:' + dest)
   fs.copyFileSync(src, dest)
 }
-copyVersionJSON()
-copyModule()
+const deleteVersionJSON = async () => {
+  fs.unlink(path.resolve(__dirname, 'version.json'), (err) => {
+    if (err) throw err;
+    console.log('version.json was deleted');
+  })
+}
+
+if (process.argv.includes('--pre')) {
+  console.log('run copy-patch.js --pre')
+  copyVersionJSON()
+  copyModule()
+} else if(process.argv.includes('--post')) {
+  console.log('run copy-patch.js --post')
+  deleteVersionJSON()
+}
+
