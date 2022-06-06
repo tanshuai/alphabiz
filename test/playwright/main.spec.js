@@ -302,6 +302,8 @@ test.describe('task', () => {
     await window.waitForTimeout(1000)
     await basePage.jumpPage('downloadedStatus')
     await homePage.uploadAllBtn.click()
+    await window.waitForLoadState()
+    await window.waitForTimeout(1000)
     await basePage.jumpPage('uploadingStatus')
     await homePage.searchBtn.click({ force: true })
     // 确保切换到卡片模式
