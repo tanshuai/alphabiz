@@ -112,18 +112,30 @@ Cypress.Commands.add('signIn', (username, password, { cacheSession = true } = {}
     cy.contains('Password').type('{selectall}{backspace}').type(Cypress.env(password), { log: false })
     cy.get('.q-card__actions').contains('Sign in').click()
     // wait page jump
-    cy.get('.q-notification__message', { timeout: 60000 * 2 }).should('be.visible').then($header => {
-      const text = $header.text()
-      cy.log(text)
-      cy.task('log', 'alert:' + text)
-      if (/There is a problem with the network, please try again later/.test(text) ||
-        /Pending sign-in attempt already in progress/.test(text) ||
-        /reCAPTCHA verification error/.test(text)) {
-        cy.log('text is There is a problem with the network')
-        cy.get('.q-notification__message', { timeout: 60000 }).should('not.be.visible')
-        cy.get('.q-card__actions').contains('Sign in').click()
+    cy.get('.q-notification__message', { timeout: 60000 * 2 }).should('be.visible')
+    cy.get('body').then($body => {
+      if ($body.find('.q-notification__message').length > 0) {
+        // evaluates as true if button exists at all
+        cy.get('.q-notification__message').then($header => {
+          if ($header.is(':visible')) {
+            // you get here only if button EXISTS and is VISIBLE
+            const text = $header.text()
+            cy.log(text)
+            cy.task('log', 'alert:' + text)
+            if (/There is a problem with the network, please try again later/.test(text) ||
+              /Pending sign-in attempt already in progress/.test(text) ||
+              /reCAPTCHA verification error/.test(text)) {
+              cy.log('text is There is a problem with the network')
+              cy.get('.q-notification__message', { timeout: 60000 * 2 }).should('not.be.visible')
+              cy.get('.q-card__actions').contains('Sign in').click()
+            } else {
+              cy.log('text is not network')
+            }
+          }
+        })
       } else {
-        cy.log('text is not network')
+        // you get here if the button DOESN'T EXIST
+        assert.isOk('everything', 'everything is OK')
       }
     })
     cy.get('.q-notification__message', { timeout: 60000 * 2 }).should('have.text', 'Signed in')
@@ -154,7 +166,13 @@ Cypress.Commands.add('signIn', (username, password, { cacheSession = true } = {}
   }
 })
 Cypress.Commands.add('signOut', () => {
-  cy.get('[aria-label="Menu"]').click()
+  cy.get('.left-drawer-header').then(($el) => {
+    const isVisible = Cypress.dom.isVisible($el)
+    cy.log('isVisible' + isVisible)
+    if (!isVisible) {
+      cy.get('[aria-label="Menu"]').click()
+    } // true
+  })
   cy.contains('more_horiz').click()
   cy.get("[data-cy='sign-out-btn']").click()
   cy.contains('Sign out anyway').then(($element) => {
