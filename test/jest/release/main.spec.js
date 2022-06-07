@@ -74,8 +74,6 @@ describe('upload', () => {
     expect(await homePage.getPageTitle()).toBe('Uploading')
     await homePage.jumpPage('downloadedStatusTab')
     expect(await homePage.getPageTitle()).toBe('Downloaded')
-    await homePage.jumpPage('settingsLink', 'accountLink')
-    expect(await homePage.getPageTitle()).toBe('Advanced')
   })
   it('Switch to Simplified Chinese', async () => {
     await homePage.jumpPage('settingsLink', 'basicLink')
