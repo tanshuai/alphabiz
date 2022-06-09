@@ -1,6 +1,7 @@
-corner menu
-fix: upload tasks always regenerate ab uri
-remove old setting file
-separate version.json in build
-refact: set file associations with each extname #171 #142
-temporary recovery
+fix get version in browser
+use private repo for internal channel
+fix select component keyname
+try release
+try fix public repo electron test
+refact: add default settings for web mode, add disk check option #171 #190
+Unify the Workflow file structure #8
