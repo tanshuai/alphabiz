@@ -20,7 +20,7 @@ function datestring () {
 
 /**
  * @function makeid
- * @description  Generate email - [random number]@message.to
+ * @description  Generate email - [random number]@email.domain
  * @param length
  * @return { string } email
  */
@@ -31,8 +31,7 @@ function makeid (length) {
   for (var i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength))
   }
-  // console.log(result + '@message.to')
-  return result + '@message.to'
+  return result
 }
 
 // 获取email

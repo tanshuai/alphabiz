@@ -36,7 +36,7 @@ describe('upload', () => {
     console.log('concerText:' + concerText)
     if ((/Want to Join/).test(concerText)) {
       // 未登录
-      await accountPage.signIn('+8613530474220', process.env.TEST_PASSWORD, 1)
+      await accountPage.signIn('+86' + process.env.TEST3_PHONE_NUMBER, process.env.TEST_PASSWORD, 1)
     } else {
       // 已登陆,等待拉取数据
       await client.$('//*[@Name="Settings"]').click()
