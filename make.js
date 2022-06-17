@@ -5,7 +5,7 @@ const { productName, description } = require('./package.json')
 const publicVersion = require('./public/version.json').version
 const versionHeader = publicVersion.match(/\d+\.\d+\.\d+/gm)
 const pkgVersion = require('./public/version.json').packageVer
-console.log('test version', pkgVersion, publicVersion, versionHeader[0])
+
 const readline = require('readline')
 const { copySync } = require('fs-extra')
 

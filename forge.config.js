@@ -3,8 +3,7 @@ const fs = require('fs')
 const { resolve } = require('path')
 const { default: rebuild } = require('electron-rebuild')
 
-const { name, description, author, productName } = package
-const version = require('./public/version.json').packageVer
+const { name, version, description, author, productName } = package
 const icoPath = resolve(__dirname, 'public/platform-assets/windows/icon.ico')
 const wixLangPath = resolve(__dirname, 'wix/localizations')
 // Add localization files here
