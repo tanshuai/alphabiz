@@ -1,8 +1,5 @@
-try update node-gyp version
-bug fix
-remove cached version.json
-try update node-gyp on push.yml
-add icon in control panel
-resolve #171
-use worker_threads for heavy works #199
-fix regex match release-name
+add parallel non-blocking test #194
+try fast release version
+fix tag name error
+use multi workers #199
+modify playwright test
