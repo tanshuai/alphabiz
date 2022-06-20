@@ -68,6 +68,13 @@ jobs:
       - name: download the latest releases of all platforms 🧪
         run: yarn test:e2e:download-stable
 
+      - name: Upload Test Results 🗃
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: "${{ matrix.os }}-output"
+          path: test/output/**
+
   win_job:
     runs-on: ${{ matrix.os }}
     strategy:
