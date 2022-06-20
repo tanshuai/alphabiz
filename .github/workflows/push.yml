@@ -227,7 +227,10 @@ jobs:
         run: |
           unset REPO
           if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
-          then yarn node update-version.js ${{ steps.unify.outputs.tag-name }} ${{ steps.slug.outputs.sha7 }} ; \
+          then if ${{ contains(steps.checkout.outputs.new-tag-name, 'nightly') }} ; \
+               then yarn node update-version.js ${{ steps.unify.outputs.tag-name }} ${{ steps.slug.outputs.sha7 }} ; \
+               else yarn node update-version.js ${{ steps.unify.outputs.tag-name }} ${{ steps.slug.outputs.sha7 }} --stable; \
+               fi
           fi
           export BUILD_VERSION=${{ steps.unify.outputs.tag-name }}
           yarn packager
