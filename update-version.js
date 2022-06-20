@@ -58,7 +58,7 @@ const getSourceCommit = async () => {
         console.error(`Error from Git: ${stderr}`)
         return
       }
-    const sha7 = /(?<=-)\w{7}(?=\s)|^\w{7}(?=\s)/.exec(stdout.trim())
+    const sha7 = /(?<=-)\w{7}(?=\s)|^\w{7}(?=\s)|^\w{7}/.exec(stdout.trim())
     resolve(sha7[0])
     })
   })
