@@ -77,7 +77,7 @@ jobs:
 
       - name: Install alphabiz.msi
         run: |
-          Start-Process msiexec -ArgumentList "/quiet","/i","C:\alphabiz.msi"
+          Start-Process msiexec -ArgumentList "/quiet","/i","alphabiz.msi"
           Start-Sleep -s 20
         shell: powershell
 
