@@ -19,6 +19,7 @@
     "test:e2e:ci": "cross-env E2E_TEST=true start-test \"http-server build/spa -s/\" http-get://localhost:8080 \"cypress run --config-file test/cypress/cypress-config.json --browser chrome\"",
     "test:e2e:electron": "xvfb-maybe -- playwright test test/playwright/main.spec.js",
     "test:e2e:electron:download": "xvfb-maybe -- playwright test test/playwright/download.spec.js",
+    "test:e2e:download-stable": "xvfb-maybe -- yarn playwright test test/playwright/downloadLatestReleases.spec.js",
     "test:appium": "appium --log ./test/output/release/appium.log",
     "test:release": "jest test/jest/release/main.spec.js --c=./test/jest/release/jest.config.js",
     "test:release:creditsUpload": "jest test/jest/release/creditsUpload.spec.js --c=./test/jest/release/jest.config.js",
