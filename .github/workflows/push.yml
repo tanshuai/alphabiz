@@ -103,7 +103,7 @@ jobs:
       # need convert to a single line,then get property use fromJson().property
       - name: Get release.json property
         id: release
-        if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
+        if: contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
           content=`cat ./release.json`
           content="${content//'%'/'%25'}"
@@ -132,7 +132,7 @@ jobs:
         id: nightly
         run: |
           echo "::set-output name=commit-version::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /(?<=v)\d+\.\d+\.\d+/g')"
-          echo "::set-output name=commit-date::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /(?<=-)\d{8,12}(?=-)/g')"
+          echo "::set-output name=commit-date::$(set TZ=UTC-8 && git log -1 --date=format-local:"%Y%m%d%H%M" --format="%cd")"
           echo "::set-output name=commit-sha7::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /(?<=-)\w{7}(?=\s)|^\w{7}(?=\s)/g')"
           echo "::set-output name=commit-message::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /\d{8,12}-\w+/g')"
           export DESCRIBE=$(cat github-describe/github-describe.txt)
@@ -140,8 +140,6 @@ jobs:
           echo "DESCRIBE<<EOF" >> $GITHUB_ENV
           echo "$DESCRIBE" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
-          echo "contains(env.MODIFIED_FILE_LIST, 'release.json')"
-          echo "${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }}"
         shell: bash
 
       # This step for unify the tag name
