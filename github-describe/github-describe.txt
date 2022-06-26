@@ -2,6 +2,11 @@ try yarn in windows
 fix: workers not working in production mode
 try use node_gyp8.4.1
 fast release
+bug fixed
 update public repo GitHub Describe
 save github-describe
 fix identifier  error
+fix migrate error
+modify the Sequence of steps
+use map for torrent store, use faster update function #199
+pause tasks if disk space is not enough #190
