@@ -6,7 +6,7 @@ name: CI/CT for each push && nightly
 
 on:
   schedule:
-    - cron: "00 12 * * *"
+    - cron: "30 1 * * *"
   pull_request:
   push:
     paths:
@@ -132,7 +132,7 @@ jobs:
         id: nightly
         run: |
           echo "::set-output name=commit-version::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /(?<=v)\d+\.\d+\.\d+/g')"
-          echo "::set-output name=commit-date::$(set TZ=UTC-8 && git log -1 --date=format-local:"%Y%m%d%H%M" --format="%cd")"
+          echo "::set-output name=commit-date::$(TZ=UTC-8 git log -1 --date=format-local:"%Y%m%d%H%M" --format="%cd")"
           echo "::set-output name=commit-sha7::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /(?<=-)\w{7}(?=\s)|^\w{7}(?=\s)/g')"
           echo "::set-output name=commit-message::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /\d{8,12}-\w+/g')"
           export DESCRIBE=$(cat github-describe/github-describe.txt)
