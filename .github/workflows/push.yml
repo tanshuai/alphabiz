@@ -6,7 +6,7 @@ name: CI/CT for each push && nightly
 
 on:
   schedule:
-    - cron: "30 1 * * *"
+    - cron: "00 2 * * *"
   pull_request:
   push:
     paths:
