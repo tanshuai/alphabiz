@@ -55,5 +55,42 @@ jobs:
         run: |
           TZ=UTC-8 git log -10 --date=format-local:"%Y%m%d%H%M" --format="%cd"
           echo "--------------------------"
-
         shell: bash
+
+      - name: Install dependencies 👨🏻‍💻
+        run: |
+          yarn || (echo "===== yarn Attempt: 2 ====" && yarn)
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PAT }}
+          GITHUB_PAT: ${{ secrets.PAT }}
+
+      - name: Install UnPackaged 👨🏻‍💻
+        run: |
+          yarn unpackaged || (echo "===== yarn unpackaged Attempt: 2 ====" && yarn unpackaged)
+        shell: bash
+
+      - name: Run electron-packager
+        if: contains(github.event.head_commit.message, 'run packager')
+        id: packager
+        run: |
+          yarn packager
+        shell: bash
+
+      - name: Install winappdriver.msi
+        if: matrix.os == 'windows-2022' && steps.packager.outcome == 'success'
+        run: |
+          Invoke-WebRequest "https://github.com/microsoft/WinAppDriver/releases/download/v1.2.1/WindowsApplicationDriver_1.2.1.msi" -OutFIle "C:\WindowsApplicationDriver_1.2.1.msi"
+          Start-Process msiexec -ArgumentList "/quiet","/x","{087BBF93-D9E3-4D27-BDBE-9C702E0066FC}" -Verb runAs -Wait
+          Start-Process msiexec -ArgumentList "/quiet","/i","C:\WindowsApplicationDriver_1.2.1.msi" -Verb runAs -Wait
+          Start-Sleep -s 5
+        shell: powershell
+
+      - name: Run appium
+        if: matrix.os == 'windows-2022' && steps.packager.outcome == 'success'
+        run: |
+          Start-Process PowerShell -ArgumentList "yarn test:appium"
+          Start-Sleep -s 10
+
+      - name: Run release test 🧪
+        if: matrix.os == 'windows-2022' && steps.packager.outcome == 'success'
+        run: yarn test:release
