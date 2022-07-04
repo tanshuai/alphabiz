@@ -57,6 +57,30 @@ jobs:
           echo "--------------------------"
         shell: bash
 
+      - name: Setup Node.js ${{ matrix.node-version }} 📮
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "yarn"
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@zeeis"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PAT }}
+
+      - name: update node-gyp on Linux and macOS
+        if: matrix.os != 'windows-2022'
+        shell: bash
+        run: |
+          npm install --global node-gyp@8.4.1
+          npm config set node_gyp $(npm prefix -g)/lib/node_modules/node-gyp/bin/node-gyp.js
+
+      - name: update node-gyp on windows to support Visual Studio 2019
+        if: matrix.os == 'windows-2022'
+        shell: powershell
+        run: |
+          npm install --global node-gyp@8.4.1
+          npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
+
       - name: Install dependencies 👨🏻‍💻
         run: |
           yarn || (echo "===== yarn Attempt: 2 ====" && yarn)
