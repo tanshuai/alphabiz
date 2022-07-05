@@ -222,6 +222,7 @@ jobs:
 
       - name: Run electron-packager
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
+        id: packager
         run: |
           unset REPO
           if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
@@ -233,6 +234,25 @@ jobs:
           export BUILD_VERSION=${{ steps.unify.outputs.tag-name }}
           yarn packager
         shell: bash
+
+      - name: Install winappdriver.msi
+        if: matrix.os == 'windows-2022' && steps.packager.outcome == 'success' && !contains(github.event.head_commit.message, 'skip e2e')
+        run: |
+          Invoke-WebRequest "https://github.com/microsoft/WinAppDriver/releases/download/v1.2.1/WindowsApplicationDriver_1.2.1.msi" -OutFIle "C:\WindowsApplicationDriver_1.2.1.msi"
+          Start-Process msiexec -ArgumentList "/quiet","/x","{087BBF93-D9E3-4D27-BDBE-9C702E0066FC}" -Verb runAs -Wait
+          Start-Process msiexec -ArgumentList "/quiet","/i","C:\WindowsApplicationDriver_1.2.1.msi" -Verb runAs -Wait
+          Start-Sleep -s 5
+        shell: powershell
+
+      - name: Run appium
+        if: matrix.os == 'windows-2022' && steps.packager.outcome == 'success' && !contains(github.event.head_commit.message, 'skip e2e')
+        run: |
+          Start-Process PowerShell -ArgumentList "yarn test:appium"
+          Start-Sleep -s 10
+
+      - name: e2e test for release 🧪
+        if: matrix.os == 'windows-2022' && steps.packager.outcome == 'success' && !contains(github.event.head_commit.message, 'skip e2e')
+        run: yarn test:release
 
       - name: Package for ${{ matrix.os }}-${{ steps.unify.outputs.package-name }} Release 🗜️
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
