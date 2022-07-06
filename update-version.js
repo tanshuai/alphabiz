@@ -10,16 +10,19 @@ const releaseObj = require(releaseJSON)
 const unpackagedVersionJSON = fs.readFileSync('build/electron/UnPackaged/version.json')
 const unpackagedVersionObj = JSON.parse(unpackagedVersionJSON)
 const content = {
-    packageVer: '',
-    channel: '',
-    buildTime: '',
-    buildCommit: '',
-    sourceCommit: '',
-    version: ''
+  packageVer: '',
+  channel: '',
+  buildTime: '',
+  buildCommit: '',
+  sourceCommit: '',
+  version: ''
 }
 const getBuildTime = async () => {
   return new Promise((resolve, reject) => {
-    exec('set TZ=UTC-8 && git log -1 --date=format-local:"%Y%m%d%H%M" --format="%cd"', (error, stdout, stderr) => {
+    let command
+    if (process.platform === 'win32') command = 'set TZ=UTC-8 && git log -1 --date=format-local:"%Y%m%d%H%M" --format="%cd"'
+    else command = 'TZ=UTC-8 git log -1 --date=format-local:"%Y%m%d%H%M" --format="%cd"'
+    exec(command, (error, stdout, stderr) => {
     if (error) {
       console.error(`exec error: ${error}`)
       return
@@ -71,7 +74,6 @@ const updateVersionJSON = async () => {
   if (!process.argv[3]) content.buildCommit = await getCommit()
   else content.buildCommit = process.argv[3]
   content.sourceCommit = await getSourceCommit()
-  
   // 如果正式发布,则从argv传入新的tagname format: node update-version.js [newTagName] [newSHA7]
   if (!process.argv[2]){
     content.channel = 'nightly'
@@ -81,11 +83,8 @@ const updateVersionJSON = async () => {
     else content.channel = 'nightly'
     content.version = process.argv[2]
   }
-  
-  
   const data = JSON.stringify(content, null, 2)
   fs.writeFileSync(versionJSON, data)
 }
 
 updateVersionJSON()
-

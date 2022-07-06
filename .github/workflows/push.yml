@@ -34,6 +34,7 @@ jobs:
       EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
       PHONE_NUMBER_ACCOUNT: ${{ secrets.PHONE_NUMBER_ACCOUNT }}
       PHONE_NUMBER_TOKEN: ${{ secrets.PHONE_NUMBER_TOKEN }}
+      TEST_EMAIL_DOMAIN: ${{ secrets.TEST_EMAIL_DOMAIN }}
       TEST1_EMAIL: ${{ secrets.TEST1_EMAIL }}
       TEST2_EMAIL: ${{ secrets.TEST2_EMAIL }}
       TEST3_EMAIL: ${{ secrets.TEST3_EMAIL }}
