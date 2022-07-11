@@ -280,7 +280,7 @@ test.describe('download ', () => {
       }
     })
   }
-  test('table mode task lists', async () => {
+  test.skip('table mode task lists', async () => {
     // 确保下载的全部种子都在做种状态
     // await commands.jumpPage('downloadedStatus')
 
