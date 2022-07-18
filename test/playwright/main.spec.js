@@ -464,7 +464,7 @@ test.describe('account', () => {
   //   }
   // ]
   test('transfer - check bill details', async () => {
-    test.setTimeout(60000 * 1)
+    test.setTimeout(60000 * 5)
     let from
     let to
     if (process.platform === 'win32') {
