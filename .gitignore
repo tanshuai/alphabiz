@@ -104,11 +104,9 @@ dist
 .tern-port
 
 public/version.json
- 
-# test file
 
-test/samples/IMDB250-item-list.xls
-test/samples/douban250-item-list.xls
+# test file
+test/samples
 test-results/
 playwright-report/
 test/download/**
