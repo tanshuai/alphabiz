@@ -83,7 +83,7 @@ jobs:
           git fetch --prune --unshallow
           echo "::set-output name=date::$(git log -1 --date=format:'%Y%m%d' --author="Alphabiz-Team" --format='%cd')"
           echo "::set-output name=event-name::${{ github.event_name }}"
-          echi "::set-output name=download-tag::$(git describe --tags --abbrev=0)"
+          echo "::set-output name=download-tag::$(git describe --tags --abbrev=0)"
           if [[ ${{ matrix.os }} = "ubuntu-latest" ]] ; \
           then echo "::set-output name=system::ubuntu" ; \
                echo "::set-output name=package::Alphabiz-linux-x64" ; \
