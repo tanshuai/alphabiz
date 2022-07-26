@@ -12,7 +12,7 @@ class Commands {
     this.creditsLink = page.locator('text=CreditsCheck Account Balance')
     this.settingsLink = page.locator('text=settingsSettings')
     this.basicLink = page.locator('text=Basic Basic Settings')
-    this.advancedLink = page.locator('text=Advanced Advanced')
+    this.advancedLink = page.locator('text=AdvancedAdvanced')
     this.developmentLink = page.locator('text=developer_modeDevelopment Developer Mode for Internal Use')
     this.accountLink = page.locator('.corner')
     this.accountSignUp = page.locator('button:has-text("Sign up")')
