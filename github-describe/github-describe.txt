@@ -1,1 +1,2 @@
-fix bugs of sorting and uploadSpeed
+fix fs.rmSync in low node version
+fix upload error
