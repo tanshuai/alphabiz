@@ -15,6 +15,9 @@ jobs:
   build-1:
     timeout-minutes: 60
     runs-on: ${{ matrix.os }}
+    outputs:
+      output1: ${{ steps.vars.outputs.tag-name }}
+      output2: ${{ steps.check.outputs.isRunAppium }}
     strategy:
       matrix:
         # os: [ubuntu-latest, windows-latest, macos-latest]
@@ -55,7 +58,21 @@ jobs:
         run: |
           TZ=UTC-8 git log -10 --date=format-local:"%Y%m%d%H%M" --format="%cd"
           echo "--------------------------"
+          echo "::set-output name=tag-name::0.1.0-nightly-202203171916"
         shell: bash
+
+      - name: Check ${{ steps.vars.outputs.tag-name }}
+        id: check
+        run: |
+          echo "${{ steps.vars.outputs.tag-name }}"
+          if [[ ${{ steps.packager.outcome }} == 'success' ]] ; \
+          then echo "::set-output name=isRunAppium::1"
+          else echo "::set-output name=isRunAppium::0"
+          fi
+
+      - name: Check isRunAppium = ${{ steps.check.outputs.isRunAppium }}
+        run: |
+          echo "${{ steps.check.outputs.isRunAppium }}"
 
       - name: Setup Node.js ${{ matrix.node-version }} 📮
         uses: actions/setup-node@v2
@@ -119,21 +136,22 @@ jobs:
       #   if: matrix.os == 'windows-2022' && steps.packager.outcome == 'success'
       #   run: yarn test:release
 
-  test-1:
+  appium-test:
     needs: build-1
+    if: needs.build-1.outputs.output2
     timeout-minutes: 60
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         # os: [ubuntu-latest, windows-latest, macos-self-hosted]
-        build: [1, 2]
+        test: [1, 2]
         node-version: [14]
-        os: [windows-2022, windows-2022]
+        os: [windows-2022]
         include:
-          - build: 1
+          - test: 1
             os: windows-2022
 
-          - build: 2
+          - test: 2
             os: windows-2022
 
     environment:
@@ -154,16 +172,48 @@ jobs:
       TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
       TEST_RESET_PASSWORD: ${{ secrets.TEST_RESET_PASSWORD }}
     steps:
-      - name: build-1 Get short SHA 🔑
-        if: matrix.build == '1'
+      - name: test-1 Get short SHA 🔑
+        if: matrix.test == '1'
         run: |
           echo "::set-output name=sha7::${GITHUB_SHA::7}"
-          echo "build-1"
+          echo "test-1"
         shell: bash
 
       - name: build-2 Get short SHA 🔑
-        if: matrix.build == '2'
+        if: matrix.test == '2'
         run: |
           echo "::set-output name=sha7::${GITHUB_SHA::7}"
-          echo "build-2"
+          echo "test-2"
         shell: bash
+
+      - name: update node-gyp on windows to support Visual Studio 2019
+        if: matrix.os == 'windows-2022'
+        shell: powershell
+        run: |
+          npm install --global node-gyp@8.4.1
+          npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
+
+      - name: Install Alphabiz
+        run: |
+          curl -L https://github.com/tanshuai/alphabiz/releases/download/${{needs.build-1.outputs.output1}}/alphabiz-${{needs.build-1.outputs.output1}}-windows.7z > alphabiz.7z
+          7z x alphabiz.7z
+        shell: bash
+
+      - name: Install winappdriver.msi
+        if: matrix.os == 'windows-2022' && steps.packager.outcome == 'success' && !contains(github.event.head_commit.message, 'skip e2e')
+        run: |
+          Invoke-WebRequest "https://github.com/microsoft/WinAppDriver/releases/download/v1.2.1/WindowsApplicationDriver_1.2.1.msi" -OutFIle "C:\WindowsApplicationDriver_1.2.1.msi"
+          Start-Process msiexec -ArgumentList "/quiet","/x","{087BBF93-D9E3-4D27-BDBE-9C702E0066FC}" -Verb runAs -Wait
+          Start-Process msiexec -ArgumentList "/quiet","/i","C:\WindowsApplicationDriver_1.2.1.msi" -Verb runAs -Wait
+          Start-Sleep -s 5
+        shell: powershell
+
+      - name: Run appium
+        if: matrix.os == 'windows-2022' && steps.packager.outcome == 'success' && !contains(github.event.head_commit.message, 'skip e2e')
+        run: |
+          Start-Process PowerShell -ArgumentList "yarn test:appium"
+          Start-Sleep -s 10
+
+      - name: e2e test for release 🧪
+        if: matrix.os == 'windows-2022' && steps.packager.outcome == 'success' && !contains(github.event.head_commit.message, 'skip e2e')
+        run: yarn test:release
