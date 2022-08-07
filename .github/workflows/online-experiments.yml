@@ -155,15 +155,15 @@ jobs:
       TEST_RESET_PASSWORD: ${{ secrets.TEST_RESET_PASSWORD }}
     steps:
       - name: build-1 Get short SHA 🔑
-        id: slug
         if: matrix.build == '1'
         run: |
           echo "::set-output name=sha7::${GITHUB_SHA::7}"
+          echo "build-1"
         shell: bash
 
       - name: build-2 Get short SHA 🔑
-        id: slug
         if: matrix.build == '2'
         run: |
           echo "::set-output name=sha7::${GITHUB_SHA::7}"
+          echo "build-2"
         shell: bash
