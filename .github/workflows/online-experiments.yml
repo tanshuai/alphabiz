@@ -79,6 +79,7 @@ jobs:
         id: check
         run: |
           echo "${{ steps.vars.outputs.tag-name }}"
+          echo "isRunAppium: ${{ steps.vars.outputs.isRunAppium }}"
         shell: bash
 
       - name: Setup Node.js ${{ matrix.node-version }} 📮
@@ -146,12 +147,11 @@ jobs:
 
   appium-test:
     needs: build-1
-    if: contains(needs.build-1.outputs.output2, '1')
+    if: contains(needs.build-1.outputs.output2, '0')
     timeout-minutes: 60
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        # os: [ubuntu-latest, windows-latest, macos-self-hosted]
         test: [1, 2]
         node-version: [14]
         os: [windows-2022]
