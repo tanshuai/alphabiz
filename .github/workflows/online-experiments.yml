@@ -143,7 +143,6 @@ jobs:
       # - name: Run release test 🧪
       #   if: matrix.os == 'windows-2022' && steps.packager.outcome == 'success'
       #   run: yarn test:release
-      # contains(github.event_name, 'schedule') ||
 
   appium-test:
     needs: build-1
