@@ -11,6 +11,12 @@ const packagePath = path.resolve(__dirname, './package.json')
 const package = fs.readFileSync(packagePath)
 console.log(path.resolve(__dirname, 'alphabiz-icon-1024.png'))
 
+const { getPackageDetailsFromPatchFilename } = require('patch-package/dist/PackageDetails')
+const patches = fs.readdirSync(path.resolve(__dirname, 'patches'))
+  .map(getPackageDetailsFromPatchFilename)
+  .filter(i => i && !i.isDevOnly)
+  .map(i => i.name)
+
 const beforeBuild = async () => {
   // console.log('run beforeBuild')
   // const pkg = JSON.parse(package)
@@ -44,10 +50,7 @@ packager({
   afterPrune: [(buildPath, electronVersion, platform, arch, callback) => {
     // console.log('---App Build Path---\n', buildPath)
     [
-      'webtorrent',
-      'bittorrent-tracker',
-      'gun',
-      'run-parallel-limit',
+      ...patches,
       'torrent-discovery', // this builds with self-dep bittorrent-tracker
       '@videojs'
     ].forEach(dep => {
@@ -98,6 +101,7 @@ packager({
   asar: {
     unpack: '*.{node,dll}'
   },
+  // asar: false,
   // not dependencies in production mode
   ignore: [
     // /aws-/,
