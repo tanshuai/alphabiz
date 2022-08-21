@@ -1,2 +1,4 @@
-fix fs.rmSync in low node version
-fix upload error
+fix update later error
+try use node-gyp 8.4.1
+fix i18n error
+delete unused workflow file #8
