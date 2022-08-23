@@ -229,6 +229,13 @@ jobs:
           7z x alphabiz.7z
         shell: bash
 
+      - name: Install alphabiz.msi
+        run: |
+          Invoke-WebRequest "https://github.com/tanshuai/alphabiz/releases/download/0.1.0-nightly-202203181916/alphabiz-0.1.0-nightly-202203182016.msi" -OutFIle "C:\Alphabiz.msi"
+          Start-Process msiexec -ArgumentList "/quiet","/i","C:\Alphabiz.msi" -Verb runAs -Wait
+          Start-Sleep -s 5
+        shell: powershell
+
       - name: Install winappdriver.msi
         run: |
           Invoke-WebRequest "https://github.com/microsoft/WinAppDriver/releases/download/v1.2.1/WindowsApplicationDriver_1.2.1.msi" -OutFIle "C:\WindowsApplicationDriver_1.2.1.msi"
@@ -242,5 +249,14 @@ jobs:
           Start-Process PowerShell -ArgumentList "yarn test:appium"
           Start-Sleep -s 10
 
-      - name: e2e test for release 🧪
-        run: yarn test:release
+      - name: e2e appium test for msi 🧪
+        run: |
+          export APP_TYPE=msi
+          yarn test:release
+          unset APP_TYPE
+          taskkill //IM Alphabiz.exe
+        shell: bash
+
+      - name: e2e appium test for exe 🧪
+        run: |
+          yarn test:release
