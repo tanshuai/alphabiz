@@ -1,6 +1,12 @@
 // const path = require('path')
-const AlphabizAppPath = require('../../../test.config.js').AlphabizAppPath
-
+let AlphabizAppPath
+if (process.env.APP_TYPE === 'msi') {
+  AlphabizAppPath = require('../../../test.config.js').AlphabizAppMSIPath
+  console.log('APP_TYPE = msi,AlphabizAppPath: ' + AlphabizAppPath)
+} else {
+  AlphabizAppPath = require('../../../test.config.js').AlphabizAppPath
+  console.log('APP_TYPE = exe,AlphabizAppPath: ' + AlphabizAppPath)
+}
 // const AlphabizAppPath = path.resolve(__dirname, '../../../dist/electron/Alphabiz-win32-x64/Alphabiz.exe')
 export const opts = {
   path: '/wd/hub',
