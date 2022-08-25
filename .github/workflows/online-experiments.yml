@@ -152,6 +152,7 @@ jobs:
     timeout-minutes: 60
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         test: [1, 2]
         node-version: [14]
@@ -229,18 +230,21 @@ jobs:
           7z x alphabiz.7z
         shell: bash
 
+      - name: Download msi and exe
+        run: |
+          curl -L https://github.com/tanshuai/alphabiz/releases/download/0.1.0-nightly-202203181916/alphabiz-0.1.0-nightly-202203182016.exe > C:/Alphabiz.exe
+          curl -L https://github.com/tanshuai/alphabiz/releases/download/0.1.0-nightly-202203181916/alphabiz-0.1.0-nightly-202203182016.msi > C:/Alphabiz.msi
+        shell: bash
+
       - name: Install alphabiz.exe
         run: |
-          Invoke-WebRequest "https://github.com/tanshuai/alphabiz/releases/download/0.1.0-nightly-202203181916/alphabiz-0.1.0-nightly-202203182016.exe" -OutFIle "C:\Alphabiz.exe"
-          echo "download complete and install begin"
           Start-Process -FilePath "C:\Alphabiz.exe" -ArgumentList '/S','/v','/qn' -passthru
-          Start-Sleep -s 5
+          Start-Sleep -s 20
+          taskkill /f /im Alphabiz.exe
         shell: powershell
 
       - name: Install alphabiz.msi
         run: |
-          Invoke-WebRequest "https://github.com/tanshuai/alphabiz/releases/download/0.1.0-nightly-202203181916/alphabiz-0.1.0-nightly-202203182016.msi" -OutFIle "C:\Alphabiz.msi"
-          echo "download complete and install begin"
           Start-Process msiexec -ArgumentList "/quiet","/i","C:\Alphabiz.msi"
         shell: powershell
 
