@@ -286,6 +286,7 @@ jobs:
     timeout-minutes: 60
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         test: [1, 2]
         node-version: [14]
@@ -356,11 +357,28 @@ jobs:
       - name: Install dependencies 👨🏻‍💻
         run: yarn
 
-      - name: Install Alphabiz
+      - name: Install Alphabiz.7z
         run: |
           curl -L https://github.com/tanshuai/alphabiz/releases/download/${{needs.nightly_job.outputs.output1}}/alphabiz-${{needs.nightly_job.outputs.output1}}-windows.7z > alphabiz.7z
           7z x alphabiz.7z
         shell: bash
+
+      - name: Download msi and exe
+        run: |
+          curl -L https://github.com/tanshuai/alphabiz/releases/download/${{needs.nightly_job.outputs.output1}}/alphabiz-${{needs.nightly_job.outputs.output1}}.exe > C:/Alphabiz.exe
+          curl -L https://github.com/tanshuai/alphabiz/releases/download/${{needs.nightly_job.outputs.output1}}/alphabiz-${{needs.nightly_job.outputs.output1}}.msi > C:/Alphabiz.msi
+        shell: bash
+
+      - name: Install Alphabiz.exe
+        run: |
+          Start-Process -FilePath "C:\Alphabiz.exe" -ArgumentList '/S','/v','/qn' -passthru
+          Start-Sleep -s 20
+          taskkill /f /im Alphabiz.exe
+        shell: powershell
+
+      - name: Install Alphabiz.msi
+        run: Start-Process msiexec -ArgumentList "/quiet","/i","C:\Alphabiz.msi"
+        shell: powershell
 
       - name: Install winappdriver.msi
         run: |
@@ -375,5 +393,21 @@ jobs:
           Start-Process PowerShell -ArgumentList "yarn test:appium"
           Start-Sleep -s 10
 
-      - name: e2e test for release 🧪
+      - name: E2E appium test for msi 🧪
+        run: |
+          export APP_TYPE=msi
+          yarn test:release
+          unset APP_TYPE
+          taskkill //F //IM Alphabiz.exe
+        shell: bash
+
+      - name: E2E appium test for exe 🧪
+        run: |
+          export APP_TYPE=exe
+          yarn test:release
+          unset APP_TYPE
+          taskkill //F //IM Alphabiz.exe
+        shell: bash
+
+      - name: E2E appium test for 7z 🧪
         run: yarn test:release
