@@ -6,8 +6,7 @@ if (process.env.APP_TYPE === 'msi') {
 } else if (process.env.APP_TYPE === 'exe') {
   AlphabizAppPath = require('../../../test.config.js').AlphabizAppEXEPath
   console.log('APP_TYPE = 7z,AlphabizAppPath: ' + AlphabizAppPath)
-}
-else {
+} else {
   AlphabizAppPath = require('../../../test.config.js').AlphabizAppPath
   console.log('APP_TYPE = 7z,AlphabizAppPath: ' + AlphabizAppPath)
 }
