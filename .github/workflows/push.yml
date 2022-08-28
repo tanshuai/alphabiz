@@ -11,7 +11,7 @@ on:
   push:
     paths:
       - "**.js"
-      - "**/push.yml"
+      - "!**/push.yml"
       - "build/**"
       - "release.json"
     branches: [main]
@@ -395,6 +395,7 @@ jobs:
 
       - name: E2E appium test for msi 🧪
         run: |
+          taskkill //F //IM Alphabiz.exe
           export APP_TYPE=msi
           yarn test:release
           unset APP_TYPE
