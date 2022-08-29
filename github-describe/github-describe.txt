@@ -1,4 +1,3 @@
-fix update later error
-try use node-gyp 8.4.1
-fix i18n error
-delete unused workflow file #8
+modify appium test
+trigger push.yml
+add test path \ skip e2e
