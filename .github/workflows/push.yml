@@ -246,11 +246,11 @@ jobs:
         run: |
           if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
           then if ${{ contains(steps.checkout.outputs.new-tag-name, 'nightly') }} ; \
-               then yarn node update-version.js ${{ steps.unify.outputs.tag-name }} ${{ steps.slug.outputs.sha7 }} ; \
-               else yarn node update-version.js ${{ steps.unify.outputs.tag-name }} ${{ steps.slug.outputs.sha7 }} --stable; \
+               then yarn node update-version.js --newTag ${{ steps.unify.outputs.tag-name }} --SHA7 ${{ steps.slug.outputs.sha7 }} --buildTime ${{ steps.nightly.outputs.commit-date }} ; \
+               else yarn node update-version.js --newTag ${{ steps.unify.outputs.tag-name }} --SHA7 ${{ steps.slug.outputs.sha7 }} --buildTime ${{ steps.nightly.outputs.commit-date }} --stable; \
                fi
+          else yarn node update-version.js --buildTime ${{ steps.nightly.outputs.commit-date }} ; \
           fi
-          export BUILD_VERSION=${{ steps.unify.outputs.tag-name }}
           yarn packager
         shell: bash
 
