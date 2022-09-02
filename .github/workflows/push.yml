@@ -372,7 +372,7 @@ jobs:
       - name: Install Alphabiz.exe
         run: |
           Start-Process -FilePath "C:\Alphabiz.exe" -ArgumentList '/S','/v','/qn' -passthru
-          Start-Sleep -s 20
+          Start-Sleep -s 25
           taskkill /f /im Alphabiz.exe
         shell: powershell
 
@@ -395,7 +395,6 @@ jobs:
 
       - name: E2E appium test for msi 🧪
         run: |
-          taskkill //F //IM Alphabiz.exe
           export APP_TYPE=msi
           yarn test:release
           unset APP_TYPE
