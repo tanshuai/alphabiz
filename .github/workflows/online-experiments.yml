@@ -240,7 +240,6 @@ jobs:
         run: |
           Start-Process -FilePath "C:\Alphabiz.exe" -Verb runAs -ArgumentList '/s','/v"/qn"'
           Start-Sleep -s 20
-          taskkill /f /im Alphabiz.exe
         shell: powershell
 
       - name: Install alphabiz.msi
