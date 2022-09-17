@@ -1,7 +1,9 @@
+/* eslint-disable no-undef */
 // /* eslint-disable no-undef */
 // /* eslint-disable jest/no-focused-tests */
 /* eslint-disable jest/no-disabled-tests */
 const wdio = require('webdriverio')
+const { exec } = require('child_process')
 const path = require('path')
 const fs = require('fs')
 
@@ -27,7 +29,29 @@ describe('upload', () => {
     basicPage = new BasicPage(client)
   }, 60000)
   afterAll(async () => {
+    // var dir = '../../output/release'
+    // if (!fs.existsSync(dir)) {
+    //   fs.mkdirSync(dir, { recursive: true })
+    // }
+    // await sleep(2000)
+    // await client.saveScreenshot('test/output/release/screenshot.png')
     await client.deleteSession()
+    const closeApp = async () => {
+      return new Promise((resolve, reject) => {
+        exec('taskkill /f /im Alphabiz.exe', (error, stdout, stderr) => {
+          if (error) {
+            reject(console.error(`exec error: ${error}`))
+            return
+          }
+          if (stderr) {
+            console.error(`Error from Git: ${stderr}`)
+            return
+          }
+          resolve(console.log('close App'))
+        })
+      })
+    }
+    await closeApp()
   })
   it('title', async () => {
     const windowTitle = await client.getTitle()
