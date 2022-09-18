@@ -68,7 +68,7 @@ jobs:
         run: |
           TZ=UTC-8 git log -10 --date=format-local:"%Y%m%d%H%M" --format="%cd"
           echo "--------------------------"
-          echo "::set-output name=tag-name::0.1.0-nightly-202203241045"
+          echo "::set-output name=tag-name::0.1.0-nightly-202203241113"
           if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
           then echo "::set-output name=isRunAppium::1" ; \
           else echo "::set-output name=isRunAppium::0" ; \
@@ -239,7 +239,8 @@ jobs:
       - name: Install alphabiz.exe
         run: |
           Start-Process -FilePath "C:\Alphabiz.exe" -Verb runAs -ArgumentList '/s','/v"/qn"'
-          Start-Sleep -s 20
+          Start-Sleep -s 30
+          taskkill //F //IM Alphabiz.exe  || ture
         shell: powershell
 
       - name: Install alphabiz.msi
@@ -265,7 +266,7 @@ jobs:
           export APP_TYPE=msi
           yarn test:release
           unset APP_TYPE
-          taskkill //F //IM Alphabiz.exe
+          taskkill //F //IM Alphabiz.exe  || ture
         shell: bash
 
       - name: e2e appium test for exe 🧪
@@ -273,9 +274,16 @@ jobs:
           export APP_TYPE=exe
           yarn test:release
           unset APP_TYPE
-          taskkill //F //IM Alphabiz.exe
+          taskkill //F //IM Alphabiz.exe  || ture
         shell: bash
 
       - name: e2e appium test for 7z 🧪
         run: |
           yarn test:release
+
+      - name: Upload Test Results 🗃
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: "appium-test-${{ matrix.test }}-output"
+          path: test/output/**
