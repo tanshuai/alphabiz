@@ -8,7 +8,7 @@ name: online-experiments
 on:
   push:
     paths:
-      - "**/online-experiments.yml"
+      - "!**/online-experiments.yml"
     branches: [main]
 
 jobs:
@@ -262,7 +262,7 @@ jobs:
 
       - name: Kill process after install app
         run: |
-          taskkill //F //IM Alphabiz.exe  || (echo "app is ready")
+          taskkill //F //IM Alphabiz.exe || (echo "app is ready")
         shell: bash
 
       - name: e2e appium test for msi 🧪
@@ -270,7 +270,7 @@ jobs:
           export APP_TYPE=msi
           yarn test:release
           unset APP_TYPE
-          taskkill //F //IM Alphabiz.exe  || (echo "app is ready")
+          taskkill //F //IM Alphabiz.exe || (echo "app is ready")
         shell: bash
 
       - name: e2e appium test for exe 🧪
@@ -278,7 +278,7 @@ jobs:
           export APP_TYPE=exe
           yarn test:release
           unset APP_TYPE
-          taskkill //F //IM Alphabiz.exe  || (echo "app is ready")
+          taskkill //F //IM Alphabiz.exe || (echo "app is ready")
         shell: bash
 
       - name: e2e appium test for 7z 🧪
