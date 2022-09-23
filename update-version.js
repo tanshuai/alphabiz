@@ -73,7 +73,7 @@ const updateVersionJSON = async () => {
   content.channel = 'nightly'
   content.sourceCommit = await getSourceCommit()
   // 如果正式发布,则从argv传入新的tagname format: node update-version.js --newTag [newTagName] --SHA7 [newSHA7] --buildTime [buildTime]
-  const argv = require('minimist')(process.argv.slice(2))
+  const argv = require('minimist')(process.argv.slice(2), {string : ['newTag', 'SHA7', 'buildTime']})
   console.log(argv)
   if(process.argv.includes('--buildTime')) content.buildTime = argv.buildTime
   // 如果正式发布buildCommit 为触发正式发布的sha7

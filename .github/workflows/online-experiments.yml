@@ -270,6 +270,7 @@ jobs:
           export APP_TYPE=msi
           yarn test:release
           unset APP_TYPE
+          sleep 10s
           taskkill //F //IM Alphabiz.exe || (echo "app is ready")
         shell: bash
 
@@ -278,6 +279,7 @@ jobs:
           export APP_TYPE=exe
           yarn test:release
           unset APP_TYPE
+          sleep 10s
           taskkill //F //IM Alphabiz.exe || (echo "app is ready")
         shell: bash
 
