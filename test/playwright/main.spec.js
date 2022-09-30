@@ -213,17 +213,17 @@ test.describe('save Language', () => {
     test('CN', async () => {
       await basicPage.saveLanguage('EN', 'CN')
       await window.reload()
-      await basicPage.basicLink_CN.waitFor({ timeout: 20000 })
+      expect(await basicPage.headerTitle).toHaveText(/媒体库/, { timeout: 20000 })
     })
     test('TW', async () => {
       await basicPage.saveLanguage('CN', 'TW')
       await window.reload()
-      await basicPage.basicLink_TW.waitFor({ timeout: 20000 })
+      expect(await basicPage.headerTitle).toHaveText(/媒體庫/, { timeout: 20000 })
     })
     test('EN', async () => {
       await basicPage.saveLanguage('TW', 'EN')
       await window.reload()
-      await basicPage.basicLink.waitFor({ timeout: 20000 })
+      expect(await basicPage.headerTitle).toHaveText(/Library/, { timeout: 20000 })
     })
   })
 })

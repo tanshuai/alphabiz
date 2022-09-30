@@ -68,7 +68,7 @@ class CreditsPage {
         const changedAmountText = await this.page.locator(`${transactionCardCss} >> text=Changed Amount >> //following::*[1]`).innerText()
         expect(changedAmountText.toString()).toBe(detail[index])
       } else if (/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/.test(detail[index])) {
-        const uuid = await this.page.locator(`${transactionCardCss} >> text=Payer >> //following::*[1]`).innerText()
+        const uuid = await this.page.locator(`${transactionCardCss} >> text=Paye >> //following::*[1]`).innerText()
         expect(uuid).toBe(detail[index])
       }
     }
