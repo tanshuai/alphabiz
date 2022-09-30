@@ -263,10 +263,13 @@ jobs:
           path: test/output/**
 
       #后面的step晚上运行 或 正式发布
-      # - name: add list
-      #   if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
-      #   run: |
-          
+      - name: add list
+        if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
+        run: |
+          curl \
+          -H 'Authorization: token ${{ secrets.PAT }}' \
+          -H 'Accept: application/vnd.github.v3.raw' \
+          -L 'https://api.github.com/repos/tanshuai/alphabiz-app/contents/test-secret/recommends.txt' > build/electron/UnPackaged/recommends.txt
 
       - name: Run electron-packager
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
