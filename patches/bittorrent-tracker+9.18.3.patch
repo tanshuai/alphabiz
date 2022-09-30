@@ -1,5 +1,5 @@
 diff --git a/node_modules/bittorrent-tracker/client.js b/node_modules/bittorrent-tracker/client.js
-index c091c31..16fecfc 100644
+index c091c31..73b71f5 100644
 --- a/node_modules/bittorrent-tracker/client.js
 +++ b/node_modules/bittorrent-tracker/client.js
 @@ -74,52 +74,75 @@ class Client extends EventEmitter {
@@ -102,13 +102,13 @@ index c091c31..16fecfc 100644
 +      return new HTTPTracker(this, announceUrl, family)
 +    } else if (protocol === 'udp:' && typeof UDPTracker === 'function') {
 +      return new UDPTracker(this, announceUrl, family)
-+    } else if ((protocol === 'ws:' || protocol === 'wss:') && webrtcSupport) {
++    } else if ((protocol === 'ws:' || protocol === 'wss:')) {
 +      // Skip ws:// trackers on https:// sites because they throw SecurityError
-+      if (protocol === 'ws:' && typeof window !== 'undefined' &&
-+        window.location.protocol === 'https:') {
-+        nextTickWarn(new Error(`Unsupported tracker protocol: ${announceUrl}`))
-+        return null
-+      }
++      // if (protocol === 'ws:' && typeof window !== 'undefined' &&
++      //   window.location.protocol === 'https:') {
++      //   nextTickWarn(new Error(`Unsupported tracker protocol: ${announceUrl}`))
++      //   return null
++      // }
 +      return new WebSocketTracker(this, announceUrl)
 +    } else {
 +      nextTickWarn(new Error(`Unsupported tracker protocol: ${announceUrl}`))
@@ -340,7 +340,7 @@ index 65d97e4..5fdb036 100644
  function genTransactionId () {
    return randombytes(4)
 diff --git a/node_modules/bittorrent-tracker/lib/client/websocket-tracker.js b/node_modules/bittorrent-tracker/lib/client/websocket-tracker.js
-index 1573cfd..37ddfb3 100644
+index 1573cfd..215bffe 100644
 --- a/node_modules/bittorrent-tracker/lib/client/websocket-tracker.js
 +++ b/node_modules/bittorrent-tracker/lib/client/websocket-tracker.js
 @@ -214,7 +214,7 @@ class WebSocketTracker extends Tracker {
@@ -351,6 +351,15 @@ index 1573cfd..37ddfb3 100644
 +      this.client.emit('warning', new Error('Invalid tracker response'), this.announceUrl)
        return
      }
+ 
+@@ -223,7 +223,7 @@ class WebSocketTracker extends Tracker {
+     } else if (data.action === 'scrape') {
+       this._onScrapeResponse(data)
+     } else {
+-      this._onSocketError(new Error(`invalid action in WS response: ${data.action}`))
++      this._onSocketError(new Error(`invalid action in WS response: ${data.action} ${JSON.stringify(data)}`))
+     }
+   }
  
 @@ -247,10 +247,10 @@ class WebSocketTracker extends Tracker {
      )

@@ -1,0 +1,685 @@
+diff --git a/node_modules/gun/gun.js b/node_modules/gun/gun.js
+index b323e92..9a69db9 100644
+--- a/node_modules/gun/gun.js
++++ b/node_modules/gun/gun.js
+@@ -1,5 +1,48 @@
+ ;(function(){
+-
++	function isNotAB (key = '', val = {}) {
++		if (key.startsWith('ab-')) return false
++		if (!key.startsWith('~')) return true
++		if (key.startsWith('~@')) return key.length !== 42
++		const splitted = key.split('/')
++		if (splitted.length === 1) {
++			const [a, b] = splitted[0].split('.')
++			if (!a || !b) return true
++			if (a.length < 40 || b.length < 40) return true
++			const keys = Object.keys(val)
++			return keys.some(k => ![
++				'_', '#', '>', 'alias', 'auth', 'pub', 'epub',
++				'profile', 'follow', 'channels',
++				'blockChannels', 'blockUsers'
++			].includes(k))
++		}
++		const keyword = splitted[1]
++		if (![
++			'follow',
++			'profile',
++			'channels'
++		].includes(keyword)) return true
++		const keys = splitted[2] ? [splitted[2]] : Object.keys(val)
++		if (keyword === 'profile') {
++			if (keys.some(k => ![
++				'_', '#', '>',
++				'avatar', 'description', 'name', 'id',
++				'blockChannels', 'blockUsers'
++			].includes(k))) {
++				return true
++			}
++			return false
++		}
++		if (keyword === 'follow') {
++			return keys.some(k => {
++				if (k.match(/[^.]{43}\.[^.]{43}/) && !k.includes('channels')) return true
++				return false
++			})
++		}
++		// if (keyword === 'channels') {
++		// 	return keys.some(k => k.length !== 20)
++		// }
++		return Object.values(val).some(k => (typeof k === 'string' && k.includes('data:image')))
++	}
+   /* UNBUILD */
+   function USE(arg, req){
+     return req? require(arg) : arg.slice? USE[R(arg)] : function(mod, path){
+@@ -70,13 +113,24 @@
+ 			}
+ 		}());
+ 		;(function(){ // Too many polls block, this "threads" them in turns over a single thread in time.
+-			var sT = setTimeout, t = sT.turn = sT.turn || function(f){ 1 == s.push(f) && p(T) }
+-			, s = t.s = [], p = sT.poll, i = 0, f, T = function(){
+-				if(f = s[i++]){ f() }
+-				if(i == s.length || 99 == i){
+-					s = t.s = s.slice(i);
+-					i = 0;
++			const ua = navigator.userAgent.toLowerCase()
++			const isMobile = ua.includes('iphone') || ua.includes('android') || ua.includes('ios')
++			const rIC = isMobile ? fn => setTimeout(fn, 200) : window.requestIdleCallback ? window.requestIdleCallback : fn => setTimeout(fn, 100)
++			var sT = setTimeout, t = sT.turn = sT.turn || function (f) { 1 == s.push(f) && p(T) }
++			, s = t.s = [], p = rIC, i = 0, f, T = function(){
++				const start = Date.now()
++				while(f = s[i++]){
++					f()
++					// Spend over a hard time
++					if (Date.now() - start > 50) {
++						// console.log(`Break blocks: ${i} done. ${s.length - i} pending. ${s.length} total.`)
++						break
++					}
+ 				}
++				// if(i == s.length || i >= 99){
++				s = t.s = s.slice(i);
++				i = 0;
++				// }
+ 				if(s.length){ p(T) }
+ 			}
+ 		}());
+@@ -194,12 +248,17 @@
+ 			dup.drop = function(age){
+ 				dup.to = null;
+ 				dup.now = +new Date;
+-				var l = Object.keys(s);
++				// var l = Object.keys(s);
+ 				console.STAT && console.STAT(dup.now, +new Date - dup.now, 'dup drop keys'); // prev ~20% CPU 7% RAM 300MB // now ~25% CPU 7% RAM 500MB
+-				setTimeout.each(l, function(id){ var it = s[id]; // TODO: .keys( is slow?
+-					if(it && (age || opt.age) > (dup.now - it.was)){ return }
+-					delete s[id];
+-				},0,99);
++				// setTimeout.each(l, function(id){ var it = s[id]; // TODO: .keys( is slow?
++				// 	if(it && (age || opt.age) > (dup.now - it.was)){ return }
++				// 	delete s[id];
++				// },0,99);
++				for (const id in s) {
++					var it = s[id]
++					if (it && (age || opt.age) > (dup.now - it.was)) { return }
++					delete s[id]
++				}
+ 			}
+ 			return dup;
+ 		}
+@@ -297,8 +356,24 @@
+ 				msg.out = universe; at.on('out', msg);
+ 				DBG && (DBG.ue = +new Date);
+ 			}
++			// let logged = false
+ 			function put(msg){
+-				if(!msg){ return }
++				if(!msg || !msg.put){ return }
++				// if (!logged) {
++				// 	console.log('@put', msg)
++				// 	if (Math.random() > .6) logged = true
++				// }
++				// Some dirty data others created made our app crashed, ignore them
++				for (const key in msg.put) {
++					if (isNotAB(key, msg.put[key])) {
++						// console.log('skip putting', key, msg.put[key])
++						delete msg.put[key];
++					}
++				}
++				// if (Object.keys(msg.put).some(k => k.startsWith('undefined'))) {
++				// 	// return console.log('skip')
++				// 	return
++				// }
+ 				var ctx = msg._||'', root = ctx.root = ((ctx.$ = msg.$||'')._||'').root;
+ 				if(msg['@'] && ctx.faith && !ctx.miss){ // TODO: AXE may split/route based on 'put' what should we do here? Detect @ in AXE? I think we don't have to worry, as DAM will route it on @.
+ 					msg.out = universe;
+@@ -337,7 +412,8 @@
+ 						return;
+ 					}
+ 					var i = 0, key; o = o || 0;
+-					while(o++ < 9 && (key = kl[i++])){
++					// var logged = false
++					while(o++ < 99 && (key = kl[i++])){
+ 						if('_' === key){ continue }
+ 						var val = node[key], state = states[key];
+ 						if(u === state){ err = ERR+cut(key)+"on"+cut(soul)+"no state."; break }
+@@ -345,6 +421,10 @@
+ 						//ctx.all++; //ctx.ack[soul+key] = '';
+ 						ham(val, key, soul, state, msg);
+ 						++C; // courtesy count;
++						// if (C>999 && !logged) {
++						// 	logged = true
++						// 	console.log('C>999', msg, node)
++						// }
+ 					}
+ 					if((kl = kl.slice(i)).length){ turn(pop); return }
+ 					++ni; kl = null; pop(o);
+@@ -360,11 +440,12 @@
+ 
+ 				var now = State(), u;
+ 				if(state > now){
++					console.log('state > now', state, now)
+ 					setTimeout(function(){ ham(val, key, soul, state, msg) }, (tmp = state - now) > MD? MD : tmp); // Max Defer 32bit. :(
+ 					console.STAT && console.STAT(((DBG||ctx).Hf = +new Date), tmp, 'future');
+ 					return;
+ 				}
+-				if(state < was){ /*old;*/ if(!ctx.miss){ return } } // but some chains have a cache miss that need to re-fire. // TODO: Improve in future. // for AXE this would reduce rebroadcast, but GUN does it on message forwarding.
++				if(state <= was){ /*old;*/ if(!ctx.miss){ return /*console.log('state <= was', state, was, key, val)*/ } } // but some chains have a cache miss that need to re-fire. // TODO: Improve in future. // for AXE this would reduce rebroadcast, but GUN does it on message forwarding.
+ 				if(!ctx.faith){ // TODO: BUG? Can this be used for cache miss as well? // Yes this was a bug, need to check cache miss for RAD tests, but should we care about the faith check now? Probably not.
+ 					if(state === was && (val === known || L(val) <= L(known))){ /*console.log("same");*/ /*same;*/ if(!ctx.miss){ return } } // same
+ 				}
+@@ -417,7 +498,12 @@
+ 			var ERR = "Error: Invalid graph!";
+ 			var cut = function(s){ return " '"+(''+s).slice(0,9)+"...' " }
+ 			var L = JSON.stringify, MD = 2147483647, State = Gun.state;
+-			var C = 0, CT, CF = function(){if(C>999 && (C/-(CT - (CT = +new Date))>1)){Gun.window && console.log("Warning: You're syncing 1K+ records a second, faster than DOM can update - consider limiting query.");CF=function(){C=0}}};
++			var C = 0, CT, CF = function(){
++				if(C>999 && (C/-(CT - (CT = +new Date))>1)){
++					Gun.window && console.log("Warning: You're syncing 1K+ records a second, faster than DOM can update - consider limiting query.");
++					CF=function(){C=0}
++				}
++			};
+ 
+ 		}());
+ 
+@@ -825,7 +911,7 @@
+ 			var gun, tmp;
+ 			if(typeof key === 'string'){
+ 				if(key.length == 0) {	
+-					(gun = this.chain())._.err = {err: Gun.log('0 length key!', key)};
++					(gun = this.chain())._.err = {err: '0 length key! ' + key};
+ 					if(cb){ cb.call(gun, gun._.err) }
+ 					return gun;
+ 				}
+@@ -969,9 +1055,6 @@
+ 			if(tmp = (seen = this.seen || (this.seen = {}))[at]){ return true }
+ 			seen[at] = true;
+ 			return;
+-			//tmp.echo[cat.id] = {}; // TODO: Warning: This unsubscribes ALL of this chain's listeners from this link, not just the one callback event.
+-			//obj.del(map, at); // TODO: Warning: This unsubscribes ALL of this chain's listeners from this link, not just the one callback event.
+-			return;
+ 		}
+ 		var empty = {}, valid = Gun.valid, u;
+ 	})(USE, './get');
+@@ -1068,11 +1151,6 @@
+ 				}
+ 				test.run = test.run || as.run;
+ 				test.stun = test.stun || as.stun; return;
+-				if(this.to.to){
+-					this.the.last.next(test);
+-					return;
+-				}
+-				test.stun = as.stun;
+ 			});
+ 		}
+ 
+@@ -1112,16 +1190,7 @@
+ 				as.via = at.root.$.get(((as.data||'')._||'')['#'] || at.$.back('opt.uuid')())
+ 			}
+ 			as.via.put(as.data, as.ack, as);
+-			
+-
+ 			return;
+-			if(at.get && at.back.soul){
+-				tmp = as.data;
+-				as.via = at.back.$;
+-				(as.data = {})[at.get] = tmp; 
+-				as.via.put(as.data, as.ack, as);
+-				return;
+-			}
+ 		}
+ 		function check(d, tmp){ return ((d && (tmp = d.constructor) && tmp.name) || typeof d) }
+ 
+@@ -1576,13 +1645,16 @@
+ 				if(!tmp){ return }
+ 				if(t? 3 > tmp.length : !tmp.length){ return } // TODO: ^
+ 				if(!t){try{tmp = (1 === tmp.length? tmp[0] : JSON.stringify(tmp));
+-				}catch(e){return opt.log('DAM JSON stringify error', e)}}
++				}catch(e){return opt.log('DAM JSON stringify error', e) && console.log(e)}}
+ 				if(!tmp){ return }
+ 				send(tmp, peer);
+ 			}
+ 			// for now - find better place later.
+ 			function send(raw, peer){ try{
+ 				var wire = peer.wire;
++				// if (peer.id && !peer.id.startsWith('http')) console.log('[send]', peer.id, raw, new Error().stack)
++				// The readyState in WebSocket is a number but in WebRTC a string
++				if (wire.readyState !== WebSocket.OPEN && wire.readyState !== 'open') return;
+ 				if(peer.say){
+ 					peer.say(raw);
+ 				} else
+@@ -1591,7 +1663,7 @@
+ 				}
+ 				mesh.say.d += raw.length||0; ++mesh.say.c; // STATS!
+ 			}catch(e){
+-				(peer.queue = peer.queue || []).push(raw);
++				(peer.queue = peer.queue || []).splice(10, 999, raw);
+ 			}}
+ 
+ 			mesh.hi = function(peer){
+@@ -1689,20 +1761,63 @@
+ 			var wire = mesh.wire || opt.wire;
+ 			mesh.wire = opt.wire = open;
+ 			function open(peer){ try{
+-				if(!peer || !peer.url){ return wire && wire(peer) }
++				if(!peer || !peer.url){ return }
+ 				var url = peer.url.replace(/^http/, 'ws');
+-				var wire = peer.wire = new opt.WebSocket(url);
++				var wire
++				try {
++					wire = peer.wire = new opt.WebSocket(url);
++					wire.onerror = e => {
++						e.stopImmediatePropagation()
++						e.preventDefault()
++						e.stopPropagation()
++						e.returnValue = false
++						// console.log('error', e)
++						// if (peer) {
++						// 	peer.__disable = true
++						// }
++						return false
++					}
++					// console.log('conn', url)
++				} catch (e) {
++					return
++				}
++				const closeWire = () => {
++					if (wire.readyState === WebSocket.CLOSED || wire.readyState === WebSocket.CLOSING) return
++					// console.log('WebSocket timeout. Close wire.', url)
++					/**
++					 * Custom error code should between 3000 and 3999, and
++					 * 3000 is already used as "unauthorized".
++					 */
++					wire.close(3001, 'timeout')
++					// wire.send('[]')
++				}
++				wire.refresh = () => {
++					// console.log('refresh by', by)
++					if (wire.timeout) clearTimeout(wire.timeout)
++					/**
++					 * The WebSocket heartbeat sent every 20 seconds, while gun server
++					 * sends data every 3 or 6 seconds. So we don't need to wait for
++					 * the whole 20 second to check if we are online. We just wait for
++					 * a six-second sync and a three, then close if nothing recieved.
++					 */
++					wire.timeout = setTimeout(closeWire, 30000)
++				}
++				wire.refresh('init')
+ 				wire.onclose = function(){
+ 					opt.mesh.bye(peer);
+ 					reconnect(peer);
+ 				};
+-				wire.onerror = function(error){
+-					reconnect(peer);
+-				};
++				// wire.onerror = function(error){
++				// 	reconnect(peer);
++				// };
+ 				wire.onopen = function(){
++					wire.refresh('onopen')
+ 					opt.mesh.hi(peer);
+ 				}
+ 				wire.onmessage = function(msg){
++					wire.refresh('onmessage')
++					if (msg.data && msg.data.length > 1e9) return;
++					// if (msg.data && msg.data.length > 500000) return;
+ 					if(!msg){ return }
+ 					opt.mesh.hear(msg.data || msg, peer);
+ 				};
+@@ -1712,12 +1827,23 @@
+ 			setTimeout(function(){ !opt.super && root.on('out', {dam:'hi'}) },1); // it can take a while to open a socket, so maybe no longer lazy load for perf reasons?
+ 
+ 			var wait = 2 * 999;
++			wait += Math.floor(Math.random() * 2000 + 2000);
+ 			function reconnect(peer){
+ 				clearTimeout(peer.defer);
+-				if(!opt.peers[peer.url]){ return }
+-				if(doc && peer.retry <= 0){ return }
++				clearTimeout(peer.wire && peer.wire.timeout);
++				// if (peer.__disable) return
++				// if(!opt.peers[peer.url]){ return }
++				if(doc && peer.retry <= 0){
++					// If all peers are closed, just retry anyway since we have to keep alive in network
++					if (Object.values(opt.peers).some(i => i.wire && i.wire.readyState === WebSocket.OPEN)) {
++						return console.log('No more retry for', peer.url)
++					} else {
++						Object.values(opt.peers).forEach(peer => (peer.retry = 60))
++					}
++				}
+ 				peer.retry = (peer.retry || opt.retry+1 || 60) - ((-peer.tried + (peer.tried = +new Date) < wait*4)?1:0);
+ 				peer.defer = setTimeout(function to(){
++					opt.peers[peer.url] = peer
+ 					if(doc && doc.hidden){ return setTimeout(to,wait) }
+ 					open(peer);
+ 				}, wait);
+@@ -1767,7 +1893,8 @@
+ 				this.to.next(msg); // remember to call next middleware adapter
+ 				var put = msg.put, soul = put['#'], key = put['.'], id = msg['#'], tmp; // pull data off wire envelope
+ 				disk[soul] = Gun.state.ify(disk[soul], key, put['>'], put[':'], soul); // merge into disk object
+-				if(stop && size > (4999880)){ root.on('in', {'@': id, err: "localStorage max!"}); return; }
++				// This limitation is unnecessary in Electron
++				// if(stop && size > (4999880)){ root.on('in', {'@': id, err: "localStorage max!"}); return; }
+ 				if(!msg['@']){ acks.push(id) } // then ack any non-ack write. // TODO: use batch id.
+ 				if(to){ return }
+ 				to = setTimeout(flush, 9+(size / 333)); // 0.1MB = 0.3s, 5MB = 15s 
+diff --git a/node_modules/gun/lib/radisk.js b/node_modules/gun/lib/radisk.js
+index cdb8e2d..1e3d1d2 100644
+--- a/node_modules/gun/lib/radisk.js
++++ b/node_modules/gun/lib/radisk.js
+@@ -1,4 +1,5 @@
+ ;(function(){
++	var Radix = require('./radix')
+ 
+ 	function Radisk(opt){
+ 
+diff --git a/node_modules/gun/lib/radix.js b/node_modules/gun/lib/radix.js
+index 62fa85b..19964b1 100644
+--- a/node_modules/gun/lib/radix.js
++++ b/node_modules/gun/lib/radix.js
+@@ -1,7 +1,11 @@
+ ;(function(){
+-
+ 	function Radix(){
+ 		var radix = function(key, val, t){
++			if (typeof key === 'string' && key.length > 1e4) return console.log('skip long');
++			if (typeof key === 'string' && key.startsWith('data:image')) {
++				console.log('skip image');
++				return;
++			}
+ 			radix.unit = 0;
+ 			if(!t && u !== val){ 
+ 				radix.last = (''+key < radix.last)? radix.last : ''+key;
+@@ -11,9 +15,12 @@
+ 			if(!key && Object.keys(t).length){ return t }
+ 			key = ''+key;
+ 			var i = 0, l = key.length-1, k = key[i], at, tmp;
++			let start = Date.now()
+ 			while(!(at = t[k]) && i < l){
+ 				k += key[++i];
+ 			}
++			const delta = Date.now() - start
++			if (delta > 1000) console.log('spend too many time', key.length, delta, key, val, t)
+ 			if(!at){
+ 				if(!each(t, function(r, s){
+ 					var ii = 0, kk = '';
+diff --git a/node_modules/gun/lib/rfs.js b/node_modules/gun/lib/rfs.js
+index 7ab3269..93686a5 100644
+--- a/node_modules/gun/lib/rfs.js
++++ b/node_modules/gun/lib/rfs.js
+@@ -83,7 +83,7 @@ Gun.on('create', function(root){
+ 	this.to.next(root);
+ 	var opt = root.opt;
+ 	if(opt.rfs === false){ return }
+-	opt.store = opt.store || (!Gun.window && Store(opt));
++	opt.store = opt.store || Store(opt);
+ });
+ 
+ module.exports = Store;
+\ No newline at end of file
+diff --git a/node_modules/gun/lib/server.js b/node_modules/gun/lib/server.js
+index 17e4038..fd6e6c1 100644
+--- a/node_modules/gun/lib/server.js
++++ b/node_modules/gun/lib/server.js
+@@ -1,4 +1,7 @@
+ ;(function(){
++	if (!window || !window.process || !window.process.versions || !window.process.versions.electron) {
++		return
++	}
+ 	require('./yson');
+ 	var Gun = require('../gun'), u;
+ 	Gun.serve = require('./serve');
+diff --git a/node_modules/gun/lib/stats.js b/node_modules/gun/lib/stats.js
+index 28d10d5..f726692 100644
+--- a/node_modules/gun/lib/stats.js
++++ b/node_modules/gun/lib/stats.js
+@@ -8,6 +8,7 @@ Gun.on('opt', function(root){
+ 	if(false === root.opt.stats){ return }
+ 	var path = require('path') || {};
+ 	var file = root.opt.file ? path.resolve(root.opt.file).split(path.sep).slice(-1)[0] : 'radata';
++	var basePath = root.opt.file ? path.dirname(root.opt.file) : path.resolve(__dirname, '..')
+ 	var noop = function(){};
+ 	var os = require('os') || {};
+ 	var fs = require('fs') || {};
+@@ -24,7 +25,7 @@ Gun.on('opt', function(root){
+ 	var S = +new Date, W;
+ 	var obj_ify = function(o){try{o = JSON.parse(o)}catch(e){o={}};return o;}
+ 	setTimeout(function(){
+-		root.stats = obj_ify((fs.existsSync(__dirname+'/../stats.'+file) && fs.readFileSync(__dirname+'/../stats.'+file).toString())) || {};
++		root.stats = obj_ify((fs.existsSync(basePath+'/stats.'+file) && fs.readFileSync(basePath+'/stats.'+file).toString())) || {};
+ 		root.stats.up = root.stats.up || {};
+ 		root.stats.up.start = root.stats.up.start || +(new Date);
+ 		root.stats.up.count = (root.stats.up.count || 0) + 1;
+@@ -63,7 +64,7 @@ Gun.on('opt', function(root){
+ 			root.opt.store.stats = {get:{time:{}, count:0}, put: {time:{}, count:0}}; // reset
+ 		}
+ 		JSON.stringifyAsync(stats, function(err, raw){ if(err){ return } W = true;
+-			fs.writeFile(__dirname+'/../stats.'+file, raw, function(err){ W = false; err && console.log(console.STAT.err = err); console.STAT && console.STAT(S, +new Date - S, 'stats stash') });
++			fs.writeFile(basePath+'/stats.'+file, raw, function(err){ W = false; err && console.log(console.STAT.err = err); console.STAT && console.STAT(S, +new Date - S, 'stats stash') });
+ 		});
+ 
+ 		//exec("top -b -n 1", function(err, out){ out && fs.writeFile(__dirname+'/../stats.top.'+file, out, noop) }); // was it really seriously actually this?
+diff --git a/node_modules/gun/lib/store.js b/node_modules/gun/lib/store.js
+index f86634b..3ee09b8 100644
+--- a/node_modules/gun/lib/store.js
++++ b/node_modules/gun/lib/store.js
+@@ -1,4 +1,5 @@
+ var Gun = (typeof window !== "undefined")? window.Gun : require('../gun');
++require('./radisk')
+ 
+ Gun.on('create', function(root){
+     if(Gun.TESTING){ root.opt.file = 'radatatest' }
+@@ -9,6 +10,7 @@ Gun.on('create', function(root){
+     var Radisk = (Gun.window && Gun.window.Radisk) || require('./radisk');
+     var Radix = Radisk.Radix;
+     var dare = Radisk(opt), esc = String.fromCharCode(27);
++    console.log('Radisk', dare)
+     var ST = 0;
+  
+     root.on('put', function(msg){
+diff --git a/node_modules/gun/lib/webrtc.js b/node_modules/gun/lib/webrtc.js
+index abc887c..a88e1f4 100644
+--- a/node_modules/gun/lib/webrtc.js
++++ b/node_modules/gun/lib/webrtc.js
+@@ -5,8 +5,9 @@
+ 		this.to.next(root);
+ 		var opt = root.opt;
+ 		if(root.once){ return }
+-		if(!Gun.Mesh){ return }
++		if (!Gun.Mesh) { return }
+ 		if(false === opt.RTCPeerConnection){ return }
++		console.log('[wrtc] init')
+ 
+ 		var env;
+ 		if(typeof window !== "undefined"){ env = window }
+@@ -17,11 +18,12 @@
+ 		var rtcsd = opt.RTCSessionDescription || env.RTCSessionDescription || env.webkitRTCSessionDescription || env.mozRTCSessionDescription;
+ 		var rtcic = opt.RTCIceCandidate || env.RTCIceCandidate || env.webkitRTCIceCandidate || env.mozRTCIceCandidate;
+ 		if(!rtcpc || !rtcsd || !rtcic){ return }
++		// console.log('[wrtc]', rtcpc, rtcsd, rtcic, env)
+ 		opt.RTCPeerConnection = rtcpc;
+ 		opt.RTCSessionDescription = rtcsd;
+ 		opt.RTCIceCandidate = rtcic;
+ 		opt.rtc = opt.rtc || {'iceServers': [
+-      {urls: 'stun:stun.l.google.com:19302'},
++			{ urls: ['stun:stun.l.google.com:19302', 'stun:global.stun.twilio.com:3478'] },
+       {urls: "stun:stun.sipgate.net:3478"}/*,
+       {urls: "stun:stun.stunprotocol.org"},
+       {urls: "stun:stun.sipgate.net:10000"},
+@@ -34,14 +36,19 @@
+     opt.rtc.dataChannel = opt.rtc.dataChannel || {ordered: false, maxRetransmits: 2};
+     opt.rtc.sdp = opt.rtc.sdp || {mandatory: {OfferToReceiveAudio: false, OfferToReceiveVideo: false}};
+     opt.announce = function(to){
++			console.log('announce', opt.pid, to)
+ 			root.on('out', {rtc: {id: opt.pid, to:to}}); // announce ourself
+     };
+ 		var mesh = opt.mesh = opt.mesh || Gun.Mesh(root);
+ 		root.on('create', function(at){
++			// console.log('[create]', at)
+ 			this.to.next(at);
+ 			setTimeout(opt.announce, 1);
+ 		});
++		setTimeout(opt.announce, 50)
++		// setInterval(opt.announce, 15000)
+ 		root.on('in', function(msg){
++			// if (msg.rtc) console.log('in', msg)
+ 			if(msg.rtc){ open(msg) }
+ 			this.to.next(msg);
+ 		});
+@@ -49,6 +56,7 @@
+ 		function open(msg){
+ 			var rtc = msg.rtc, peer, tmp;
+ 			if(!rtc || !rtc.id){ return }
++			// console.log('[gun wrtc]', rtc)
+ 			delete opt.announce[rtc.id]; /// remove after connect
+ 			if(tmp = rtc.answer){
+ 				if(!(peer = opt.peers[rtc.id] || open[rtc.id]) || peer.remoteSet){ return }
+@@ -57,25 +65,46 @@
+ 			}
+ 			if(tmp = rtc.candidate){
+ 				peer = opt.peers[rtc.id] || open[rtc.id] || open({rtc: {id: rtc.id}});
+-				return peer.addIceCandidate(new opt.RTCIceCandidate(tmp));
++				const addIce = () => {
++					if (!peer.remoteDescription) {
++						// delete open[rtc.id]
++						return
++					}
++					return peer.addIceCandidate(new opt.RTCIceCandidate(tmp)).catch(e => {
++						// console.log('add error', peer, tmp, e)
++						if (!peer.remoteDescription) delete open[rtc.id]
++					});
++				}
++				if (peer.remoteDescription) return addIce()
++				return setTimeout(addIce, 2000)
+ 			}
+ 			//if(opt.peers[rtc.id]){ return }
+ 			if(open[rtc.id]){ return }
+-			(peer = new opt.RTCPeerConnection(opt.rtc)).id = rtc.id;
++			(peer = new opt.RTCPeerConnection(opt.rtc)).id = rtc.id
++			// console.log('on open', msg, peer)
+ 			var wire = peer.wire = peer.createDataChannel('dc', opt.rtc.dataChannel);
+ 			open[rtc.id] = peer;
+ 			wire.onclose = function(){
+-				delete open[rtc.id];
++				// console.log('rtc close', rtc)
++				// delete open[rtc.id];
+ 				mesh.bye(peer);
+ 				//reconnect(peer);
+ 			};
+-			wire.onerror = function(err){};
++			wire.onerror = function(err){
++				console.log('rtc error', rtc, err)
++				delete open[rtc.id]
++			};
+ 			wire.onopen = function(e){
+-				//delete open[rtc.id];
++				console.log('wire open', opt)
++				delete open[rtc.id];
+ 				mesh.hi(peer);
++				if (opt.onWrtcPeer) {
++					opt.onWrtcPeer(peer)
++				}
+ 			}
+ 			wire.onmessage = function(msg){
+-				if(!msg){ return }
++				// console.log('rtc msg', rtc, msg)
++				if (!msg) { return }
+ 				mesh.hear(msg.data || msg, peer);
+ 			};
+ 			peer.onicecandidate = function(e){ // source: EasyRTC!
+@@ -89,7 +118,8 @@
+ 				rc.onclose = wire.onclose;
+ 			}
+ 			if(tmp = rtc.offer){
+-				rtc.offer.sdp = rtc.offer.sdp.replace(/\\r\\n/g, '\r\n')
++				console.log('set remote desc')
++				rtc.offer.sdp = rtc.offer.sdp.replace(/\\+r\\+n/g, '\r\n')
+ 				peer.setRemoteDescription(new opt.RTCSessionDescription(tmp)); 
+ 				peer.createAnswer(function(answer){
+ 					peer.setLocalDescription(answer);
+@@ -98,6 +128,7 @@
+ 				return;
+ 			}
+ 			peer.createOffer(function(offer){
++				console.log('create offer')
+ 				peer.setLocalDescription(offer);
+ 				root.on('out', {'@': msg['#'], rtc: {offer: offer, id: opt.pid}});
+ 			}, function(){}, opt.rtc.sdp);
+diff --git a/node_modules/gun/sea.js b/node_modules/gun/sea.js
+index 2319fef..71bcb42 100644
+--- a/node_modules/gun/sea.js
++++ b/node_modules/gun/sea.js
+@@ -31,16 +31,16 @@
+   })(USE, './root');
+ 
+   ;USE(function(module){
+-    var SEA = USE('./root');
+-    try{ if(SEA.window){
+-      if(location.protocol.indexOf('s') < 0
+-      && location.host.indexOf('localhost') < 0
+-      && ! /^127\.\d+\.\d+\.\d+$/.test(location.hostname)
+-      && location.protocol.indexOf('file:') < 0){
+-        console.warn('HTTPS needed for WebCrypto in SEA, redirecting...');
+-        location.protocol = 'https:'; // WebCrypto does NOT work without HTTPS!
+-      }
+-    } }catch(e){}
++    // var SEA = USE('./root');
++    // try{ if(SEA.window){
++    //   if(location.protocol.indexOf('s') < 0
++    //   && location.host.indexOf('localhost') < 0
++    //   && ! /^127\.\d+\.\d+\.\d+$/.test(location.hostname)
++    //   && location.protocol.indexOf('file:') < 0){
++    //     console.warn('HTTPS needed for WebCrypto in SEA, redirecting...');
++    //     location.protocol = 'https:'; // WebCrypto does NOT work without HTTPS!
++    //   }
++    // } }catch(e){}
+   })(USE, './https');
+ 
+   ;USE(function(module){
+@@ -467,7 +467,7 @@
+       if(cb){ try{ cb(r) }catch(e){console.log(e)} }
+       return r;
+     } catch(e) {
+-      console.log(e); // mismatched owner FOR MARTTI
++      // console.log(e); // mismatched owner FOR MARTTI
+       SEA.err = e;
+       if(SEA.throw){ throw e }
+       if(cb){ cb() }
+diff --git a/node_modules/gun/sea/https.js b/node_modules/gun/sea/https.js
+index 4f12465..fbbc011 100644
+--- a/node_modules/gun/sea/https.js
++++ b/node_modules/gun/sea/https.js
+@@ -1,12 +1,12 @@
+ 
+     var SEA = require('./root');
+-    try{ if(SEA.window){
+-      if(location.protocol.indexOf('s') < 0
+-      && location.host.indexOf('localhost') < 0
+-      && ! /^127\.\d+\.\d+\.\d+$/.test(location.hostname)
+-      && location.protocol.indexOf('file:') < 0){
+-        console.warn('HTTPS needed for WebCrypto in SEA, redirecting...');
+-        location.protocol = 'https:'; // WebCrypto does NOT work without HTTPS!
+-      }
+-    } }catch(e){}
++    // try{ if(SEA.window){
++    //   if(location.protocol.indexOf('s') < 0
++    //   && location.host.indexOf('localhost') < 0
++    //   && ! /^127\.\d+\.\d+\.\d+$/.test(location.hostname)
++    //   && location.protocol.indexOf('file:') < 0){
++    //     console.warn('HTTPS needed for WebCrypto in SEA, redirecting...');
++    //     location.protocol = 'https:'; // WebCrypto does NOT work without HTTPS!
++    //   }
++    // } }catch(e){}
+   
+\ No newline at end of file
+diff --git a/node_modules/gun/src/shim.js b/node_modules/gun/src/shim.js
+index a7a6b15..a5a6375 100644
+--- a/node_modules/gun/src/shim.js
++++ b/node_modules/gun/src/shim.js
+@@ -47,7 +47,7 @@ Object.keys = Object.keys || function(o){
+ 	return l;
+ }
+ ;(function(){ // max ~1ms or before stack overflow 
+-	var u, sT = setTimeout, l = 0, c = 0, sI = (typeof setImmediate !== ''+u && setImmediate) || sT; // queueMicrotask faster but blocks UI
++	var u, sT = setTimeout, l = 0, c = 0, sI = (typeof queueMicrotask !== ''+u && queueMicrotask) || sT; // queueMicrotask faster but blocks UI
+ 	sT.hold = sT.hold || 9;
+ 	sT.poll = sT.poll || function(f){ //f(); return; // for testing
+ 		if((sT.hold >= (+new Date - l)) && c++ < 3333){ f(); return }

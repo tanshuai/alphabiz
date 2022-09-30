@@ -1,5 +1,5 @@
 diff --git a/node_modules/webtorrent/index.js b/node_modules/webtorrent/index.js
-index 3e07d04..5c871bc 100644
+index 3e07d04..4634089 100644
 --- a/node_modules/webtorrent/index.js
 +++ b/node_modules/webtorrent/index.js
 @@ -98,7 +98,10 @@ class WebTorrent extends EventEmitter {
@@ -14,7 +14,15 @@ index 3e07d04..5c871bc 100644
      }
  
      if (this.tracker) {
-@@ -454,13 +457,23 @@ class WebTorrent extends EventEmitter {
+@@ -191,6 +194,7 @@ class WebTorrent extends EventEmitter {
+       if (!file) return null
+ 
+       const [response, stream, raw] = file._serve(data)
++      console.log(response, stream, raw)
+       const asyncIterator = stream && stream[Symbol.asyncIterator]()
+ 
+       const cleanup = () => {
+@@ -454,13 +458,23 @@ class WebTorrent extends EventEmitter {
     * Set global upload throttle rate
     * @param  {Number} rate (must be bigger or equal than zero, or -1 to disable throttling)
     */
@@ -42,7 +50,7 @@ index 3e07d04..5c871bc 100644
    }
  
    /**
-@@ -501,7 +514,9 @@ class WebTorrent extends EventEmitter {
+@@ -501,7 +515,9 @@ class WebTorrent extends EventEmitter {
      this.dht = null
  
      this.throttleGroups.down.destroy()
@@ -54,9 +62,36 @@ index 3e07d04..5c871bc 100644
  
    _onListening () {
 diff --git a/node_modules/webtorrent/lib/conn-pool.js b/node_modules/webtorrent/lib/conn-pool.js
-index 1c6ac79..b85b5c3 100644
+index 1c6ac79..051a674 100644
 --- a/node_modules/webtorrent/lib/conn-pool.js
 +++ b/node_modules/webtorrent/lib/conn-pool.js
+@@ -18,7 +18,7 @@ const debug = debugFactory('webtorrent:conn-pool')
+  */
+ class ConnPool {
+   constructor (client) {
+-    debug('create pool (port %s)', client.torrentPort)
++    console.log('create pool (port %s)', client.torrentPort)
+ 
+     this._client = client
+ 
+@@ -53,7 +53,7 @@ class ConnPool {
+ 
+     // Start TCP
+     this.tcpServer.listen(client.torrentPort, () => {
+-      debug('creating tcpServer in port %s', this.tcpServer.address().port)
++      console.log('creating tcpServer in port %s', this.tcpServer.address().port)
+       if (this._client.utp) {
+         // Setup uTP
+         this.utpServer = utp.createServer()
+@@ -62,7 +62,7 @@ class ConnPool {
+         this.utpServer.on('error', this._onUTPError)
+ 
+         // Start uTP
+-        debug('creating utpServer in port %s', this.tcpServer.address().port)
++        console.log('creating utpServer in port %s', this.tcpServer.address().port)
+         this.utpServer.listen(this.tcpServer.address().port)
+       } else {
+         this._onListening()
 @@ -118,6 +118,7 @@ class ConnPool {
     * on the infoHash in that handshake, route the peer to the right swarm.
     */
@@ -65,24 +100,139 @@ index 1c6ac79..b85b5c3 100644
      const self = this
  
      // If the connection has already been closed before the `connect` event is fired,
-@@ -137,12 +138,15 @@ class ConnPool {
+@@ -137,18 +138,26 @@ class ConnPool {
        ? Peer.createUTPIncomingPeer(conn, this._client.throttleGroups)
        : Peer.createTCPIncomingPeer(conn, this._client.throttleGroups)
  
 +    /** @type { EventEmitter } */
      const wire = peer.wire
      wire.once('pe3', onPe3)
++    // if (Math.random() < 0.3) {
++    //   console.log('fake pe3')
++    //   onPe3('1234')
++    // }
 +    // wire.prependOnceListener('pe3', onPe3)
      wire.once('handshake', onHandshake)
  
      function onPe3 (infoHashHash) {
        const torrent = self._client._getByHash(infoHashHash)
-+      console.log('onPe3', infoHashHash, torrent)
++      // console.log('onPe3', infoHashHash, torrent)
        if (torrent) {
          peer.swarm = torrent
          torrent._addIncomingPeer(peer)
+         peer.onPe3(infoHashHash)
+       } else {
+-        peer.destroy(new Error(`Unexpected info hash hash ${infoHashHash} from incoming peer ${peer.id}`))
++        return
++        // peer.destroy(new Error(`Unexpected info hash hash ${infoHashHash} from incoming peer ${peer.id}`))
+       }
+     }
+ 
+diff --git a/node_modules/webtorrent/lib/file-stream.js b/node_modules/webtorrent/lib/file-stream.js
+index a3682b1..3c39167 100644
+--- a/node_modules/webtorrent/lib/file-stream.js
++++ b/node_modules/webtorrent/lib/file-stream.js
+@@ -1,4 +1,4 @@
+-const stream = require('stream')
++const stream = require('readable-stream')
+ const debugFactory = require('debug')
+ const eos = require('end-of-stream')
+ 
+@@ -31,9 +31,14 @@ class FileStream extends stream.Readable {
+     this._piece = this._startPiece
+     this._offset = (start + file.offset) - (this._startPiece * pieceLength)
+ 
++    this.cacheRate = file.cacheRate
++    this.waitingPiece = parseInt(this._endPiece * this.cacheRate)
++
+     this._missing = end - start + 1
+     this._reading = false
+     this._notifying = false
++    this._waiting = false
++
+     this._criticalLength = Math.min((1024 * 1024 / pieceLength) | 0, 2)
+ 
+     this._torrent.select(this._startPiece, this._endPiece, true, () => {
+@@ -53,8 +58,14 @@ class FileStream extends stream.Readable {
+   }
+ 
+   _notify () {
++    // const arr = []
++    // for (let i = 1; i <= 100; i++) {
++    //   arr.push(this._torrent.pieces[this._piece + i] === null ? 1 : 0)
++    // }
++    // console.log('run _notify', this._piece, this._endPiece, this.cacheRate, this.waitingPiece, this, arr)
+     if (!this._reading || this._missing === 0) return
+     if (!this._torrent.bitfield.get(this._piece)) {
++      this._waiting = true
+       return this._torrent.critical(this._piece, this._piece + this._criticalLength)
+     }
+ 
+@@ -70,10 +81,25 @@ class FileStream extends stream.Readable {
+     if (p === this._torrent.pieces.length - 1) {
+       getOpts.length = this._torrent.lastPieceLength
+     }
++
++    // wait for the fragment following the current fragment
++    // When a resource needs to be loaded
++    const targetPiect = this._piece + this.waitingPiece < this._endPiece
++      ? this._piece + this.waitingPiece + this._criticalLength
++      : this._endPiece - 1
++    if (this._torrent.bitfield.get(targetPiect) || this._piece === this._endPiece) {
++      this._waiting = false
++    }
++    if (this._waiting) {
++      this._notifying = false
++      return this._torrent.critical(this._piece, targetPiect)
++    }
++
+     this._torrent.store.get(p, getOpts, (err, buffer) => {
+       this._notifying = false
+       if (this.destroyed) return
+       debug('read %s (length %s) (err %s)', p, buffer && buffer.length, err && err.message)
++      // console.log('read %s (length %s) (err %s)', p, buffer && buffer.length, err && err.message)
+ 
+       if (err) return this.destroy(err)
+ 
+@@ -88,6 +114,7 @@ class FileStream extends stream.Readable {
+       this._missing -= buffer.length
+ 
+       debug('pushing buffer of length %s', buffer.length)
++      // console.log('pushing buffer of length %s', buffer.length, buffer)
+       this._reading = false
+       this.push(buffer)
+ 
+diff --git a/node_modules/webtorrent/lib/file.js b/node_modules/webtorrent/lib/file.js
+index cbbc484..afe17c7 100644
+--- a/node_modules/webtorrent/lib/file.js
++++ b/node_modules/webtorrent/lib/file.js
+@@ -11,9 +11,16 @@ const mime = require('mime')
+ const eos = require('end-of-stream')
+ const FileStream = require('./file-stream.js')
+ 
++function isElectron () {
++  return (typeof window !== 'undefined' && typeof window.process === 'object' && window.process.type === 'renderer') ||
++    (typeof process !== 'undefined' && typeof process.version === 'object' && process.version.electron) ||
++    (typeof navigator === 'object' && typeof navigator.userAgent === 'string' && navigator.userAgent.includes('Electron'))
++}
++
+ class File extends EventEmitter {
+   constructor (torrent, file) {
+     super()
++    console.log('init file', torrent, file)
+ 
+     this._torrent = torrent
+     this._destroyed = false
+@@ -21,6 +28,7 @@ class File extends EventEmitter {
+ 
+     this.name = file.name
+     this.path = file.path
++    if (!file.path && !isElectron()) this.path = file.name
+     this.length = file.length
+     this.offset = file.offset
+ 
 diff --git a/node_modules/webtorrent/lib/peer.js b/node_modules/webtorrent/lib/peer.js
-index 19cb5ff..9bc5480 100644
+index 19cb5ff..714a290 100644
 --- a/node_modules/webtorrent/lib/peer.js
 +++ b/node_modules/webtorrent/lib/peer.js
 @@ -16,6 +16,20 @@ exports.enableSecure = () => {
@@ -149,7 +299,7 @@ index 19cb5ff..9bc5480 100644
      })
      wire.once('pe4', () => {
        this.onPe4()
-@@ -213,62 +234,85 @@ class Peer extends EventEmitter {
+@@ -213,62 +234,86 @@ class Peer extends EventEmitter {
  
      if (this.swarm) {
        if (this.type === 'tcpOutgoing') {
@@ -201,7 +351,8 @@ index 19cb5ff..9bc5480 100644
 +        // console.log('error infoHashHash', infoHashHash, this.swarm.infoHashHash)
          this.destroy(new Error('unexpected crypto handshake info hash for this swarm'))
        }
-       this.sendPe4()
+-      this.sendPe4()
++      else this.sendPe4()
 +    } else {
 +      // console.log('noSwarm')
 +      this.destroy(new Error('No swarm available'))
@@ -211,6 +362,7 @@ index 19cb5ff..9bc5480 100644
    }
  
    sendPe4 () {
++    if (!this.wire || !this.wire.sendPe4) return
      this.wire.sendPe4(this.swarm.infoHash)
      this.sentPe4 = true
 +    // console.log(this.swarm.infoHash, 'sendPe4')
@@ -224,8 +376,8 @@ index 19cb5ff..9bc5480 100644
    clearPipes () {
 -    this.conn.unpipe()
 -    this.wire.unpipe()
-+    this.conn?.unpipe()
-+    this.wire?.unpipe()
++    this.conn && this.conn.unpipe && this.conn.unpipe()
++    this.wire && this.wire.unpipe && this.wire.unpipe()
    }
  
    setThrottlePipes () {
@@ -239,7 +391,7 @@ index 19cb5ff..9bc5480 100644
        .pipe(new Transform({
          transform (chunk, _, callback) {
            self.emit('download', chunk.length)
-@@ -277,7 +321,7 @@ class Peer extends EventEmitter {
+@@ -277,7 +322,7 @@ class Peer extends EventEmitter {
          }
        }))
        .pipe(this.wire)
@@ -248,7 +400,7 @@ index 19cb5ff..9bc5480 100644
        .pipe(new Transform({
          transform (chunk, _, callback) {
            self.emit('upload', chunk.length)
-@@ -357,14 +401,15 @@ class Peer extends EventEmitter {
+@@ -357,14 +402,15 @@ class Peer extends EventEmitter {
    }
  
    destroy (err) {
@@ -266,7 +418,7 @@ index 19cb5ff..9bc5480 100644
  
      const swarm = this.swarm
      const conn = this.conn
-@@ -374,14 +419,27 @@ class Peer extends EventEmitter {
+@@ -374,14 +420,27 @@ class Peer extends EventEmitter {
      this.conn = null
      this.wire = null
  
@@ -295,17 +447,41 @@ index 19cb5ff..9bc5480 100644
 +    this.connected = false
    }
  }
+diff --git a/node_modules/webtorrent/lib/server.js b/node_modules/webtorrent/lib/server.js
+index 7e08906..960994c 100644
+--- a/node_modules/webtorrent/lib/server.js
++++ b/node_modules/webtorrent/lib/server.js
+@@ -77,6 +77,7 @@ function Server (torrent, opts = {}) {
+     }
+ 
+     const pathname = new URL(req.url, 'http://example.com').pathname
++    const url = req.url
+ 
+     // Allow cross-origin requests (CORS)
+     if (isOriginAllowed(req)) {
+@@ -141,8 +142,9 @@ function Server (torrent, opts = {}) {
+       if (Number.isNaN(index) || index >= torrent.files.length) {
+         return serve404Page()
+       }
+-
+       const file = torrent.files[index]
++      const cacheRate = url.split('wait=')[1]
++      file.cacheRate = cacheRate
+       serveFile(file)
+     }
+ 
 diff --git a/node_modules/webtorrent/lib/torrent.js b/node_modules/webtorrent/lib/torrent.js
-index ac7cb97..95ab3fa 100644
+index ac7cb97..d9dcb81 100644
 --- a/node_modules/webtorrent/lib/torrent.js
 +++ b/node_modules/webtorrent/lib/torrent.js
-@@ -64,6 +64,56 @@ try {
+@@ -64,6 +64,71 @@ try {
    TMP = path.join(typeof os.tmpdir === 'function' ? os.tmpdir() : '/', 'webtorrent')
  }
  
 +const toVerify = []
++global.toVerify = toVerify
 +let isVerifing = false
-+/** @param { (cb: Function) => void } fn */
++/** @param { (cb: Function) => void } fn @param { Torrent } tr */
 +const queueVerify = (fn, tr) => {
 +  // console.log('queue', tr)
 +  const callFn = () => {
@@ -314,15 +490,29 @@ index ac7cb97..95ab3fa 100644
 +    // let client have time to do something
 +    setTimeout(() => {
 +      console.log('Verifying', tr.name || tr.origin || tr.token || tr.infoHash)
-+      fn(() => {
++      fn((err) => {
++        console.log('Completed verifying', tr.name || tr.origin || tr.token, err)
++        if (err) {
++          // Mark file error
++          console.log('Verify error occurred. Mark all as unverified.', tr)
++          const l = tr.pieces.length
++          tr.pieces.map((p, i) => {
++            if (!p) {
++              if (i === l - 1) tr.pieces[i] = new Piece(tr.lastPieceLength)
++              else tr.pieces[i] = new Piece(tr.pieceLength)
++              tr._reservations[i] = []
++              tr.bitfield.set(i, false)
++            }
++          })
++        }
 +        if (!isVerifing) return
 +        isVerifing = false
 +        const next = toVerify.shift()
 +        if (typeof next === 'function') {
-+          // console.log('Run next', toVerify.length)
++          console.log('Run next', toVerify.length)
 +          next()
-+        // } else {
-+        //   console.log('Empty queue')
++        } else {
++          console.log('Empty queue')
 +        }
 +      })
 +    }, 1000)
@@ -330,7 +520,7 @@ index ac7cb97..95ab3fa 100644
 +  if (tr) {
 +    tr.waiting = true
 +    tr.once('destroy', () => {
-+      // console.log('remove')
++      console.log('remove', tr.name || tr.origin || tr.token || tr.infoHash)
 +      const index = toVerify.findIndex(i => i === callFn)
 +      if (index !== -1) {
 +        toVerify.splice(index, 1)
@@ -356,7 +546,17 @@ index ac7cb97..95ab3fa 100644
  class Torrent extends EventEmitter {
    constructor (torrentId, client, opts) {
      super()
-@@ -368,6 +418,8 @@ class Torrent extends EventEmitter {
+@@ -341,7 +406,8 @@ class Torrent extends EventEmitter {
+       tracker: trackerOpts,
+       port: this.client.torrentPort,
+       userAgent: USER_AGENT,
+-      lsd: this.client.lsd
++      lsd: this.client.lsd,
++      intervalMs: 15000
+     })
+ 
+     this.discovery.on('error', (err) => {
+@@ -368,6 +434,8 @@ class Torrent extends EventEmitter {
      this.discovery.on('warning', (err) => {
        this.emit('warning', err)
      })
@@ -365,10 +565,11 @@ index ac7cb97..95ab3fa 100644
    }
  
    _getMetadataFromServer () {
-@@ -596,31 +648,46 @@ class Torrent extends EventEmitter {
+@@ -595,32 +663,73 @@ class Torrent extends EventEmitter {
+     })
    }
  
-   _verifyPieces (cb) {
+-  _verifyPieces (cb) {
 -    parallelLimit(this.pieces.map((piece, index) => cb => {
 -      if (this.destroyed) return cb(new Error('torrent is destroyed'))
 -
@@ -376,6 +577,7 @@ index ac7cb97..95ab3fa 100644
 -      // Specify length for the last piece in case it is zero-padded
 -      if (index === this.pieces.length - 1) {
 -        getOpts.length = this.lastPieceLength
++  _verifyPieces (cb, fullreload = false) {
 +    // console.log('verify pieces')
 +    this.verifyStatus = {
 +      current: 0,
@@ -383,13 +585,25 @@ index ac7cb97..95ab3fa 100644
 +    }
 +    /** @param { Function } done */
 +    const mission = (done) => {
++      let isVerifyError = false
 +      const callDone = (...args) => {
-+        done()
-+        cb(...args)
++        done(isVerifyError)
++        if (isVerifyError) {
++          this.verifyStatus = {
++            current: 0,
++            total: this.pieces.length
++          }
++          console.log('Reverify', this)
++          this._verifyPieces(cb, true)
++        } else {
++          console.log('Verify done', this)
++          cb(...args)
++        }
        }
 -      this.store.get(index, getOpts, (err, buf) => {
 +      parallelLimit(this.pieces.map((piece, index) => cb => {
 +        this.verifyStatus.current++
++        if (isVerifyError) return cb(null)
          if (this.destroyed) return cb(new Error('torrent is destroyed'))
 +        if (piece === null) return cb(null)
  
@@ -410,7 +624,17 @@ index ac7cb97..95ab3fa 100644
 -            this._debug('piece invalid %s', index)
 -          }
 -          cb(null)
-+          if (err) return queueMicrotask(() => cb(null)) // ignore error
++          if (err) return queueMicrotask(() => {
++            // console.log('verify error!')
++            if (err && (err.message === 'Could not satisfy length' || err.message.startsWith('ENOENT: no such file or directory'))) {
++              return cb(null)
++            }
++            if (!fullreload) {
++              // console.log(err, index, this._hashes[index])
++              isVerifyError = true
++            }
++            cb(null)
++          }) // ignore error
 +          sha1(buf, hash => {
 +            if (this.destroyed) return cb(new Error('torrent is destroyed'))
 +
@@ -418,6 +642,10 @@ index ac7cb97..95ab3fa 100644
 +              this._debug('piece verified %s', index)
 +              this._markVerified(index)
 +            } else {
++              if (!fullreload && piece.missing !== piece.length) {
++                console.log('hash error!', hash, this._hashes[index], index)
++                isVerifyError = true
++              }
 +              this._debug('piece invalid %s', index)
 +            }
 +            cb(null)
@@ -431,7 +659,7 @@ index ac7cb97..95ab3fa 100644
    }
  
    rescanFiles (cb) {
-@@ -753,6 +820,8 @@ class Torrent extends EventEmitter {
+@@ -753,6 +862,8 @@ class Torrent extends EventEmitter {
      this._peers = null
      this._servers = null
      this._xsRequests = null
@@ -440,7 +668,7 @@ index ac7cb97..95ab3fa 100644
    }
  
    addPeer (peer) {
-@@ -893,6 +962,7 @@ class Torrent extends EventEmitter {
+@@ -893,6 +1004,7 @@ class Torrent extends EventEmitter {
     * peer that has already sent a handshake.
     */
    _addIncomingPeer (peer) {
@@ -448,13 +676,76 @@ index ac7cb97..95ab3fa 100644
      if (this.destroyed) return peer.destroy(new Error('torrent is destroyed'))
      if (this.paused) return peer.destroy(new Error('torrent is paused'))
  
-@@ -1144,6 +1214,7 @@ class Torrent extends EventEmitter {
+@@ -1144,6 +1256,7 @@ class Torrent extends EventEmitter {
      })
  
      wire.once('close', () => {
 +      wire.ut_metadata = null
        clearTimeout(timeoutId)
      })
+ 
+@@ -1208,6 +1321,7 @@ class Torrent extends EventEmitter {
+       const oldOffset = s.offset
+ 
+       // check for newly downloaded pieces in selection
++      // console.log('start while loop @ gcSelections')
+       while (this.bitfield.get(s.from + s.offset) && s.from + s.offset < s.to) {
+         s.offset += 1
+       }
+@@ -1262,7 +1376,9 @@ class Torrent extends EventEmitter {
+     // update wires in random order for better request distribution
+     const ite = randomIterate(this.wires)
+     let wire
++    // console.log('start while loop @ _update')
+     while ((wire = ite())) {
++        if (this.destroyed) return
+       this._updateWireWrapper(wire)
+     }
+   }
+@@ -1302,6 +1418,7 @@ class Torrent extends EventEmitter {
+       if (wire.requests.length) return
+ 
+       let i = self._selections.length
++      // console.log('start while loop @ validateWire')
+       while (i--) {
+         const next = self._selections[i]
+         let piece
+@@ -1313,6 +1430,7 @@ class Torrent extends EventEmitter {
+           let tries = 0
+           const filter = genPieceFilterFunc(start, end, tried)
+ 
++          // console.log('start while loop inside validateWire')
+           while (tries < len) {
+             piece = self._rarityMap.getRarestPiece(filter)
+             if (piece < 0) break
+@@ -1388,10 +1506,12 @@ class Torrent extends EventEmitter {
+           let tries = 0
+           const filter = genPieceFilterFunc(start, end, tried, rank)
+ 
++          // console.log('start while loop @ trySelectWire')
+           while (tries < len) {
+             piece = self._rarityMap.getRarestPiece(filter)
+             if (piece < 0) break
+ 
++            // console.log('start while loop inside trySelectWire')
+             while (self._request(wire, piece, self._critical[piece] || hotswap)) {
+               // body intentionally empty
+               // request all non-reserved blocks in this piece
+@@ -1410,6 +1530,7 @@ class Torrent extends EventEmitter {
+           for (piece = next.from + next.offset; piece <= next.to; piece++) {
+             if (!wire.peerPieces.get(piece) || !rank(piece)) continue
+ 
++            // console.log('start while loop with self._request')
+             while (self._request(wire, piece, self._critical[piece] || hotswap)) {
+               // body intentionally empty
+               // request all non-reserved blocks in piece
+@@ -1471,6 +1592,7 @@ class Torrent extends EventEmitter {
+ 
+     let numInterestedUnchoked = 0
+     // leave one rechoke slot open for optimistic unchoking
++    // console.log('start while loop @ _rechoke')
+     while (wireStack.length > 0 && numInterestedUnchoked < this._rechokeNumSlots - 1) {
+       const wire = wireStack.pop() // next best quality peer
  
 diff --git a/node_modules/webtorrent/lib/utp.js b/node_modules/webtorrent/lib/utp.js
 index 2cde3f4..21956e3 100644
