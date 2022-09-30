@@ -1,6 +1,34 @@
-add push test workflow
-fix scripts error
-fix account test scripts
-use module: alphabiz-account
-upgrade alphabiz-account
-update test case list - settings test
+remove electronOnly settings for web mode
+assign default setting for web mode
+remove electron settings
+Update package.json
+try use ubuntu22.04 run wallet test
+Update package.json
+fix bug
+Update package.json
+fix open library from url
+Update package.json
+clipboard
+clipboard
+fix add subtitle、skip e2e
+Update package.json
+run push test
+Update package.json
+Update mixinKeychainLib.js
+paste blockchain url
+Update mixinKeychainLib.js
+Update EssentialLink.vue
+skip e2e
+skip e2e
+fix txn bug
+fix rule bug
+push to public repo
+save recommends list
+remove secure in webtorrent
+i18n
+fix page height in web mode
+fix upload error in web mode, close #667
+fix #668
+fix blockchain
+Update yarn.lock
+fix test error
