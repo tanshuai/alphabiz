@@ -111,6 +111,7 @@ test-results/
 playwright-report/
 test/download/**
 test/output/**
+test/**/libraryCreate.spec.js
 
 # build/
 *.torrent
