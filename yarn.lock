@@ -2810,7 +2810,7 @@ addr-to-ip-port@^1.0.1, addr-to-ip-port@^1.5.4:
 
 addressparser@^0.3.2:
   version "0.3.2"
-  resolved "https://registry.npmmirror.com/addressparser/-/addressparser-0.3.2.tgz#59873f35e8fcf6c7361c10239261d76e15348bb2"
+  resolved "https://registry.yarnpkg.com/addressparser/-/addressparser-0.3.2.tgz#59873f35e8fcf6c7361c10239261d76e15348bb2"
   integrity sha512-fDlslCJpojuY1cnb7tY7COAriA7cdSzDiWyrWNdFn7Cjd+jrEgZavqkOgD/wg+eH765YPnQjqlS88OL/Q0Qtkg==
 
 addressparser@~1.0.1:
@@ -5548,12 +5548,12 @@ electron@17.0.0:
 
 emailjs-base64@^1.1.4:
   version "1.1.4"
-  resolved "https://registry.npmmirror.com/emailjs-base64/-/emailjs-base64-1.1.4.tgz#392fa38cb6aa35dccd3af3637ffc14c1c7ce9612"
+  resolved "https://registry.yarnpkg.com/emailjs-base64/-/emailjs-base64-1.1.4.tgz#392fa38cb6aa35dccd3af3637ffc14c1c7ce9612"
   integrity sha512-4h0xp1jgVTnIQBHxSJWXWanNnmuc5o+k4aHEpcLXSToN8asjB5qbXAexs7+PEsUKcEyBteNYsSvXUndYT2CGGA==
 
 emailjs-mime-codec@^2.0.7:
   version "2.0.9"
-  resolved "https://registry.npmmirror.com/emailjs-mime-codec/-/emailjs-mime-codec-2.0.9.tgz#d184451b6f2e55c5868b0f0a82d18fe2b82f0c97"
+  resolved "https://registry.yarnpkg.com/emailjs-mime-codec/-/emailjs-mime-codec-2.0.9.tgz#d184451b6f2e55c5868b0f0a82d18fe2b82f0c97"
   integrity sha512-7qJo4pFGcKlWh/kCeNjmcgj34YoJWY0ekZXEHYtluWg4MVBnXqGM4CRMtZQkfYwitOhUgaKN5EQktJddi/YIDQ==
   dependencies:
     emailjs-base64 "^1.1.4"
@@ -5562,7 +5562,7 @@ emailjs-mime-codec@^2.0.7:
 
 emailjs@^2.2.0:
   version "2.2.0"
-  resolved "https://registry.npmmirror.com/emailjs/-/emailjs-2.2.0.tgz#ba5b23e4a4b0a4510f652e873b154e9407b6ca03"
+  resolved "https://registry.yarnpkg.com/emailjs/-/emailjs-2.2.0.tgz#ba5b23e4a4b0a4510f652e873b154e9407b6ca03"
   integrity sha512-J9HNx13GA5DnJma10YxsSqYCErTyB0KoVflTddPTyKlEVHM0MckZXn/zDqovdacwWkHCxqC9AKVY8GMPaGvaGQ==
   dependencies:
     addressparser "^0.3.2"
@@ -6780,10 +6780,10 @@ grapheme-splitter@^1.0.2:
   resolved "https://registry.yarnpkg.com/grapheme-splitter/-/grapheme-splitter-1.0.4.tgz#9cf3a665c6247479896834af35cf1dbb4400767e"
   integrity sha512-bzh50DW9kTPM00T8y4o8vQg89Di9oLJVLW/KaOGIXJWP/iqCN6WKYkbNOF04vFLJhwcpYUh9ydh/+5vpOqV4YQ==
 
-gun@^0.2020.1236:
-  version "0.2020.1236"
-  resolved "https://registry.yarnpkg.com/gun/-/gun-0.2020.1236.tgz#50a8a7b0277911cba28857627214c846c6aeb321"
-  integrity sha512-kTVisg8ipKvkrrcYNkH5zQXrDdMQsCeDVnYQse8loOlSsbLEAgUcD+o8XZIbsq0geY6F/3KFm64dADchInFLtg==
+gun@^0.2020.1237:
+  version "0.2020.1237"
+  resolved "https://registry.yarnpkg.com/gun/-/gun-0.2020.1237.tgz#e798917f66a7195a9d620a7c4de3bdc331d32c83"
+  integrity sha512-5WiAMqbLzKfYy/45AVGNrI0OiU7hG5z2hdMeRBMDYXGHzkOUDvbrOnO6qaEqmvCwlwzHJaIilKS51KvMyxhDTQ==
   dependencies:
     ws "^7.2.1"
   optionalDependencies:
@@ -10260,7 +10260,7 @@ railroad-diagrams@^1.0.0:
 
 ramda@^0.26.1:
   version "0.26.1"
-  resolved "https://registry.npmmirror.com/ramda/-/ramda-0.26.1.tgz#8d41351eb8111c55353617fc3bbffad8e4d35d06"
+  resolved "https://registry.yarnpkg.com/ramda/-/ramda-0.26.1.tgz#8d41351eb8111c55353617fc3bbffad8e4d35d06"
   integrity sha512-hLWjpy7EnsDBb0p+Z3B7rPi3GDeRG5ZtiI33kJhTt+ORCd38AbAIjB/9zRIUoeTbE/AVX5ZkU7m6bznsvrf8eQ==
 
 randexp@0.4.6:
@@ -11635,7 +11635,7 @@ test-exclude@^6.0.0:
 
 text-encoding@^0.7.0:
   version "0.7.0"
-  resolved "https://registry.npmmirror.com/text-encoding/-/text-encoding-0.7.0.tgz#f895e836e45990624086601798ea98e8f36ee643"
+  resolved "https://registry.yarnpkg.com/text-encoding/-/text-encoding-0.7.0.tgz#f895e836e45990624086601798ea98e8f36ee643"
   integrity sha512-oJQ3f1hrOnbRLOcwKz0Liq2IcrvDeZRHXhd9RgLrsT+DjWY/nty1Hi7v3dtkaEYbPYe0mUoOfzRrMwfXXwgPUA==
 
 text-hex@1.0.x:

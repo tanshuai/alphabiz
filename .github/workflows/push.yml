@@ -18,6 +18,7 @@ on:
       - "!test/**"
       - "build/**"
       - "release.json"
+      - "package.json"
     branches: [main]
 
 jobs:
@@ -262,6 +263,10 @@ jobs:
           path: test/output/**
 
       #后面的step晚上运行 或 正式发布
+      # - name: add list
+      #   if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
+      #   run: |
+          
 
       - name: Run electron-packager
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
