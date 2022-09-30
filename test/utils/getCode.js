@@ -69,18 +69,9 @@ function mailListener (type, time, to) {
     })
     // 连接开始时
     mailListener.on('server:connected', function () {
-      // console.log('imapConnected')
       mailListener.imap.search([['SINCE', datestring()]], function (err, list) {
         if (err) throw err
-        // console.log('list:' + list.reverse())
         if (list.length !== 0) {
-          // if (type === 1) {
-          //   mailListener.imap.addFlags(list, '\\Seen', function (err) {
-          //     if (err) {
-          //       console.log('error marking message read/SEEN')
-          //     }
-          //   })
-          // }
           var f = mailListener.imap.fetch(list, { bodies: '' })
           f.on('message', function (msg, seqno) {
             msg.on('body', function (stream, info) {
@@ -88,35 +79,19 @@ function mailListener (type, time, to) {
                 if (err) throw err
                 // 判断email to
                 const emailto = mail.to
-                // console.log('connected targetTo:' + to)
-                // console.log('connected to:' + emailto.text)
                 if (emailto.text === to) {
-                  // console.log('this is targetTo')
                   // 点击获取邮件 时间之后 收到的邮件
                   if (!type || Date.parse(time) < Date.parse(mail.date)) {
-                  // const headers = mail.headers
-                  // headers.forEach(function (item) {
-                  //   console.log(item.toString())
-                  // })
-                    // const emailto = mail.to
-                    // console.log(emailto.text)
-                    // console.log('subject:' + mail.subject)
-                    // console.log('time:' + mail.date)
-                    // console.log('html:' + mail.html)
-                    // console.log('text:' + mail.text)
                     const str = (type ? mail.html : mail.text)
                     // (verification|invitation)
-                    const codeType = (type ? 'Verification' : 'invitation')
-                    const codeword = (type ? 'Code' : 'code')
-                    const reg = new RegExp('(?<=\\bYour\\s' + codeType + '\\s' + codeword + '\\sis\\s)\\w+\\b')
-                    const code = reg.exec(str)
+                    // const codeType = (type ? 'verification' : 'invitation')
+                    // const codeword = (type ? 'code' : 'code')
+                    // const reg = new RegExp('(?<=\\bYour\\s' + codeType + '\\s' + codeword + '\\sis\\s)\\w+\\b')
+                    const codeReg = type ? new RegExp('\\d{6}')
+                      : new RegExp('(?<=\\bYou\\sreceived\\san\\sinvitation\\scode:\\s)\\w+\\b')
+                    const code = codeReg.exec(str)
                     console.log('code:' + code)
                     if (code) { // if code != null
-                      // mailListener.imap.addFlags('1195', '\\Seen', function (err) {
-                      //   if (err) {
-                      //     console.log('error marking message read/SEEN')
-                      //   }
-                      // })
                       resolve(code[0])
                       mailListener.stop()
                     }
@@ -143,31 +118,19 @@ function mailListener (type, time, to) {
     })
     // 新邮件到达时
     mailListener.on('mail', function (mail, seqno, attributes) {
-      // var mailuid = attributes.uid
-      // mailListener.imap.addFlags(mailuid, '\\Seen', function (err) {
-      //   if (err) {
-      //     console.log('error marking message read/SEEN')
-      //   }
-      // })
-
-      // console.log('-----------------------')
-      // console.log(mail.to)
       const emailto = mail.to
       // console.log(emailto[0].address)
       if (emailto[0].address === to) {
-        console.log('this is targetTo')
         // mail processing code goes here
         if (Date.parse(time) < Date.parse(mail.date)) {
-        // console.log('subject:' + mail.subject)
-        // console.log('time:' + mail.date)
-        // console.log('html:' + mail.html)
-        // console.log('text:' + mail.text)
           const str = (type ? mail.html : mail.text)
           // (verification|invitation)
-          const codeType = (type ? 'Verification' : 'invitation')
-          const codeword = (type ? 'Code' : 'code')
-          const reg = new RegExp('(?<=\\bYour\\s' + codeType + '\\s' + codeword + '\\sis\\s)\\w+\\b')
-          const code = reg.exec(str)
+          // const codeType = (type ? 'verification' : 'invitation')
+          // const codeword = (type ? 'code' : 'code')
+          // const reg = new RegExp('(?<=\\bYour\\s' + codeType + '\\s' + codeword + '\\sis\\s)\\w+\\b')
+          const codeReg = type ? new RegExp('\\d{6}')
+            : new RegExp('(?<=\\bYou\\sreceived\\san\\sinvitation\\scode:\\s)\\w+\\b')
+          const code = codeReg.exec(str)
           console.log('code:' + code)
           if (code) { // if code = null
             resolve(code[0])
@@ -191,11 +154,7 @@ function getSMS (type, time) {
     const client = require('twilio')(process.env.PHONE_NUMBER_ACCOUNT, process.env.PHONE_NUMBER_TOKEN)
 
     client.messages.list({ limit: 5 }).then(messages => messages.forEach(m => {
-      // console.log('body:' + m.body)
-      // console.log('from:' + m.from)
-      // console.log('dateSent:' + m.dateSent)
       if (!type || Date.parse(time) < Date.parse(m.dateSent)) {
-        // console.log('subject:' + mail.subject)
         const str = m.body
         const codeReg = (type ? new RegExp('(?<=\\bYour\\sVerification\\sCode\\sis\\s)\\w+\\b')
           : new RegExp('(?<=\\bYou\\sreceived\\san\\sinvitation\\scode:\\s)\\w+\\b'))

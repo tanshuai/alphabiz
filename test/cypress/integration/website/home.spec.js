@@ -9,7 +9,7 @@
 // This test will pass when run against a clean Quasar project
 describe('Landing', () => {
   beforeEach(() => {
-    cy.visit('/')
+    cy.visit('https://web.alpha.biz')
   })
   it('.should() - assert that <title> is correct', () => {
     cy.title().should('include', 'Alphabiz')
@@ -17,15 +17,5 @@ describe('Landing', () => {
   it('.should() - has version number with x.x.x format', () => {
     cy.get('#version').contains(/^v\d+\.\d+\.\d+/)
   })
-  it.skip('.should() - has correct version number', () => {
-    cy.readFile('package.json').then((text) => {
-      const regex = new RegExp(`^v${text.version}`)
-      cy.get('#version').contains(regex)
-    })
-  })
-  it.skip('.should() - has correct git commit id', () => {
-    cy.readFile('commit.json').then((text) => {
-      cy.get('#commit').should('have.text', '(' + text.commit + ')')
-    })
-  })
 })
+

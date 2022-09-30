@@ -28,12 +28,12 @@ describe('Credits', () => {
     // 转账金额
     const transferAmount = 1
 
-    cy.signIn(payee.account, payee.password)
+    cy.signIn(payee.account, payee.password, { isWebsite: true })
     cy.toCredits()
     cy.getPoint().as('payeePoint')
     cy.getReceiptCode().as('payeeReceiptCode')
 
-    cy.signIn(transferee.account, transferee.password)
+    cy.signIn(transferee.account, transferee.password, { isWebsite: true })
     cy.toCredits()
     cy.getPoint().as('transfereePoint')
     cy.getReceiptCode().as('transfereeReceiptCode')
@@ -56,7 +56,7 @@ describe('Credits', () => {
       })
     })
 
-    cy.signIn(payee.account, payee.password)
+    cy.signIn(payee.account, payee.password, { isWebsite: true })
     cy.toCredits()
     cy.get('@payeePoint').then(payeePoint => {
       // 断言 收款人 积分变化

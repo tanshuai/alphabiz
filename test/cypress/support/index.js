@@ -16,6 +16,12 @@
 // Import commands.js using ES2015 syntax:
 import './commands'
 
+import './model/playerPage'
+import './model/creditsPage'
+import './model/walletPage'
+import './model/basicPage'
+import './model/toolPage'
+
 const resizeObserverLoopError = 'ResizeObserver loop limit exceeded'
 
 Cypress.on('uncaught:exception', (err) => {

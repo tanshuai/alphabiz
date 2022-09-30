@@ -16,8 +16,8 @@ require('dotenv').config()
 const { calculation } = require('../../utils/calculation')
 module.exports = (on, config) => {
   on('task', {
-    calculation ({ type, time, to }) {
-      return calculation(type, time, to)
+    calculation ({ type, from, to }) {
+      return calculation(type, from, to)
     },
     log (message) {
       console.log(message)

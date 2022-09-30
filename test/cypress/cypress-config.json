@@ -1,5 +1,5 @@
 {
-  "baseUrl": "http://localhost:8080/",
+  "baseUrl": "https://localhost:8080/",
   "fixturesFolder": "test/cypress/fixtures",
   "integrationFolder": "test/cypress/integration",
   "pluginsFile": "test/cypress/plugins/index.js",
@@ -8,5 +8,19 @@
   "videosFolder": "test/cypress/videos",
   "video": false,
   "retries": 2,
-  "experimentalSessionSupport": true
+  "experimentalSessionSupport": true,
+  "viewportWidth": 1268,
+  "viewportHeight": 768,
+  "clientCertificates": [
+    {
+      "url": "https://localhost:8080/",
+      "ca": [],
+      "certs": [
+        {
+          "cert": "test/cypress/fixtures/E2E-TEST.pem",
+          "key": "test/cypress/fixtures/E2E-TEST-key.pem"
+        }
+      ]
+    }
+  ]
 }

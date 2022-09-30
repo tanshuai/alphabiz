@@ -81,7 +81,7 @@ describe('upload', () => {
       if (calculation('reduce', changedCredit, initialCredit) >= 0.001) break
       await sleep(5000)
     }
-    console.log('credits increase')
+    console.log('credits increase:' + changedCredit)
     // 等待下载者完成下载
     // console.log('waitTaskPeersHidden')
     // await homePage.jumpPage('uploadingStatusTab')

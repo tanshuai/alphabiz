@@ -3,7 +3,7 @@
 
 describe('Player', () => {
   beforeEach(() => {
-    cy.signIn('test1' + Cypress.env('testEmailDomain'), 'password')
+    cy.signIn('test1' + Cypress.env('testEmailDomain'), 'password', { isWebsite: true })
   })
   it('.mkv', () => {
     const mediaPath = 'samples/Embedded.Subtitles.Sample.Princess.Mononoke.1080p.H264.AAC.DualAudio.5.1.BDrip.mkv'

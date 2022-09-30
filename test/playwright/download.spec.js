@@ -135,7 +135,7 @@ for (const tg of taskGroup) {
       const downloadNum = await allCard.count()
       console.log(`${tg.groupName} downloadNum: ` + downloadNum)
       // expect(downloadNum).toBe(5)
-      await homePage.waitForAllHidden(allCard, timeout, 30000)
+      await basePage.waitForAllHidden(allCard, timeout, 30000)
       // let waitTime = 0
       // while (1) {
       //   if (waitTime >= timeout) break

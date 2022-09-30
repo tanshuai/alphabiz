@@ -3,7 +3,7 @@
 
 describe('LanguageSelection', () => {
   beforeEach(() => {
-    cy.signIn('test1' + Cypress.env('testEmailDomain'), 'password')
+    cy.signIn('test1' + Cypress.env('testEmailDomain'), 'password', { isWebsite: true })
   })
   it('CN', () => {
     cy.changeLanguage('EN', 'CN')
