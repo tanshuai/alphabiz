@@ -83,7 +83,11 @@ const updateVersionJSON = async () => {
   if(!process.argv.includes('--newTag')) {
     content.version = content.packageVer + '-' + content.channel + '-' + content.buildTime
   } else {
-    if (process.argv.includes('--stable')) content.channel = 'stable'
+    if (process.argv.includes('--stable')) {
+      content.channel = 'stable'
+      // 正式发布通过push release.json触发，版本更新后需要手动更新public repo和private repo 的package.json的version,同步版本号
+      content.packageVer = argv.newTag
+    }
     content.version = argv.newTag
   }
   const data = JSON.stringify(content, null, 2)
