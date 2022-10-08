@@ -119,7 +119,6 @@ test.afterEach(async ({}, testInfo) => {
     await window.screenshot({ path: `${ScreenshotsPath}${testInfo.title}-retry-${testInfo.retry}-fail.png` })
   }
 })
-
 test('close set default', async () => {
   try {
     await basePage.defaultAppAlert.waitFor({ timeout: 3000 })
@@ -134,13 +133,6 @@ test('reset torrent status', async () => {
   test.setTimeout(60000 * 4)
   await window.waitForLoadState()
   await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
-  await basePage.jumpPage('downloadingStatus')
-  try {
-    await homePage.downRemoveAllBtn.waitFor({ timeout: 5000 })
-  } catch (e) {
-    await basePage.jumpPage('downloadingStatus')
-  }
-  await homePage.searchBtn.click({ force: true })
   await homePage.clearTask()
 })
 
@@ -149,7 +141,7 @@ test.describe('play video', () => {
     if (process.platform === 'darwin') test.setTimeout(60000 * 5)
     else test.setTimeout(60000 * 3)
     await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
-    await window.waitForLoadState()
+    await window.waitForTimeout(1000)
     await basePage.jumpPage('playerLink')
   })
   test('avi_type', async () => {
@@ -248,8 +240,10 @@ test.describe('download ', () => {
       try {
         await homePage.downRemoveAllBtn.waitFor({ timeout: 5000 })
       } catch (e) {
+        await window.waitForTimeout(2000)
         await basePage.jumpPage('downloadingStatus')
       }
+      await homePage.searchBtn.click({ force: true })
       await window.waitForTimeout(2000)
       // 等待任务卡片加载
       if (!await homePage.getCard(bt.btName).isVisible()) {
@@ -499,48 +493,50 @@ test.describe('task', () => {
     await homePage.copySuccessAlert.waitFor('visible')
     await basePage.waitForAllHidden(await homePage.copySuccessAlert)
     // 验证alphabiz链接
-    await basePage.headerTitle.click({ force: true })
-    await window.keyboard.press(`${basePage.modifier}+KeyV`)
-    expect(await homePage.magnetTarea).toHaveValue(/alphabiz:\/\//)
-    await homePage.cardCancelBtn.click()
+    if (process.platform !== 'darwin') {
+      await basePage.headerTitle.click({ force: true })
+      await window.keyboard.press(`${basePage.modifier}+KeyV`)
+      expect(await homePage.magnetTarea).toHaveValue(/alphabiz:\/\//)
+      await homePage.cardCancelBtn.click()
 
-    await basePage.jumpPage('downloadingStatus')
-    await homePage.downloadBtn.click()
-    expect(await homePage.magnetTarea).toHaveValue(/alphabiz:\/\//)
-    await homePage.cardCancelBtn.click()
-    await basePage.jumpPage('uploadingStatus')
-    await window.waitForTimeout(1000)
-    // 验证ab链接
-    await moreIcon.click()
-    await homePage.moreCard.waitFor()
-    await window.waitForTimeout(1000)
-    await homePage.copyShareUrlBtn.click()
-    await homePage.copySuccessAlert.waitFor('visible')
-    await basePage.headerTitle.click({ force: true })
-    await window.keyboard.press(`${basePage.modifier}+KeyV`)
-    expect(await homePage.magnetTarea).toHaveValue(/ab:\/\//)
-    await homePage.cardCancelBtn.click()
+      await basePage.jumpPage('downloadingStatus')
+      await homePage.downloadBtn.click()
+      expect(await homePage.magnetTarea).toHaveValue(/alphabiz:\/\//)
+      await homePage.cardCancelBtn.click()
+      await basePage.jumpPage('uploadingStatus')
+      await window.waitForTimeout(1000)
+      // 验证ab链接
+      await moreIcon.click()
+      await homePage.moreCard.waitFor()
+      await window.waitForTimeout(1000)
+      await homePage.copyShareUrlBtn.click()
+      await homePage.copySuccessAlert.waitFor('visible')
+      await basePage.headerTitle.click({ force: true })
+      await window.keyboard.press(`${basePage.modifier}+KeyV`)
+      expect(await homePage.magnetTarea).toHaveValue(/ab:\/\//)
+      await homePage.cardCancelBtn.click()
 
-    await basePage.jumpPage('downloadingStatus')
-    await homePage.downloadBtn.click()
-    expect(await homePage.magnetTarea).toHaveValue(/ab:\/\//)
+      await basePage.jumpPage('downloadingStatus')
+      await homePage.downloadBtn.click()
+      expect(await homePage.magnetTarea).toHaveValue(/ab:\/\//)
 
-    // 验证magnet链接
-    await homePage.magnetTarea.fill('magnet:?xt=urn:btih:61b3b8856c4839edf51f5c2346599b6bec524145')
-    // 复制磁链
-    await window.focus('.q-card >> textarea')
-    await window.keyboard.press(`${basePage.modifier}+KeyA`)
-    await window.keyboard.press(`${basePage.modifier}+KeyC`)
-    await homePage.cardCancelBtn.click()
-    await window.keyboard.press(`${basePage.modifier}+KeyV`)
-    expect(await homePage.magnetTarea).toHaveValue(/magnet:\?/)
-    await homePage.cardCancelBtn.click()
-    await homePage.downloadBtn.click()
-    expect(await homePage.magnetTarea).toHaveValue(/magnet:\?/)
-    await homePage.cardCancelBtn.click()
+      // 验证magnet链接
+      await homePage.magnetTarea.fill('magnet:?xt=urn:btih:61b3b8856c4839edf51f5c2346599b6bec524145')
+      // 复制磁链
+      await window.focus('.q-card >> textarea')
+      await window.keyboard.press(`${basePage.modifier}+KeyA`)
+      await window.keyboard.press(`${basePage.modifier}+KeyC`)
+      await homePage.cardCancelBtn.click()
+      await window.keyboard.press(`${basePage.modifier}+KeyV`)
+      expect(await homePage.magnetTarea).toHaveValue(/magnet:\?/)
+      await homePage.cardCancelBtn.click()
+      await homePage.downloadBtn.click()
+      expect(await homePage.magnetTarea).toHaveValue(/magnet:\?/)
+      await homePage.cardCancelBtn.click()
 
-    await basePage.jumpPage('uploadingStatus')
-    await window.waitForTimeout(1000)
+      await basePage.jumpPage('uploadingStatus')
+      await window.waitForTimeout(1000)
+    }
     // "更多"功能检查文件路径
     await moreIcon.click()
     await homePage.moreCard.waitFor()
@@ -644,6 +640,7 @@ test.describe('upload', () => {
     await window.waitForTimeout(3000)
     await basePage.jumpPage('uploadingStatus')
     await window.waitForTimeout(2000)
+    await homePage.searchBtn.click({ force: true })
     await homePage.uploadBtn.click()
     await homePage.uploadCard.waitFor()
     await homePage.ucCancelBtn.click()

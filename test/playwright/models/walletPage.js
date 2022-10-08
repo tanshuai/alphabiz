@@ -159,7 +159,7 @@ class WalletPage extends BasePage {
     // copy
     await this.wcMoreBtn.click()
     await this.CopyLinkBtn.click()
-    await this.checkAlert('copy', /copied/, { isWaitAlertHidden: true, isLog: false })
+    await this.checkAlert('copy', /Copied/, { isWaitAlertHidden: true, isLog: false })
     await this.jumpPage(targetPage)
     await this.page.waitForTimeout(2000)
     await this.page.keyboard.press(`${this.modifier}+KeyV`)

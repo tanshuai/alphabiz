@@ -16,8 +16,8 @@ class HomePage extends BasePage {
       moreBtn: 'button:has-text("more_horiz")',
       stopBtn: 'button:has-text("STOP")',
       resumeBtn: 'button:has-text("play_arrowResume")',
-      seedBtn: 'button:has-text("play_arrowSeed")',
-      playBtn: 'button:has-text("play_circlePlay")',
+      seedBtn: 'button:has-text("Seed")',
+      playBtn: 'button:has-text("Play")',
       openDirBtn: 'button:has-text("folderOpen directory")',
       libraryBtn: 'button:has-text("video_libraryLibrary")',
       deleteBtn: 'button:has-text("Delete")',
@@ -33,7 +33,7 @@ class HomePage extends BasePage {
       uploadSpeed: '//td[3]',
       stopBtn: 'button:has-text("stop")',
       seedBtn: 'button:has-text("cloud_upload")',
-      fileOpenBtn: 'button:has-text("file_open")',
+      fileOpenBtn: 'button:has-text("smart_display")',
       folderBtn: 'button:has-text("folder")',
       moreBtn: 'button:has-text("more_horiz")',
       closeBtn: 'button:has-text("close")'
@@ -113,6 +113,12 @@ class HomePage extends BasePage {
 
   async clearTask () {
     await this.jumpPage('downloadingStatus')
+    try {
+      await this.downRemoveAllBtn.waitFor({ timeout: 5000 })
+    } catch (e) {
+      await this.jumpPage('downloadingStatus')
+    }
+    await this.searchBtn.click({ force: true })
     await this.page.waitForTimeout(1000)
     if (await this.downRemoveAllBtn.isEnabled()) {
       await this.downRemoveAllBtn.click()

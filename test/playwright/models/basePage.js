@@ -74,7 +74,9 @@ class BasePage {
    */
   async jumpPage (firstTarget, secondTarget) {
     const menuButton = await this[secondTarget] || await this[firstTarget]
-    if (await this[firstTarget].isHidden()) {
+    await this.page.waitForTimeout(500)
+    const isHidden = await this[firstTarget].isHidden()
+    if (isHidden) {
       await this.menuIcon.click()
     }
     if (secondTarget) {
@@ -151,11 +153,13 @@ class BasePage {
 
   // Determine whether to log in and log in for download tests
   async ensureLoginStatus (username, password, isWaitAlert, isSetToken = true) {
+    await this.page.waitForTimeout(500)
     // if not logged in
     if (await this.accountInput.isVisible()) {
       await this.signIn(username, password, isWaitAlert, isSetToken)
     } else {
-      if (await this.downloadingStatus.isHidden()) await this.menuIcon.click()
+      const leftBar = await this.downloadingStatus.isVisible()
+      if (!leftBar) await this.menuIcon.click()
       if (await this.accountSignIn.isVisible()) {
         await this.signIn(username, password, isWaitAlert, isSetToken)
       }

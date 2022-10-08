@@ -139,11 +139,12 @@ class LibraryPage extends BasePage {
     // preview channel
     this.previewHead = page.locator('.q-card:has-text("preview mode")')
     // edit channel card(ec)
-    this.ecTitle = page.locator('.post-list-title')
-    this.ecAddPostBtn = page.locator('.post-list-title button:has-text("add")')
-    this.ecImportExcelBtn = page.locator('.post-list-title button:has-text("table_rows")')
-    this.ecCloseBtn = page.locator('.post-list-title button:has-text("close")')
-    this.ecDesc = page.locator('.post-list-card .description')
+    const editChannelCardCss = '.post-list-card'
+    this.ecTitle = page.locator(editChannelCardCss)
+    this.ecAddPostBtn = page.locator(`${editChannelCardCss} button:has-text("add")`)
+    this.ecImportExcelBtn = page.locator(`${editChannelCardCss} button:has-text("table_rows")`)
+    this.ecCloseBtn = page.locator(`${editChannelCardCss} button:has-text("close") >> nth=0`)
+    this.ecDesc = page.locator(`${editChannelCardCss} .description`)
     this.ecPostListEleObj = {
       titleEle: '.post-title',
       posterEle: '.post-title >> //preceding::*[1]',
@@ -173,6 +174,11 @@ class LibraryPage extends BasePage {
     this.shareChannelAlert = page.locator('[role="alert"]:has-text("Share URL is copied to your clipboard")')
     this.copiedAlert = page.locator('[role="alert"] >> text=/Copied/')
     this.removedFavoriteAlert = page.locator('[role="alert"]:has-text("Removed favorite")')
+  }
+
+  async scrollToLoadPage () {
+    await this.page.locator(".library-index").hover()
+    await this.page.mouse.wheel(0, 10000)
   }
 
   async checkNavBar (title, options = { timeout: 1000 }) {

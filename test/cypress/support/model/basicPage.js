@@ -37,6 +37,7 @@ Cypress.Commands.add('changeLanguage', (lang, targetLang) => {
   // 刷新验证是否保存
   cy.reload()
   cy.location('pathname', { timeout: 60000 }).should('eq', '/library')
+
   cy.toBasic(targetLang)
   cy.get(HEADER_TITLE).contains(I18N.BASIC_TITLE[targetLang]).click()
 })

@@ -377,13 +377,6 @@ test.describe('channel', () => {
     await libraryPage.getChannelCardEle('', 'card').waitFor()
   })
   test('clear env', async () => {
-    // 情况下载任务
-    await basePage.jumpPage('downloadingStatus')
-    try {
-      await homePage.downRemoveAllBtn.waitFor({ timeout: 5000 })
-    } catch (e) {
-      await basePage.jumpPage('downloadingStatus')
-    }
     await homePage.clearTask()
 
     // 关闭推荐页面
@@ -437,7 +430,7 @@ test.describe('channel', () => {
     }
     await basePage.exploreLink.waitFor()
     await basePage.jumpPage('exploreLink')
-    await libraryPage.getPostCardEle('', 'channelTitleEle').nth(0).waitFor({ timeout: 30000 })
+    await libraryPage.getPostCardEle('', 'channelTitleEle').nth(0).waitFor({ timeout: 60000 })
   })
 
   test('add channel', async () => {
@@ -559,6 +552,7 @@ test.describe('channel', () => {
     test('home page', async () => {
       await basePage.jumpPage('homeLink')
       await basePage.waitForAllHidden(await basePage.centerAlert)
+      await libraryPage.scrollToLoadPage()
       await window.waitForTimeout(5000)
       await libraryPage.ensurePostCard(postObj, { page: 'homeLink', favorite: true })
       const channelTitle = await libraryPage.getPostCardEle(postObj.title, 'channelTitleEle')
@@ -628,6 +622,7 @@ test.describe('channel', () => {
     })
     test('local favorites', async () => {
       await basePage.jumpPage('homeLink')
+      await libraryPage.scrollToLoadPage()
       const starBtn = await libraryPage.getPostCardEle(postObj.title, 'starBtn')
       const starBtnText = await starBtn.innerText()
       if (starBtnText === 'star_border') await starBtn.click()
@@ -860,6 +855,7 @@ test.describe('channel', () => {
       }
       // 主页屏蔽，关注页标记，编辑页标记，搜索页标记
       await basePage.jumpPage('homeLink')
+      await libraryPage.scrollToLoadPage()
       await expect(libraryPage.getChannelCardEle(channelObj.title, 'card')).toHaveCount(0)
       await basePage.jumpPage('followingLink')
       await window.waitForTimeout(5000)
@@ -884,6 +880,7 @@ test.describe('channel', () => {
 
       // 验证关注页，主页，编辑页标记，搜索页标记
       await basePage.jumpPage('homeLink')
+      await libraryPage.scrollToLoadPage()
       await window.waitForTimeout(5000)
       await libraryPage.getPostCardEle(postObj.title, 'postTitle').waitFor()
 
@@ -910,6 +907,7 @@ test.describe('channel', () => {
 
       test('channel header', async () => {
         await basePage.jumpPage('homeLink')
+        await libraryPage.scrollToLoadPage()
         // 进入频道详细页面
         await libraryPage.getPostCardEle(postObj.title, 'channelTitleEle').click()
         const cdFollowBtn = await libraryPage.cdFollowBtn
@@ -1031,6 +1029,7 @@ test.describe('channel', () => {
     await libraryPage.ecCloseBtn.click()
     // 主页
     await basePage.jumpPage('homeLink')
+    await libraryPage.scrollToLoadPage()
     await window.waitForTimeout(5000)
     await expect(libraryPage.getPostCardEle(postObj2.title, 'postTitle')).toHaveCount(0)
     await expect(libraryPage.getPostCardEle(postObj.title, 'postTitle')).toHaveCount(1)

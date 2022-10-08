@@ -11,6 +11,7 @@
   "experimentalSessionSupport": true,
   "viewportWidth": 1268,
   "viewportHeight": 768,
+  "chromeWebSecurity": false,
   "clientCertificates": [
     {
       "url": "https://localhost:8080/",
