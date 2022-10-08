@@ -1,34 +1,13 @@
-remove electronOnly settings for web mode
-assign default setting for web mode
-remove electron settings
-Update package.json
-try use ubuntu22.04 run wallet test
-Update package.json
-fix bug
-Update package.json
-fix open library from url
-Update package.json
-clipboard
-clipboard
-fix add subtitle、skip e2e
-Update package.json
-run push test
-Update package.json
-Update mixinKeychainLib.js
-paste blockchain url
-Update mixinKeychainLib.js
-Update EssentialLink.vue
-skip e2e
-skip e2e
-fix txn bug
-fix rule bug
-push to public repo
-save recommends list
-remove secure in webtorrent
-i18n
-fix page height in web mode
-fix upload error in web mode, close #667
-fix #668
-fix blockchain
-Update yarn.lock
-fix test error
+resolve #675
+fix electron test error
+fix #676
+fix ab-url error with special task name, fix #670, close #671
+fix phone account test
+Update account.spec.js
+virtual scroll
+disable follow/unfollow until loaded, close #677
+fix e2e test error
+Resume the basic Settings test
+add debounce for inputs #672
+print main-process errors in main window for debugging
+virtual scroll
