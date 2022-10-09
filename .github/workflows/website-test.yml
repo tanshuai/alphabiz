@@ -49,6 +49,12 @@ jobs:
           echo "::set-output name=sha7::${GITHUB_SHA::7}"
         shell: bash
 
+      - name: Get message
+        id: vars
+        run: |
+          git fetch --prune --unshallow
+        shell: bash
+
       - name: Checkout ${{ steps.slug.outputs.sha7 }} ⬇️
         uses: actions/checkout@v2
 
