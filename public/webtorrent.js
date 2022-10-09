@@ -403,7 +403,7 @@ const addListeners = (tr, conf = {}, isSeeding = false) => {
   })
   tr.on('warning', () => {})
   tr.on('error', e => {
-    info('Torrent error', e, conf)
+    console.log('Torrent error', e, conf)
     ipcRenderer.send('webtorrent-error', torrentToJson(tr), e.message)
   })
   tr.on('wire', wire => onWire(wire, tr))
@@ -951,7 +951,7 @@ const stopServer = () => {
     let { file, token, ...options } = torrentInfo
     // for downloaded torrents
     if (!file) file = torrentInfo.files.map(i => i.path)
-    info(torrentInfo)
+    console.log(torrentInfo)
     if (!file.length) return ipcRenderer.send('seed-error')
     if (!token) token = Math.random().toString().substr(2)
     return seedTorrent(token, file, options)
