@@ -22,7 +22,7 @@ jobs:
       matrix:
         # os: [ubuntu-latest, windows-latest, macos-latest]
         os: [windows-latest]
-        node-version: [14]
+        node-version: [16]
     environment:
       name: CICD
     env:
