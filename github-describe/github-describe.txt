@@ -1,13 +1,9 @@
-resolve #675
-fix electron test error
-fix #676
-fix ab-url error with special task name, fix #670, close #671
-fix phone account test
-Update account.spec.js
+fix e2e test check wallet address error
+fixed: #619
+try fix cypress read ECONNRESET error in windows
+fix electron wallet test
 virtual scroll
-disable follow/unfollow until loaded, close #677
-fix e2e test error
-Resume the basic Settings test
-add debounce for inputs #672
-print main-process errors in main window for debugging
+fix #678
+allow upload multi files as single tasks #669
+performance update
 virtual scroll
