@@ -116,6 +116,13 @@ jobs:
         run: yarn test:e2e:ci
         shell: bash
 
+      - name: Upload Test Results 🗃
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: "${{ matrix.os }}-output"
+          path: test/output/**
+
   appium-test:
     needs: build-1
     if: |
