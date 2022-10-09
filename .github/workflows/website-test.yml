@@ -1,0 +1,92 @@
+name: CT website test
+
+on:
+  schedule:
+    - cron: "40 3 * * *"
+  pull_request:
+  push:
+    paths:
+      - "**/website-test.yml"
+    branches: [main]
+
+jobs:
+  nightly_job:
+    runs-on: ${{ matrix.os }}
+    if: "!contains(github.event.head_commit.message , 'skip workflow')"
+    outputs:
+      output1: ${{ steps.unify.outputs.tag-name }}
+      output2: ${{ steps.check.outputs.isRunAppium }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        node-version: [16]
+        include:
+          - os: windows-latest
+            node-version: 16
+      fail-fast: false
+    environment:
+      name: CICD
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.PAT }}
+      GITHUB_PAT: ${{ secrets.PAT }}
+      EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
+      EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+      PHONE_NUMBER_ACCOUNT: ${{ secrets.PHONE_NUMBER_ACCOUNT }}
+      PHONE_NUMBER_TOKEN: ${{ secrets.PHONE_NUMBER_TOKEN }}
+      TEST_EMAIL_DOMAIN: ${{ secrets.TEST_EMAIL_DOMAIN }}
+      TEST1_EMAIL: ${{ secrets.TEST1_EMAIL }}
+      TEST2_EMAIL: ${{ secrets.TEST2_EMAIL }}
+      TEST3_EMAIL: ${{ secrets.TEST3_EMAIL }}
+      TEST1_PHONE_NUMBER: ${{ secrets.TEST1_PHONE_NUMBER }}
+      TEST2_PHONE_NUMBER: ${{ secrets.TEST2_PHONE_NUMBER }}
+      TEST3_PHONE_NUMBER: ${{ secrets.TEST3_PHONE_NUMBER }}
+      TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+      TEST_RESET_PASSWORD: ${{ secrets.TEST_RESET_PASSWORD }}
+    steps:
+      - name: Get short SHA 🔑
+        id: slug
+        run: |
+          echo "::set-output name=sha7::${GITHUB_SHA::7}"
+        shell: bash
+
+      - name: Checkout ${{ steps.slug.outputs.sha7 }} ⬇️
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js ${{ matrix.node-version }} 📮
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "yarn"
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@zeeis"
+      
+      - name: Install dependencies 👨🏻‍💻
+        uses: nick-fields/retry@v2
+        with:
+          timeout_seconds: 600
+          max_attempts: 2
+          shell: bash
+          retry_on: error
+          command: yarn
+          on_retry_command: rm -rf C:/Users/runneradmin/AppData/Local/node-gyp/
+
+      - name: Install UnPackaged 👨🏻‍💻
+        uses: nick-fields/retry@v2
+        with:
+          timeout_seconds: 600
+          max_attempts: 2
+          shell: bash
+          retry_on: error
+          command: yarn unpackaged
+          on_retry_command: rm -rf C:/Users/runneradmin/AppData/Local/node-gyp/
+
+      - name: E2E Test 🧪
+        if: "!contains(github.event.head_commit.message, 'skip e2e')"
+        run: yarn test:e2e:website:ci
+
+      - name: Upload Test Results 🗃
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: "${{ matrix.os }}-output"
+          path: test-secret/output/**

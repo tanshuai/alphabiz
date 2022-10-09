@@ -11,14 +11,13 @@ on:
   push:
     paths:
       - "**.js"
-      - "**/push.yml"
+      - "!**/push.yml"
       - "!patches/**"
       - "!public/**"
       - "!wix/**"
       - "!test/**"
       - "build/**"
       - "release.json"
-      - "package.json"
     branches: [main]
 
 jobs:
