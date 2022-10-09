@@ -97,12 +97,12 @@ class WalletPage extends BasePage {
     const num = await this.transferList.count()
     const lastNum = num >= 2 ? num - 1 : 1
     if (info.senderAddress) {
-      const senderAddressText = await this.getTransferItemEle(lastNum, 'senderAddress').innerText()
-      expect(senderAddressText).toBe(info.senderAddress)
+      const senderAddressRegexp = new RegExp(`0x(0*|)${info.senderAddress.replace(/^0x(0*|)/, '')}`)
+      expect(await this.getTransferItemEle(lastNum, 'senderAddress')).toHaveText(senderAddressRegexp)
     }
     if (info.recipientAddress) {
-      const recipientAddressText = await this.getTransferItemEle(lastNum, 'recipientAddress').innerText()
-      expect(recipientAddressText).toBe(info.recipientAddress)
+      const recipientAddressRegexp = new RegExp(`0x(0*|)${info.recipientAddress.replace(/^0x(0*|)/, '')}`)
+      expect(await this.getTransferItemEle(lastNum, 'recipientAddress')).toHaveText(recipientAddressRegexp)
     }
 
     const coinTypeText = await this.getTransferItemEle(lastNum, 'coinType').innerText()
@@ -154,13 +154,13 @@ class WalletPage extends BasePage {
 
   async checkCollectionLink (targetPage, address, options = {}) {
     if (typeof options.isCloseDialog === 'undefined') options.isCloseDialog = true
-
-    await this.jumpPage('walletLink')
+    const headerTitle = await this.headerTitle.innerText()
+    if (!/Wallet/.test(headerTitle)) await this.jumpPage('walletLink')
     // copy
     await this.wcMoreBtn.click()
     await this.CopyLinkBtn.click()
     await this.checkAlert('copy', /Copied/, { isWaitAlertHidden: true, isLog: false })
-    await this.jumpPage(targetPage)
+    if (targetPage !== 'walletLink') await this.jumpPage(targetPage)
     await this.page.waitForTimeout(2000)
     await this.page.keyboard.press(`${this.modifier}+KeyV`)
     await this.dialogWalletCard.waitFor()

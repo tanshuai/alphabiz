@@ -22,6 +22,8 @@ class DevelopmentPage extends BasePage {
   }
 
   async openWalletPage () {
+    const headerTitle = await this.headerTitle.innerText()
+    if (/Wallet/.test(headerTitle)) return
     const isVisibleWallet = await this.walletLink.isVisible()
     if (isVisibleWallet) return
     await this.jumpPage('developmentLink')

@@ -84,7 +84,9 @@ test.describe('wallet', () => {
   test.beforeEach(async () => {
     test.setTimeout(60000 * 15)
     await developmentPage.openWalletPage()
-    await walletPage.jumpPage('walletLink')
+    const headerTitle = await basePage.headerTitle.innerText()
+    if (!/Wallet/.test(headerTitle)) await walletPage.jumpPage('walletLink')
+    await walletPage.acAddressText.click({ force: true })
     await expect(walletPage.connectionStatus).toHaveText(/online/, { timeout: 60000 })
     await window.waitForTimeout(7000)
     await walletPage.ensureClearKey()
