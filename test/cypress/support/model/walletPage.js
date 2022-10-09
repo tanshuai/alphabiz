@@ -12,11 +12,11 @@ Cypress.Commands.add('createKey', () => {
   cy.get('.q-card button').contains('Create').click()
   cy.contains('checkConfirm', { timeout: 15000 })
   cy.get('.q-card [role="alert"]').eq(3).invoke('text').then((addressText) => {
-    cy.task('log', addressText)
+    // cy.task('log', addressText)
     cy.get('.q-card [role="alert"]').eq(4).invoke('text').then((publicKeyText) => {
-      cy.task('log', publicKeyText)
+      // cy.task('log', publicKeyText)
       cy.get('.q-card [role="alert"]').eq(5).invoke('text').then((privateKeyText) => {
-        cy.task('log', privateKeyText)
+        // cy.task('log', privateKeyText)
         cy.contains('Confirm').click()
         cy.get('.blockchain-card:nth(3)', { timeout: 90000 })
         return cy.wrap({
@@ -58,10 +58,12 @@ Cypress.Commands.add('walletCheckDetail', (info) => {
   cy.get('.blockchain-card:nth(3) tr').its('length').then(lastEle => {
     cy.log(`lastEle ${lastEle}`)
     lastEle = lastEle === 1 ? 1 : lastEle - 1
+    const senderAddressRegexp = new RegExp(`0x(0*|)${info.senderAddress.substring(2)}`)
+    const recipientAddressRegexp = new RegExp(`0x(0*|)${info.recipientAddress.substring(2)}`)
     const tdCss = `.blockchain-card:nth(3) tr:nth(${lastEle})`
     cy.get(`${tdCss} td:nth(0)`).should('have.text', '0x1::TestCoin::TestCoin')
-    cy.get(`${tdCss} td:nth(1)`).should('have.text', info.senderAddress)
-    cy.get(`${tdCss} td:nth(2)`).should('have.text', info.recipientAddress)
+    cy.get(`${tdCss} td:nth(1)`).invoke('text').should('match', senderAddressRegexp)
+    cy.get(`${tdCss} td:nth(2)`).invoke('text').should('match', recipientAddressRegexp)
     cy.get(`${tdCss} td:nth(3)`).should('have.text', info.amount)
   })
 })
