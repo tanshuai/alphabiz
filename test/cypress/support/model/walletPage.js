@@ -58,8 +58,8 @@ Cypress.Commands.add('walletCheckDetail', (info) => {
   cy.get('.blockchain-card:nth(3) tr').its('length').then(lastEle => {
     cy.log(`lastEle ${lastEle}`)
     lastEle = lastEle === 1 ? 1 : lastEle - 1
-    const senderAddressRegexp = new RegExp(`0x(0*|)${info.senderAddress.substring(2)}`)
-    const recipientAddressRegexp = new RegExp(`0x(0*|)${info.recipientAddress.substring(2)}`)
+    const senderAddressRegexp = new RegExp(`0x(0*|)${info.senderAddress.replace(/^0x(0*|)/, '')}`)
+    const recipientAddressRegexp = new RegExp(`0x(0*|)${info.recipientAddress.replace(/^0x(0*|)/, '')}`)
     const tdCss = `.blockchain-card:nth(3) tr:nth(${lastEle})`
     cy.get(`${tdCss} td:nth(0)`).should('have.text', '0x1::TestCoin::TestCoin')
     cy.get(`${tdCss} td:nth(1)`).invoke('text').should('match', senderAddressRegexp)
