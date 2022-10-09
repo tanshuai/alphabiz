@@ -476,7 +476,7 @@ index f86634b..3ee09b8 100644
   
      root.on('put', function(msg){
 diff --git a/node_modules/gun/lib/webrtc.js b/node_modules/gun/lib/webrtc.js
-index abc887c..a88e1f4 100644
+index abc887c..c48348c 100644
 --- a/node_modules/gun/lib/webrtc.js
 +++ b/node_modules/gun/lib/webrtc.js
 @@ -5,8 +5,9 @@
@@ -508,7 +508,7 @@ index abc887c..a88e1f4 100644
      opt.rtc.dataChannel = opt.rtc.dataChannel || {ordered: false, maxRetransmits: 2};
      opt.rtc.sdp = opt.rtc.sdp || {mandatory: {OfferToReceiveAudio: false, OfferToReceiveVideo: false}};
      opt.announce = function(to){
-+			console.log('announce', opt.pid, to)
++			// console.log('announce', opt.pid, to)
  			root.on('out', {rtc: {id: opt.pid, to:to}}); // announce ourself
      };
  		var mesh = opt.mesh = opt.mesh || Gun.Mesh(root);
@@ -566,12 +566,12 @@ index abc887c..a88e1f4 100644
  			};
 -			wire.onerror = function(err){};
 +			wire.onerror = function(err){
-+				console.log('rtc error', rtc, err)
++				// console.log('rtc error', rtc, err)
 +				delete open[rtc.id]
 +			};
  			wire.onopen = function(e){
 -				//delete open[rtc.id];
-+				console.log('wire open', opt)
++				// console.log('wire open', opt)
 +				delete open[rtc.id];
  				mesh.hi(peer);
 +				if (opt.onWrtcPeer) {
@@ -590,7 +590,7 @@ index abc887c..a88e1f4 100644
  			}
  			if(tmp = rtc.offer){
 -				rtc.offer.sdp = rtc.offer.sdp.replace(/\\r\\n/g, '\r\n')
-+				console.log('set remote desc')
++				// console.log('set remote desc')
 +				rtc.offer.sdp = rtc.offer.sdp.replace(/\\+r\\+n/g, '\r\n')
  				peer.setRemoteDescription(new opt.RTCSessionDescription(tmp)); 
  				peer.createAnswer(function(answer){
@@ -599,7 +599,7 @@ index abc887c..a88e1f4 100644
  				return;
  			}
  			peer.createOffer(function(offer){
-+				console.log('create offer')
++				// console.log('create offer')
  				peer.setLocalDescription(offer);
  				root.on('out', {'@': msg['#'], rtc: {offer: offer, id: opt.pid}});
  			}, function(){}, opt.rtc.sdp);
