@@ -1,9 +1,17 @@
-fix e2e test check wallet address error
-fixed: #619
-try fix cypress read ECONNRESET error in windows
-fix electron wallet test
+wait loading library key
 virtual scroll
-fix #678
-allow upload multi files as single tasks #669
-performance update
 virtual scroll
+Update VirtualScrollLayout.vue
+virtual scroll
+try fix #682
+try fix player #679
+modify website e2e test
+fix website workflow output path
+fix website test workflow env
+use windows-latest node 16
+virtual scroll
+set default upload option to `single`
+allow paste FileList, remove drop animation when paste
+sync follow state in all post cards, resolve #680
+fix save libdb error
+Update VirtualScrollLayout.vue
