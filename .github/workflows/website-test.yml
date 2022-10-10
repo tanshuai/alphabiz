@@ -95,4 +95,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: "${{ matrix.os }}-output"
-          path: test-secret/output/**
+          path: test/output/**
