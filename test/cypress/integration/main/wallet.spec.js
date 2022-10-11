@@ -12,7 +12,7 @@ describe('wallet', () => {
   it('transfer', () => {
     const amount = 100
     cy.createKey().as('firstKey').then(value => {
-      cy.task('log', value)
+      // cy.task('log', value)
     })
     cy.wait(5000)
     cy.getCoin().then(text => {
@@ -20,7 +20,7 @@ describe('wallet', () => {
     })
     cy.deleteKey()
     cy.createKey().as('secondKey').then(value => {
-      cy.task('log', value)
+      // cy.task('log', value)
     })
     cy.getCoin().then(text => {
       return cy.wrap(parseInt(text)).as('initCoin_secondKey')

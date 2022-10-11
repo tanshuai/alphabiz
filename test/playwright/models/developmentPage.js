@@ -14,7 +14,13 @@ class DevelopmentPage extends BasePage {
   async openTools () {
     const isVisibleDevelopment = await this.developmentLink.isVisible()
     if (isVisibleDevelopment) return
-    await this.versionBtn.click()
+    try {
+      await this.versionBtn.click({ timeout: 5000 })
+    } catch (e) {
+      await this.versionBtn.click({ force: true })
+      await this.versionBtn.click()
+    }
+    
     await this.aboutDialog.waitFor()
     await this.alphabizLogo.click({ clickCount: 5 })
     await this.checkAlert('Tools', /is enabled/, { position: 'center' })

@@ -135,6 +135,8 @@ class WalletPage extends BasePage {
     keyObj.address = address.replace('content_copy', '').replace(/\n/g, '')
     keyObj.publicKey = publicKey.replace('content_copy', '').replace(/\n/g, '')
     keyObj.privateKey = privateKey.replace('content_copy', '').replace(/\n/g, '')
+    console.log('keyObj', keyObj)
+    await this.page.waitForTimeout(3000)
     await this.gscConfirmBtn.click()
     await this.walletCard.waitFor({ timeout: 60000 * 4})
     return keyObj
