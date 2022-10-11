@@ -11,7 +11,7 @@ on:
   push:
     paths:
       - "**.js"
-      - "**/push.yml"
+      - "!**/push.yml"
       - "!patches/**"
       - "!public/**"
       - "!wix/**"
@@ -252,7 +252,8 @@ jobs:
 
       - name: E2E Test 🧪
         if: |
-          matrix.os != 'windows-latest' && !contains(github.event.head_commit.message, 'skip e2e')
+          !(contains(github.event_name, 'schedule') && matrix.os == 'windows-latest')
+            && !contains(github.event.head_commit.message, 'skip e2e')
         run: yarn test:e2e:ci
 
       - name: Upload Test Results 🗃
