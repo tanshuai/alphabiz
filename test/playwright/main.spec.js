@@ -109,6 +109,9 @@ test.beforeAll(async () => {
   // // fix electron test - ServiceWorker is not defined
   // await window.reload()
 })
+test.afterAll(async () => {
+  await electronApp.close()
+})
 test.beforeEach(async () => {
 })
 test.afterEach(async ({}, testInfo) => {

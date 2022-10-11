@@ -63,6 +63,9 @@ test.beforeAll(async () => {
   //   console.log(`Console log: ${msg.text()} \n`)
   // })
 })
+test.afterAll(async () => {
+  await electronApp.close()
+})
 test.beforeEach(async () => {
   await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
 })
@@ -86,7 +89,11 @@ test.describe('wallet', () => {
     await developmentPage.openWalletPage()
     const headerTitle = await basePage.headerTitle.innerText()
     if (!/Wallet/.test(headerTitle)) await walletPage.jumpPage('walletLink')
-    await walletPage.acAddressText.click({ force: true })
+    try {
+      await walletPage.acAddressText.click({ force: true })
+    } catch (e) {
+      await walletPage.getStartedCard.click({ force: true })
+    }
     await expect(walletPage.connectionStatus).toHaveText(/online/, { timeout: 60000 })
     await window.waitForTimeout(7000)
     await walletPage.ensureClearKey()
