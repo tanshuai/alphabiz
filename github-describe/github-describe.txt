@@ -1,4 +1,9 @@
-fix event name error
-fast release
-fix #223, fix #225
-feedback: add category options, i18n and open external url for github issue #15
+Bump plist from 3.0.4 to 3.0.5
+fix web test
+fix error in web mode for Safari
+remove test log
+change sign in button label
+aws: add log
+fix #227
+feedback: add web mode system info and expandable table #15
+fix btn error
