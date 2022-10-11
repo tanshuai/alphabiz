@@ -28,7 +28,7 @@ describe('wallet', () => {
     cy.get('@firstKey').then(value => {
       cy.walletTransfer(value.address, amount)
     })
-    cy.wait(7000)
+    cy.wait(10000)
     cy.get('@initCoin_secondKey').then(initCoin => {
       cy.getCoin().then(coin => {
         cy.wrap(parseInt(coin)).should('be.lt', initCoin - amount)
