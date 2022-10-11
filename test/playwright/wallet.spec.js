@@ -56,12 +56,15 @@ test.beforeAll(async () => {
   walletPage = new WalletPage(window)
   developmentPage = new DevelopmentPage(window)
 
-  // window.on('console', msg => {
-  //   if (msg.text().includes('WebSocket connection')) return
-  //   if (msg.text().includes('get channel list')) return
-  //   if (msg.text().includes('wire')) return
-  //   console.log(`Console log: ${msg.text()} \n`)
-  // })
+  window.on('console', msg => {
+    if (msg.type() === "error") {
+      if (msg.text().includes('WebSocket connection')) return
+      if (msg.text().includes('get channel list')) return
+      if (msg.text().includes('wire')) return
+      if (msg.text().includes('recommends.txt')) return
+      console.log(`Console log: ${msg.text()} \n ${msg.location().url} \n lineNumber:${msg.location().lineNumber} \n columnNumber:${msg.location().columnNumber} \n`)
+    }
+  })
 })
 test.afterAll(async () => {
   await electronApp.close()
@@ -84,15 +87,16 @@ test('create test env', async () => {
 
 test.describe('wallet', () => {
   let firstKey, secondKey
-  test.beforeEach(async () => {
+  test.beforeEach(async ({ }, testInfo) => {
+    if (process.platform === 'darwin' && testInfo.title === 'copy') test.skip()
     test.setTimeout(60000 * 15)
     await developmentPage.openWalletPage()
     const headerTitle = await basePage.headerTitle.innerText()
     if (!/Wallet/.test(headerTitle)) await walletPage.jumpPage('walletLink')
     try {
-      await walletPage.acAddressText.click({ force: true })
+      await walletPage.acAddressText.click({ timeout: 10000, force: true })
     } catch (e) {
-      await walletPage.getStartedCard.click({ force: true })
+      await walletPage.getStartedCard.click({ timeout: 10000, force: true })
     }
     await expect(walletPage.connectionStatus).toHaveText(/online/, { timeout: 60000 })
     await window.waitForTimeout(7000)
