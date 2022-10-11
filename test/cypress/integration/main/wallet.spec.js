@@ -1,7 +1,7 @@
 /// <reference path="cypress" />
 /// <reference path="../../support/index.d.ts" />
 
-describe('LanguageSelection', () => {
+describe('wallet', () => {
   beforeEach(() => {
     cy.signIn('test1' + Cypress.env('testEmailDomain'), 'password')
     cy.wait(2000)
