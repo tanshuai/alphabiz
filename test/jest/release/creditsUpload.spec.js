@@ -34,7 +34,7 @@ describe('upload', () => {
     // 判断是否已经登录
     if (await client.$('//*[@Name="SIGN IN"]').isDisplayed()) {
       // 未登录
-      await accountPage.signIn(process.env.TEST3_EMAIL, process.env.TEST_PASSWORD, 1)
+      await accountPage.signIn(process.env.TEST3_EMAIL, process.env.TEST_PASSWORD, { isWaitAlert: true })
     } else {
       await homePage.jumpPage('creditsLink')
       // 已登陆,等待拉取数据

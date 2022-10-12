@@ -173,10 +173,10 @@ class HomePage {
     })
   }
 
-  async getTaskStatus (torrentName) {
-    await this.page.$('//Text[@Name="' + torrentName + '"]').click()
+  async getTaskStatus (torrentName, opt = { isLog: true }) {
+    await this.page.$('//Text[@Name="' + torrentName + '"]')
     const taskStatus = await this.page.$('//Text[@Name="' + torrentName + '"]/following-sibling::Text[starts-with(@Name,"Status:")]')
-    console.log(await taskStatus.getText())
+    if (opt.isLog) console.log(await taskStatus.getText())
     return await taskStatus.getText()
   }
 

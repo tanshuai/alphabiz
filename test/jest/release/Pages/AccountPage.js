@@ -1,3 +1,4 @@
+const { sleep } = require('../../../utils/getCode')
 class AccountPage {
   constructor (page) {
     this.page = page
@@ -14,7 +15,9 @@ class AccountPage {
 
   async signIn (username, password, opt = { isWaitAlert: false }) {
     await this.username.setValue(username)
+    await sleep(2000)
     await this.password.setValue(password)
+    await sleep(2000)
     await this.signInBtn.click()
 
     if (opt.isWaitAlert) {
@@ -25,7 +28,7 @@ class AccountPage {
         timeout: 40000,
         timeoutMsg: 'signInCard is not hidden'
       })
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      await sleep(2000)
       await this.importCloudKeyOKBtn.click()
       await this.importCloudKeyOKBtn.waitUntil(async () => {
         return (await this.importCloudKeyOKBtn.isDisplayed()) === false

@@ -56,11 +56,11 @@ describe('download', () => {
   })
   it('download seeding', async () => {
     const DownloadFilePath = path.resolve(__dirname, '../../download')
-
+    await sleep(10000)
     // 判断是否已经登录
-    if (await client.$('//*[@Name="SIGN IN"]').isDisplayed()) {
+    if (await accountPage.username.isDisplayed()) {
       // 未登录
-      await accountPage.signIn(process.env.TEST2_EMAIL, process.env.TEST_PASSWORD, 1)
+      await accountPage.signIn(process.env.TEST2_EMAIL, process.env.TEST_PASSWORD, { isWaitAlert: true })
     } else {
       await homePage.jumpPage('creditsLink')
       // 已登陆,等待拉取数据
@@ -112,9 +112,17 @@ describe('download', () => {
         console.log('check task status')
         const taskTitle = await homePage.getTask(torrentName)
         taskTitle.click()
+        // 等待种子开始下载
+        await homePage.downloadTorrentBtn.waitUntil(async () => {
+          const statusText = await homePage.getTaskStatus(torrentName, { isLog: false })
+          return !statusText.include('Loading')
+        }, {
+          timeout: 60000 * 10,
+          timeoutMsg: 'task not start'
+        })
 
         // 等待其他客户端上传bt种子
-        const taskPeers = await homePage.getTaskPeers(torrentName, 60000 * 10)
+        // const taskPeers = await homePage.getTaskPeers(torrentName, 60000 * 10)
 
         // 使用开发版本的付费积分功能
         // await homePage.downloadPaymentProd(taskPeers, 0)
