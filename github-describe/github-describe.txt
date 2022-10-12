@@ -1,17 +1,13 @@
-wait loading library key
+fix electron player test
+fix electron wallet test error
 virtual scroll
-virtual scroll
+try output wallet create key error
+fix stat error when initted
 Update VirtualScrollLayout.vue
-virtual scroll
-try fix #682
-try fix player #679
-modify website e2e test
-fix website workflow output path
-fix website test workflow env
-use windows-latest node 16
-virtual scroll
-set default upload option to `single`
-allow paste FileList, remove drop animation when paste
-sync follow state in all post cards, resolve #680
-fix save libdb error
-Update VirtualScrollLayout.vue
+mixins for LibraryIndex
+add create key waiting time
+add waiting transfer time、skip workflow
+fix new Date format error in safari
+support drag-and-drop to add task in web mode
+fix window self runnner
+mixins for LibraryIndex
