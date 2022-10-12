@@ -1,13 +1,6 @@
-fix electron player test
-fix electron wallet test error
-virtual scroll
-try output wallet create key error
-fix stat error when initted
-Update VirtualScrollLayout.vue
+mixins for LIbraryIndex
+Update mixinKeychainLib.js
 mixins for LibraryIndex
-add create key waiting time
-add waiting transfer time、skip workflow
-fix new Date format error in safari
-support drag-and-drop to add task in web mode
-fix window self runnner
-mixins for LibraryIndex
+reduce github runner workflow timeout
+fix release test
+fix release creditsDownload test error
