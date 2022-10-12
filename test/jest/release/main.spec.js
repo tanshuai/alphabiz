@@ -47,9 +47,10 @@ describe('upload', () => {
   })
   it('ensure sign in', async () => {
     // 判断是否已经登录
-    if (await client.$('//*[@Name="SIGN IN"]').isDisplayed()) {
+    await sleep(5000)
+    if (await accountPage.username.isDisplayed()) {
       // 未登录
-      await accountPage.signIn(process.env.TEST1_EMAIL, process.env.TEST_PASSWORD, 1)
+      await accountPage.signIn(process.env.TEST1_EMAIL, process.env.TEST_PASSWORD, { isWaitAlert: true })
     } else {
       await homePage.jumpPage('creditsLink')
       // 已登陆,等待拉取数据
@@ -76,9 +77,15 @@ describe('upload', () => {
     expect(await homePage.getPageTitle()).toBe('Downloaded')
   })
   it('Switch to Simplified Chinese', async () => {
-    await homePage.jumpPage('settingsLink', 'basicLink')
+    // 收起媒体库
+    await homePage.jumpPage('libraryLink')
+    await homePage.jumpPage('basicLink')
+    expect(await homePage.getPageTitle()).toBe('Basic')
     await basicPage.switchLanguages('english', 'simplifiedChinese')
     await client.saveScreenshot(outputPath + '/basic-language-simplifiedChinese.png')
     expect(await homePage.getPageTitle()).toBe('基础设置')
+    await basicPage.switchLanguages('simplifiedChinese', 'english')
+    await client.saveScreenshot(outputPath + '/basic-language-english.png')
+    expect(await homePage.getPageTitle()).toBe('Basic')
   })
 })

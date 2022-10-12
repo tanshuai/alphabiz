@@ -11,13 +11,14 @@ class HomePage {
   // 菜单
   get menuBtn () { return this.page.$('//Button[@Name="Menu"]') }
   get pageTitle () { return this.page.$('//Button[@Name="Menu"]/following::Text[1]') }
+  get libraryLink () { return this.page.$('//*[@Name="Library"]') }
   get homeLink () { return this.page.$('//*[@Name="Home"]') }
   get playerLink () { return this.page.$('//*[@Name="Player"]') }
   get creditsLink () { return this.page.$('//*[@Name="Credits"]') }
   get settingsLink () { return this.page.$('//*[@Name="Settings"]') }
   get basicLink () { return this.page.$('//*[@Name="Basic"]') }
   get accountLink () { return this.page.$('//*[@Name="Advanced"]') }
-  get developmentLink () { return this.page.$('//*[@Name="Development Developer Mode for Internal Use"]') }
+  get developmentLink () { return this.page.$('//*[@Name="Development"]') }
   // 种子状态tab
   get downloadingStatusTab () { return this.page.$('//*[@AutomationId="downloading"]') }
   get uploadingStatusTab () { return this.page.$('//*[@AutomationId="uploading"]') }

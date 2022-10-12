@@ -117,7 +117,7 @@ describe('download', () => {
         const taskPeers = await homePage.getTaskPeers(torrentName, 60000 * 10)
 
         // 使用开发版本的付费积分功能
-        await homePage.downloadPaymentProd(taskPeers, 0)
+        // await homePage.downloadPaymentProd(taskPeers, 0)
 
         // 查看积分减少变化
         await homePage.jumpPage('creditsLink')

@@ -7,22 +7,31 @@ class AccountPage {
   get username () { return this.page.$('//Edit[@Name="Phone number or email"]') }
   get password () { return this.page.$('//Edit[@Name="Password"]') }
   get signInBtn () { return this.page.$('//Button[@Name="SIGN UP"]/preceding-sibling::Button[1]') }
+  get importCloudKeyOKBtn () { return this.page.$('//Button[@Name="OK"]') }
   get accountSettingsTitle () { return this.page.$('//Text[@Name="Account"]') }
   get signOutBtn () { return this.page.$('//*[@Name="Sign out"]') }
+  get signOutAnywayBtn () { return this.page.$('//Button[@Name="Sign out anyway"]') }
 
-  async signIn (username, password, isWaitAlert) {
+  async signIn (username, password, opt = { isWaitAlert: false }) {
     await this.username.setValue(username)
     await this.password.setValue(password)
     await this.signInBtn.click()
 
-    if (isWaitAlert) {
+    if (opt.isWaitAlert) {
       // 等待登录卡片消失
-      const signInCard = await this.username
-      await signInCard.waitUntil(async () => {
+      await this.username.waitUntil(async () => {
         return (await this.username.isDisplayed()) === false
       }, {
         timeout: 40000,
         timeoutMsg: 'signInCard is not hidden'
+      })
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      await this.importCloudKeyOKBtn.click()
+      await this.importCloudKeyOKBtn.waitUntil(async () => {
+        return (await this.importCloudKeyOKBtn.isDisplayed()) === false
+      }, {
+        timeout: 40000,
+        timeoutMsg: 'importCloudKeyCard is not hidden'
       })
       if (!(await this.page.$('//*[@Name="Credits"]').isDisplayed())) {
         await this.page.$('//Button[@Name="Menu"]').click()
@@ -34,10 +43,11 @@ class AccountPage {
   async signOut () {
     if (!(await this.signOutBtn.isDisplayed())) {
       await this.accountSettingsTitle.waitForDisplayed({ timeout: 20000 })
-      await this.page.$('/Pane/Document/Group[2]/Group[2]').click()
+      await this.page.$('//Custom[@Name="Lv. 2"]/following-sibling::Button[1]').click()
     }
     await this.signOutBtn.click()
-    await this.page.$('//Test[@Name="Want to Join"]').waitForDisplayed({ timeout: 15000 })
+    await this.signOutAnywayBtn.click()
+    await this.username.waitForDisplayed({ timeout: 20000 })
   }
 }
 
