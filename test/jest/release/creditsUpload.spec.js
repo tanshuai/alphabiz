@@ -32,7 +32,12 @@ describe('upload', () => {
   })
   afterEach(async () => {
     // console.log('isSuccess', expect.getState().currentTestName, isSuccess)
-    if (!isSuccess) await client.saveScreenshot(outputPath + `/${expect.getState().currentTestName}.png`)
+    if (!isSuccess) {
+      if (!fs.existsSync(outputPath)) {
+        fs.mkdirSync(outputPath, { recursive: true })
+      }
+      await client.saveScreenshot(outputPath + `/${expect.getState().currentTestName}.png`)
+    }
   })
   it.skip('test1', async () => {
     expect(1).toBe(1)

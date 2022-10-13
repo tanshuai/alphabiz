@@ -34,7 +34,12 @@ describe('download', () => {
   })
   afterEach(async () => {
     // console.log('isSuccess', expect.getState().currentTestName, isSuccess)
-    if (!isSuccess) await client.saveScreenshot(outputPath + `/${expect.getState().currentTestName}.png`)
+    if (!isSuccess) {
+      if (!fs.existsSync(outputPath)) {
+        fs.mkdirSync(outputPath, { recursive: true })
+      }
+      await client.saveScreenshot(outputPath + `/${expect.getState().currentTestName}.png`)
+    }
   })
   it.skip('delete task', async () => {
     let isDelete = false
