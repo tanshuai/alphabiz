@@ -40,7 +40,7 @@ class AccountPage {
       if (!(await this.page.$('//*[@Name="Credits"]').isDisplayed())) {
         await this.page.$('//Button[@Name="Menu"]').click()
       }
-      await this.accountSettingsTitle.waitForDisplayed()
+      await this.accountSettingsTitle.waitForDisplayed({ timeout: 30000 })
     }
   }
 
