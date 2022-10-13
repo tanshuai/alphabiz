@@ -52,13 +52,17 @@ describe('upload', () => {
       // 未登录
       await accountPage.signIn(process.env.TEST3_EMAIL, process.env.TEST_PASSWORD, { isWaitAlert: true })
     } else {
-      await homePage.jumpPage('creditsLink')
+      await homePage.jumpPage('homeLink')
       // 已登陆,等待拉取数据
       // await client.$('//*[@Name="Settings"]').click()
       if (!await homePage.settingsLink.isDisplayed()) {
         await homePage.menuBtn.click()
+        await sleep(1000)
+        if (!await homePage.settingsLink.isDisplayed()) {
+          await homePage.menuBtn.click()
+        }
       }
-      await accountPage.accountSettingsTitle.waitForDisplayed({ timeout: 10000 })
+      await accountPage.accountMoreBtn.waitForDisplayed({ timeout: 15000 })
     }
 
     // 查看初始积分

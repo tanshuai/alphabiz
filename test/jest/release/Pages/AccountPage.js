@@ -10,6 +10,7 @@ class AccountPage {
   get signInBtn () { return this.page.$('//Button[@Name="SIGN UP"]/preceding-sibling::Button[1]') }
   get importCloudKeyOKBtn () { return this.page.$('//Button[@Name="OK"]') }
   get accountSettingsTitle () { return this.page.$('//Text[@Name="Account"]') }
+  get accountMoreBtn () { return this.page.$('//Custom[starts-with(@Name,"Lv.")]/following-sibling::Button[1]')}
   get signOutBtn () { return this.page.$('//*[@Name="Sign out"]') }
   get signOutAnywayBtn () { return this.page.$('//Button[@Name="Sign out anyway"]') }
 
@@ -40,14 +41,14 @@ class AccountPage {
       if (!(await this.page.$('//*[@Name="Credits"]').isDisplayed())) {
         await this.page.$('//Button[@Name="Menu"]').click()
       }
-      await this.accountSettingsTitle.waitForDisplayed({ timeout: 30000 })
+      await this.accountMoreBtn.waitForDisplayed({ timeout: 30000 })
     }
   }
 
   async signOut () {
     if (!(await this.signOutBtn.isDisplayed())) {
       await this.accountSettingsTitle.waitForDisplayed({ timeout: 20000 })
-      await this.page.$('//Custom[@Name="Lv. 2"]/following-sibling::Button[1]').click()
+      await this.accountMoreBtn.click()
     }
     await this.signOutBtn.click()
     await this.signOutAnywayBtn.click()

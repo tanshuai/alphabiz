@@ -42,15 +42,17 @@ class HomePage {
 
   // 跳转菜单页面-支持跳转二级目录
   async jumpPage (firstTarget, secondTarget) {
-    await sleep(1000)
+    await sleep(2000)
     const menuLink = await this[secondTarget] || await this[firstTarget]
     if (!(await this[firstTarget].isDisplayed())) {
-      // await this.page.$('/Button[@Name="Menu"]').click()
       await this.menuBtn.click()
+      await sleep(1000)
+      if (!(await this[firstTarget].isDisplayed())) {
+        await this.menuBtn.click()
+      }
     }
     if (secondTarget) {
       if (!(await menuLink.isDisplayed())) {
-      // await this.page.$('/Button[@Name="Menu"]').click()
         await this[firstTarget].click()
       }
     }

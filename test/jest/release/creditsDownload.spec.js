@@ -77,13 +77,17 @@ describe('download', () => {
       // 未登录
       await accountPage.signIn(process.env.TEST2_EMAIL, process.env.TEST_PASSWORD, { isWaitAlert: true })
     } else {
-      await homePage.jumpPage('creditsLink')
+      await homePage.jumpPage('homeLink')
       // 已登陆,等待拉取数据
       // await client.$('//*[@Name="Settings"]').click()
       if (!await homePage.settingsLink.isDisplayed()) {
         await homePage.menuBtn.click()
+        await sleep(1000)
+        if (!await homePage.settingsLink.isDisplayed()) {
+          await homePage.menuBtn.click()
+        }
       }
-      await accountPage.accountSettingsTitle.waitForDisplayed({ timeout: 10000 })
+      await accountPage.accountMoreBtn.waitForDisplayed({ timeout: 15000 })
     }
 
     // 查看初始积分
@@ -129,7 +133,7 @@ describe('download', () => {
         console.log('任务未下载')
         // 下载bt种子
         await homePage.jumpPage('downloadingStatusTab')
-        await homePage.downloadTorrent('alphabiz://GoneNutty.avi/AaJKFjiFIyvGNE0Fur1wE36EC+Dl', DownloadFilePath)
+        await homePage.downloadTorrent('alphabiz://GoneNutty.avi/AaJKFjiFIyvGNE0Fur1wE36EC+Dl&_Td6WFoAAAFpIt42AgAhARwAAAAQz1jM4AC3AEZdABhqCGEMasx_OPsfBFf13OOYW5xF7e0HINkIZP9Ep1rbI74+n0R63w2OQgpQX9OpSJvNChXnpMoaSfWgK44ljmeAgDPktAAAAACE1btxAAFeuAEAAADqmdptPjANiwIAAAAAAVla', DownloadFilePath)
         // await homePage.downloadTorrent('alphabiz://ChinaCup.1080p.H264.AAC.mp4/AZLwy9+LB7G1y0HGGJis+f4UZlze&MDAyNzAwMjgwMDI5MDAyYTAwMmIwMDJjMDAyZCZ0cj0=', DownloadFilePath)
         await homePage.waitSeedFound(torrentName, 60000 * 10)
         // 查看种子任务卡片状态
