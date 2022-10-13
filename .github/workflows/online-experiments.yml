@@ -126,7 +126,7 @@ jobs:
   appium-test:
     needs: build-1
     if: |
-      (contains(github.event_name, 'schedule') || contains(needs.build-1.outputs.output2, '0'))
+      (contains(github.event_name, 'schedule') || contains(needs.build-1.outputs.output2, '1'))
         && !contains(github.event.head_commit.message, 'skip e2e')
     timeout-minutes: 60
     runs-on: ${{ matrix.os }}
