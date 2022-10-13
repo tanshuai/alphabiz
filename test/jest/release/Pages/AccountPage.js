@@ -36,6 +36,7 @@ class AccountPage {
         timeout: 40000,
         timeoutMsg: 'importCloudKeyCard is not hidden'
       })
+      await sleep(3000)
       if (!(await this.page.$('//*[@Name="Credits"]').isDisplayed())) {
         await this.page.$('//Button[@Name="Menu"]').click()
       }

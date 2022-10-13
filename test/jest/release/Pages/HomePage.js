@@ -78,9 +78,9 @@ class HomePage {
       // setValue功能的自动清除内容不稳定，手动清除输入框内容
       const text = await this.page.$('//Edit[@Name="Download directory position"]').getText()
       const backSpaces = new Array(text.length).fill('\uE003')
-      await sleep(1000)
+      await sleep(2000)
       await this.downloadDirectoryEdit.setValue(backSpaces)
-      await sleep(1000)
+      await sleep(2000)
       await this.downloadDirectoryEdit.setValue(directory)
     }
     await this.confirmDownloadBtn.click()

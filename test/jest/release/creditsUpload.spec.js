@@ -13,26 +13,37 @@ const { calculation } = require('../../utils/calculation')
 
 let client, homePage, accountPage, creditsPage, developmentPage
 jest.setTimeout(60000 * 15)
-
+const outputFile = process.env.APP_TYPE === 'exe' ? '/exe' : process.env.APP_TYPE === 'msi' ? '/msi' : '/7z'
+const outputPath = path.resolve(__dirname, '../../output/release' + outputFile)
+let isSuccess = false
 describe('upload', () => {
-  beforeEach(async () => {
+  beforeAll(async () => {
     client = await wdio.remote(obj.opts)
     homePage = new HomePage(client)
     accountPage = new AccountPage(client)
     creditsPage = new CreditsPage(client)
     developmentPage = new DevelopmentPage(client)
-  }, 60000)
-  afterEach(async () => {
+  }, 120000)
+  afterAll(async () => {
     await client.deleteSession()
+  })
+  beforeEach(async () => {
+    isSuccess = false
+  })
+  afterEach(async () => {
+    // console.log('isSuccess', expect.getState().currentTestName, isSuccess)
+    if (!isSuccess) await client.saveScreenshot(outputPath + `/${expect.getState().currentTestName}.png`)
   })
   it.skip('test1', async () => {
     expect(1).toBe(1)
   })
   it('upload seeding', async () => {
-    const uploadFilePath = path.resolve(__dirname, '../../cypress/fixtures/samples/ChinaCup.1080p.H264.AAC.mp4')
-    const torrentName = 'ChinaCup.1080p.H264.AAC.mp4'
+    const uploadFilePath = path.resolve(__dirname, '../../cypress/fixtures/samples/GoneNutty.avi')
+    const torrentName = 'GoneNutty.avi'
+    // const torrentName = 'ChinaCup.1080p.H264.AAC.mp4'
     // 判断是否已经登录
-    if (await client.$('//*[@Name="SIGN IN"]').isDisplayed()) {
+    await sleep(10000)
+    if (await accountPage.username.isDisplayed()) {
       // 未登录
       await accountPage.signIn(process.env.TEST3_EMAIL, process.env.TEST_PASSWORD, { isWaitAlert: true })
     } else {
@@ -62,18 +73,9 @@ describe('upload', () => {
       }
     }
 
-    // 查看种子任务卡片状态
-    // await homePage.jumpPage('uploadingStatusTab')
     const taskStatus = await homePage.getTaskStatus(torrentName)
-    expect(taskStatus).toBe('Status: Seeding')
+    expect(taskStatus).toBe('Status: Uploading')
 
-    // 等待种子上传(其他用户下载种子)
-    // await homePage.waitSeedUpload(torrentName)
-
-    // const taskPeers = await homePage.getTaskPeers(torrentName, 60000 * 10)
-    // taskPeers.click()
-    // 等待积分增加变化
-    // await client.$('//Text[@Name="Uploading"]').click()
     await homePage.jumpPage('creditsLink')
     let changedCredit
     while (1) {
@@ -82,13 +84,8 @@ describe('upload', () => {
       await sleep(5000)
     }
     console.log('credits increase:' + changedCredit)
-    // 等待下载者完成下载
-    // console.log('waitTaskPeersHidden')
-    // await homePage.jumpPage('uploadingStatusTab')
-    // // waitTaskPeershidden
-    // await homePage.waitTaskPeers(torrentName, 60000 * 5, 0)
     await sleep(10000)
     console.log('wait download complete')
-    // expect(1).toBe(1)
+    isSuccess = true
   })
 })
