@@ -1,21 +1,5 @@
 
 import 'cypress-file-upload'
-Cypress.on('uncaught:exception', (err, runnable) => {
-  if (err.message.includes('User-Initiated Abort') ||
-    err.message.includes('RTCError') ||
-    err.message.includes('Failed to execute \'setRemoteDescription\'') ||
-    err.message.includes('Avoided redundant navigation') ||
-    err.message.includes('Connection failed')
-  ) {
-    return false
-  }
-})
-Cypress.on('before:browser:launch', (browser, launchOptions) => {
-  if ((browser.name === 'chrome' || browser.name === 'edge') && browser.isHeadless) {
-    launchOptions.args.push('--disable-gpu')
-    return launchOptions
-  }
-})
 Cypress.Commands.add(
   'dataCy',
   {

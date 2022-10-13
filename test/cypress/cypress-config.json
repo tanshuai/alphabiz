@@ -8,6 +8,7 @@
   "videosFolder": "test/cypress/videos",
   "video": false,
   "retries": 2,
+  "defaultCommandTimeout": 15000,
   "numTestsKeptInMemory": 10,
   "experimentalSessionSupport": true,
   "viewportWidth": 1268,

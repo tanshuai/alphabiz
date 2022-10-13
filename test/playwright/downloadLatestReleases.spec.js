@@ -19,7 +19,7 @@ test.afterEach(async ({ }, testInfo) => {
 
 test.describe('download stable version alphabiz', () => {
   test('download', async () => {
-    test.setTimeout(60000 * 20)
+    test.setTimeout(60000 * 3)
     const [response] = await Promise.all([
       // Waits for the next response matching some conditions
       page.waitForResponse(response => response.url() === 'https://api.github.com/repos/tanshuai/alphabiz/releases/latest'),
@@ -27,9 +27,19 @@ test.describe('download stable version alphabiz', () => {
       page.goto('https://api.github.com/repos/tanshuai/alphabiz/releases/latest')
     ])
     const resJson = await response.json()
-    const tagName = resJson.tag_name
+    let tagName = resJson.tag_name
     console.log('latest stable version: ', tagName)
-
+    if (typeof tagName === 'undefined') {
+      const [response] = await Promise.all([
+        // Waits for the next response matching some conditions
+        page.waitForResponse(response => response.url() === 'https://api.github.com/repos/tanshuai/alphabiz/releases/latest'),
+        // Triggers the response
+        page.goto('https://api.github.com/repos/tanshuai/alphabiz/releases/latest')
+      ])
+      const resJson = await response.json()
+      tagName = resJson.tag_name
+      console.log('2: latest stable version: ', tagName)
+    }
     await page.goto(`https://alpha.biz/`)
     console.log('web load end!')
     let eleClass
