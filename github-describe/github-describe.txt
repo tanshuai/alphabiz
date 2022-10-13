@@ -1,6 +1,8 @@
-mixins for LIbraryIndex
-Update mixinKeychainLib.js
-mixins for LibraryIndex
-reduce github runner workflow timeout
-fix release test
-fix release creditsDownload test error
+fix release credits download test
+fix screenshot error when release test failed
+add waiting time 、skip workflow
+add waiting app duration skip workflow
+fix windows size too small
+use mixin: LibLoader
+Update Index.js
+fix release test sign in、add cypress test waitting time
