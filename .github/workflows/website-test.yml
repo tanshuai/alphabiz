@@ -2,11 +2,11 @@ name: CT website test
 
 on:
   schedule:
-    - cron: "40 3 * * *"
+    - cron: "00 3 * * *"
   pull_request:
   push:
     paths:
-      - "**/website-test.yml"
+      - "!**/website-test.yml"
     branches: [main]
 #
 jobs:

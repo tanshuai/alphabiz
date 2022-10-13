@@ -77,10 +77,10 @@ jobs:
         run: |
           TZ=UTC-8 git log -10 --date=format-local:"%Y%m%d%H%M" --format="%cd"
           echo "--------------------------"
-          echo "::set-output name=tag-name::0.1.0-nightly-202204151014"
+          echo "::set-output name=tag-name::0.2.1-nightly-202210121923"
           if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
           then echo "::set-output name=isRunAppium::1" ; \
-          else echo "::set-output name=isRunAppium::0" ; \
+          else echo "::set-output name=isRunAppium::1" ; \
           fi
         shell: bash
 
@@ -111,17 +111,17 @@ jobs:
           command: yarn unpackaged
           on_retry_command: rm -rf C:/Users/runneradmin/AppData/Local/node-gyp/
 
-      - name: E2E Test 🧪
-        if: "!contains(github.event.head_commit.message, 'skip e2e')"
-        run: yarn test:e2e:ci
-        shell: bash
+      # - name: E2E Test 🧪
+      #   if: "!contains(github.event.head_commit.message, 'skip e2e')"
+      #   run: yarn test:e2e:ci
+      #   shell: bash
 
-      - name: Upload Test Results 🗃
-        if: always()
-        uses: actions/upload-artifact@v2
-        with:
-          name: "${{ matrix.os }}-output"
-          path: test/output/**
+      # - name: Upload Test Results 🗃
+      #   if: always()
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: "${{ matrix.os }}-output"
+      #     path: test/output/**
 
   appium-test:
     needs: build-1
