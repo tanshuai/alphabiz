@@ -1,8 +1,9 @@
-fix release credits download test
-fix screenshot error when release test failed
-add waiting time 、skip workflow
-add waiting app duration skip workflow
-fix windows size too small
-use mixin: LibLoader
-Update Index.js
-fix release test sign in、add cypress test waitting time
+wait loading lib key
+fix #687
+improve setFilmRate
+wait loading key card hidden
+LIbraryIndex: ui adjustment
+wait loading post in home page
+try log darwin save language test status
+fix darwin save language test
+virtual scroll
