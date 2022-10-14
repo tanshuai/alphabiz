@@ -182,12 +182,20 @@ class BasePage {
     try {
       await this.page.locator('text=Loading lib key').waitFor('visible', { timeout: 10000 })
       await this.waitForAllHidden(await this.page.locator('text=Loading lib key'), 90000)
+    } catch {
+      console.log('not wait loading lib key')
+    }
+    try {
+      const headerTitle = await this.headerTitle.innerText()
+      console.log('headerTitle', headerTitle)
+      if (headerTitle.includes('Library')) {
+        await this.page.locator('.post-card').nth(0).waitFor('visible', { timeout: 30000 })
+      }
+    } catch (e) {
       if (await this.page.locator('.q-card:has-text("No available post")').isVisible()) {
         await this.page.locator('.q-card:has-text("No available post") button:has-text("Cancel")').click()
         expect(await this.page.locator('.q-card:has-text("No available post") button:has-text("Cancel")')).toHaveCount(0)
       }
-    } catch {
-      console.log('not wait loading lib key')
     }
   }
 

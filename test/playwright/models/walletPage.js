@@ -138,7 +138,7 @@ class WalletPage extends BasePage {
     console.log('keyObj', keyObj)
     await this.page.waitForTimeout(3000)
     await this.gscConfirmBtn.click()
-    await this.walletCard.waitFor({ timeout: 60000 * 4})
+    await this.walletCard.waitFor({ timeout: 60000})
     return keyObj
   }
   async recoveryKey (privateKey) {

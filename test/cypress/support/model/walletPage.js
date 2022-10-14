@@ -18,7 +18,7 @@ Cypress.Commands.add('createKey', () => {
       cy.get('.q-card [role="alert"]').eq(5).invoke('text').then((privateKeyText) => {
         // cy.task('log', privateKeyText)
         cy.contains('Confirm').click()
-        cy.get('.blockchain-card:nth(3)', { timeout: 90000 })
+        cy.get('.blockchain-card:nth(3)', { timeout: 60000 })
         return cy.wrap({
           address: addressText.replace('content_copy', '').replace(/\n/g, ''),
           publicKey: publicKeyText.replace('content_copy', '').replace(/\n/g, ''),
