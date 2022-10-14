@@ -197,6 +197,10 @@ class BasePage {
         expect(await this.page.locator('.q-card:has-text("No available post") button:has-text("Cancel")')).toHaveCount(0)
       }
     }
+    if (await this.page.locator('.q-card:has-text("No available post")').isVisible()) {
+      await this.page.locator('.q-card:has-text("No available post") button:has-text("Cancel")').click()
+      expect(await this.page.locator('.q-card:has-text("No available post") button:has-text("Cancel")')).toHaveCount(0)
+    }
   }
 
   async waitForAllHidden (locator, timeout = 10000, waitTime = 200) {

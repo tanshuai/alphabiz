@@ -179,6 +179,9 @@ test.describe('play video', () => {
 test.describe('save Language', () => {
   test.describe('signInPage', () => {
     test.beforeEach(async () => {
+      if (process.platform === 'darwin') {
+        test.skip()
+      }
       await basePage.clearLocalstorage()
       await window.waitForTimeout(3000)
     })
@@ -206,6 +209,9 @@ test.describe('save Language', () => {
       await window.waitForLoadState()
       await window.locator(signIncardCss).waitFor()
       if (process.platform === 'darwin') {
+        await basePage.clearLocalstorage()
+        await window.waitForTimeout(3000)
+        await basePage.quickSaveLanguage('EN')
         await window.reload()
         await window.waitForLoadState()
         await window.locator(signIncardCss).waitFor()
@@ -215,11 +221,11 @@ test.describe('save Language', () => {
   })
   test.describe('basicPage', () => {
     test.beforeEach(async () => {
+      if (process.platform === 'darwin') {
+        test.skip()
+      }
       await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
       await window.waitForLoadState()
-      if (process.platform === 'darwin') {
-        await window.screenshot({ path: `${ScreenshotsPath}basicPageStatus.png` })
-      }
     })
     test('CN', async () => {
       await basicPage.saveLanguage('EN', 'CN')
