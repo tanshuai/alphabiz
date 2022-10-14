@@ -205,27 +205,36 @@ test.describe('save Language', () => {
       await window.reload()
       await window.waitForLoadState()
       await window.locator(signIncardCss).waitFor()
+      if (process.platform === 'darwin') {
+        await window.reload()
+        await window.waitForLoadState()
+        await window.locator(signIncardCss).waitFor()
+        await window.screenshot({ path: `${ScreenshotsPath}signInPageStatus.png` })
+      }
     })
   })
   test.describe('basicPage', () => {
     test.beforeEach(async () => {
       await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
       await window.waitForLoadState()
+      if (process.platform === 'darwin') {
+        await window.screenshot({ path: `${ScreenshotsPath}basicPageStatus.png` })
+      }
     })
     test('CN', async () => {
       await basicPage.saveLanguage('EN', 'CN')
       await window.reload()
-      expect(await basicPage.headerTitle).toHaveText(/媒体库/, { timeout: 20000 })
+      await expect(await basicPage.headerTitle).toHaveText(/媒体库/, { timeout: 20000 })
     })
     test('TW', async () => {
       await basicPage.saveLanguage('CN', 'TW')
       await window.reload()
-      expect(await basicPage.headerTitle).toHaveText(/媒體庫/, { timeout: 20000 })
+      await expect(await basicPage.headerTitle).toHaveText(/媒體庫/, { timeout: 20000 })
     })
     test('EN', async () => {
       await basicPage.saveLanguage('TW', 'EN')
       await window.reload()
-      expect(await basicPage.headerTitle).toHaveText(/Library/, { timeout: 20000 })
+      await expect(await basicPage.headerTitle).toHaveText(/Library/, { timeout: 20000 })
     })
   })
 })
