@@ -77,7 +77,7 @@ class BasePage {
     await this.page.waitForTimeout(500)
     const isHidden = await this[firstTarget].isHidden()
     if (isHidden) {
-      await this.menuIcon.click()
+      await this.menuIcon.click({ timeout: 60000 })
     }
     if (secondTarget) {
       if (await menuButton.isHidden()) {
