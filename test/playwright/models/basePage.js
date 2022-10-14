@@ -130,6 +130,7 @@ class BasePage {
       const alertText = await this.alert.innerText()
       console.log('alert: [ ', alertText, ' ]')
       await this.signInAlert.waitFor()
+      await this.waitLoadingLibKey()
     }
   }
 
@@ -165,11 +166,28 @@ class BasePage {
       }
       try {
         await this.accountMore.waitFor()
+        if (await this.page.locator('text=Loading lib key').isVisible()) {
+          await this.waitLoadingLibKey()
+        }
       } catch {
         await this.page.evaluate(() => localStorage.clear())
         await this.page.reload()
         await this.signIn(username, password, isWaitAlert, isSetToken)
       }
+    }
+    
+  }
+
+  async waitLoadingLibKey () {
+    try {
+      await this.page.locator('text=Loading lib key').waitFor('visible', { timeout: 10000 })
+      await this.waitForAllHidden(await this.page.locator('text=Loading lib key'), 90000)
+      if (await this.page.locator('.q-card:has-text("No available post")').isVisible()) {
+        await this.page.locator('.q-card:has-text("No available post") button:has-text("Cancel")').click()
+        expect(await this.page.locator('.q-card:has-text("No available post") button:has-text("Cancel")')).toHaveCount(0)
+      }
+    } catch {
+      console.log('not wait loading lib key')
     }
   }
 
