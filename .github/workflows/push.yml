@@ -320,7 +320,7 @@ jobs:
     strategy:
       matrix:
         test: [1, 2]
-        node-version: [14]
+        node-version: [16]
         os: [windows-latest]
         include:
           - test: 1
