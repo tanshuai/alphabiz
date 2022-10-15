@@ -12,7 +12,7 @@ const { sleep } = require('../../utils/getCode')
 const { calculation } = require('../../utils/calculation')
 
 let client, homePage, accountPage, creditsPage, developmentPage
-jest.setTimeout(60000 * 15)
+jest.setTimeout(60000 * 20)
 const outputFile = process.env.APP_TYPE === 'exe' ? '/exe' : process.env.APP_TYPE === 'msi' ? '/msi' : '/7z'
 const outputPath = path.resolve(__dirname, '../../output/release' + outputFile)
 let isSuccess = false
@@ -48,22 +48,7 @@ describe('upload', () => {
     // const torrentName = 'ChinaCup.1080p.H264.AAC.mp4'
     // 判断是否已经登录
     await sleep(10000)
-    if (await accountPage.username.isDisplayed()) {
-      // 未登录
-      await accountPage.signIn(process.env.TEST3_EMAIL, process.env.TEST_PASSWORD, { isWaitAlert: true })
-    } else {
-      await homePage.jumpPage('homeLink')
-      // 已登陆,等待拉取数据
-      // await client.$('//*[@Name="Settings"]').click()
-      if (!await homePage.settingsLink.isDisplayed()) {
-        await homePage.menuBtn.click()
-        await sleep(1000)
-        if (!await homePage.settingsLink.isDisplayed()) {
-          await homePage.menuBtn.click()
-        }
-      }
-      await accountPage.accountMoreBtn.waitForDisplayed({ timeout: 15000 })
-    }
+    await accountPage.ensureSignIn(process.env.TEST1_EMAIL, process.env.TEST_PASSWORD, { isWaitAlert: true })
 
     // 查看初始积分
     await homePage.jumpPage('creditsLink')

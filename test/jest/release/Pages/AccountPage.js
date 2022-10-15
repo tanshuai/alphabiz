@@ -1,6 +1,8 @@
 const { sleep } = require('../../../utils/getCode')
-class AccountPage {
+const { HomePage } = require('./HomePage')
+class AccountPage extends HomePage {
   constructor (page) {
+    super(page)
     this.page = page
   }
 
@@ -37,11 +39,50 @@ class AccountPage {
         timeout: 40000,
         timeoutMsg: 'importCloudKeyCard is not hidden'
       })
+      if (await this.importCloudKeyOKBtn.isDisplayed()) {
+        await this.importCloudKeyOKBtn.click()
+        await this.importCloudKeyOKBtn.waitUntil(async () => {
+          return (await this.importCloudKeyOKBtn.isDisplayed()) === false
+        }, {
+          timeout: 40000,
+          timeoutMsg: 'The second attempt - importCloudKeyCard is not hidden'
+        })
+      }
       await sleep(3000)
       if (!(await this.page.$('//*[@Name="Credits"]').isDisplayed())) {
         await this.page.$('//Button[@Name="Menu"]').click()
       }
       await this.accountMoreBtn.waitForDisplayed({ timeout: 30000 })
+    }
+  }
+
+  async ensureSignIn (username, password, opt = { isWaitAlert: false }) {
+    // 判断是否已经登录
+    if (await this.username.isDisplayed()) {
+      // 未登录
+      await this.signIn(username, password, { isWaitAlert: true })
+    } else {
+      // 判断是否需要导入云端密钥
+      if (await this.importCloudKeyOKBtn.isDisplayed()) {
+        await this.importCloudKeyOKBtn.click()
+        await this.importCloudKeyOKBtn.waitUntil(async () => {
+          return (await this.importCloudKeyOKBtn.isDisplayed()) === false
+        }, {
+          timeout: 40000,
+          timeoutMsg: 'auto sign in - importCloudKeyCard is not hidden'
+        })
+      }
+      await this.jumpPage('homeLink')
+      // 已登陆,等待拉取数据
+      // await client.$('//*[@Name="Settings"]').click()
+      if (!await this.settingsLink.isDisplayed()) {
+        await this.menuBtn.click()
+        await sleep(1000)
+        if (!await this.settingsLink.isDisplayed()) {
+          await this.menuBtn.click()
+        }
+      }
+      await this.accountMoreBtn.waitForDisplayed({ timeout: 15000 })
     }
   }
 

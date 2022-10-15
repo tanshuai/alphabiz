@@ -55,23 +55,8 @@ describe('main', () => {
   })
   it('ensure sign in', async () => {
     // 判断是否已经登录
-    await sleep(5000)
-    if (await accountPage.username.isDisplayed()) {
-      // 未登录
-      await accountPage.signIn(process.env.TEST1_EMAIL, process.env.TEST_PASSWORD, { isWaitAlert: true })
-    } else {
-      await homePage.jumpPage('homeLink')
-      // 已登陆,等待拉取数据
-      // await client.$('//*[@Name="Settings"]').click()
-      if (!await homePage.settingsLink.isDisplayed()) {
-        await homePage.menuBtn.click()
-        await sleep(1000)
-        if (!await homePage.settingsLink.isDisplayed()) {
-          await homePage.menuBtn.click()
-        }
-      }
-      await accountPage.accountMoreBtn.waitForDisplayed({ timeout: 15000 })
-    }
+    await sleep(10000)
+    await accountPage.ensureSignIn(process.env.TEST1_EMAIL, process.env.TEST_PASSWORD, { isWaitAlert: true })
     isSuccess = true
   })
   it('version number', async () => {

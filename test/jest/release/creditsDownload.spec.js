@@ -16,7 +16,7 @@ let client, homePage, accountPage, creditsPage, developmentPage
 const torrentName = 'GoneNutty.avi'
 const outputFile = process.env.APP_TYPE === 'exe' ? '/exe' : process.env.APP_TYPE === 'msi' ? '/msi' : '/7z'
 const outputPath = path.resolve(__dirname, '../../output/release' + outputFile)
-jest.setTimeout(60000 * 15)
+jest.setTimeout(60000 * 20)
 let isSuccess = false
 describe('download', () => {
   beforeAll(async () => {
@@ -72,23 +72,7 @@ describe('download', () => {
   it('download seeding', async () => {
     const DownloadFilePath = path.resolve(__dirname, '../../download')
     await sleep(10000)
-    // 判断是否已经登录
-    if (await accountPage.username.isDisplayed()) {
-      // 未登录
-      await accountPage.signIn(process.env.TEST2_EMAIL, process.env.TEST_PASSWORD, { isWaitAlert: true })
-    } else {
-      await homePage.jumpPage('homeLink')
-      // 已登陆,等待拉取数据
-      // await client.$('//*[@Name="Settings"]').click()
-      if (!await homePage.settingsLink.isDisplayed()) {
-        await homePage.menuBtn.click()
-        await sleep(1000)
-        if (!await homePage.settingsLink.isDisplayed()) {
-          await homePage.menuBtn.click()
-        }
-      }
-      await accountPage.accountMoreBtn.waitForDisplayed({ timeout: 15000 })
-    }
+    await accountPage.ensureSignIn(process.env.TEST1_EMAIL, process.env.TEST_PASSWORD, { isWaitAlert: true })
 
     // 查看初始积分
     await homePage.jumpPage('creditsLink')
@@ -114,7 +98,7 @@ describe('download', () => {
           const statusText = await homePage.getTaskStatus(torrentName, { isLog: false })
           return !statusText.include('Loading')
         }, {
-          timeout: 60000 * 10,
+          timeout: 60000 * 15,
           timeoutMsg: 'task not start'
         })
 
