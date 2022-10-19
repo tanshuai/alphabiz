@@ -1,10 +1,8 @@
+fix: #705 #706
 Update FieldRules.js
-add MarkdownDialog
-add internal notice
-Update FieldRules.js
-internal dialog
-#691
-adjust title size
-Update account.ts
+close internal notice card
+fix connect timeout error #689
+fix sign up test
+fix internal notice card in website
 AlphabizAccount
-add download subtitle method #698
+change player subtitles #698
