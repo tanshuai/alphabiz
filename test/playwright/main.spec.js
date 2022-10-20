@@ -483,7 +483,7 @@ test.describe('account', () => {
   //     username: '+86' + process.env.TEST3_PHONE_NUMBER
   //   }
   // ]
-  test.only('transfer - check bill details', async () => {
+  test('transfer - check bill details', async () => {
     test.setTimeout(60000 * 5)
     let from
     let to
