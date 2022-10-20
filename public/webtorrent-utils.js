@@ -131,6 +131,7 @@ const torrentToJson = (tr, deltaTime, speeder) => {
   if (tr.timeRemaining) o.timeRemaining = tr.timeRemaining
   if (tr.metadata) o.hasMetadata = true
   if (tr.numPeers) o.peersNum = tr.numPeers
+  if (tr.subtitleList && tr.subtitleList.length) o.subtitleList = tr.subtitleList
 
   // byte map
   const byteMap = getByteMap(tr)

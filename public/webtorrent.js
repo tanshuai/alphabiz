@@ -524,6 +524,7 @@ const addTorrent = (token, conf, cb) => {
     if (conf.fromPost) tr.fromPost = conf.fromPost
     if (conf.postTitle) tr.postTitle = conf.postTitle
     if (conf.name) tr.name = conf.name
+    if (conf.subtitleList && conf.subtitleList.length) tr.subtitleList = conf.subtitleList
     verbose('Torrent conf', tr)
     addListeners(tr, conf)
     verbose('Listener added')
