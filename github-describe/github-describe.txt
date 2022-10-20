@@ -1,8 +1,7 @@
-fix: #705 #706
-Update FieldRules.js
-close internal notice card
-fix connect timeout error #689
-fix sign up test
-fix internal notice card in website
-AlphabizAccount
-change player subtitles #698
+Update account.js
+Update Index.js
+fix border color changes
+Update package.json
+add fetchNext for LibLoader
+fix dialog bug
+download subtitle when download torrent #698
