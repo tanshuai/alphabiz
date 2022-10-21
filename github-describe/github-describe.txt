@@ -1,7 +1,8 @@
-Update account.js
-Update Index.js
-fix border color changes
-Update package.json
-add fetchNext for LibLoader
-fix dialog bug
-download subtitle when download torrent #698
+delete subtitle when delete torrent #698
+AlphabizAccount
+ReCaptcha
+VersionControl
+VersionControl
+edit subtitle list #698
+pause player when sign out #714
+Update Updater.vue
