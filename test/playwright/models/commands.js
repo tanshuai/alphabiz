@@ -103,22 +103,24 @@ class Commands {
     await this.page.locator(':nth-child(2) > .q-card').waitFor('hidden')
   }
 
-  async checkBillDetail () {
+  async checkBillDetail (detail, type) {
     await this.page.waitForLoadState()
     await this.page.waitForTimeout(1000)
-    await this.page.click('.q-table__grid-content > :nth-child(1)')
+    if (type === 'expense') await this.page.click('.q-table__grid-content > :nth-child(1) >> text=-')
+    else await this.page.click('.q-table__grid-content > :nth-child(1) >> text=+')
     await this.page.locator('form >> text=cancel').waitFor('visible')
-    for (var index in arguments) {
-      if (arguments[index] === 'Transfer') {
+
+    for (var index in detail) {
+      if (detail[index] === 'Transfer') {
         const categoryText = await this.page.locator('form >> text=Category >> //following::*[1]').innerText()
-        expect(categoryText).toBe(arguments[index])
-      } else if (arguments[index] === 'finish') {
+        expect(categoryText).toBe(detail[index])
+      } else if (detail[index] === 'finish') {
         const statusText = await this.page.locator('form >> text=Status >> //following::*[1]').innerText()
-        expect(statusText).toBe(arguments[index])
-      } else if (/^(\+|-)\d+$/.test(arguments[index])) {
+        expect(statusText).toBe(detail[index])
+      } else if (/^(\+|-)\d+$/.test(detail[index])) {
         const changedAmountText = await this.page.locator('form >> text=Changed Amount >> //following::*[1]').innerText()
-        expect(changedAmountText).toBe(arguments[index])
-      } else { await this.page.click('form >> :nth-match(div:has-text("' + arguments[index] + '"), 3)') }
+        expect(changedAmountText).toBe(detail[index])
+      } else { await this.page.click('form >> :nth-match(div:has-text("' + detail[index] + '"), 3)') }
     }
     await this.page.click('button:has-text("Cancel")')
   }

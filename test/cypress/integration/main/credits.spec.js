@@ -81,7 +81,7 @@ describe('Credits', () => {
         cy.transfer(payeeID, transferAmount)
         // 转账 end
         // 断言 付款人 转单明细
-        cy.get('.q-table__grid-content > :nth-child(1)').click()
+        cy.get('.q-table__grid-content > :nth-child(1)').eq(1).click()
         cy.get('.q-dialog__inner > .q-card', { timeout: 5000 }).should('be.visible').then($card => {
           cy.get('.rounded-borders > :nth-child(2)').contains(payeeID)
           cy.get('.rounded-borders > :nth-child(3)').contains('Transfer')
@@ -96,7 +96,7 @@ describe('Credits', () => {
         // 断言 收款人 积分变化
         cy.get('.text-right > div').invoke('text').should('eq', (parseInt(payeePoint) + transferAmount).toString())
         // 断言 收款人 转单明细
-        cy.get('.q-table__grid-content > :nth-child(1)').click()
+        cy.get('.q-table__grid-content > :nth-child(1)').eq(0).click()
         cy.get('.q-dialog__inner > .q-card', { timeout: 5000 }).should('be.visible').then($card => {
           cy.get('.rounded-borders > :nth-child(2)').contains(transfereeID)
           cy.get('.rounded-borders > :nth-child(3)').contains('Transfer')

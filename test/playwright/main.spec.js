@@ -545,7 +545,7 @@ test.describe('account', () => {
     // 转账
     await commands.transfer(payeeID, transferAmount.toString())
     // 查看账单明细
-    await commands.checkBillDetail(payeeID, 'Transfer', '-' + transferAmount, 'finish')
+    await commands.checkBillDetail([payeeID, 'Transfer', '-' + transferAmount, 'finish'], 'expense')
     // 断言积分变化是否正确
     await sleep(2000)
     await window.waitForLoadState()
