@@ -476,7 +476,7 @@ index f86634b..3ee09b8 100644
   
      root.on('put', function(msg){
 diff --git a/node_modules/gun/lib/webrtc.js b/node_modules/gun/lib/webrtc.js
-index abc887c..c48348c 100644
+index abc887c..2c8bf5c 100644
 --- a/node_modules/gun/lib/webrtc.js
 +++ b/node_modules/gun/lib/webrtc.js
 @@ -5,8 +5,9 @@
@@ -532,7 +532,7 @@ index abc887c..c48348c 100644
  			delete opt.announce[rtc.id]; /// remove after connect
  			if(tmp = rtc.answer){
  				if(!(peer = opt.peers[rtc.id] || open[rtc.id]) || peer.remoteSet){ return }
-@@ -57,25 +65,46 @@
+@@ -57,25 +65,48 @@
  			}
  			if(tmp = rtc.candidate){
  				peer = opt.peers[rtc.id] || open[rtc.id] || open({rtc: {id: rtc.id}});
@@ -553,7 +553,9 @@ index abc887c..c48348c 100644
  			//if(opt.peers[rtc.id]){ return }
  			if(open[rtc.id]){ return }
 -			(peer = new opt.RTCPeerConnection(opt.rtc)).id = rtc.id;
-+			(peer = new opt.RTCPeerConnection(opt.rtc)).id = rtc.id
++			peer = new opt.RTCPeerConnection(opt.rtc)
++			if (!peer) return console.log('no peer', peer, opt.rtc)
++			peer.id = rtc.id
 +			// console.log('on open', msg, peer)
  			var wire = peer.wire = peer.createDataChannel('dc', opt.rtc.dataChannel);
  			open[rtc.id] = peer;
@@ -585,7 +587,7 @@ index abc887c..c48348c 100644
  				mesh.hear(msg.data || msg, peer);
  			};
  			peer.onicecandidate = function(e){ // source: EasyRTC!
-@@ -89,7 +118,8 @@
+@@ -89,7 +120,8 @@
  				rc.onclose = wire.onclose;
  			}
  			if(tmp = rtc.offer){
@@ -595,7 +597,7 @@ index abc887c..c48348c 100644
  				peer.setRemoteDescription(new opt.RTCSessionDescription(tmp)); 
  				peer.createAnswer(function(answer){
  					peer.setLocalDescription(answer);
-@@ -98,6 +128,7 @@
+@@ -98,6 +130,7 @@
  				return;
  			}
  			peer.createOffer(function(offer){
@@ -604,7 +606,7 @@ index abc887c..c48348c 100644
  				root.on('out', {'@': msg['#'], rtc: {offer: offer, id: opt.pid}});
  			}, function(){}, opt.rtc.sdp);
 diff --git a/node_modules/gun/sea.js b/node_modules/gun/sea.js
-index 2319fef..71bcb42 100644
+index 2319fef..d402998 100644
 --- a/node_modules/gun/sea.js
 +++ b/node_modules/gun/sea.js
 @@ -31,16 +31,16 @@
@@ -634,7 +636,23 @@ index 2319fef..71bcb42 100644
    })(USE, './https');
  
    ;USE(function(module){
-@@ -467,7 +467,7 @@
+@@ -337,6 +337,7 @@
+       // First: ECDSA keys for signing/verifying...
+       var sa = await shim.subtle.generateKey({name: 'ECDSA', namedCurve: 'P-256'}, true, [ 'sign', 'verify' ])
+       .then(async (keys) => {
++        console.log('usr keys', keys)
+         // privateKey scope doesn't leak out from here!
+         //const { d: priv } = await shim.subtle.exportKey('jwk', keys.privateKey)
+         var key = {};
+@@ -357,6 +358,7 @@
+       try{
+       var dh = await ecdhSubtle.generateKey({name: 'ECDH', namedCurve: 'P-256'}, true, ['deriveKey'])
+       .then(async (keys) => {
++        console.log('usr e keys', keys)
+         // privateKey scope doesn't leak out from here!
+         var key = {};
+         key.epriv = (await ecdhSubtle.exportKey('jwk', keys.privateKey)).d;
+@@ -467,7 +469,7 @@
        if(cb){ try{ cb(r) }catch(e){console.log(e)} }
        return r;
      } catch(e) {
@@ -643,6 +661,26 @@ index 2319fef..71bcb42 100644
        SEA.err = e;
        if(SEA.throw){ throw e }
        if(cb){ cb() }
+@@ -954,6 +956,11 @@
+         delete sS.pair;
+         }catch(e){};
+       }
++      var cat = gun._
++      if (cat) {
++        console.log('CAT', cat)
++        if (cat.ing) cat.ing = false
++      }
+       return gun;
+     }
+   })(USE, './create');
+@@ -1333,7 +1340,6 @@
+         check.hash(eve, msg, val, key, soul, at, no); return;
+       } 
+       check.any(eve, msg, val, key, soul, at, no, at.user||''); return;
+-      eve.to.next(msg); // not handled
+     }
+     check.hash = function(eve, msg, val, key, soul, at, no){
+       SEA.work(val, null, function(data){
 diff --git a/node_modules/gun/sea/https.js b/node_modules/gun/sea/https.js
 index 4f12465..fbbc011 100644
 --- a/node_modules/gun/sea/https.js
