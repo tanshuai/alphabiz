@@ -1,8 +1,22 @@
-#696
-fix: #715
+fix: #716
+fix: #720 #717
+fix: #718
 ui adjustment
-library post add subtitleList #698
-delete subtitle files completely #698
-add subtitle icon in postCard
-fix duplicate language subtitle error
+fix download subtitle path error
+disable legacy oauth
+use OAuthEntry
+use OAuthEntry
+add timeout hint, clear player when pause task #708
+OAuth
+amplify backend
+oauth
+fix #712
+bump @zeeis/alphabiz-libdb to v0.0.83
+fix #707
+resolve #699
+#702
+resolve #711
+fix #700
+try logout before register #713
 AlphabizAccount
+fix clear player error
