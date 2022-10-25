@@ -34,7 +34,7 @@ class HomePage {
 
   // 上传bt功能
   get uploadTorrentBtn () { return this.page.$('[name="UPLOAD"]') }
-  get torrentFileBtn () { return this.page.$('//*[@Name="Torrent file"]') }
+  get torrentFileBtn () { return this.page.$('//*[@Name="File"]') }
   get fileNameEdit () { return this.page.$('//ComboBox[@ClassName="ComboBox"]/Edit[@ClassName="Edit" and @Name="File name:"]') }
   get confirmUploadBtn () { return this.page.$('//Button[@Name="CANCEL"]/following-sibling::Button[@Name="UPLOAD"]') }
 
@@ -137,14 +137,14 @@ class HomePage {
   }
 
   async getTaskPeers (torrentName, timeout) {
-    await this.page.$('//Text[@Name="' + torrentName + '"]/following-sibling::Button[starts-with(@Name,"PEERS:")]').waitForDisplayed({ timeout: timeout })
-    return await this.page.$('//Text[@Name="' + torrentName + '"]/following-sibling::Button[starts-with(@Name,"PEERS:")]')
+    await this.page.$('//Text[@Name="' + torrentName + '"]/following-sibling::Button[@Name="DELETE"]/following-sibling::Button[1]').waitForDisplayed({ timeout: timeout })
+    return await this.page.$('//Text[@Name="' + torrentName + '"]/following-sibling::Button[@Name="DELETE"]/following-sibling::Button[1]')
   }
 
   // status = 1  ->  wait display
   // status = 0  ->  wait hidden
   async waitTaskPeers (torrentName, timeout, status) {
-    const taskPeers = await this.page.$('//Text[@Name="' + torrentName + '"]/following-sibling::Button[starts-with(@Name,"PEERS:")]')
+    const taskPeers = await this.page.$('//Text[@Name="' + torrentName + '"]/following-sibling::Button[@Name="DELETE"]/following-sibling::Button[1]')
     console.log('waitTaskPeers')
     await this.page.$('//Text[@Name="' + torrentName + '"]').click()
     await taskPeers.waitUntil(async function () {
@@ -176,6 +176,11 @@ class HomePage {
     await this.page.$('//Button[@Name="Pay 2 point for 20MB data"]').click()
     await sleep(2000)
     await this.page.$('//Text[@Name="Alphabiz"]').click()
+  }
+
+  async downloadPaymentProd (taskPeers, isAutoRenew) {
+    await taskPeers.click()
+    await this.page.$('//Button[@Name="OK"]').click()
   }
 
   async deleteTask (torrentName) {

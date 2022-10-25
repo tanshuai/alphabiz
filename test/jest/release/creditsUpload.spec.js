@@ -31,15 +31,13 @@ describe('upload', () => {
     const uploadFilePath = path.resolve(__dirname, '../../cypress/fixtures/samples/ChinaCup.1080p.H264.AAC.mp4')
     const torrentName = 'ChinaCup.1080p.H264.AAC.mp4'
     // 判断是否已经登录
-    await homePage.jumpPage('accountLink')
-    const concerText = await homePage.accountLink.getText()
-    console.log('concerText:' + concerText)
-    if ((/Want to Join/).test(concerText)) {
+    await homePage.jumpPage('creditsLink')
+    if (await client.$('//*[@Name="SIGN IN"]').isDisplayed()) {
       // 未登录
       await accountPage.signIn('+86' + process.env.TEST3_PHONE_NUMBER, process.env.TEST_PASSWORD, 1)
     } else {
       // 已登陆,等待拉取数据
-      await client.$('//*[@Name="Settings"]').click()
+      // await client.$('//*[@Name="Settings"]').click()
       await accountPage.accountSettingsTitle.waitForDisplayed({ timeout: 10000 })
     }
 
@@ -65,8 +63,8 @@ describe('upload', () => {
     const taskStatus = await homePage.getTaskStatus(torrentName)
     expect(taskStatus).toBe('Status: Seeding')
 
-    // 等待种子上传(其他用户下载种子)
-    await homePage.waitSeedUpload(torrentName)
+    // // 等待种子上传(其他用户下载种子)
+    // await homePage.waitSeedUpload(torrentName)
 
     // const taskPeers = await homePage.getTaskPeers(torrentName, 60000 * 10)
     // taskPeers.click()
@@ -75,15 +73,17 @@ describe('upload', () => {
     let changedCredit
     while (1) {
       changedCredit = await creditsPage.checkCredits()
-      if (Number(initialCredit) + 2 <= Number(changedCredit)) break
+      if (Number(initialCredit) + 1 <= Number(changedCredit)) break
       await sleep(5000)
     }
+    console.log('credots increase')
     // 等待下载者完成下载
-    console.log('waitTaskPeersHidden')
-    await homePage.jumpPage('uploadingStatusTab')
-    // waitTaskPeershidden
-    await homePage.waitTaskPeers(torrentName, 60000 * 5, 0)
-    console.log('success!')
+    // console.log('waitTaskPeersHidden')
+    // await homePage.jumpPage('uploadingStatusTab')
+    // // waitTaskPeershidden
+    // await homePage.waitTaskPeers(torrentName, 60000 * 5, 0)
+    await sleep(20000)
+    console.log('wait download complete')
     // expect(1).toBe(1)
   })
 })

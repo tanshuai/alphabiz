@@ -25,7 +25,7 @@ describe('download', () => {
   afterEach(async () => {
     await client.deleteSession()
   })
-  it('delete task', async () => {
+  it.skip('delete task', async () => {
     let isDelete = false
     let isJump = true
     await homePage.jumpPage('downloadingStatusTab')
@@ -55,19 +55,15 @@ describe('download', () => {
   })
   it('download seeding', async () => {
     const DownloadFilePath = path.resolve(__dirname, '../../download')
-    // console.log('DownloadFilePath:' + DownloadFilePath)
-    // 'C:/Users/Zhaoyulin/BTdownload/build-alphabiz'
 
     // 判断是否已经登录
-    await homePage.jumpPage('accountLink')
-    const concerText = await homePage.accountLink.getText()
-    console.log('concerText:' + concerText)
-    if ((/Want to Join/).test(concerText)) {
+    await homePage.jumpPage('creditsLink')
+    if (await client.$('//*[@Name="SIGN IN"]').isDisplayed()) {
       // 未登录
       await accountPage.signIn(process.env.EMAIL_USERNAME, process.env.TEST_PASSWORD, 1)
     } else {
       // 已登陆,等待拉取数据
-      await client.$('//*[@Name="Settings"]').click()
+      // await client.$('//*[@Name="Settings"]').click()
       await accountPage.accountSettingsTitle.waitForDisplayed({ timeout: 10000 })
     }
 
@@ -89,12 +85,12 @@ describe('download', () => {
         // 等待其他客户端上传bt种子
         const taskPeers = await homePage.getTaskPeers(torrentName, 10000)
         // 使用开发版本的付费积分功能
-        await homePage.downloadPaymentDev(taskPeers, 0)
+        await homePage.downloadPaymentProd(taskPeers, 0)
 
         // 查看积分减少变化
         await homePage.jumpPage('creditsLink')
         const changedCredit = await creditsPage.checkCredits()
-        if (Number(initialCredit) + 10 <= Number(changedCredit)) console.log('success!')
+        if (Number(initialCredit) + 1 <= Number(changedCredit)) console.log('success!')
       } catch (error) {
         // 未出现，结束测试
         console.log('tast end')
@@ -116,7 +112,7 @@ describe('download', () => {
         const taskPeers = await homePage.getTaskPeers(torrentName, 60000 * 5)
 
         // 使用开发版本的付费积分功能
-        await homePage.downloadPaymentDev(taskPeers, 0)
+        await homePage.downloadPaymentProd(taskPeers, 0)
 
         // 查看积分减少变化
         await homePage.jumpPage('creditsLink')
