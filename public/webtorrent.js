@@ -4,9 +4,11 @@ const { ipcRenderer } = require('electron')
 const crypto = require('crypto')
 const fs = require('fs')
 const path = require('path')
+// const diskusage = require('diskusage')
 const FSChunkStore = require('fs-chunk-store')
 
 import { useAlphabizProtocol, useClientEvents } from './wt-extention.js'
+import utils from './webtorrent-utils.js'
 
 let info = () => {} // console.log
 let verbose = () => {} // console.log
@@ -54,7 +56,7 @@ const responseTorrentProps = [
   'usedTime'
 ]
 /**
- * @typedef { import('src/types').TorrentInfo } TorrentInfo
+ * @typedef { import('../src/types').TorrentInfo } TorrentInfo
  * @typedef { import('webtorrent/lib/torrent') } RawTorrent
  * @typedef { RawTorrent & TorrentInfo } Torrent
  */
@@ -70,63 +72,7 @@ let deltaTime = 1000
  * @returns { Partial<Torrent> }
  */
 const torrentToJson = (tr) => {
-  const o = {}
-  responseTorrentProps.forEach(prop => { o[prop] = tr[prop] })
-  o.done = tr.downloaded >= tr.length
-  o.download = tr.progress !== 1 && !tr.upload
-  o.upload = tr.upload
-  // hmm, a typo error that is already used everywhere
-  o.recieved = tr.received
-  o.files = tr.files
-    ? tr.files.map(
-        /** @param { import('webtorrent/lib/file') } file */
-        file => {
-          return {
-            name: file.name,
-            path: path.resolve(tr.path, file.path),
-            progress: file.progress || 0
-          }
-        }
-      ).filter(i => !i.name.match(/^_____padding_file_(.*)____$/))
-    : []
-  if (tr.timeRemaining) o.timeRemaining = tr.timeRemaining
-  if (tr.metadata) o.hasMetadata = true
-  if (tr.numPeers) o.peersNum = tr.numPeers
-  o.connections = []
-  tr.wires.forEach(wire => {
-    // if (!wire.remoteAddress) return
-    let level = 'low'
-    if (wire._uploadThrottle._group === client.throttleGroups.mid) level = 'mid'
-    if (wire._uploadThrottle._group === client.throttleGroups.high) level = 'high'
-    let downloadSpeed = 0, uploadSpeed = 0
-    if (speeder.has(wire._debugId)) {
-      const prev = speeder.get(wire._debugId)
-      downloadSpeed = (wire.downloaded - prev.downloaded) / deltaTime
-      uploadSpeed = (wire.uploaded - prev.uploaded) / deltaTime
-    }
-    speeder.set(wire._debugId, {
-      downloaded: wire.downloaded,
-      uploaded: wire.uploaded
-    })
-    o.connections.push({
-      id: wire.peerId,
-      address: wire.remoteAddress,
-      isAbPeer: wire._is_alphabiz_peer_,
-      uploadSpeed,
-      downloadSpeed,
-      user: wire.remoteUser,
-      subId: wire.remoteSub,
-      transactions: wire.transactions,
-      remoteGroup: wire.remoteGroup,
-      downloaded: wire.downloaded,
-      level
-    })
-  })
-  o.connections.sort((a, b) => {
-    if (!a.address || !a.address.localeCompare) return 0
-    return a.address.localeCompare(b.address)
-  })
-  return o
+  return utils.torrentToJson(tr, deltaTime, speeder)
 }
 /** @param { number } speed */
 const speedLimit = speed => {
@@ -168,18 +114,24 @@ const initClient = (retries = 0) => {
   if (client) {
     if (client.torrents.length) return info('Client is not idle, keep it alive')
   }
+
   const conf = { peerId }
   const dhtPort = parseInt(localStorage.getItem('dhtPort'))
   const torrentPort = parseInt(localStorage.getItem('torrentPort'))
   if (!isNaN(dhtPort)) conf.dhtPort = dhtPort
   if (!isNaN(torrentPort)) conf.torrentPort = torrentPort
-  const downloadLimit = parseInt(localStorage.getItem('downloadLimit'))
-  const uploadLimit = parseInt(localStorage.getItem('uploadLimit'))
-  const highLevelRadix = parseInt(localStorage.getItem('highLevelRadix'))
+  const maxConns = parseInt(localStorage.getItem('maximumConnectionsNum'))
+  if (!isNaN(maxConns)) conf.maxConns = maxConns
+  const downloadSpeed = parseInt(localStorage.getItem('downloadSpeed'))
+  const uploadSpeed = parseInt(localStorage.getItem('uploadSpeed'))
+  const payedUserShareRate = Number(localStorage.getItem('payedUserShareRate'))
+  // block local IP
+  conf.blocklist = utils.getLocalIPList() || []
+
   info('init client', conf)
   client = new WebTorrent(conf)
-  if (!isNaN(downloadLimit)) client.throttleDownload(downloadLimit)
-  if (!isNaN(uploadLimit) && !isNaN(highLevelRadix)) client.throttleUpload(uploadLimit, highLevelRadix)
+  if (!isNaN(downloadSpeed)) client.throttleDownload(downloadSpeed)
+  if (!isNaN(uploadSpeed) && !isNaN(payedUserShareRate)) client.throttleUpload(uploadSpeed, payedUserShareRate)
   client.on('error', e => {
     warn(e)
     if (dhtPort && torrentPort) {
@@ -203,14 +155,13 @@ const initClient = (retries = 0) => {
 }
 
 /**
- * setTimeout cannot be triggered if client is busy
+ * `setTimeout` cannot be triggered if client is busy.
+ * Here we use rAF to ensure out callback runs as fast as posible
  */
 const queueTimeout = (cb, timeout) => {
   const start = Date.now()
   const run = () => {
-    const end = Date.now()
-    const delta = end - start
-    if (delta >= timeout) cb()
+    if (Date.now() - start >= timeout) cb()
     else requestAnimationFrame(run)
   }
   requestAnimationFrame(run)
@@ -219,7 +170,7 @@ let shouldSendInfo = true
 const updateTorrent = () => {
   // console.time('torrent status')
   if (!shouldSendInfo) {
-    setTimeout(updateTorrent, 1000)
+    queueTimeout(updateTorrent, 1000)
     return info('skip send')
   } else {
     verbose('update torrent')
@@ -276,10 +227,15 @@ const updateTorrent = () => {
   // console.timeEnd('torrent status')
   // if there are too many torrents in the client
   // send info every seconds may cause performance issue
-  if (client.torrents.length > 100) setTimeout(updateTorrent, 2000)
-  else setTimeout(updateTorrent, 1000)
+  if (client.torrents.length > 50) {
+    client.maxConns = Math.min(client.maxConns, 10)
+  }
+  if (client.torrents.length > 100) {
+    client.maxConns = Math.min(client.maxConns, 5)
+    queueTimeout(updateTorrent, 2000)
+  } else queueTimeout(updateTorrent, 1000)
 }
-setTimeout(updateTorrent, 1000)
+queueTimeout(updateTorrent, 1000)
 
 const onDone = (tr) => {
   if (tr.upload) return
@@ -289,7 +245,7 @@ const onDone = (tr) => {
   ipcRenderer.send('webtorrent-finish-all-payments', json)
   if (!tr.completedTime) tr.completedTime = Date.now()
 }
-/** @param { Torrent } tr */
+/** @param { RawTorrent } tr */
 const onReady = (tr) => {
   tr.files.forEach(/** @param { import('webtorrent/lib/file') } f */f => {
     // BitComet 0.85+ uses these files itself but will never seed them,
@@ -298,8 +254,19 @@ const onReady = (tr) => {
       console.log('deselect', f.name)
     }
   })
-  info('ready', torrentToJson(tr))
-  ipcRenderer.send('webtorrent-ready', torrentToJson(tr))
+  const json = torrentToJson(tr)
+  info('ready', json)
+  ipcRenderer.send('webtorrent-ready', json)
+  // diskusage.check(tr.path, (err, result) => {
+  //   if (err) warn(err)
+  //   else {
+  //     const { free } = result
+  //     if (tr.length - tr.downloaded > free + 100_000_000) {
+  //       ipcRenderer.send('webtorrent-no-space', json)
+  //       stopTorrent(tr.infoHash)
+  //     }
+  //   }
+  // })
   if (client.torrents.filter(i => !i.ready).length === 0) {
     info('All torrents are ready')
   }
@@ -356,7 +323,7 @@ const addListeners = (tr, conf = {}, isSeeding = false) => {
  * @param { Function } [cb]
  */
 const addTorrent = (token, conf, cb) => {
-  console.log('Add torrent', conf)
+  // console.log('Add torrent', conf)
   if (conf.isSeeding && conf.progress === 1) return seedTorrent(token, conf.file, conf)
   if (conf.infoHash) {
     const matched = conf.infoHash.match(/btih:([^&]*)/)
@@ -393,7 +360,7 @@ const addTorrent = (token, conf, cb) => {
     const tr = client.add(torrentId, {
       path: conf.path || conf.downloadDirectory,
       store: FSChunkStore,
-      storeCacheSlots: 0,
+      storeCacheSlots: 10,
       strategy: 'sequential',
       // skipVerify: true,
       announce: [...(conf.trackers || []), ...WEBTORRENT_ANNOUCEMENT]
@@ -470,7 +437,7 @@ const deleteTorrent = (infoHash, destroyStore) => {
     server = null
     serverInfoHash = ''
   }
-  const tr = client.get(infoHash)
+  const tr = client.get(infoHash) || client.torrents.find(t => t.token === infoHash)
   info('delete', infoHash, tr, destroyStore)
   if (tr) {
     const publicPath = tr.files.length ? getPublicPath(tr.files.map(i => i.path)) : getPublicPath(tr.file || [])
@@ -508,7 +475,7 @@ const seedTorrent = (token, files, options, isAutoUpload = false, callback = nul
     tr = client.add(options.token || options.origin || options.infoHash, {
       path: options.path || options.downloadDirectory,
       store: FSChunkStore,
-      storeCacheSlots: 0,
+      storeCacheSlots: 10,
       strategy: 'sequential',
       skipVerify: options.progress === 1,
       announce: [...(options.trackers || []), ...WEBTORRENT_ANNOUCEMENT]
@@ -517,7 +484,7 @@ const seedTorrent = (token, files, options, isAutoUpload = false, callback = nul
     tr = client.add(options.torrentPath, {
       path: options.path || options.downloadDirectory,
       store: FSChunkStore,
-      storeCacheSlots: 0,
+      storeCacheSlots: 10,
       skipVerify: true,
       announce: [...(options.trackers || []), ...WEBTORRENT_ANNOUCEMENT]
     })
@@ -525,7 +492,7 @@ const seedTorrent = (token, files, options, isAutoUpload = false, callback = nul
     tr = client.add(options.magnetURI, {
       path: options.path || options.downloadDirectory,
       store: FSChunkStore,
-      storeCacheSlots: 0,
+      storeCacheSlots: 10,
       skipVerify: true,
       announce: [...(options.trackers || []), ...WEBTORRENT_ANNOUCEMENT]
     })
@@ -535,7 +502,7 @@ const seedTorrent = (token, files, options, isAutoUpload = false, callback = nul
     tr = client.seed(files, {
       ...options,
       store: FSChunkStore,
-      storeCacheSlots: 0,
+      storeCacheSlots: 10,
       skipVerify: true,
       // announce to default list only
       announce: [...WEBTORRENT_ANNOUCEMENT]
@@ -712,6 +679,44 @@ const stopServer = () => {
       if (t) t.destroy()
     })
   })
+  ipcRenderer.on('delete-all', (e, type, destroyStore, deleteAutoUpload) => {
+    shouldSendInfo = false
+    console.log('Delete all', type, destroyStore, deleteAutoUpload)
+    const toDeletes = client.torrents.filter(tr => {
+      if (type === 'all') return true
+      const isUpload = tr.upload || tr.progress === 1 || tr.isSeeding
+      if (type === 'upload') {
+        if (!deleteAutoUpload && tr.isAutoUpload) return false
+        return isUpload
+      }
+      return !isUpload
+    })
+    if (!toDeletes.length) {
+      shouldSendInfo = true
+      return
+    }
+    // ensure all torrents are deleted
+    let end = 0
+    toDeletes.forEach(tr => {
+      end++
+      console.log(tr.infoHash)
+      shouldDelete.push(tr.infoHash)
+      tr.removeAllListeners()
+      try {
+        tr.destroy({ destroyStore }, () => {
+          if (shouldDelete.includes(tr.infoHash)) {
+            shouldDelete.splice(shouldDelete.indexOf(tr.infoHash), 1)
+          }
+          end--
+          if (end === 0) shouldSendInfo = true
+        })
+      } catch(e) { }
+    })
+    // avoid something go wrong
+    setTimeout(() => {
+      shouldSendInfo = true
+    }, 2000)
+  })
   ipcRenderer.on('seed-torrent', (e, torrentInfo) => {
     let { file, token, ...options } = torrentInfo
     // for downloaded torrents
@@ -798,36 +803,43 @@ const stopServer = () => {
     setThrottleGroup({infoHash, peerId, subId, level })
   })
   ipcRenderer.on('save-torrent-file', (e, infoHash, dir) => saveTorrentFile(infoHash, dir))
-  ipcRenderer.on('set-client', (e, {
-    uploadLimit,
-    downloadLimit,
+  ipcRenderer.on('update-settings', (e, {
+    uploadSpeed,
+    downloadSpeed,
     maximumConnectionsNum,
     dhtPort,
     torrentPort,
-    highLevelRadix
+    payedUserShareRate
   }) => {
     // old versions use string, but now number
     dhtPort = parseInt(dhtPort)
     torrentPort = parseInt(torrentPort)
     info('Set client', {
-      uploadLimit,
-      downloadLimit,
+      uploadSpeed,
+      downloadSpeed,
       maximumConnectionsNum,
       dhtPort,
       torrentPort,
-      highLevelRadix
+      payedUserShareRate
     })
-    if (uploadLimit) {
-      const limit = speedLimit(uploadLimit)
-      const radix = Number(highLevelRadix) || 0.7
-      client.throttleUpload(limit, radix)
-      localStorage.setItem('uploadLimit', limit.toString())
-      localStorage.setItem('highLevelRadix', radix.toString())
+    if (payedUserShareRate) {
+      const shareRate = Number(payedUserShareRate) || 0.7
+      localStorage.setItem('payedUserShareRate', shareRate.toString())
     }
-    if (downloadLimit) {
-      const limit = speedLimit(downloadLimit)
+    if (uploadSpeed) {
+      const limit = speedLimit(uploadSpeed)
+      localStorage.setItem('uploadSpeed', limit.toString())
+    }
+    const shareRate = Number(localStorage.getItem('payedUserShareRate')) || 0.7
+    const limit = parseInt(localStorage.getItem('uploadSpeed'))
+    if (!isNaN(shareRate) && !isNaN(limit)) {
+      if (limit === -1) client.throttleUpload(-1)
+      else client.throttleUpload(limit, shareRate)
+    }
+    if (downloadSpeed) {
+      const limit = speedLimit(downloadSpeed)
       client.throttleDownload(limit)
-      localStorage.setItem('downloadLimit', limit.toString())
+      localStorage.setItem('downloadSpeed', limit.toString())
     }
     if (maximumConnectionsNum) {
       client.maxConns = maximumConnectionsNum

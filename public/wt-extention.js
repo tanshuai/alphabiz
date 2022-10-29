@@ -2,9 +2,9 @@ const { EventEmitter } = require('events')
 const { ipcRenderer } = require('electron')
 const bencode = require('bencode')
 
-/** @typedef { import('bittorrent-protocol') } Wire */
+/** @typedef { import('../src/types').Wire } Wire */
 
-const payChunkSize = 10 * 1024 * 1024
+const payChunkSize = 10 * 1000 * 1000
 const payPrice = 1
 const payedMap = new Map()
 const autoRenewMap = new Map()
@@ -12,7 +12,7 @@ const transactions = new Map()
 
 // this is helpful for reuse payments after torrent restart
 const delayPaments = []
-window.delayPaments = delayPaments
+// window.delayPaments = delayPaments
 
 /**
  * @type { Map<string, {
@@ -24,12 +24,15 @@ window.delayPaments = delayPaments
  * }[]> }
  */
 const transactionMap = new Map()
-window.payedMap = payedMap
+// window.payedMap = payedMap
 
-const userInfo = {
+const storedUser = localStorage.getItem('userInfo')
+const userInfo = storedUser ? JSON.parse(storedUser) : {
   user: '',
   sub: ''
 }
+console.log('Init user', userInfo)
+
 let client = null
 export const useClientEvents = (_client) => {
   client = _client
@@ -41,6 +44,7 @@ ipcRenderer.on('set-user', (e, user) => {
   console.log('set user', user)
   userInfo.user = user.user
   userInfo.sub = user.sub
+  localStorage.setItem('userInfo', JSON.stringify(userInfo))
   client.torrents.forEach(tr => {
     tr.wires.forEach(wire => {
       if (wire._is_alphabiz_peer_ && wire.alphabiz_protocol) {
@@ -135,6 +139,8 @@ export const useAlphabizProtocol = (client, torrent) => {
       this.remoteSub = ''
       // for client usage
       this._wire._setThrottleGroup = level => this._setThrottleGroup(level)
+
+      this._initUpload()
     }
     onHandshake (infoHash, peerId) {
       this._infoHash = infoHash
@@ -147,15 +153,27 @@ export const useAlphabizProtocol = (client, torrent) => {
       this._send({
         ab_peer: '_ab_' + this._peerId,
         ab_user: this._user,
-        ab_sub: this._subId
+        ab_sub: this._subId,
+        ab_has_meta: torrent.metadata ? 1 : 0
       })
+      if (!torrent.metadata) {
+        torrent.once('metadata', () => {
+          this._send({ ab_has_meta: 1 })
+        })
+      }
     }
     onExtendedHandshake (handshake) {
       if (!handshake.m || !handshake.m[EXT_NAME]) {
         console.error('Client does not support', EXT_NAME)
       }
     }
+    _sendByteMap () {
+      // console.log('Change', torrent.byteMap)
+      if (!torrent.byteMap) return
+      this._send({ ab_byte_map: JSON.stringify(torrent.byteMap) })
+    }
     _initUpload () {
+      const wire = this._wire
       wire.on('upload', bytes => {
         if (!this.remoteSub) return
         const subId = this.remoteSub
@@ -166,7 +184,7 @@ export const useAlphabizProtocol = (client, torrent) => {
           trans[0].payedSize -= bytes
           if (trans[0].payedSize < 0) {
             const completed = trans.shift()
-            if (trans[0]) trans[0].payedSize += completed.payedSize
+            // if (trans[0]) trans[0].payedSize += completed.payedSize
             ipcRenderer.send('webtorrent-payment-completed', {
               transactionId: completed.id,
               infoHash: this._infoHash,
@@ -178,7 +196,7 @@ export const useAlphabizProtocol = (client, torrent) => {
           }
         }
         // notify renew if rest time is less then 5s
-        const speed = wire.uploadSpeed ? wire.uploadSpeed() : 1024000
+        const speed = wire.uploadSpeed ? wire.uploadSpeed() : 1_000_000
         if (autoRenewMap.get(subId) && left < 5 * speed) {
           // avoid multi renewing
           autoRenewMap.set(subId, false)
@@ -196,6 +214,12 @@ export const useAlphabizProtocol = (client, torrent) => {
         if (!this._wire.transactions) return
         this._send({ ab_task_done: this._wire.transactions.join('$') })
       })
+      // const sendByteMap = () => {
+      //   // console.log('Change', torrent.byteMap)
+      //   if (!torrent.byteMap) return
+      //   this._send({ ab_byte_map: JSON.stringify(torrent.byteMap) })
+      // }
+      torrent.on('byte-map-change', () => this._sendByteMap())
     }
     _onAbPeer (peerId, user, subId) {
       if (!peerId.startsWith('_ab_')) return
@@ -236,6 +260,7 @@ export const useAlphabizProtocol = (client, torrent) => {
           }
         }
       }
+      this._sendByteMap()
       // TODO:
       if (!this.isSeeding) {
         this._sendPubKey()
@@ -248,7 +273,7 @@ export const useAlphabizProtocol = (client, torrent) => {
     _sendAesKey () { }
     _setThrottleGroup (level) {
       const t = this._wire._uploadThrottle
-      if (!t || !t._group) throw new Error('not_connected')
+      if (!t || !t._group) return // throw new Error('not_connected')
       if (!client.throttleGroups[level]) throw new Error('level_not_found')
       if (t._group === client.throttleGroups[level]) return { code: 0, message: 'success' }
       t._group._removeThrottle(t)
@@ -261,9 +286,11 @@ export const useAlphabizProtocol = (client, torrent) => {
       this._wire.remoteGroup = group
     }
     _onPaymentReceived (payment) {
+      console.log('receive')
       client.emit('verify-payment', payment)
     }
     _onPaymentVerified ({ infoHash, payed, autoRenew, id }) {
+      console.log('verified')
       const subId = this.remoteSub
       if (!subId) return
       this._setThrottleGroup('high')
@@ -353,6 +380,12 @@ export const useAlphabizProtocol = (client, torrent) => {
       } catch (e) {
         return
       }
+      if (dict.ab_has_meta) {
+        this._wire.remote_has_meta = true
+      }
+      if (dict.ab_byte_map) {
+        this._wire.remote_byte_map = JSON.parse(dict.ab_byte_map.toString())
+      }
       if (dict.ab_peer) {
         return this._onAbPeer(dict.ab_peer.toString(), dict.ab_user && dict.ab_user.toString(), dict.ab_sub && dict.ab_sub.toString())
       }
@@ -401,7 +434,7 @@ export const useAlphabizProtocol = (client, torrent) => {
     onClose () {
       const recieved = this._wire.recieved
       // 10 mb
-      if (recieved > 1024 * 1024 * 10) {
+      if (recieved > 1000 * 1000 * 10) {
         // confirmPayment()
       }
     }
