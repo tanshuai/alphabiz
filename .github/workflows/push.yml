@@ -12,6 +12,8 @@ on:
     paths:
       - "**.js"
       - "!**/push.yml"
+      - "!public/**"
+      - "!test/**"
       - "build/**"
       - "release.json"
     branches: [main]
