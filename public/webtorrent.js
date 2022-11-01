@@ -272,7 +272,7 @@ const onReady = (tr) => {
   }
 }
 const onMetadata = (tr, conf) => {
-  info('metadata', torrentToJson({ ...conf, ...tr }))
+  // info('metadata', torrentToJson({ ...conf, ...tr }))
   ipcRenderer.send('webtorrent-metadata', tr.infoHash)
   ipcRenderer.send('webtorrent-data', torrentToJson(tr))
 }
