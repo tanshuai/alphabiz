@@ -34,7 +34,7 @@ describe('upload', () => {
     await homePage.jumpPage('creditsLink')
     if (await client.$('//*[@Name="SIGN IN"]').isDisplayed()) {
       // 未登录
-      await accountPage.signIn('+86' + process.env.TEST3_PHONE_NUMBER, process.env.TEST_PASSWORD, 1)
+      await accountPage.signIn(process.env.TEST3_EMAIL, process.env.TEST_PASSWORD, 1)
     } else {
       // 已登陆,等待拉取数据
       // await client.$('//*[@Name="Settings"]').click()
@@ -63,12 +63,13 @@ describe('upload', () => {
     const taskStatus = await homePage.getTaskStatus(torrentName)
     expect(taskStatus).toBe('Status: Seeding')
 
-    // // 等待种子上传(其他用户下载种子)
-    // await homePage.waitSeedUpload(torrentName)
+    // 等待种子上传(其他用户下载种子)
+    await homePage.waitSeedUpload(torrentName)
 
     // const taskPeers = await homePage.getTaskPeers(torrentName, 60000 * 10)
     // taskPeers.click()
     // 等待积分增加变化
+    await homePage.jumpPage('creditsLink')
     await homePage.jumpPage('creditsLink')
     let changedCredit
     while (1) {
@@ -76,13 +77,13 @@ describe('upload', () => {
       if (Number(initialCredit) + 1 <= Number(changedCredit)) break
       await sleep(5000)
     }
-    console.log('credots increase')
+    console.log('credits increase')
     // 等待下载者完成下载
     // console.log('waitTaskPeersHidden')
     // await homePage.jumpPage('uploadingStatusTab')
     // // waitTaskPeershidden
     // await homePage.waitTaskPeers(torrentName, 60000 * 5, 0)
-    await sleep(20000)
+    await sleep(10000)
     console.log('wait download complete')
     // expect(1).toBe(1)
   })

@@ -66,13 +66,13 @@ class HomePage {
   async downloadTorrent (magnetLink, directory) {
     await this.downloadTorrentBtn.click()
     await this.downloadMagnetEdit.setValue(magnetLink)
-    // setValue功能的自动清除内容不稳定，手动清除输入框内容
-    // const text = await this.page.$('//Edit[@Name="Download directory position"]').getText()
-    // const backSpaces = new Array(text.length).fill('\uE003')
-    // await sleep(1000)
-    // await this.downloadDirectoryEdit.setValue(backSpaces)
-    // await sleep(1000)
     if (directory) {
+      // setValue功能的自动清除内容不稳定，手动清除输入框内容
+      const text = await this.page.$('//Edit[@Name="Download directory position"]').getText()
+      const backSpaces = new Array(text.length).fill('\uE003')
+      await sleep(1000)
+      await this.downloadDirectoryEdit.setValue(backSpaces)
+      await sleep(1000)
       await this.downloadDirectoryEdit.setValue(directory)
     }
     await this.confirmDownloadBtn.click()
@@ -98,15 +98,17 @@ class HomePage {
   async waitSeedUpload (torrentName) {
     while (1) {
       try {
-        const taskPeer = await this.page.$('//Text[@Name="' + torrentName + '"]/following-sibling::Button[starts-with(@Name,"PEERS:")]')
+        await this.page.$('//Text[@Name="' + torrentName + '"]/following-sibling::Button[1]').click()
+        const taskPeer = await this.page.$('//*[@Name="Peers"]')
         await taskPeer.waitUntil(async function () {
           return (await this.isDisplayed()) === true
         }, {
-          timeout: 120000,
+          timeout: 20000,
           timeoutMsg: 'no seeds found'
         })
       } catch (err) {
-        // await this.seedsStopAndSeed(torrentName)
+        await this.page.$('//Text[@Name="Uploading"]').click()
+        await this.seedsStopAndSeed(torrentName)
         continue
       }
       break
