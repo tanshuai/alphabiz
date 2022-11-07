@@ -68,7 +68,7 @@ jobs:
         run: |
           TZ=UTC-8 git log -10 --date=format-local:"%Y%m%d%H%M" --format="%cd"
           echo "--------------------------"
-          echo "::set-output name=tag-name::0.1.0-nightly-202203301916"
+          echo "::set-output name=tag-name::0.1.0-nightly-202204011111"
           if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
           then echo "::set-output name=isRunAppium::1" ; \
           else echo "::set-output name=isRunAppium::0" ; \
@@ -243,9 +243,8 @@ jobs:
           Start-Process PowerShell -ArgumentList "yarn test:appium"
           Start-Sleep -s 10
 
-      - name: e2e appium test for 7z 🧪
+      - name: Kill process after install app
         run: |
-          yarn test:release
           taskkill //F //IM Alphabiz.exe || (echo "app is ready")
         shell: bash
 
@@ -253,6 +252,7 @@ jobs:
         if: matrix.test == '1'
         run: |
           yarn test:release:creditsDownload
+          sleep 10s
           taskkill //F //IM Alphabiz.exe || (echo "app is ready")
         shell: bash
 
@@ -260,6 +260,7 @@ jobs:
         if: matrix.test == '2'
         run: |
           yarn test:release:creditsUpload
+          sleep 10s
           taskkill //F //IM Alphabiz.exe || (echo "app is ready")
         shell: bash
 
