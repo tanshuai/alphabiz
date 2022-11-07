@@ -105,13 +105,13 @@ jobs:
           on_retry_command: rm -rf C:/Users/runneradmin/AppData/Local/node-gyp/
 
       - name: public describe to Twitter
-        if: contains(steps.vars.outputs.event-name, 'schedule')
+        # if: contains(steps.vars.outputs.event-name, 'schedule')
         run: yarn node publicTwitter.js
 
   appium-test:
     needs: build-1
     if: |
-      (contains(github.event_name, 'schedule') || contains(needs.build-1.outputs.output2, '0'))
+      (contains(github.event_name, 'schedule') || contains(needs.build-1.outputs.output2, '2'))
         && !contains(github.event.head_commit.message, 'skip e2e')
     timeout-minutes: 60
     runs-on: ${{ matrix.os }}
