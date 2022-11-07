@@ -338,6 +338,10 @@ jobs:
       TEST3_PHONE_NUMBER: ${{ secrets.TEST3_PHONE_NUMBER }}
       TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
       TEST_RESET_PASSWORD: ${{ secrets.TEST_RESET_PASSWORD }}
+      TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
+      TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
+      TWITTER_ACCESS_TOKEN_KEY: ${{ secrets.TWITTER_ACCESS_TOKEN_KEY }}
+      TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
     steps:
       - name: appium_test_job Get short SHA 🔑
         run: |
