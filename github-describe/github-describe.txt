@@ -1,3 +1,8 @@
-backend: GithubSubscription Task
-fix bug of `createBindingTasks`
-add TaskPanel
+try run push test
+fix electron test error
+modify version before run e2e test
+fix assertion path error
+add view: TaskPage
+backend: improve Task
+task page: support status: cancelled
+backend: improve task
