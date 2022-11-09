@@ -13,7 +13,7 @@ const publicTwitter = async (describe) => {
   await twitterClient.v2.tweet(describe)
   console.log('Tweet successfully!')
 }
-// publicTwitter(describe)
+publicTwitter(describe)
 
 
 
