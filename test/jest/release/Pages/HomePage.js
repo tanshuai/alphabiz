@@ -1,5 +1,5 @@
 const { sleep } = require('../../../utils/getCode')
-
+const fs = require('fs')
 class HomePage {
   constructor (page) {
     this.page = page
@@ -35,7 +35,7 @@ class HomePage {
   // 上传bt功能
   get uploadTorrentBtn () { return this.page.$('[name="UPLOAD"]') }
   get torrentFileBtn () { return this.page.$('//*[@Name="File"]') }
-  get fileNameEdit () { return this.page.$('//ComboBox[@ClassName="ComboBox"]/Edit[@ClassName="Edit" and @Name="File name:"]') }
+  get fileNameEdit () { return this.page.$('//Edit[@ClassName="Edit"][@Name="File name:"]') }
   get confirmUploadBtn () { return this.page.$('//Button[@Name="CANCEL"]/following-sibling::Button[@Name="UPLOAD"]') }
 
   // 跳转菜单页面-支持跳转二级目录
@@ -81,6 +81,12 @@ class HomePage {
   async uploadTorrent (directory) {
     await this.uploadTorrentBtn.click()
     await this.torrentFileBtn.click()
+    var dir = '../../output/release'
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true })
+    }
+    await sleep(2000)
+    await this.page.saveScreenshot('test/output/release/upload-file-selector.png')
     await this.fileNameEdit.setValue([directory, '\uE007'])
     await this.confirmUploadBtn.click()
   }
