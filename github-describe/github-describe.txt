@@ -1,8 +1,8 @@
-try run push test
-fix electron test error
-modify version before run e2e test
-fix assertion path error
-add view: TaskPage
-backend: improve Task
-task page: support status: cancelled
-backend: improve task
+OAuth: backend storage provider_tokens
+Task: improve SubscribeGithubRepo
+add workflow timeout, retry upload files when error, skip e2e
+Task: add isSubscribeGithubRepo
+Task Panel: improve task stage
+fix bug: invalid task stage
+fix #788
+fix: add rules for password
