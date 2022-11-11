@@ -38,6 +38,9 @@ describe('upload', () => {
     } else {
       // 已登陆,等待拉取数据
       // await client.$('//*[@Name="Settings"]').click()
+      if (!await homePage.settingsLink.isDisplayed()) {
+        await homePage.menuBtn.click()
+      }
       await accountPage.accountSettingsTitle.waitForDisplayed({ timeout: 10000 })
     }
 
@@ -59,7 +62,7 @@ describe('upload', () => {
     }
 
     // 查看种子任务卡片状态
-    await homePage.jumpPage('uploadingStatusTab')
+    // await homePage.jumpPage('uploadingStatusTab')
     const taskStatus = await homePage.getTaskStatus(torrentName)
     expect(taskStatus).toBe('Status: Seeding')
 
@@ -69,7 +72,7 @@ describe('upload', () => {
     // const taskPeers = await homePage.getTaskPeers(torrentName, 60000 * 10)
     // taskPeers.click()
     // 等待积分增加变化
-    await homePage.jumpPage('creditsLink')
+    await client.$('//Text[@Name="Uploading"]').click()
     await homePage.jumpPage('creditsLink')
     let changedCredit
     while (1) {

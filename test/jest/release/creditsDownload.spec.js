@@ -64,6 +64,9 @@ describe('download', () => {
     } else {
       // 已登陆,等待拉取数据
       // await client.$('//*[@Name="Settings"]').click()
+      if (!await homePage.settingsLink.isDisplayed()) {
+        await homePage.menuBtn.click()
+      }
       await accountPage.accountSettingsTitle.waitForDisplayed({ timeout: 10000 })
     }
 
