@@ -1,8 +1,4 @@
-OAuth: backend storage provider_tokens
-Task: improve SubscribeGithubRepo
-add workflow timeout, retry upload files when error, skip e2e
-Task: add isSubscribeGithubRepo
-Task Panel: improve task stage
-fix bug: invalid task stage
-fix #788
-fix: add rules for password
+fix: #793
+fix: #790
+bump @zeeis/alphabiz-libdb to v0.0.87
+add settings for gun peers in advanced settings, close #773
