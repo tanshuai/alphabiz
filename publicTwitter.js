@@ -24,7 +24,9 @@ const publicTwitter = async (describe) => {
     accessToken: process.env.TWITTER_ACCESS_TOKEN_KEY,
     accessSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET
   })
-  await twitterClient.v2.tweet(describe)
+  await twitterClient.v2.tweet(describe).catch(err => {
+    if (!err.data.detail.includes('Tweet with duplicate content')) throw err
+  })
   console.log('Tweet successfully!')
 }
 const desc = getDescribe(describe)
