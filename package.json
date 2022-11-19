@@ -6,7 +6,7 @@
   "productName": "Alphabiz",
   "author": "Alphabiz Team <dev@alpha.biz>",
   "scripts": {
-    "preinstall": "node update-version.js",
+    "preunpackaged": "node update-version.js",
     "postinstall": "patch-package && node ./node_modules/symlink-dir/dist/cli.js node_modules/@zeeis/velectron node_modules/electron && ./node_modules/.bin/electron-rebuild -v 17.0.0",
     "packager": "node packager.js",
     "postpackager": "node post-build",
@@ -74,6 +74,10 @@
     "twilio": "^3.73.0",
     "webdriverio": "^7.16.13",
     "xvfb-maybe": "^0.2.1"
+  },
+  "optionalDependencies": {
+    "electron-installer-debian": "^3.1.0",
+    "exe-icon-extractor": "^1.0.8"
   },
   "config": {
     "forge": "./forge.config.js"
