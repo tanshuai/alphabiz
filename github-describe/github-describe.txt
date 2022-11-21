@@ -1,9 +1,9 @@
-Update use-github-pat.md
-add token select scopes
-show PAT input when s3 bucket is not used
-push code to test repo
-AlphabizAccount: add MFA cards
-fix website not find icon error
-AlphabizAccount: support mobile fullscreen
-AlphabizAccount: add i18n for signInCard, signUpCard
-AlphabizAccount: add i18n for mfa cards
+try push code to test repo
+tmp ignore src-capacitor
+fix #799 removing changes in 6519f1e02b245f4363866d4178e88f147493f181
+fix #802
+fix #808
+fix #805
+try fix #804
+add workflow waiting time
+fix push workflow error
