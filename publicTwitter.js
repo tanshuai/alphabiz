@@ -13,7 +13,7 @@ const getDescribe = (describe) => {
     })
     .join("\n")
   desc = desc.substring(0, 280)
-  desc = desc.replace(/\r?\n?[^\r\n]*$/, "")
+  desc = desc.replace(/\r?\n?[^\r\n]*$/, "").replace(/\.(?=\w+)/gm, ' ')
   return desc
 }
 
