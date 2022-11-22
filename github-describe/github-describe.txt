@@ -1,9 +1,2 @@
-try push code to test repo
-tmp ignore src-capacitor
-fix #799 removing changes in 6519f1e02b245f4363866d4178e88f147493f181
-fix #802
-fix #808
-fix #805
-try fix #804
-add workflow waiting time
-fix push workflow error
+push github-describe when event is schedule, fix #807
+fix push workflow
