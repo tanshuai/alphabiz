@@ -17,7 +17,7 @@ on:
       - "build/**"
       - "release.json"
     branches: [main]
-#
+
 jobs:
   nightly_job:
     runs-on: ${{ matrix.os }}
