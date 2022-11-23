@@ -1,2 +1,10 @@
-push github-describe when event is schedule, fix #807
-fix push workflow
+add theme editor
+Update SettingSlider.vue
+support appx display name starts with number, add config validator
+add: floating theme editor
+fix eslint
+improve theme editor
+improve theme editor
+Update library.ts
+improve oauth
+fix oauth bug
