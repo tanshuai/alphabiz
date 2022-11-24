@@ -1,10 +1,10 @@
-add theme editor
-Update SettingSlider.vue
-support appx display name starts with number, add config validator
-add: floating theme editor
-fix eslint
-improve theme editor
-improve theme editor
-Update library.ts
-improve oauth
-fix oauth bug
+oauth: add redirect page
+oauth: add logger for debug
+improve signedOutDialog
+OAuth: handle redirect
+oauth: fix redirect
+oauth: fix redirect
+use displayName as app name in ui
+oauth: add auto redirect
+improve oauth login
+improve dev page
