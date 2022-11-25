@@ -1,10 +1,7 @@
-oauth: add redirect page
-oauth: add logger for debug
-improve signedOutDialog
-OAuth: handle redirect
-oauth: fix redirect
-oauth: fix redirect
-use displayName as app name in ui
-oauth: add auto redirect
-improve oauth login
-improve dev page
+add subtitle e2e test, change language list order
+AlphabizAccount: add floating api
+AlphabizAccount: add corner slot, handle showLicenseTerms
+AlphabizAccount: fullscreen signInDialog on mobile platform
+fix padding of applicationbar
+AlphabizAccount: hiddenPassword for password input
+fix add subtitle error in e2e test, replace app name in workflow
