@@ -1,7 +1,11 @@
-add subtitle e2e test, change language list order
-AlphabizAccount: add floating api
-AlphabizAccount: add corner slot, handle showLicenseTerms
-AlphabizAccount: fullscreen signInDialog on mobile platform
-fix padding of applicationbar
-AlphabizAccount: hiddenPassword for password input
-fix add subtitle error in e2e test, replace app name in workflow
+try fix account test in ubuntu
+try screenshot test status
+retry account test
+add fullscreen for amplifyDialogGroups in mobile
+test case customization
+improve MFA
+improve fullscreen
+run upload s3 step only ab, page models customization
+fix #805
+fix #811
+add codes for debug
