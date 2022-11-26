@@ -1,19 +1,13 @@
 const { TwitterApi } = require('twitter-api-v2')
 const fs = require('fs')
 require('dotenv').config()
-const describe = fs.readFileSync('./github-describe/github-describe.txt', 'utf-8')
-
+let describe = fs.readFileSync('./github-describe/github-describe.txt', 'utf-8')
+describe = describe.replace(/\r\n/gm, '\r')
 // describe length cannot exceed 280
 const getDescribe = (describe) => {
   let desc = describe.replace(/(,\s|)skip e2e/gm, '').replace(/^\s*\n/gm, '')
-  // delete duplicate lines
-  desc = desc.split('\r')
-    .filter((item, i, allItems) => {
-      return i === allItems.indexOf(item)
-    })
-    .join("\n")
   desc = desc.substring(0, 280)
-  desc = desc.replace(/\r?\n?[^\r\n]*$/, "").replace(/\.(?=\w+)/gm, ' ')
+  desc = desc.replace(/\r?\n?[^\r\n]*$/, "")
   return desc
 }
 
@@ -29,9 +23,30 @@ const publicTwitter = async (describe) => {
   })
   console.log('Tweet successfully!')
 }
-const desc = getDescribe(describe)
-console.log(desc)
-publicTwitter(desc)
+
+function sleep (ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+(async () => {
+  const descArr = []
+  let remainDesc = describe
+  while (1) {
+    if (remainDesc.length < 280) {
+      descArr.push(remainDesc)
+      break
+    }
+    const desc = getDescribe(remainDesc)
+    descArr.push(desc)
+    remainDesc = remainDesc.slice(desc.length + 1, remainDesc.length)
+  }
+  console.log(descArr)
+  for (const d of descArr) {
+    await publicTwitter(d)
+    await sleep(5000)
+  }
+})()
+
 
 
 
