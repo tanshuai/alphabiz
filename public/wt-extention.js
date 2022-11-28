@@ -336,6 +336,7 @@ export const useAlphabizProtocol = (client, torrent) => {
           this._onPaymentCompleted(id)
         }
       }
+      payedMap.delete(this.remoteSub, this._infoHash)
     }
     _onPaymentFinished (id) {
       console.log('Finished', id)
