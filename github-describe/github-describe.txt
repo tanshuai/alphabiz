@@ -1,11 +1,12 @@
-try fix account test in ubuntu
-try screenshot test status
-retry account test
-add fullscreen for amplifyDialogGroups in mobile
-test case customization
-improve MFA
+fix e2e test title error
+fix installer display name, close fengpxu/6to-app#5
+improve menu corner logo
+amplify dialog & markdown dialog (#779)
+update AboutDialog (#779)
+fix #800, fix #809
+Uncheck subtitle url format
+e2e test set localStorage customization
+installation package uses displayName
+fullscreen for networkDiagnotic
+fullscreen for Feedback
 improve fullscreen
-run upload s3 step only ab, page models customization
-fix #805
-fix #811
-add codes for debug
