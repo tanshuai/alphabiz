@@ -1,12 +1,8 @@
-fix e2e test title error
-fix installer display name, close fengpxu/6to-app#5
-improve menu corner logo
-amplify dialog & markdown dialog (#779)
-update AboutDialog (#779)
-fix #800, fix #809
-Uncheck subtitle url format
-e2e test set localStorage customization
-installation package uses displayName
-fullscreen for networkDiagnotic
-fullscreen for Feedback
-improve fullscreen
+improve networkDiagnotic (#779)
+web e2e test customization
+workflow customization
+show pat input
+recommends step only alphabiz
+check display name when update in s3, fix syntax error
+clear icon when loaded recommend img
+fix displayName for app resolve fengpxu/6to-app#5
