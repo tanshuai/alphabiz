@@ -1,8 +1,3 @@
-improve networkDiagnotic (#779)
-web e2e test customization
-workflow customization
-show pat input
-recommends step only alphabiz
-check display name when update in s3, fix syntax error
-clear icon when loaded recommend img
-fix displayName for app resolve fengpxu/6to-app#5
+fix make rename step
+add reset template method
+push code to test repo
