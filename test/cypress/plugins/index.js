@@ -13,8 +13,13 @@
 // the project's config changing)
 
 require('dotenv').config()
-
+const { calculation } = require('../../utils/calculation')
 module.exports = (on, config) => {
+  on('task', {
+    calculation ({ type, time, to }) {
+      return calculation(type, time, to)
+    }
+  })
   // copy any needed variables from process.env to config.env
   config.env.testEmail = process.env.EMAIL_USERNAME
   config.env.test1Email = process.env.TEST1_EMAIL

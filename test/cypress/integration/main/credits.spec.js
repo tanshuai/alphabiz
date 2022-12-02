@@ -20,6 +20,14 @@ describe('Credits', () => {
       }
     }
   })
+  // it('test', () => {
+  //   const num1 = 1.011
+  //   const num2 = 2.022
+  //   cy.log((parseInt(num1) * 1000 + parseInt(num2) * 1000))
+  //   cy.task('calculation', { type: 'addd', time: num1, to: num2 }).then((number) => {
+  //     cy.log('111:' + number.toFixed(3))
+  //   })
+  // })
   it('test1 to test2 transfer - check bill details', () => {
     let from
     let to
@@ -68,10 +76,10 @@ describe('Credits', () => {
 
       cy.get('.q-card:nth-child(2) > .q-card__section:nth-child(1) > :nth-child(2)').click()
       cy.get('body').then($el => {
-        // 获取 收款人 初始积分
+        // 获取 转账人 初始积分
         const transfereePoint = $el.find('.text-right > div').text()
-        cy.log('payeePoint:' + transfereePoint)
-        // 获取 收款人 ID
+        cy.log('transfereePoint:' + transfereePoint)
+        // 获取 转账人 ID
         let transfereeID = $el.find('input[type=text]').val()
         // 去除文本两边的空格
         transfereeID = transfereeID.replace(/(^\s*)|(\s*$)/g, '')
@@ -80,7 +88,7 @@ describe('Credits', () => {
         // 转账 start
         cy.transfer(payeeID, transferAmount)
         // 转账 end
-        // 断言 付款人 转单明细
+        // 断言 转账人 转单明细
         cy.get('.q-table__grid-content > :nth-child(1)').eq(1).click()
         cy.get('.q-dialog__inner > .q-card', { timeout: 5000 }).should('be.visible').then($card => {
           cy.get('.rounded-borders > :nth-child(2)').contains(payeeID)
@@ -88,19 +96,23 @@ describe('Credits', () => {
           cy.get('.rounded-borders > :nth-child(4)').contains('-' + transferAmount)
           cy.get('.rounded-borders > :nth-child(5)').contains('finish')
         })
-        // 断言 付款人 积分变化
-        cy.get('.text-right > div').invoke('text').should('eq', (parseInt(transfereePoint) - transferAmount).toString())
+        // 断言 转账人 积分变化
+        cy.task('calculation', { type: 'reduce', time: transfereePoint, to: transferAmount }).then((number) => {
+          cy.get('.text-right > div').invoke('text').should('eq', number.toString())
+        })
 
         cy.signIn(payee, payeePassword)
         cy.toCredits()
         // 断言 收款人 积分变化
-        cy.get('.text-right > div').invoke('text').should('eq', (parseInt(payeePoint) + transferAmount).toString())
+        cy.task('calculation', { type: 'add', time: payeePoint, to: transferAmount }).then((number) => {
+          cy.get('.text-right > div').invoke('text').should('eq', number.toString())
+        })
         // 断言 收款人 转单明细
         cy.get('.q-table__grid-content > :nth-child(1)').eq(0).click()
         cy.get('.q-dialog__inner > .q-card', { timeout: 5000 }).should('be.visible').then($card => {
           cy.get('.rounded-borders > :nth-child(2)').contains(transfereeID)
           cy.get('.rounded-borders > :nth-child(3)').contains('Transfer')
-          cy.get('.rounded-borders > :nth-child(4)').contains('+' + transferAmount)
+          cy.get('.rounded-borders > :nth-child(4)').contains(transferAmount)
           cy.get('.rounded-borders > :nth-child(5)').contains('finish')
         })
       })
