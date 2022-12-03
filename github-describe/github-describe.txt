@@ -1,7 +1,1 @@
-fix: handle `Failed to fetch`
-improve `ConnectionStatus` (#779)
-improve `QuickStart` (#779)
-improve `ChannelEdit` (#779)
-#779 `BlockList`
-#779 `EditProfile`
-retry download subtitle when failed
+fix github describe
