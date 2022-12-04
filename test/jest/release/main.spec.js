@@ -58,7 +58,7 @@ describe('upload', () => {
     // 验证版本
     expect(version).toBe('v' + appPackage.version)
   })
-  it.skip('Switch to Simplified Chinese', async () => {
+  it('Switch to Simplified Chinese', async () => {
     await homePage.jumpPage('settingsLink', 'basicLink')
     await basicPage.switchLanguages('english', 'simplifiedChinese')
     const basicTitle = await client.$('//*[@Name="基础设置"]').getText()

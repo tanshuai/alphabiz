@@ -9,6 +9,7 @@ const { CreditsPage } = require('./Pages/CreditsPage')
 const { DevelopmentPage } = require('./Pages/DevelopmentPage')
 const obj = require('./TestEnvironment')
 const { sleep } = require('../../utils/getCode')
+const { calculation } = require('../../utils/calculation')
 
 let client, homePage, accountPage, creditsPage, developmentPage
 jest.setTimeout(60000 * 10)
@@ -77,7 +78,7 @@ describe('upload', () => {
     let changedCredit
     while (1) {
       changedCredit = await creditsPage.checkCredits()
-      if (Number(initialCredit) + 1 <= Number(changedCredit)) break
+      if (calculation('reduce', changedCredit, initialCredit) >= 0.001) break
       await sleep(5000)
     }
     console.log('credits increase')

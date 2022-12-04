@@ -7,7 +7,7 @@ class CreditsPage {
 
   async checkCredits () {
     await this.CreditsText.waitForDisplayed({ timeout: 20000 })
-    const credit = new RegExp('(?<=[:]\\s)\\d+').exec(await this.CreditsText.getText())
+    const credit = new RegExp('(?<=[:]\\s)\\d+.\\d+').exec(await this.CreditsText.getText())
     return credit[0]
   }
 }
