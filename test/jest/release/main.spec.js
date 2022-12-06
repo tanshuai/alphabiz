@@ -42,26 +42,35 @@ describe('upload', () => {
     expect(windowTitle).toBe('Alphabiz')
     // const appTitle = await homePage.getAppTitle()
     // expect(appTitle).toBe('Alphabiz')
-    // // 判断该路径是否存在，若不存在，则创建
-    // var dir = '../../output/release'
-    // if (!fs.existsSync(dir)) {
-    //   fs.mkdirSync(dir, { recursive: true })
-    // }
-    // await sleep(2000)
-    // await client.saveScreenshot('test/output/release/screenshot.png')
+    // 判断该路径是否存在，若不存在，则创建
+    var dir = '../../output/release'
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true })
+    }
+    await sleep(2000)
+    await client.saveScreenshot('test/output/release/screenshot.png')
   })
-  it.skip('version number', async () => {
+  it('version number', async () => {
     const version = await homePage.getAppVersion()
-    console.log('version:' + version)
     // 验证版本格式
     expect(version).toMatch(/^v\d+\.\d+\.\d+/)
-    // 验证版本
-    expect(version).toBe('v' + appPackage.version)
+  })
+  it('check page title', async () => {
+    if (await homePage.getPageTitle() !== 'Downloading') {
+      await homePage.jumpPage('downloadingStatusTab')
+      expect(await homePage.getPageTitle()).toBe('Downloading')
+    }
+    await homePage.jumpPage('uploadingStatusTab')
+    expect(await homePage.getPageTitle()).toBe('Uploading')
+    await homePage.jumpPage('downloadedStatusTab')
+    expect(await homePage.getPageTitle()).toBe('Downloaded')
+    await homePage.jumpPage('settingsLink', 'accountLink')
+    expect(await homePage.getPageTitle()).toBe('Advanced')
   })
   it('Switch to Simplified Chinese', async () => {
     await homePage.jumpPage('settingsLink', 'basicLink')
     await basicPage.switchLanguages('english', 'simplifiedChinese')
-    const basicTitle = await client.$('//*[@Name="基础设置"]').getText()
-    expect(basicTitle).toBe('基础设置')
+    await client.saveScreenshot('test/output/release/basic-language-simplifiedChinese.png')
+    expect(await homePage.getPageTitle()).toBe('基础设置')
   })
 })

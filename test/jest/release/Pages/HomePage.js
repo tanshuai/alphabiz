@@ -7,15 +7,16 @@ class HomePage {
 
   // 标题栏
   get AppTitle () { return this.page.$('/Pane/Document/Group[1]/Text[1]') }
-  get AppVersion () { return this.page.$('/Pane/Document/Group[1]/Text[2]') }
+  get AppVersion () { return this.page.$('//*[@AutomationId="version"]/Text') }
   // 菜单
   get menuBtn () { return this.page.$('//Button[@Name="Menu"]') }
+  get pageTitle () { return this.page.$('//Button[@Name="Menu"]/following::Text[1]') }
   get homeLink () { return this.page.$('//*[@Name="Home"]') }
   get playerLink () { return this.page.$('//*[@Name="Player"]') }
   get creditsLink () { return this.page.$('//*[@Name="Credits"]') }
   get settingsLink () { return this.page.$('//*[@Name="Settings"]') }
   get basicLink () { return this.page.$('//*[@Name="Basic"]') }
-  get accountLink () { return this.page.$('/Pane/Document/Group[2]/Group[9]') }
+  get accountLink () { return this.page.$('//*[@Name="Advanced"]') }
   get developmentLink () { return this.page.$('//*[@Name="Development Developer Mode for Internal Use"]') }
   // 种子状态tab
   get downloadingStatusTab () { return this.page.$('//*[starts-with(@Name,"Downloading (")]') }
@@ -60,7 +61,13 @@ class HomePage {
   }
 
   async getAppVersion () {
+    console.log('version :' + await this.AppVersion.getText())
     return await this.AppVersion.getText()
+  }
+
+  async getPageTitle () {
+    console.log('pageTitle :' + await this.pageTitle.getText())
+    return await this.pageTitle.getText()
   }
 
   async downloadTorrent (magnetLink, directory) {
