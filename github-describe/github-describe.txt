@@ -1,8 +1,9 @@
-restore subtitles when the player refresh #822
-separate requestRecommends
-pause player when delete account #824
-#821
-#779
-fix #821
-fix nupkg file name invalid
-#779
+fix file path contains spaces
+improve torrent table list
+ui adjustment
+skip e2e
+remove `lorem`
+Update MnemonicCode.vue
+install package name use fileName, skip e2e
+fix syntax error, skip e2e
+output player log #822
