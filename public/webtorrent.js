@@ -10,6 +10,28 @@ const FSChunkStore = require('fs-chunk-store')
 import { useAlphabizProtocol, useClientEvents } from './wt-extention.js'
 import utils from './webtorrent-utils.js'
 
+/**
+ * @typedef { import('../src/types').TrackerStatus } TrackerStatus
+ */
+/**
+ * @class TrackerMap
+ * @extends { Map<string, TrackerStatus> }
+ */
+class TrackerMap extends Map {
+  /**
+   * @method set
+   * @param { string } key
+   * @param { TrackerStatus } value
+   */
+  set (key, value) {
+    super.set(key, Object.assign(
+      { url: key },
+      (typeof value === 'object' ? value : { value }),
+      { timestamp: Date.now() }
+    ))
+  }
+}
+
 let info = () => {} // console.log
 let verbose = () => {} // console.log
 // Use this to keep logger with correct caller line
@@ -155,6 +177,32 @@ const initClient = (retries = 0) => {
 }
 
 /**
+ * @param { string | Torrent } infoHash
+ * @param { string } url
+ */
+const addTracker = (infoHash, url) => {
+  /** @type { Torrent } */
+  const tr = typeof infoHash === 'string' ? client.get(infoHash) : infoHash
+  if (!tr || !tr.trackerMap) return
+  tr.trackerMap.set(url, { status: 'connecting' })
+  utils.addTracker(tr, url)
+}
+/**
+ * @param { string | Torrent } infoHash
+ * @param { string } url
+ */
+const removeTracker = (infoHash, url) => {
+  /** @type { Torrent } */
+  const tr = typeof infoHash === 'string' ? client.get(infoHash) : infoHash
+  if (!tr || !tr.trackerMap) return
+  utils.removeTracker(tr, url, () => {
+    tr.trackerMap.delete(url)
+  })
+}
+global.addTracker = addTracker
+global.removeTracker = removeTracker
+
+/**
  * `setTimeout` cannot be triggered if client is busy.
  * Here we use rAF to ensure out callback runs as fast as posible
  */
@@ -296,7 +344,12 @@ const onInfoHash = (infoHash, tr, conf, isSeeding) => {
   else ipcRenderer.send('webtorrent-infohash', infoHash, { ...conf, isSeeding })
   infoHashes.push(infoHash)
 }
-/** @param { Torrent } tr */
+/**
+ * @function addListeners
+ * @param { Torrent } tr
+ * @param { TorrentInfo } conf
+ * @param { boolean } isSeeding
+ */
 const addListeners = (tr, conf = {}, isSeeding = false) => {
   if (!conf) conf = {}
   tr.pending = false
@@ -309,13 +362,56 @@ const addListeners = (tr, conf = {}, isSeeding = false) => {
   tr.on('done', () => onDone(tr))
   tr.on('ready', () => onReady(tr))
   tr.on('metadata', () => onMetadata(tr, conf))
-  tr.on('infoHash', infoHash => onInfoHash(infoHash, tr, conf, isSeeding))
+  tr.on('infoHash', infoHash => {
+    onInfoHash(infoHash, tr, conf, isSeeding)
+  })
   tr.on('warning', () => {})
   tr.on('error', e => {
     info('Torrent error', e, conf)
     ipcRenderer.send('webtorrent-error', torrentToJson(tr), e.message)
   })
   tr.on('wire', wire => onWire(wire, tr))
+  tr.on('discovery', () => {
+    if (tr.discovery) {
+      console.log('start discovery')
+      tr.trackerMap = new TrackerMap()
+      // init map
+      tr.discovery._announce.forEach(url => {
+        tr.trackerMap.set(url, { status: 'connecting' })
+      })
+      tr.discovery.tracker.on('warning', (error, url) => {
+        console.log('tracker warning', url, error.message)
+        if (!url) return console.warn('No emitted url', error)
+        tr.trackerMap.set(url, {
+          status: 'error',
+          message: utils.parseTrackerWarning(error.message)
+        })
+      })
+      // tr.discovery.tracker.on('peer', (...args) => {
+      //   console.log('tracker peer', args)
+      // })
+      tr.discovery.tracker.on('update', (info, url) => {
+        // console.log('tracker update', url, info)
+        if (!url) return console.warn('No emitted url', info)
+        tr.trackerMap.set(url, {
+          status: 'updated',
+          info
+        })
+      })
+      // tr.discovery.tracker.on('scrape', (...args) => {
+      //   console.log('tracker scrape', args)
+      // })
+      // tr.addTracker = url => utils.addTracker(tr, url)
+      // tr.removeTracker = url => utils.removeTracker(tr, url)
+      if (conf.customTrackers) {
+        for (const tracker of conf.customTrackers) {
+          addTracker(tr, tracker)
+        }
+      }
+    } else {
+      console.log('no discovery')
+    }
+  })
 }
 /**
  * @param { string } token
@@ -513,7 +609,7 @@ const seedTorrent = (token, files, options, isAutoUpload = false, callback = nul
       skipVerify: true,
       maxWebConns: client.maxConns,
       // announce to default list only
-      announce: [...WEBTORRENT_ANNOUCEMENT]
+      announce: [...(options.trackers || []), ...WEBTORRENT_ANNOUCEMENT]
     })
     tr.isUploadByFiles = true
   }
@@ -884,6 +980,15 @@ const stopServer = () => {
         shouldSendInfo = true
       })
   })
+  ipcRenderer.on('add-tracker', (e, { infoHash, url }) => {
+    console.log('add-tracker', infoHash, url)
+    addTracker(infoHash, url)
+  })
+  ipcRenderer.on('remove-tracker', (e, { infoHash, url }) => {
+    console.log('remove-tracker', infoHash, url)
+    removeTracker(infoHash, url)
+  })
+
   initClient(0)
   // ipcRenderer.send('webtorrent-initted')
   window.addEventListener('error', e => {
