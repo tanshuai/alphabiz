@@ -1,7 +1,4 @@
-Update PostCard.vue
+ui adjustment #779
 #779
-fix drag empty file prompt
-improve performance
-update displayName fengpxu/6to-app#5
-try force quit for updater resolve #810
-fix #827
+Update Dialog.vue
+fix: network error #828
