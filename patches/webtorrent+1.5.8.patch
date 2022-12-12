@@ -94,7 +94,7 @@ index 19cb5ff..8cd6538 100644
    }
  }
 diff --git a/node_modules/webtorrent/lib/torrent.js b/node_modules/webtorrent/lib/torrent.js
-index ac7cb97..db16993 100644
+index ac7cb97..c9f9f1e 100644
 --- a/node_modules/webtorrent/lib/torrent.js
 +++ b/node_modules/webtorrent/lib/torrent.js
 @@ -64,6 +64,54 @@ try {
@@ -152,7 +152,16 @@ index ac7cb97..db16993 100644
  class Torrent extends EventEmitter {
    constructor (torrentId, client, opts) {
      super()
-@@ -596,31 +644,39 @@ class Torrent extends EventEmitter {
+@@ -368,6 +416,8 @@ class Torrent extends EventEmitter {
+     this.discovery.on('warning', (err) => {
+       this.emit('warning', err)
+     })
++
++    this.emit('discovery')
+   }
+ 
+   _getMetadataFromServer () {
+@@ -596,31 +646,39 @@ class Torrent extends EventEmitter {
    }
  
    _verifyPieces (cb) {
@@ -211,7 +220,7 @@ index ac7cb97..db16993 100644
    }
  
    rescanFiles (cb) {
-@@ -753,6 +809,8 @@ class Torrent extends EventEmitter {
+@@ -753,6 +811,8 @@ class Torrent extends EventEmitter {
      this._peers = null
      this._servers = null
      this._xsRequests = null
@@ -220,7 +229,7 @@ index ac7cb97..db16993 100644
    }
  
    addPeer (peer) {
-@@ -1144,6 +1202,7 @@ class Torrent extends EventEmitter {
+@@ -1144,6 +1204,7 @@ class Torrent extends EventEmitter {
      })
  
      wire.once('close', () => {

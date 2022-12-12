@@ -222,7 +222,13 @@ jobs:
         shell: bash
 
       - name: Install dependencies 👨🏻‍💻
-        run: yarn
+        uses: nick-fields/retry@v2
+        with:
+          timeout_seconds: 600
+          max_attempts: 2
+          shell: bash
+          retry_on: error
+          command: yarn
 
       - name: Install Alphabiz
         run: |
