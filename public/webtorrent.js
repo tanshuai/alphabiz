@@ -24,9 +24,10 @@ class TrackerMap extends Map {
    * @param { TrackerStatus } value
    */
   set (key, value) {
+    if (typeof value !== 'object') return console.error('Not an object', value)
     super.set(key, Object.assign(
       { url: key },
-      (typeof value === 'object' ? value : { value }),
+      value,
       { timestamp: Date.now() }
     ))
   }
@@ -391,7 +392,7 @@ const addListeners = (tr, conf = {}, isSeeding = false) => {
       //   console.log('tracker peer', args)
       // })
       tr.discovery.tracker.on('update', (info, url) => {
-        // console.log('tracker update', url, info)
+        console.log('tracker update', url, info)
         if (!url) return console.warn('No emitted url', info)
         tr.trackerMap.set(url, {
           status: 'updated',
