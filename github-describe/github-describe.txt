@@ -1,4 +1,4 @@
-ui adjustment #779
-#779
-Update Dialog.vue
-fix: network error #828
+add appx package identity name
+fix: add backgroundColor for `TableList`
+try to fix: fullscreen on ios safari
+show subtitleList in more card
