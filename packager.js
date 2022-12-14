@@ -43,7 +43,7 @@ packager({
   // NOTE: this requires `yarn` before `yarn build`
   afterPrune: [(buildPath, electronVersion, platform, arch, callback) => {
     // console.log('---App Build Path---\n', buildPath)
-    ['webtorrent', '@videojs'].forEach(dep => {
+    ['webtorrent', 'bittorrent-tracker', '@videojs'].forEach(dep => {
       const src = path.resolve(__dirname, 'node_modules', dep)
       const dest = path.resolve(buildPath, 'node_modules', dep)
       if (!fs.existsSync(src)) return
