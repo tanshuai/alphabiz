@@ -1,30 +1,10 @@
-run experiments workflow
-retry run experiments workflow
-test set vs2019 in windows-2022
 Update online-experiments.yml
-remove old codes
-i18n update
-fix abort error
-move main-process components to components/*
-Update add-a-gql-resolver.md
-fix account setting ui bug
-add bonus for binding email or phone number
-Update AmplifyTabPanel.vue
-add debug logs, try fix #234
-update credit display 1000 => 1
-fix: #239
-change credit units
-fix #236
-fix: support transfer credits with float value
-add：(test) log
-try fix patch-package error
-update credit font size
-run test
-update transfer rule
-update transfer amount rules
-try delete transaction after torrent done
-fix: port settings does not apply to webtorrent
-set torrent maxWebConns to client maxConns
-allow cancel installation when updating
-fix #222
-remove logs; transaction conflict err
+fix appium test
+fix appium test - get page title error
+trigger experimental workflow
+remove error step
+add retry fail step in internal workflow
+fix tracker errors, add tracker list, allow tracker management, resolve #241
+fix: #242
+fast fix
+resolve #240
