@@ -1,7 +1,8 @@
-support horizontal #779
-adjustment padding
-disable `getCodes`
-insert TaskCard to CreditPage
-fix subtitle list
-add `SafariPolyfill`
-fix #808
+#779
+#779
+#830 #829
+fix table list e2e test
+move `TaskItem` files
+fix credits e2e test
+add TaskStageCard
+try fix crashes
