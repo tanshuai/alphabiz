@@ -4,5 +4,5 @@ module.exports = {
   setupFilesAfterEnv: ['./jest.setup.js'],
   // testRunner: 'jest-jasmine2'
   testRunner: 'jest-circus/runner',
-  testTimeout: 60000
+  testTimeout: 20000
 }
