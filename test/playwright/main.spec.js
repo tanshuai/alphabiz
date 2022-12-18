@@ -298,7 +298,7 @@ test.describe('download ', () => {
       }
     })
   }
-  test.skip('table mode task lists', async () => {
+  test('table mode task lists', async () => {
     // 确保下载的全部种子都在做种状态
     // await commands.jumpPage('downloadedStatus')
 
@@ -410,7 +410,7 @@ test.describe('download ', () => {
     await sleep(1000)
     const magnetText = await window.locator('//*[@aria-label="Download directory position"]/preceding::*[1]').inputValue()
     // console.log('magnetText:' + magnetText)
-    expect(/alphabiz:\/\/The%2BWIRED%2BCD/.test(magnetText)).toBe(true)
+    expect(/alphabiz:\/\//.test(magnetText)).toBe(true)
     await window.click('button:has-text("Cancel")')
     await sleep(1000)
     await window.reload()
