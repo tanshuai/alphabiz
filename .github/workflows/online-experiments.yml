@@ -288,7 +288,7 @@ jobs:
 
       - name: Install alphabiz.exe
         run: |
-          Start-Process -FilePath "C:\Alphabiz.exe" -Verb runAs -ArgumentList '/s','/v"/qn"'
+          Start-Process -FilePath "C:\alphabiz.exe" -Verb runAs -ArgumentList '/s','/v"/qn"'
           Start-Sleep -s 30
         shell: powershell
 
