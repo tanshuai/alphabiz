@@ -43,10 +43,17 @@ packager({
   // NOTE: this requires `yarn` before `yarn build`
   afterPrune: [(buildPath, electronVersion, platform, arch, callback) => {
     // console.log('---App Build Path---\n', buildPath)
-    ['webtorrent', 'bittorrent-tracker', '@videojs'].forEach(dep => {
+    [
+      'webtorrent',
+      'bittorrent-tracker',
+      'torrent-discovery', // this builds with self-dep bittorrent-tracker
+      '@quasar/app',
+      '@videojs'
+    ].forEach(dep => {
       const src = path.resolve(__dirname, 'node_modules', dep)
       const dest = path.resolve(buildPath, 'node_modules', dep)
-      if (!fs.existsSync(src)) return
+      if (!fs.existsSync(src)) return console.error('not found', src)
+      console.log('--- COPY ---\n', src, '\n', dest, '\n--- COPY END ---')
       if (fs.existsSync(dest)) fs.rmSync(dest, { recursive: true })
       const copyRecursive = (src, dest) => {
         if (fs.statSync(src).isDirectory()) {
