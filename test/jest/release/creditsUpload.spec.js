@@ -68,12 +68,12 @@ describe('upload', () => {
     expect(taskStatus).toBe('Status: Seeding')
 
     // 等待种子上传(其他用户下载种子)
-    await homePage.waitSeedUpload(torrentName)
+    // await homePage.waitSeedUpload(torrentName)
 
     // const taskPeers = await homePage.getTaskPeers(torrentName, 60000 * 10)
     // taskPeers.click()
     // 等待积分增加变化
-    await client.$('//Text[@Name="Uploading"]').click()
+    // await client.$('//Text[@Name="Uploading"]').click()
     await homePage.jumpPage('creditsLink')
     let changedCredit
     while (1) {
