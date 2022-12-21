@@ -68,7 +68,7 @@ jobs:
         run: |
           TZ=UTC-8 git log -10 --date=format-local:"%Y%m%d%H%M" --format="%cd"
           echo "--------------------------"
-          echo "::set-output name=tag-name::0.1.0-nightly-202204021950"
+          echo "::set-output name=tag-name::0.1.0-nightly-202204071343"
           if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
           then echo "::set-output name=isRunAppium::1" ; \
           else echo "::set-output name=isRunAppium::0" ; \
@@ -260,7 +260,7 @@ jobs:
           command: |
             taskkill //F //IM Alphabiz.exe || (echo "app is ready")
             sleep 10s
-            yarn test:release
+            yarn test:release:creditsUpload
 
       - name: e2e appium creditUpload test for 7z 🧪
         if: matrix.test == '2'
@@ -273,7 +273,7 @@ jobs:
           command: |
             taskkill //F //IM Alphabiz.exe || (echo "app is ready")
             sleep 10s
-            yarn test:release
+            yarn test:release:creditsDownload
 
       - name: Download msi and exe
         run: |
