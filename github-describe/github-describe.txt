@@ -1,12 +1,4 @@
-remaining-time element fixed width
-fix recommend card image error
-fix post card icon
-ui adjustment (检查更新进入更新后的按钮颜色是一样的。 #8)
-fix ChannelHeader on website
-fix ChannelHeader on website
-download subtitle add agent
-fix library test
-delete appx zh language
-fix electron test script
-rename spec file name
-fix preload directory error in new app
+use table layout for Index
+fix status bar
+fix subscribed days of task
+add Table Layout for explore
