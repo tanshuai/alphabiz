@@ -374,14 +374,14 @@ const addListeners = (tr, conf = {}, isSeeding = false) => {
   tr.on('wire', wire => onWire(wire, tr))
   tr.on('discovery', () => {
     if (tr.discovery) {
-      console.log('start discovery')
+      info('start discovery')
       tr.trackerMap = new TrackerMap()
       // init map
       tr.discovery._announce.forEach(url => {
         tr.trackerMap.set(url, { status: 'connecting' })
       })
       tr.discovery.tracker.on('warning', (error, url) => {
-        console.log('tracker warning', url, error.message)
+        verbose('tracker warning', url, error.message)
         if (!url) return console.warn('No emitted url', error)
         tr.trackerMap.set(url, {
           status: 'error',
@@ -392,7 +392,7 @@ const addListeners = (tr, conf = {}, isSeeding = false) => {
       //   console.log('tracker peer', args)
       // })
       tr.discovery.tracker.on('update', (info, url) => {
-        console.log('tracker update', url, info)
+        verbose('tracker update', url, info)
         if (!url) return console.warn('No emitted url', info)
         tr.trackerMap.set(url, {
           status: 'updated',
