@@ -47,7 +47,6 @@ packager({
       'webtorrent',
       'bittorrent-tracker',
       'torrent-discovery', // this builds with self-dep bittorrent-tracker
-      '@quasar/app',
       '@videojs'
     ].forEach(dep => {
       const src = path.resolve(__dirname, 'node_modules', dep)
