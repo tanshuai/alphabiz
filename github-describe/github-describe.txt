@@ -1,4 +1,2 @@
-use table layout for Index
-fix status bar
-fix subscribed days of task
-add Table Layout for explore
+fix: #836
+#674
