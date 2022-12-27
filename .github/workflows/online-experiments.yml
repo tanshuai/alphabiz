@@ -82,68 +82,6 @@ jobs:
           echo "isRunAppium: ${{ steps.vars.outputs.isRunAppium }}"
         shell: bash
 
-      # - name: Setup Node.js ${{ matrix.node-version }} 📮
-      #   uses: actions/setup-node@v2
-      #   with:
-      #     node-version: ${{ matrix.node-version }}
-      #     cache: "yarn"
-      #     registry-url: "https://npm.pkg.github.com"
-      #     scope: "@zeeis"
-      #   env:
-      #     NODE_AUTH_TOKEN: ${{ secrets.PAT }}
-
-      # - name: update node-gyp on Linux and macOS
-      #   if: matrix.os != 'windows-2022'
-      #   shell: bash
-      #   run: |
-      #     npm install --global node-gyp@8.4.1
-      #     npm config set node_gyp $(npm prefix -g)/lib/node_modules/node-gyp/bin/node-gyp.js
-
-      # - name: update node-gyp on windows to support Visual Studio 2019
-      #   if: matrix.os == 'windows-2022'
-      #   shell: powershell
-      #   run: |
-      #     npm install --global node-gyp@8.4.1
-      #     npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
-
-      # - name: Install dependencies 👨🏻‍💻
-      #   run: |
-      #     yarn || (echo "===== yarn Attempt: 2 ====" && yarn)
-      #   env:
-      #     NODE_AUTH_TOKEN: ${{ secrets.PAT }}
-      #     GITHUB_PAT: ${{ secrets.PAT }}
-
-      # - name: Install UnPackaged 👨🏻‍💻
-      #   run: |
-      #     yarn unpackaged || (echo "===== yarn unpackaged Attempt: 2 ====" && yarn unpackaged)
-      #   shell: bash
-
-      # - name: Run electron-packager
-      #   if: contains(github.event.head_commit.message, 'run packager')
-      #   id: packager
-      #   run: |
-      #     yarn packager
-      #   shell: bash
-
-      # - name: Install winappdriver.msi
-      #   if: matrix.os == 'windows-2022' && steps.packager.outcome == 'success'
-      #   run: |
-      #     Invoke-WebRequest "https://github.com/microsoft/WinAppDriver/releases/download/v1.2.1/WindowsApplicationDriver_1.2.1.msi" -OutFIle "C:\WindowsApplicationDriver_1.2.1.msi"
-      #     Start-Process msiexec -ArgumentList "/quiet","/x","{087BBF93-D9E3-4D27-BDBE-9C702E0066FC}" -Verb runAs -Wait
-      #     Start-Process msiexec -ArgumentList "/quiet","/i","C:\WindowsApplicationDriver_1.2.1.msi" -Verb runAs -Wait
-      #     Start-Sleep -s 5
-      #   shell: powershell
-
-      # - name: Run appium
-      #   if: matrix.os == 'windows-2022' && steps.packager.outcome == 'success'
-      #   run: |
-      #     Start-Process PowerShell -ArgumentList "yarn test:appium"
-      #     Start-Sleep -s 10
-
-      # - name: Run release test 🧪
-      #   if: matrix.os == 'windows-2022' && steps.packager.outcome == 'success'
-      #   run: yarn test:release
-
   appium-test:
     needs: build-1
     if: |
@@ -180,19 +118,10 @@ jobs:
       TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
       TEST_RESET_PASSWORD: ${{ secrets.TEST_RESET_PASSWORD }}
     steps:
-      - name: test-1 Get short SHA 🔑
-        if: matrix.test == '1'
+      - name: test Get short SHA 🔑
         run: |
           echo "::set-output name=sha7::${GITHUB_SHA::7}"
           echo "test-1"
-          echo "isRunAppium: ${{needs.build-1.outputs.output2}}"
-        shell: bash
-
-      - name: build-2 Get short SHA 🔑
-        if: matrix.test == '2'
-        run: |
-          echo "::set-output name=sha7::${GITHUB_SHA::7}"
-          echo "test-2"
           echo "isRunAppium: ${{needs.build-1.outputs.output2}}"
         shell: bash
 

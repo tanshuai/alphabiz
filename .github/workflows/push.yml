@@ -430,8 +430,8 @@ jobs:
 
       - name: Download msi and exe
         run: |
-          curl -L https://github.com/tanshuai/alphabiz/releases/download/${{needs.build-1.outputs.output1}}/alphabiz-${{needs.build-1.outputs.output1}}.exe > C:/alphabiz.exe
-          curl -L https://github.com/tanshuai/alphabiz/releases/download/${{needs.build-1.outputs.output1}}/alphabiz-${{needs.build-1.outputs.output1}}.msi > C:/alphabiz.msi
+          curl -L https://github.com/tanshuai/alphabiz/releases/download/${{needs.nightly_job.outputs.output1}}/alphabiz-${{needs.nightly_job.outputs.output1}}.exe > C:/alphabiz.exe
+          curl -L https://github.com/tanshuai/alphabiz/releases/download/${{needs.nightly_job.outputs.output1}}/alphabiz-${{needs.nightly_job.outputs.output1}}.msi > C:/alphabiz.msi
         shell: bash
 
       - name: Install alphabiz.msi
