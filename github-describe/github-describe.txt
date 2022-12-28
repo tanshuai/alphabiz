@@ -1,6 +1,8 @@
-Bump decode-uri-component from 0.2.0 to 0.2.2
-add abeventhandler
-add dynamohelper
-fix #839
 #835
-rename to invitation_status
+add api `ignore_notify` for invitation
+delete e2e test only annotation
+hide and disable auto-update in windows-store build
+fix save language error
+exit pip when force load player
+fix web e2e test save language error
+add ignore link for email
