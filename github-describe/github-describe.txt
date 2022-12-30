@@ -1,10 +1,6 @@
-fix: #840
-fix get latest commit date
-fix: #842
-increase the wait time #841
-get package name dynamically in s3
-fix e2e test save language error
-#844
-#843
 #847
-#847
+#845
+#846
+close useless log
+fix #838
+update not-found message
