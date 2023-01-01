@@ -19,9 +19,9 @@ class HomePage {
   get accountLink () { return this.page.$('//*[@Name="Advanced"]') }
   get developmentLink () { return this.page.$('//*[@Name="Development Developer Mode for Internal Use"]') }
   // 种子状态tab
-  get downloadingStatusTab () { return this.page.$('//*[starts-with(@Name,"Downloading (")]') }
-  get uploadingStatusTab () { return this.page.$('//*[starts-with(@Name,"Uploading (")]') }
-  get downloadedStatusTab () { return this.page.$('//*[starts-with(@Name,"Downloaded (")]') }
+  get downloadingStatusTab () { return this.page.$('//*[@AutomationId="downloading"]') }
+  get uploadingStatusTab () { return this.page.$('//*[@AutomationId="uploading"]') }
+  get downloadedStatusTab () { return this.page.$('//*[@AutomationId="downloaded"]') }
   // 下载bt功能
   get downloadTorrentBtn () { return this.page.$('[name="DOWNLOAD"]') }
   get downloadMagnetEdit () { return this.page.$('/Pane[@Name="Alphabiz"]//Edit[@Name="Download directory position"]/preceding::*[1]') }

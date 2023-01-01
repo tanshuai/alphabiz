@@ -5,9 +5,9 @@ class Commands {
     // menu
     this.menuIcon = page.locator('[aria-label="Menu"]')
     this.homeLink = page.locator('text=HomeDownload/Upload and Media Files')
-    this.downloadingStatus = page.locator('text=Downloading (')
-    this.uploadingStatus = page.locator('text=Uploading (')
-    this.downloadedStatus = page.locator('text=Downloaded (')
+    this.downloadingStatus = page.locator('.left-drawer-menu >> text=Downloading')
+    this.uploadingStatus = page.locator('.left-drawer-menu >> text=Uploading')
+    this.downloadedStatus = page.locator('.left-drawer-menu >> text=Downloaded')
     this.playerLink = page.locator('text=PlayerMedia Player')
     this.creditsLink = page.locator('text=CreditsCheck Account Balance')
     this.settingsLink = page.locator('text=settingsSettings')
