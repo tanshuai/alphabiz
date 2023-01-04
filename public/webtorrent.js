@@ -150,6 +150,7 @@ const initClient = (retries = 0) => {
   const payedUserShareRate = Number(localStorage.getItem('payedUserShareRate'))
   // block local IP
   conf.blocklist = utils.getLocalIPList() || []
+  conf.secure = true
 
   info('init client', conf)
   client = new WebTorrent(conf)
