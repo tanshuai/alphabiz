@@ -1,4 +1,4 @@
-fix latest commit date error
-fix default video player name
-push code to test repo
-save play state when entering pip
+add player log #857
+use temp folder to sync public resources
+try sync code to public repo
+set workflow timezone
