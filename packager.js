@@ -7,9 +7,9 @@ const version = require('./package.json').version
 const publicVersion = require('./public/version.json').version
 
 const buildVersion = publicVersion || version
-const packagePath = path.resolve(__dirname, './package.json')
-const package = fs.readFileSync(packagePath)
-console.log(path.resolve(__dirname, 'alphabiz-icon-1024.png'))
+
+const app = require('./developer/app')
+const appName = app.name
 
 const { getPackageDetailsFromPatchFilename } = require('patch-package/dist/PackageDetails')
 const patches = fs.readdirSync(path.resolve(__dirname, 'patches'))
@@ -17,33 +17,42 @@ const patches = fs.readdirSync(path.resolve(__dirname, 'patches'))
   .filter(i => i && !i.isDevOnly)
   .map(i => i.name)
 
+const packagePath = path.resolve(__dirname, './package.json')
+const package = fs.readFileSync(packagePath)
+const packageJson = JSON.parse(package)
+packageJson.productName = appName
+// fs.writeFileSync(packagePath, JSON.stringify(packageJson, null, 2))
+// process.on('exit', () => {
+//   console.log('Restore package.json before quasar build exit')
+//   fs.writeFileSync(packagePath, package)
+// })
+
 const beforeBuild = async () => {
-  // console.log('run beforeBuild')
-  // const pkg = JSON.parse(package)
-  // pkg.version = buildVersion
-  // console.log('Build version:', pkg.version)
-  // fs.writeFileSync(packagePath, JSON.stringify(pkg, null, 2))
-  // process.on('exit', () => {
-  //   fs.writeFileSync(packagePath, package)
-  //   console.log('Restored package.json before exit')
-  // })
+  const { platform, arch } = process
+  const destDir = path.resolve(__dirname, `build/electron/${appName}-${platform}-${arch}`)
+  console.log('beforeBuild', destDir)
+  if (fs.existsSync(destDir)) {
+    fs.rmSync(destDir, { recursive: true })
+    console.log('删除成功！')
+  }
 }
 
 beforeBuild()
 packager({
   dir: './build/electron/UnPackaged',
   out: './build/electron',
+  name: app.displayName,
   appVersion: buildVersion,
   buildVersion: buildVersion,
   extraResource: [
-    path.resolve(__dirname, 'alphabiz-icon-1024.png'),
-    path.resolve(__dirname, 'public/favicon.ico'),
-    path.resolve(__dirname, 'public/platform-assets/mac/trayiconTemplate.png'),
+    path.resolve(__dirname, 'developer/icon-1024.png'),
+    path.resolve(__dirname, 'developer/favicon.ico'),
+    path.resolve(__dirname, 'developer/platform-assets/mac/trayiconTemplate.png'),
     path.resolve(__dirname, 'public/version.json')
   ],
   icon: process.platform === 'darwin'
-    ? path.resolve(__dirname, 'public/platform-assets/mac/app.icns')
-    : path.resolve(__dirname, 'public/platform-assets/windows/icon.ico'),
+    ? path.resolve(__dirname, 'developer/platform-assets/mac/app.icns')
+    : path.resolve(__dirname, 'developer/platform-assets/windows/icon.ico'),
   // patch-package does not work in quasar production mode
   // we should manually copy our patched webtorrent to build path
   // NOTE: this requires `yarn` before `yarn build`
@@ -74,6 +83,56 @@ packager({
       }
       copyRecursive(src, dest)
     })
+      ;[
+        'assets',
+        'icons',
+        'platform-assets',
+        '.'
+      ].forEach(assetDir => {
+        const src = path.resolve(__dirname, 'developer', assetDir)
+        const dest = path.resolve(buildPath, assetDir === '.' ? 'node_modules/developer' : 'developer/' + assetDir)
+        if (!fs.existsSync(src)) return console.error('not found', src)
+        console.log('--- COPY ---\n', src, '\n', dest, '\n--- COPY END ---')
+        // fs.rmSync not support low version
+        const removeDir = (dir) => {
+          const files = fs.readdirSync(dir) // 一个数组
+          files.forEach((item) => {
+            let file = dir + "/" + item
+            if (fs.statSync(file).isFile()) {
+              fs.unlinkSync(file)
+            } else {
+              removeDir(file)
+            }
+          })
+          fs.rmdirSync(dir)
+        }
+        if (fs.existsSync(dest)) {
+          const nodeVersion = /(?<=v)\d{1,2}(?=.)/.exec(process.version)
+          if (nodeVersion[0] < 14) removeDir(dest)
+          else fs.rmSync(dest, { recursive: true })
+        }
+        const copyRecursive = (src, dest) => {
+          if (fs.statSync(src).isDirectory()) {
+            fs.readdirSync(src).forEach(dir => {
+              copyRecursive(path.resolve(src, dir), path.resolve(dest, dir))
+            })
+          } else {
+            // ensure directory exists
+            if (!fs.existsSync(path.dirname(dest))) {
+              fs.mkdirSync(path.dirname(dest), { recursive: true })
+            }
+            fs.copyFileSync(src, dest)
+          }
+        }
+        copyRecursive(src, dest)
+      })
+    const packageJsonPath = path.resolve(buildPath, 'package.json')
+    fs.writeFileSync(packageJsonPath, fs.readFileSync(packageJsonPath).toString().replace(/Alphabiz/g, appName))
+    const indexPath = path.resolve(buildPath, 'index.html')
+    if (fs.existsSync(indexPath)) {
+      const index = fs.readFileSync(indexPath).toString('utf-8')
+      fs.writeFileSync(indexPath, index.replace(/Alphabiz/g, appName))
+    }
     callback()
   }],
   afterCopy: [(buildPath, electronVersion, platform, arch, callback) => {
@@ -102,6 +161,7 @@ packager({
     unpack: '*.{node,dll}'
   },
   // asar: false,
+
   // not dependencies in production mode
   ignore: [
     // /aws-/,
