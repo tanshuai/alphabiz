@@ -31,15 +31,43 @@ const copyModule = async () => {
       copyRecursive(src, dest)
     })
 }
+const copyDeveloper = async () => {
+  const src = path.resolve(__dirname, 'developer')
+  const dest = path.resolve(__dirname, 'build/electron/UnPackaged/node_modules/developer')
+  const dest2 = path.resolve(__dirname, 'build/electron/UnPackaged/developer')
+  // console.log('src:' + src)
+  // console.log('dest:' + dest)
+  if (!fs.existsSync(src)) return
+  if (fs.existsSync(dest)) fs.rmSync(dest, { recursive: true })
+  if (fs.existsSync(dest2)) fs.rmSync(dest2, { recursive: true })
+  const copyRecursive = (src, dest) => {
+    if (fs.statSync(src).isDirectory()) {
+      fs.readdirSync(src).forEach(dir => {
+        copyRecursive(path.resolve(src, dir), path.resolve(dest, dir))
+      })
+    } else {
+      // ensure directory exists
+      if (!fs.existsSync(path.dirname(dest))) {
+        fs.mkdirSync(path.dirname(dest), { recursive: true })
+      }
+      fs.copyFileSync(src, dest)
+    }
+  }
+  copyRecursive(src, dest)
+  copyRecursive(src, dest2)
+}
+
 const copyVersionJSON = async () => {
   const src = path.resolve(__dirname, 'public/version.json')
-  const dest = path.resolve(__dirname, 'version.json')
+  const dest = path.resolve(__dirname, 'node_modules/@zeeis/velectron/dist/resources/version.json')
   // console.log('src:' + src)
   // console.log('dest:' + dest)
   fs.copyFileSync(src, dest)
 }
 const deleteVersionJSON = async () => {
-  fs.unlink(path.resolve(__dirname, 'version.json'), (err) => {
+  const dest = path.resolve(__dirname, 'node_modules/@zeeis/velectron/dist/resources/version.json')
+  if (!fs.existsSync(dest)) return
+  fs.unlink(dest, (err) => {
     if (err) throw err;
     console.log('version.json was deleted');
   })
@@ -47,10 +75,20 @@ const deleteVersionJSON = async () => {
 
 if (process.argv.includes('--pre')) {
   console.log('run copy-patch.js --pre')
-  // copyVersionJSON()
+  copyVersionJSON()
   copyModule()
+  copyDeveloper()
 } else if (process.argv.includes('--post')) {
   console.log('run copy-patch.js --post')
-  // deleteVersionJSON()
+  deleteVersionJSON()
+  const dest = path.resolve(__dirname, 'build/electron/UnPackaged/node_modules/developer')
+  const dest2 = path.resolve(__dirname, 'build/electron/UnPackaged/developer')
+  if (fs.existsSync(dest)) {
+    console.log(dest)
+    fs.rmSync(dest, { recursive: true })
+  }
+  if (fs.existsSync(dest2)) {
+    console.log(dest2)
+    fs.rmSync(dest2, { recursive: true })
+  }
 }
-
