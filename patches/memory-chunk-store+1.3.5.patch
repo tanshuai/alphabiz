@@ -1,0 +1,36 @@
+diff --git a/node_modules/memory-chunk-store/index.js b/node_modules/memory-chunk-store/index.js
+index 16acf56..30ef285 100644
+--- a/node_modules/memory-chunk-store/index.js
++++ b/node_modules/memory-chunk-store/index.js
+@@ -3,6 +3,7 @@ module.exports = Storage
+ const queueMicrotask = require('queue-microtask')
+ 
+ function Storage (chunkLength, opts) {
++  console.log('init', chunkLength, opts)
+   if (!(this instanceof Storage)) return new Storage(chunkLength, opts)
+   if (!opts) opts = {}
+ 
+@@ -17,9 +18,23 @@ function Storage (chunkLength, opts) {
+     this.lastChunkLength = (this.length % this.chunkLength) || this.chunkLength
+     this.lastChunkIndex = Math.ceil(this.length / this.chunkLength) - 1
+   }
++  // Webtorrent does not seed file correctly in web mode.
++  // Here we manually update pieces for it.
++  if (opts.torrent && opts.torrent.origin && opts.torrent.origin instanceof File) {
++    /** @type { File } */
++    const f = opts.torrent.origin
++    f.arrayBuffer().then(ab => {
++      const buf = Buffer.from(ab)
++      for (let i = 0; i < this.length; i += this.chunkLength) {
++        const piece = buf.slice(i, i + this.chunkLength)
++        this.put(Math.floor(i / this.chunkLength), piece, console.log)
++      }
++    })
++  }
+ }
+ 
+ Storage.prototype.put = function (index, buf, cb = () => {}) {
++  console.log('put', buf, index)
+   if (this.closed) return queueMicrotask(() => cb(new Error('Storage is closed')))
+ 
+   const isLastChunk = (index === this.lastChunkIndex)
