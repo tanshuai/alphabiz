@@ -14,14 +14,18 @@
 
 require('dotenv').config()
 const { calculation } = require('../../utils/calculation')
+const app = require('../../../developer/app.js')
 module.exports = (on, config) => {
   on('task', {
-    calculation ({ type, time, to }) {
-      return calculation(type, time, to)
+    calculation ({ type, from, to }) {
+      return calculation(type, from, to)
     },
     log (message) {
       console.log(message)
       return null
+    },
+    appconfig () {
+      return app
     }
   })
   // copy any needed variables from process.env to config.env

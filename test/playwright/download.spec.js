@@ -7,7 +7,7 @@ const { BasePage } = require('./models/basePage')
 const { HomePage } = require('./models/homePage')
 const { parseCSV, get2DArray } = require('../utils/getCSV')
 // get random email
-
+const app = require('../../developer/app.js')
 let window, windows, electronApp, basePage, homePage
 const ScreenshotsPath = 'test/output/playwright/main.spec/'
 let from
@@ -53,7 +53,7 @@ test.beforeAll(async () => {
   windows = electronApp.windows()
 
   for (const win of windows) {
-    if (await win.title() === 'Alphabiz') window = win
+    if (await win.title() === app.name) window = win
   }
   console.log('windows title:' + await window.title())
   // new Pege Object Model
@@ -135,7 +135,7 @@ for (const tg of taskGroup) {
       const downloadNum = await allCard.count()
       console.log(`${tg.groupName} downloadNum: ` + downloadNum)
       // expect(downloadNum).toBe(5)
-      await homePage.waitForAllHidden(allCard, timeout, 30000)
+      await basePage.waitForAllHidden(allCard, timeout, 30000)
       // let waitTime = 0
       // while (1) {
       //   if (waitTime >= timeout) break

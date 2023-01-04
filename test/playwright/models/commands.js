@@ -114,7 +114,7 @@ class Commands {
 
   async getCredit () {
     await this.page.waitForTimeout(3000)
-    return await this.page.locator('.text-right > div').innerText()
+    return await this.page.locator('[data-cy="currentCredit"]').innerText()
   }
 
   async transfer (ID, amount) {

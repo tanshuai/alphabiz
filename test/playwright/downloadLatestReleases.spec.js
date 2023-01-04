@@ -3,6 +3,7 @@ const { test, expect } = require('@playwright/test');
 const { chromium } = require('playwright')
 const path = require('path')
 const ScreenshotsPath = 'test/output/playwright/downloadLatest/'
+const app = require('../../developer/app.js')
 let browser, page
 test.beforeAll(async () => {
   browser = await chromium.launch({
@@ -17,20 +18,31 @@ test.afterEach(async ({ }, testInfo) => {
   }
 })
 
-test.describe('download stable version alphabiz', () => {
+test.describe(`download stable version ${app.name}`, () => {
   test('download', async () => {
-    test.setTimeout(60000 * 20)
+    test.setTimeout(60000 * 3)
+    const releasesLatestUrl = `https://api.github.com/repos/tanshuai/${app.update.github.repo}/releases/latest`
     const [response] = await Promise.all([
       // Waits for the next response matching some conditions
-      page.waitForResponse(response => response.url() === 'https://api.github.com/repos/tanshuai/alphabiz/releases/latest'),
+      page.waitForResponse(response => response.url() === releasesLatestUrl),
       // Triggers the response
-      page.goto('https://api.github.com/repos/tanshuai/alphabiz/releases/latest')
+      page.goto(releasesLatestUrl)
     ])
     const resJson = await response.json()
-    const tagName = resJson.tag_name
+    let tagName = resJson.tag_name
     console.log('latest stable version: ', tagName)
-
-    await page.goto(`https://alpha.biz/`)
+    if (typeof tagName === 'undefined') {
+      const [response] = await Promise.all([
+        // Waits for the next response matching some conditions
+        page.waitForResponse(response => response.url() === releasesLatestUrl),
+        // Triggers the response
+        page.goto(releasesLatestUrl)
+      ])
+      const resJson = await response.json()
+      tagName = resJson.tag_name
+      console.log('2: latest stable version: ', tagName)
+    }
+    await page.goto(app.homepage)
     console.log('web load end!')
     let eleClass
     process.platform === 'darwin' ? eleClass = 'fa-apple'
@@ -53,10 +65,10 @@ test.describe('download stable version alphabiz', () => {
     process.platform === 'darwin' ? fileExt = 'dmg'
       : process.platform === 'win32' ? fileExt = 'msi'
         : fileExt = 'deb'
-    const regex = new RegExp(`^alphabiz-${tagName}\.${fileExt}$`)
+    const regex = new RegExp(`^${app.name.toLowerCase()}-${tagName}\.${fileExt}$`)
     expect(regex.test(fileSuggestedFilename)).toBe(true)
 
-    const targetPath = path.resolve(__dirname, `../../alphabiz.${fileExt}`)
+    const targetPath = path.resolve(__dirname, `../../${app.name.toLowerCase()}.${fileExt}`)
     console.log(targetPath)
     await download.saveAs(targetPath)
 

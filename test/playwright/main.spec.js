@@ -9,9 +9,11 @@ const { BasePage } = require('./models/basePage')
 const { HomePage } = require('./models/homePage')
 const { PlayerPage } = require('./models/playerPage')
 const { CreditsPage } = require('./models/creditsPage')
+const { BasicPage } = require('./models/basicPage')
 
 const { calculation } = require('../utils/calculation')
-let window, windows, electronApp, basePage, homePage, playerPage, creditsPage
+const app = require('../../developer/app.js')
+let window, windows, electronApp, basePage, homePage, playerPage, creditsPage, basicPage
 const ScreenshotsPath = 'test/output/playwright/main.spec/'
 let from
 let to
@@ -30,30 +32,45 @@ to = to + process.env.TEST_EMAIL_DOMAIN
 const btData = [
   {
     btName: 'uTorrent Web Tutorial Video',
-    magnetLink: 'magnet:?xt=urn:btih:61b3b8856c4839edf51f5c2346599b6bec524145',
+    magnetLink: `${app.shortProtocol}://AWGzuIVsSDnt9R9cI0ZZm2vsUkFF`,
     isStreaming: 0,
     isDelete: 0,
     fileType: 'folder'
   },
   {
     btName: 'The WIRED CD - Rip. Sample. Mash. Share',
-    magnetLink: 'alphabiz://The+WIRED+CD+-+Rip.+Sample.+Mash.+Share/AaiP2llU6JF4w3Jxamp4uBgO1NrT&_Td6WFoAAAFpIt42AgAhARwAAAAQz1jM4AQ2AZRdABhgxG8IY8MSV1K_VKsx55jv8ahwgTX5jKB2up6HR8eDRb6BvCkztx6mgEb++b2k0T1kLtZV_Z3BAncfL9IZEXrCc2i3lZ1gwntqOdl5Y6U4ITwioxtrEFVVqgnT7fNc84aa4e4nbkoHiGnrIyjqiDO6Th6ghL6fgab+SzF6QoLdOc_CzeSlbolwRBY6XVrJDoXv0R2cuLjOd2K0fNlkoov1603Ml_lh_5EboBPwH+OOmSVNhU2VlV8_JhxjvAyuSH2BztiDRz1bVFkIdjxPR234SGYsuJpslus1CEnVW+bjTYwN6URFizlYFNVAeUEyN6RuAJBa8Zr5R9rTZj8ZZt9oSUK2igP7XtUePDYebMj3TjlP1dIp+i_HBQOtJ+Yd4zFcLi1aeQteo2DP694kshUMvyLM1ZBS6FdnwVLNCGFZ_TEBIhR73Nm2DXdas086dQFXAEOmjwprTaPyWwRqVrEXn9uuWDFUe8TbJYK6hQbfFdTCM8Mq4dNnAQqcepFfmbE4PAd+m7zOGXFARinVN+L_ZK16ADAA4uMAAawDtwgAAANYnWQ+MA2LAgAAAAABWVo=',
-    testName: 'alphabiz- ',
+    magnetLink: `${app.protocol}://The+WIRED+CD+-+Rip.+Sample.+Mash.+Share/AaiP2llU6JF4w3Jxamp4uBgO1NrT&_Td6WFoAAAFpIt42AgAhARwAAAAQz1jM4AQ2AZRdABhgxG8IY8MSV1K_VKsx55jv8ahwgTX5jKB2up6HR8eDRb6BvCkztx6mgEb++b2k0T1kLtZV_Z3BAncfL9IZEXrCc2i3lZ1gwntqOdl5Y6U4ITwioxtrEFVVqgnT7fNc84aa4e4nbkoHiGnrIyjqiDO6Th6ghL6fgab+SzF6QoLdOc_CzeSlbolwRBY6XVrJDoXv0R2cuLjOd2K0fNlkoov1603Ml_lh_5EboBPwH+OOmSVNhU2VlV8_JhxjvAyuSH2BztiDRz1bVFkIdjxPR234SGYsuJpslus1CEnVW+bjTYwN6URFizlYFNVAeUEyN6RuAJBa8Zr5R9rTZj8ZZt9oSUK2igP7XtUePDYebMj3TjlP1dIp+i_HBQOtJ+Yd4zFcLi1aeQteo2DP694kshUMvyLM1ZBS6FdnwVLNCGFZ_TEBIhR73Nm2DXdas086dQFXAEOmjwprTaPyWwRqVrEXn9uuWDFUe8TbJYK6hQbfFdTCM8Mq4dNnAQqcepFfmbE4PAd+m7zOGXFARinVN+L_ZK16ADAA4uMAAawDtwgAAANYnWQ+MA2LAgAAAAABWVo=`,
+    testName: `${app.protocol}- `,
     isStreaming: 0,
     isDelete: 0,
     fileType: 'folder'
   },
+  // {
+  //   btName: 'sintel.mp4',
+  //   magnetLink: 'magnet:?xt=urn:btih:6a9759bffd5c0af65319979fb7832189f4f3c35d&dn=sintel.mp4&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&ws=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2Fsintel-1024-surround.mp4',
+  //   testName: `Streaming ${app.protocol}- `,
+  //   isStreaming: 1,
+  //   isDelete: 0,
+  //   fileType: 'video_file'
+  // },
+  // {
+  //   btName: 'sintel.mp4',
+  //   magnetLink: 'magnet:?xt=urn:btih:6a9759bffd5c0af65319979fb7832189f4f3c35d&dn=sintel.mp4&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&ws=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2Fsintel-1024-surround.mp4',
+  //   isStreaming: 0,
+  //   isDelete: 0,
+  //   fileType: 'video_file'
+  // }
   {
     btName: 'bbb_sunflower_1080p_30fps_normal.mp4',
-    magnetLink: 'alphabiz://bbb_sunflower_1080p_30fps_normal.mp4/AYhZSqrL3kDvPiUQxHN07AqjlsCO&_Td6WFoAAAFpIt42AgAhARwAAAAQz1jM4AMtAW1dABhgxG8IY8MSV1K_VKsx55jv8ahwgTX5jKB2up6HR8eDRb6BvCkztx6mgEb++b2O2b3K3oD_twGGSig+KBe78TiXxGleWSnbRlWB69ZvfD70oiEhlTlty+AtgRrH+kzx7fD910Bx9Uf4_7Js+dNII8l3GxJ4B175xFepPURPh6AnWzB9cVwPtgxmF4hSxh7Z_thhoZBH4KP2yrr9bIPbiBIfR4rnRGgQhoMYOe1vRpDVUFDC_y_tNp17fwwfvvvAj5elliGbJODzL4qEq_HB_lUhXHCZDoPbg1kCa8TfDkYL+2wWqViHW5YjR6DIxnlf8AAswdMmYa5OLaHRfCaqLtreJ_iohdSxAp2rckxS001Zp7ra+N_aIUxh9H3a96O2YBfWo_2PdmbBhT1A8s20u6d9cVtOTDvkpvOb8aiGcUn+swScBUm1SBP2DgoZJ6zeNvQcBQ9WKwD51ImdTrOxf2ShB64iMvUV0iO_3x3WAAAAAJcI4UEAAYUDrgYAAOI5sWM+MA2LAgAAAAABWVo=',
-    testName: 'Streaming alphabiz- ',
+    magnetLink: `${app.protocol}://bbb_sunflower_1080p_30fps_normal.mp4/AYhZSqrL3kDvPiUQxHN07AqjlsCO&_Td6WFoAAAFpIt42AgAhARwAAAAQz1jM4AMtAW1dABhgxG8IY8MSV1K_VKsx55jv8ahwgTX5jKB2up6HR8eDRb6BvCkztx6mgEb++b2O2b3K3oD_twGGSig+KBe78TiXxGleWSnbRlWB69ZvfD70oiEhlTlty+AtgRrH+kzx7fD910Bx9Uf4_7Js+dNII8l3GxJ4B175xFepPURPh6AnWzB9cVwPtgxmF4hSxh7Z_thhoZBH4KP2yrr9bIPbiBIfR4rnRGgQhoMYOe1vRpDVUFDC_y_tNp17fwwfvvvAj5elliGbJODzL4qEq_HB_lUhXHCZDoPbg1kCa8TfDkYL+2wWqViHW5YjR6DIxnlf8AAswdMmYa5OLaHRfCaqLtreJ_iohdSxAp2rckxS001Zp7ra+N_aIUxh9H3a96O2YBfWo_2PdmbBhT1A8s20u6d9cVtOTDvkpvOb8aiGcUn+swScBUm1SBP2DgoZJ6zeNvQcBQ9WKwD51ImdTrOxf2ShB64iMvUV0iO_3x3WAAAAAJcI4UEAAYUDrgYAAOI5sWM+MA2LAgAAAAABWVo=`,
+    testName: `Streaming ${app.protocol}- `,
     isStreaming: 1,
     isDelete: 0,
     fileType: 'video_file'
   },
   {
     btName: 'bbb_sunflower_1080p_30fps_normal.mp4',
-    magnetLink: 'alphabiz://bbb_sunflower_1080p_30fps_normal.mp4/AYhZSqrL3kDvPiUQxHN07AqjlsCO&_Td6WFoAAAFpIt42AgAhARwAAAAQz1jM4AMtAW1dABhgxG8IY8MSV1K_VKsx55jv8ahwgTX5jKB2up6HR8eDRb6BvCkztx6mgEb++b2O2b3K3oD_twGGSig+KBe78TiXxGleWSnbRlWB69ZvfD70oiEhlTlty+AtgRrH+kzx7fD910Bx9Uf4_7Js+dNII8l3GxJ4B175xFepPURPh6AnWzB9cVwPtgxmF4hSxh7Z_thhoZBH4KP2yrr9bIPbiBIfR4rnRGgQhoMYOe1vRpDVUFDC_y_tNp17fwwfvvvAj5elliGbJODzL4qEq_HB_lUhXHCZDoPbg1kCa8TfDkYL+2wWqViHW5YjR6DIxnlf8AAswdMmYa5OLaHRfCaqLtreJ_iohdSxAp2rckxS001Zp7ra+N_aIUxh9H3a96O2YBfWo_2PdmbBhT1A8s20u6d9cVtOTDvkpvOb8aiGcUn+swScBUm1SBP2DgoZJ6zeNvQcBQ9WKwD51ImdTrOxf2ShB64iMvUV0iO_3x3WAAAAAJcI4UEAAYUDrgYAAOI5sWM+MA2LAgAAAAABWVo=',
+    magnetLink: `${app.protocol}://bbb_sunflower_1080p_30fps_normal.mp4/AYhZSqrL3kDvPiUQxHN07AqjlsCO&_Td6WFoAAAFpIt42AgAhARwAAAAQz1jM4AMtAW1dABhgxG8IY8MSV1K_VKsx55jv8ahwgTX5jKB2up6HR8eDRb6BvCkztx6mgEb++b2O2b3K3oD_twGGSig+KBe78TiXxGleWSnbRlWB69ZvfD70oiEhlTlty+AtgRrH+kzx7fD910Bx9Uf4_7Js+dNII8l3GxJ4B175xFepPURPh6AnWzB9cVwPtgxmF4hSxh7Z_thhoZBH4KP2yrr9bIPbiBIfR4rnRGgQhoMYOe1vRpDVUFDC_y_tNp17fwwfvvvAj5elliGbJODzL4qEq_HB_lUhXHCZDoPbg1kCa8TfDkYL+2wWqViHW5YjR6DIxnlf8AAswdMmYa5OLaHRfCaqLtreJ_iohdSxAp2rckxS001Zp7ra+N_aIUxh9H3a96O2YBfWo_2PdmbBhT1A8s20u6d9cVtOTDvkpvOb8aiGcUn+swScBUm1SBP2DgoZJ6zeNvQcBQ9WKwD51ImdTrOxf2ShB64iMvUV0iO_3x3WAAAAAJcI4UEAAYUDrgYAAOI5sWM+MA2LAgAAAAABWVo=`,
     isStreaming: 0,
     isDelete: 0,
     fileType: 'video_file'
@@ -82,16 +99,21 @@ test.beforeAll(async () => {
 
   for (const win of windows) {
     console.log(await win.title())
-    if (await win.title() === 'Alphabiz') window = win
+    if (await win.title() === app.name) window = win
   }
   // new Pege Object Model
   basePage = new BasePage(window)
   homePage = new HomePage(window)
   playerPage = new PlayerPage(window)
   creditsPage = new CreditsPage(window)
+  basicPage = new BasicPage(window)
+  // // fix electron test - ServiceWorker is not defined
+  // await window.reload()
+})
+test.afterAll(async () => {
+  await electronApp.close()
 })
 test.beforeEach(async () => {
-  await window.evaluate(() => localStorage.clear())
 })
 test.afterEach(async ({}, testInfo) => {
   if (testInfo.status !== testInfo.expectedStatus) {
@@ -100,12 +122,6 @@ test.afterEach(async ({}, testInfo) => {
     await window.screenshot({ path: `${ScreenshotsPath}${testInfo.title}-retry-${testInfo.retry}-fail.png` })
   }
 })
-test.afterAll(async () => {
-  // // Exit app.
-  // await window.evaluate(() => localStorage.clear())
-  // await electronApp.close()
-})
-
 test('close set default', async () => {
   try {
     await basePage.defaultAppAlert.waitFor({ timeout: 3000 })
@@ -116,84 +132,151 @@ test('close set default', async () => {
   }
 })
 
-test.skip('reset torrent status', async () => {
+test('reset torrent status', async () => {
+  test.setTimeout(60000 * 4)
   await window.waitForLoadState()
   await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
-  await basePage.jumpPage('downloadingStatus')
-  await homePage.searchBtn.click({ force: true })
-  if (await homePage.downRemoveAllBtn.isEnabled()) {
-    await homePage.downRemoveAllBtn.click()
-    await homePage.deleteFileChk.click()
-    await homePage.deleteBtn.click()
-  }
-  await basePage.jumpPage('uploadingStatus')
-  if (await homePage.upRemoveAllBtn.isEnabled()) {
-    await homePage.upRemoveAllBtn.click()
-    await homePage.removeAutoUploadFilesChk.click()
-    await homePage.deleteFileChk.click()
-    await homePage.deleteBtn.click()
-  }
-  await basePage.jumpPage('downloadedStatus')
-  if (await homePage.clearHistoryBtn.isEnabled()) {
-    await homePage.clearHistoryBtn.click()
-    await homePage.deleteBtn.click()
-  }
+  await homePage.clearTask()
 })
 
 test.describe('play video', () => {
   test.beforeEach(async () => {
     if (process.platform === 'darwin') test.setTimeout(60000 * 5)
+    else test.setTimeout(60000 * 3)
     await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
-    await window.waitForLoadState()
+    await window.waitForTimeout(1000)
     await basePage.jumpPage('playerLink')
   })
   test('avi_type', async () => {
     const media = './test/cypress/fixtures/samples/GoneNutty.avi'
     // Upload
-    await playerPage.fileInput.setInputFiles(media)
+    await playerPage.fileInput.setInputFiles(media, { timeout: 60000 })
     await window.waitForLoadState()
     // should video can play
     const progressControl = await playerPage.controlBar
-    await expect(progressControl).toBeVisible()
+    await expect(progressControl).toBeVisible({ timeout: 30000 })
+    try {
+      await playerPage.playing.waitFor({ timeout: 10000 })
+    } catch (e) {
+      await playerPage.paused.waitFor({ timeout: 10000 })
+    }
   })
   test('BluRay_mkv_type', async () => {
     const media = './test/cypress/fixtures/samples/Test-Sample-Tenet.2020.IMAX.2160p.UHD.BluRay.x265.10bit.HDR.DTS-HD.MA.5.1202111171122322.mkv'
     // Upload
-    await playerPage.fileInput.setInputFiles(media)
+    await playerPage.fileInput.setInputFiles(media, { timeout: 60000 })
     await window.waitForLoadState()
     // should video can play
     const progressControl = await playerPage.controlBar
-    await expect(progressControl).toBeVisible()
+    await expect(progressControl).toBeVisible({ timeout: 30000 })
+    try {
+      await playerPage.playing.waitFor({ timeout: 10000 })
+    } catch (e) {
+      await playerPage.paused.waitFor({ timeout: 10000 })
+    }
+  })
+})
+
+test.describe('save Language', () => {
+  test.describe('signInPage', () => {
+    test.beforeEach(async () => {
+      if (process.platform === 'darwin') {
+        test.skip()
+      }
+      await basePage.clearLocalstorage()
+      await window.waitForTimeout(3000)
+    })
+    test('CN', async () => {
+      await basePage.quickSaveLanguage('CN')
+      const signIncardCss = '.q-card:has-text("登录账户")'
+      await window.locator(signIncardCss).waitFor()
+      await window.reload()
+      await window.waitForLoadState()
+      await window.locator(signIncardCss).waitFor()
+    })
+    test('TW', async () => {
+      await basePage.quickSaveLanguage('TW')
+      const signIncardCss = '.q-card:has-text("登錄賬戶")'
+      await window.locator(signIncardCss).waitFor()
+      await window.reload()
+      await window.waitForLoadState()
+      await window.locator(signIncardCss).waitFor()
+    })
+    test('EN', async () => {
+      await basePage.quickSaveLanguage('EN')
+      const signIncardCss = '.q-card:has-text("sign in")'
+      await window.locator(signIncardCss).waitFor()
+      await window.reload()
+      await window.waitForLoadState()
+      await window.locator(signIncardCss).waitFor()
+      if (process.platform === 'darwin') {
+        await basePage.clearLocalstorage()
+        await window.waitForTimeout(3000)
+        await basePage.quickSaveLanguage('EN')
+        await window.reload()
+        await window.waitForLoadState()
+        await window.locator(signIncardCss).waitFor()
+        await window.screenshot({ path: `${ScreenshotsPath}signInPageStatus.png` })
+      }
+    })
+  })
+  test.describe('basicPage', () => {
+    test.beforeEach(async () => {
+      if (process.platform === 'darwin') {
+        test.skip()
+      }
+      await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
+      await window.waitForLoadState()
+    })
+    test('CN', async () => {
+      await basicPage.saveLanguage('EN', 'CN')
+      await expect(await basicPage.headerTitle).toHaveText(/基础设置/, { timeout: 20000 })
+    })
+    test('TW', async () => {
+      await basicPage.saveLanguage('CN', 'TW')
+      await expect(await basicPage.headerTitle).toHaveText(/基礎設置/, { timeout: 20000 })
+    })
+    test('EN', async () => {
+      await basicPage.saveLanguage('TW', 'EN')
+      await expect(await basicPage.headerTitle).toHaveText(/Basic/, { timeout: 20000 })
+    })
   })
 })
 
 test.describe('download ', () => {
-  for (const btDate of btData) {
-    test((btDate.testName ? btDate.testName : '') + btDate.btName, async () => {
+  for (const bt of btData) {
+    test((bt.testName ? bt.testName : '') + bt.btName, async () => {
       await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
-      if (btDate.btName === 'uTorrent Web Tutorial Video') {
+      if (bt.btName === 'uTorrent Web Tutorial Video') {
         test.setTimeout(60000 * 5)
-      } else if (btDate.btName === 'The WIRED CD - Rip. Sample. Mash. Share') {
+      } else if (bt.btName === 'The WIRED CD - Rip. Sample. Mash. Share') {
         test.setTimeout(60000 * 10)
-      } else if (btDate.btName === 'bbb_sunflower_1080p_30fps_normal.mp4') {
+      } else if (bt.btName === 'bbb_sunflower_1080p_30fps_normal.mp4') {
+        test.setTimeout(60000 * 15)
+      } else if (bt.btName === 'sintel.mp4') {
         test.setTimeout(60000 * 15)
       }
       await window.waitForLoadState()
 
       // 跳转到 home
       await basePage.jumpPage('downloadingStatus')
+      try {
+        await homePage.downRemoveAllBtn.waitFor({ timeout: 5000 })
+      } catch (e) {
+        await window.waitForTimeout(2000)
+        await basePage.jumpPage('downloadingStatus')
+      }
       await homePage.searchBtn.click({ force: true })
       await window.waitForTimeout(2000)
       // 等待任务卡片加载
-      if (!await homePage.getCard(btDate.btName).isVisible()) {
+      if (!await homePage.getCard(bt.btName).isVisible()) {
         await window.waitForTimeout(2000)
       }
       // download bbb_sunflower_1080p_30fps_normal.mp4 下载中状态多等一会
-      if (btDate.btName === 'bbb_sunflower_1080p_30fps_normal.mp4' && btDate.isStreaming === 0) {
+      if ((bt.btName === 'bbb_sunflower_1080p_30fps_normal.mp4' || bt.btName === 'sintel.mp4') && bt.isStreaming === 0) {
         let waitTime = 0
-        // await window.reload()
         while (1) {
-          if (!await homePage.getCard(btDate.btName).isVisible()) {
+          if (!await homePage.getCard(bt.btName).isVisible()) {
             waitTime += 3
           } else break
           if (waitTime >= 15) break
@@ -201,34 +284,34 @@ test.describe('download ', () => {
         }
       }
       // 判断 任务 在downloading状态
-      if (await homePage.getCard(btDate.btName).isVisible()) {
+      if (await homePage.getCard(bt.btName).isVisible()) {
         // 等待下载完成
-        const DownloadStatus = await (await homePage.getCardEle(btDate.btName, 'statusText')).innerText()
+        const DownloadStatus = await (await homePage.getCardEle(bt.btName, 'statusText')).innerText()
         //  判断 文件存在，下载完成
-        if (DownloadStatus === 'Status: Paused') await homePage.getCardEle(btDate.btName, 'resumeBtn').click()
+        if (DownloadStatus === 'Status: Paused') await homePage.getCardEle(bt.btName, 'resumeBtn').click()
         try {
-          await homePage.getCardEle(btDate.btName, 'statusText', 'Downloading').click({ timeout: 60000 })
+          await homePage.getCardEle(bt.btName, 'statusText', 'Downloading').click({ timeout: 60000 })
         } catch (error) {
           await basePage.jumpPage('uploadingStatus')
           await homePage.searchBtn.click({ force: true })
-          await homePage.getCardEle(btDate.btName, 'statusText', 'Seeding').click({ timeout: 30000 })
+          await homePage.getCardEle(bt.btName, 'statusText', 'Seeding').click({ timeout: 30000 })
         }
       } else {
         // 判断 任务 在seeding状态
         await basePage.jumpPage('uploadingStatus')
         await homePage.searchBtn.click({ force: true })
         await window.waitForTimeout(1000)
-        if (!await homePage.getCard(btDate.btName).isVisible()) {
+        if (!await homePage.getCard(bt.btName).isVisible()) {
           // 任务不存在  bt未开始下载
           await basePage.jumpPage('downloadingStatus')
           await homePage.searchBtn.click({ force: true })
-          await homePage.downloadTorrent(btDate.magnetLink)
+          await homePage.downloadTorrent(bt.magnetLink)
           try {
-            await window.click('text=' + btDate.btName, { timeout: 20000 })
+            await window.click('text=' + bt.btName, { timeout: 20000 })
             // 等待 任务 加载 验证， 判断任务是 下载中
             let time
-            btDate.btName.includes('uTorrent') ? time = 15000 : time = 60000
-            await homePage.getCardEle(btDate.btName, 'statusText', 'Downloading').click({ timeout: time })
+            bt.btName.includes('uTorrent') ? time = 15000 : time = 60000
+            await homePage.getCardEle(bt.btName, 'statusText', 'Downloading').click({ timeout: time })
           } catch (error) {
             console.log('The seed download is complete')
           }
@@ -236,33 +319,33 @@ test.describe('download ', () => {
       }
 
       // 等待下载完成
-      if (await homePage.getCardEle(btDate.btName, 'statusText').isVisible()) {
-        const btStatus = await (await homePage.getCardEle(btDate.btName, 'statusText')).innerText()
+      if (await homePage.getCardEle(bt.btName, 'statusText').isVisible()) {
+        const btStatus = await (await homePage.getCardEle(bt.btName, 'statusText')).innerText()
         if (btStatus === 'Status: Downloading') {
-          const progressBar = await homePage.getCardEle(btDate.btName, 'processText')
+          const progressBar = await homePage.getCardEle(bt.btName, 'processText')
           let oldProgress = parseFloat(/\d{1,3}.\d{0,2}/.exec(await progressBar.innerText()))
           let timestamp = 0
           // wait download
           while (1) {
-            if (!await homePage.getCard(btDate.btName).isVisible()) break
-            const DownloadStatus = await (await homePage.getCardEle(btDate.btName, 'statusText')).innerText()
+            if (!await homePage.getCard(bt.btName).isVisible()) break
+            const DownloadStatus = await (await homePage.getCardEle(bt.btName, 'statusText')).innerText()
             // console.log('DownloadStatus:' + DownloadStatus)
             if (DownloadStatus !== 'Status: Downloading') {
               break
             }
-            const progressBar = await homePage.getCardEle(btDate.btName, 'processText')
+            const progressBar = await homePage.getCardEle(bt.btName, 'processText')
             const progressPercentage = parseFloat(/\d{1,3}.\d{0,2}/.exec(await progressBar.innerText()))
             // console.log('progressPercentage:' + progressPercentage)
             if (oldProgress === progressPercentage) {
               if (timestamp >= 40) {
-                await window.screenshot({ path: `${ScreenshotsPath}${btDate.btName}-download-fail.png` })
+                await window.screenshot({ path: `${ScreenshotsPath}${bt.btName}-download-fail.png` })
                 break
               }
               timestamp += 5
             } else if (oldProgress < progressPercentage) timestamp = 0
 
             oldProgress = progressPercentage
-            if (btDate.isStreaming) {
+            if (bt.isStreaming) {
               if (progressPercentage > 20) break
             }
             if (progressPercentage === 100) break
@@ -272,22 +355,21 @@ test.describe('download ', () => {
           }
         }
       }
-      if (btDate.isStreaming !== 1) {
+      if (bt.isStreaming !== 1) {
         await basePage.jumpPage('uploadingStatus')
         await homePage.searchBtn.click({ force: true })
       }
       // 点击 Play 按钮
-      await homePage.getCardEle(btDate.btName, 'playBtn').click()
+      await homePage.getCardEle(bt.btName, 'playBtn').click()
       // 点击播放列表的第一个文件，跳转到player页面
       await homePage.firstFileBtn.click()
 
       // should video can play
       await playerPage.controlBar.waitFor({ timeout: 40000 })
-      // await window.reload()
       // 是否删除种子
-      if (btDate.isDelete) {
+      if (bt.isDelete) {
         await basePage.jumpPage('uploadingStatus')
-        await homePage.getCardEle(btDate.btName, 'deleteBtn').click()
+        await homePage.getCardEle(bt.btName, 'deleteBtn').click()
         await homePage.deleteFileChk.click()
         await homePage.deleteBtn.click()
       }
@@ -297,6 +379,7 @@ test.describe('download ', () => {
 test.describe('task', () => {
   test.beforeEach(async ({ }, testInfo) => {
     if (process.platform === 'darwin') test.setTimeout(60000 * 5)
+    else test.setTimeout(60000 * 3)
     await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
     await window.waitForLoadState()
     await window.waitForTimeout(1000)
@@ -318,7 +401,6 @@ test.describe('task', () => {
         await homePage.getCard(bt.btName).waitFor({ timeout: 20000 })
       }
     }
-    console.log('task beforeEach end!')
   })
   test('card mode task list', async () => {
     await window.screenshot({ path: `${ScreenshotsPath}card-mode-taskStatus.png` })
@@ -386,13 +468,22 @@ test.describe('task', () => {
     await playerPage.controlBar.waitFor({ timeout: 10000 })
     await basePage.jumpPage('uploadingStatus')
     await window.waitForTimeout(1000)
+    await window.locator(`text=${btData[0].btName}`).click({ clickCount: 2 })
+    // should video can play
+    await playerPage.controlBar.waitFor({ timeout: 10000 })
+    await basePage.jumpPage('uploadingStatus')
+    await window.waitForTimeout(1000)
+    await window.locator(`text=${btData[2].btName}`).click({ clickCount: 2 })
+    // should video can play
+    await playerPage.controlBar.waitFor({ timeout: 10000 })
+    await basePage.jumpPage('uploadingStatus')
+    await window.waitForTimeout(1000)
     // 文件大小
     const fileSize = await homePage.getListEle(btData[1].btName, 'fileSize').innerText()
     // expect(fileSize).toBe('56.07 MB')
     expect(/\d+\.\d+\s(MB|GB)/.test(fileSize)).toBe(true)
     // 完成时间格式 hh:mm:ss格式 非当日任务显示yesterday或yy-mm-dd格式
-    const time = await homePage.getListEle(btData[1].btName, 'completedTime').innerText()
-    expect(/(\d{1,2}:\d{1,2}:\d{1,2}|Yesterday|\d{1,2}-\d{1,2}-\d{1,2})/.test(time)).toBe(true)
+    expect(await homePage.getListEle(btData[1].btName, 'completedTime')).toHaveText(/(\d{1,2}:\d{1,2}:\d{1,2}|Yesterday|\d{1,2}-\d{1,2}-\d{1,2})/)
     // 上传速度: (上传中) 单位KB/s或MB/s
     const uploadSpeed = await homePage.getListEle(btData[1].btName, 'uploadSpeed').innerText()
     // console.log('uploadSpeed:' + uploadSpeed)
@@ -422,7 +513,57 @@ test.describe('task', () => {
     await window.waitForTimeout(1000)
     await homePage.copyUrlBtn.click()
     await homePage.copySuccessAlert.waitFor('visible')
+    await basePage.waitForAllHidden(await homePage.copySuccessAlert)
+    await basePage.headerTitle.click({ force: true })
+    // 验证app协议链接
+    if (process.platform !== 'darwin') {
+      await window.keyboard.press(`${basePage.modifier}+KeyV`)
+      const protocolRegExp = new RegExp(`${app.protocol}:\/\/`)
+      const shortProtocolRegExp = new RegExp(`${app.shortProtocol}:\/\/`)
+      expect(await homePage.magnetTarea).toHaveValue(protocolRegExp)
+      await homePage.cardCancelBtn.click()
+
+      await basePage.jumpPage('downloadingStatus')
+      await homePage.downloadBtn.click()
+      expect(await homePage.magnetTarea).toHaveValue(protocolRegExp)
+      await homePage.cardCancelBtn.click()
+      await basePage.jumpPage('uploadingStatus')
+      await window.waitForTimeout(1000)
+      // 验证分享短链接
+      await moreIcon.click()
+      await homePage.moreCard.waitFor()
+      await window.waitForTimeout(1000)
+      await homePage.copyShareUrlBtn.click()
+      await homePage.copySuccessAlert.waitFor('visible')
+      await basePage.headerTitle.click({ force: true })
+      await window.keyboard.press(`${basePage.modifier}+KeyV`)
+      expect(await homePage.magnetTarea).toHaveValue(shortProtocolRegExp)
+      await homePage.cardCancelBtn.click()
+
+      await basePage.jumpPage('downloadingStatus')
+      await homePage.downloadBtn.click()
+      expect(await homePage.magnetTarea).toHaveValue(shortProtocolRegExp)
+
+      // 验证magnet链接
+      await homePage.magnetTarea.fill('magnet:?xt=urn:btih:61b3b8856c4839edf51f5c2346599b6bec524145')
+      // 复制磁链
+      await window.focus('.q-card >> textarea')
+      await window.keyboard.press(`${basePage.modifier}+KeyA`)
+      await window.keyboard.press(`${basePage.modifier}+KeyC`)
+      await homePage.cardCancelBtn.click()
+      await window.keyboard.press(`${basePage.modifier}+KeyV`)
+      expect(await homePage.magnetTarea).toHaveValue(/magnet:\?/)
+      await homePage.cardCancelBtn.click()
+      await homePage.downloadBtn.click()
+      expect(await homePage.magnetTarea).toHaveValue(/magnet:\?/)
+      await homePage.cardCancelBtn.click()
+
+      await basePage.jumpPage('uploadingStatus')
+      await window.waitForTimeout(1000)
+    }
     // "更多"功能检查文件路径
+    await moreIcon.click()
+    await homePage.moreCard.waitFor()
     const filePathElement = await homePage.fileTreeBtn
     // 检查文件夹树状结构
     if (process.platform === 'darwin') await window.waitForTimeout(5000)
@@ -447,16 +588,6 @@ test.describe('task', () => {
     await theWoredCD.waitFor('hidden')
     await basePage.jumpPage('uploadingStatus')
     await theWoredCD.waitFor('visible')
-    // // // 验证magnet被复制到剪贴板
-    // await basePage.jumpPage('downloadingStatus')
-    // await homePage.downloadBtn.click()
-    // await window.waitForTimeout(1000)
-    // const magnetText = await window.locator('//*[@aria-label="Download directory position"]/preceding::*[1]').inputValue()
-    // // console.log('magnetText:' + magnetText)
-    // expect(/alphabiz:\/\//.test(magnetText)).toBe(true)
-    // await window.click('button:has-text("Cancel")')
-    // await window.waitForTimeout(5000)
-    // await window.reload()
   })
   test('pause all', async () => {
     for (const bt of btData) {
@@ -464,14 +595,14 @@ test.describe('task', () => {
     }
     await window.waitForTimeout(2000)
     await homePage.upPauseAllBtn.click()
-    await homePage.waitForAllHidden(await homePage.allCard, 60000)
+    await basePage.waitForAllHidden(await homePage.allCard, 60000)
     await basePage.jumpPage('downloadedStatus')
     for (const bt of btData) {
       await homePage.getCard(bt.btName).waitFor('visible')
     }
     await window.waitForTimeout(2000)
     await homePage.uploadAllBtn.click()
-    await homePage.waitForAllHidden(await homePage.allCard, 60000)
+    await basePage.waitForAllHidden(await homePage.allCard, 60000)
     await basePage.jumpPage('uploadingStatus')
     for (const bt of btData) {
       await homePage.getCard(bt.btName).waitFor('visible')
@@ -480,9 +611,10 @@ test.describe('task', () => {
   test('search task', async () => {
     await basePage.headerTitle.click()
     await homePage.searchBtn.click()
-    await homePage.searchInput.fill('sunflower')
+    await homePage.searchInput.fill('bbb')
     await window.waitForTimeout(1000)
-    await expect(homePage.getCard('bbb_sunflower_1080p')).toBeVisible()
+    // await expect(homePage.getCard('bbb_sunflower_1080p')).toBeVisible()
+    await expect(homePage.getCard('bbb')).toBeVisible()
     await expect(homePage.getCard('uTorrent Web')).toBeHidden()
     await expect(homePage.getCard('The WIRED CD')).toBeHidden()
     await homePage.searchCloseBtn.click()
@@ -500,19 +632,34 @@ test.describe('task', () => {
     const btName = [
       'uTorrent Web Tutorial Video',
       'The WIRED CD - Rip. Sample. Mash. Share',
+      // 'sintel.mp4'
       'bbb_sunflower_1080p_30fps_normal.mp4'
     ]
     for (const bt of btName) {
-      await homePage.getCardEle(bt, 'deleteBtn').click()
-      await homePage.deleteFileChk.click()
-      await homePage.deleteBtn.click()
-      await window.waitForTimeout(1000)
-      await expect(homePage.getCard(bt)).toBeHidden()
+      if (await homePage.getCard(bt).isVisible()) {
+        await homePage.getCardEle(bt, 'deleteBtn').click()
+        await homePage.deleteFileChk.click()
+        await homePage.deleteBtn.click()
+        await homePage.getCard(bt).waitFor({ state: 'hidden', timeout: 30000 })
+        // await expect(await homePage.getCard(bt)).toBeHidden()
+      } else {
+        console.log('[' + bt + '] task has been deleted')
+      }
     }
   })
 })
 
 test.describe('upload', () => {
+  test('open upload card', async () => {
+    await window.waitForTimeout(3000)
+    await basePage.jumpPage('uploadingStatus')
+    await window.waitForTimeout(2000)
+    await homePage.searchBtn.click({ force: true })
+    await homePage.uploadBtn.click()
+    await homePage.uploadCard.waitFor()
+    await homePage.ucCancelBtn.click()
+    expect(await homePage.uploadCard).toHaveCount(0)
+  })
   test.skip('test1', async () => {
     test.setTimeout(60000 * 15)
     const btName = 'ChinaCup.1080p.H264.AAC.mp4'
@@ -564,20 +711,6 @@ test.describe('upload', () => {
 })
 
 test.describe('account', () => {
-  // const userInfo = [
-  //   {
-  //     nikename: 'test1',
-  //     username: process.env.TEST1_EMAIL
-  //   },
-  //   {
-  //     nikename: 'test2',
-  //     username: process.env.EMAIL_USERNAME
-  //   },
-  //   {
-  //     nikename: 'test3',
-  //     username: '+86' + process.env.TEST3_PHONE_NUMBER
-  //   }
-  // ]
   test('transfer - check bill details', async () => {
     test.setTimeout(60000 * 5)
     // 转账人账号、密码
@@ -600,6 +733,7 @@ test.describe('account', () => {
     // 登录收款人账号
     await basePage.signIn(payee, payeePassword, 1)
     await basePage.jumpPage('creditsLink')
+    await creditsPage.creditsText.click({ force: true })
     // await window.waitForTimeout(10000)
     // 获取收款人id
     const payeeID = await creditsPage.getID()
@@ -613,6 +747,7 @@ test.describe('account', () => {
     // 登录付款人账号
     await basePage.signIn(transferee, transfereePassword, 1)
     await basePage.jumpPage('creditsLink')
+    await creditsPage.creditsText.click({ force: true })
     // await window.waitForTimeout(10000)
     // 获取转账人id
     const transfereeID = await creditsPage.getID()
@@ -633,16 +768,16 @@ test.describe('account', () => {
     expect(await creditsPage.creditsText.innerText()).toBe(calculation('reduce', transfereePoint, transferAmount).toString())
     // 退出付款人账号
     await basePage.signOut()
-    // await window.waitForTimeout(1000)
-    // // 登录收款人账号
-    // await basePage.signIn(payee, payeePassword, 1)
-    // await basePage.jumpPage('creditsLink')
-    // await window.waitForTimeout(2000)
-    // // 查看账单
-    // await creditsPage.checkBillDetail(transfereeID, 'Transfer', '+' + transferAmount, 'finish')
-    // // 断言积分变化是否正确
-    // expect(await creditsPage.creditsText.innerText()).toBe(payeeAfterPoint.toString())
-    // await basePage.signOut()
-    // await window.waitForTimeout(1000)
+    await window.waitForTimeout(1000)
+    // 登录收款人账号
+    await basePage.signIn(payee, payeePassword, 1)
+    await basePage.jumpPage('creditsLink')
+    await window.waitForTimeout(2000)
+    // 查看账单
+    await creditsPage.checkBillDetail([transfereeID, 'Transfer', transferAmount.toString(), 'finish'], 'income')
+    // 断言积分变化是否正确
+    expect(await creditsPage.creditsText.innerText()).toBe(payeeAfterPoint.toString())
+    await basePage.signOut()
+    await window.waitForTimeout(1000)
   })
 })
