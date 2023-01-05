@@ -75,12 +75,12 @@ const deleteVersionJSON = async () => {
 
 if (process.argv.includes('--pre')) {
   console.log('run copy-patch.js --pre')
-  copyVersionJSON()
+  if (process.platform !== 'darwin') copyVersionJSON()
   copyModule()
   copyDeveloper()
 } else if (process.argv.includes('--post')) {
   console.log('run copy-patch.js --post')
-  deleteVersionJSON()
+  if (process.platform === 'darwin') deleteVersionJSON()
   const dest = path.resolve(__dirname, 'build/electron/UnPackaged/node_modules/developer')
   const dest2 = path.resolve(__dirname, 'build/electron/UnPackaged/developer')
   if (fs.existsSync(dest)) {
