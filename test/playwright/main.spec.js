@@ -77,6 +77,8 @@ const btData = [
   }
 ]
 test.beforeAll(async () => {
+  // Set timeout for this hook.
+  test.setTimeout(90000)
   // Launch Electron app.
   electronApp = await electron.launch({
     args: [
@@ -155,11 +157,7 @@ test.describe('play video', () => {
     // should video can play
     const progressControl = await playerPage.controlBar
     await expect(progressControl).toBeVisible({ timeout: 30000 })
-    try {
-      await playerPage.playing.waitFor({ timeout: 10000 })
-    } catch (e) {
-      await playerPage.paused.waitFor({ timeout: 10000 })
-    }
+    await expect(await playerPage.bigPlayBtn).not.toBeVisible({ timeout: 30000 })
   })
   test('BluRay_mkv_type', async () => {
     const media = './test/cypress/fixtures/samples/Test-Sample-Tenet.2020.IMAX.2160p.UHD.BluRay.x265.10bit.HDR.DTS-HD.MA.5.1202111171122322.mkv'
@@ -169,11 +167,7 @@ test.describe('play video', () => {
     // should video can play
     const progressControl = await playerPage.controlBar
     await expect(progressControl).toBeVisible({ timeout: 30000 })
-    try {
-      await playerPage.playing.waitFor({ timeout: 10000 })
-    } catch (e) {
-      await playerPage.paused.waitFor({ timeout: 10000 })
-    }
+    await expect(await playerPage.bigPlayBtn).not.toBeVisible({ timeout: 30000 })
   })
 })
 
@@ -225,18 +219,18 @@ test.describe('save Language', () => {
       if (process.platform === 'darwin') {
         test.skip()
       }
+      //确保语言en
+      await basePage.clearLocalstorage()
+      await window.waitForTimeout(3000)
+      await basePage.quickSaveLanguage('EN')
       await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
       await window.waitForLoadState()
     })
-    test('CN', async () => {
+    test('EN -> CN -> TW -> EN', async () => {
       await basicPage.saveLanguage('EN', 'CN')
       await expect(await basicPage.headerTitle).toHaveText(/基础设置/, { timeout: 20000 })
-    })
-    test('TW', async () => {
       await basicPage.saveLanguage('CN', 'TW')
       await expect(await basicPage.headerTitle).toHaveText(/基礎設置/, { timeout: 20000 })
-    })
-    test('EN', async () => {
       await basicPage.saveLanguage('TW', 'EN')
       await expect(await basicPage.headerTitle).toHaveText(/Basic/, { timeout: 20000 })
     })
@@ -384,10 +378,6 @@ test.describe('task', () => {
     await window.waitForLoadState()
     await window.waitForTimeout(1000)
     await basePage.jumpPage('downloadedStatus')
-    await homePage.uploadAllBtn.click()
-    await window.waitForLoadState()
-    await window.waitForTimeout(1000)
-    await basePage.jumpPage('uploadingStatus')
     await homePage.searchBtn.click({ force: true })
     // 确保切换到卡片模式
     const cardMode = await homePage.toggleCardModeBtn
@@ -396,6 +386,11 @@ test.describe('task', () => {
     }
     await window.waitForLoadState()
     await window.waitForTimeout(2000)
+    await homePage.uploadAllBtn.click()
+    await window.waitForLoadState()
+    await window.waitForTimeout(2000)
+    await basePage.jumpPage('uploadingStatus')
+    await homePage.searchBtn.click({ force: true })
     if (!testInfo.title.includes('delete')) {
       for (const bt of btData) {
         await homePage.getCard(bt.btName).waitFor({ timeout: 20000 })
@@ -551,9 +546,13 @@ test.describe('task', () => {
       await window.keyboard.press(`${basePage.modifier}+KeyA`)
       await window.keyboard.press(`${basePage.modifier}+KeyC`)
       await homePage.cardCancelBtn.click()
+      expect(await homePage.magnetTarea).toHaveCount(0, { timeout: 30000 })
+      await window.waitForTimeout(2000)
       await window.keyboard.press(`${basePage.modifier}+KeyV`)
       expect(await homePage.magnetTarea).toHaveValue(/magnet:\?/)
       await homePage.cardCancelBtn.click()
+      expect(await homePage.magnetTarea).toHaveCount(0, { timeout: 30000 })
+      await window.waitForTimeout(2000)
       await homePage.downloadBtn.click()
       expect(await homePage.magnetTarea).toHaveValue(/magnet:\?/)
       await homePage.cardCancelBtn.click()

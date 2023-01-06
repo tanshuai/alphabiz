@@ -162,7 +162,7 @@ class BasePage {
     else if (targetLanguage === 'CN') language = '简体中文'
     else if (targetLanguage === 'TW') language = '繁體中文'
     await this.languageBtn.click()
-    await this.page.locator(`text=${language}`).click()
+    await this.page.locator(`.q-item:has-text("${language}")`).click()
   }
 
   async signIn (username, password, isWaitAlert, isSetToken = true) {
@@ -180,6 +180,13 @@ class BasePage {
       await this.alert.waitFor({ timeout: 90000 })
       const alertText = await this.alert.innerText()
       console.log('alert: [ ', alertText, ' ]')
+      if (alertText.includes('ReCAPTCHA validation failed')) {
+        await this.waitForAllHidden(await this.alert)
+        await this.signInBtn.click()
+        await this.alert.waitFor({ timeout: 90000 })
+        const alertText = await this.alert.innerText()
+        console.log('alert: [ ', alertText, ' ]')
+      }
       await this.signInAlert.waitFor()
       // if (isSetToken) await this.waitLoadingLibKey()
     }
