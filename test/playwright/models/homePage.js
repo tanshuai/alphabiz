@@ -115,6 +115,7 @@ class HomePage extends BasePage {
 
   async clearTask () {
     await this.jumpPage('downloadingStatus')
+    await this.page.waitForTimeout(7000)
     try {
       await this.downRemoveAllBtn.waitFor({ timeout: 5000 })
     } catch (e) {

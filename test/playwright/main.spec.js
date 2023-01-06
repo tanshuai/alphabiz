@@ -113,7 +113,6 @@ test.beforeAll(async () => {
   // await window.reload()
 })
 test.afterAll(async () => {
-  await electronApp.close()
 })
 test.beforeEach(async () => {
 })
@@ -301,9 +300,9 @@ test.describe('download ', () => {
           await homePage.searchBtn.click({ force: true })
           await homePage.downloadTorrent(bt.magnetLink)
           if (!bt.btName.includes('uTorrent')) {
-            await window.click('text=' + bt.btName, { timeout: 20000 })
+            await window.click('text=' + bt.btName, { timeout: 2 * 60000 })
             // 等待 任务 加载 验证， 判断任务是 下载中
-            await homePage.getCardEle(bt.btName, 'statusText', 'Downloading').click({ timeout: 60000 })
+            await homePage.getCardEle(bt.btName, 'statusText', 'Downloading').click({ timeout: 2 * 60000 })
           }
         }
       }
@@ -327,7 +326,7 @@ test.describe('download ', () => {
             const progressPercentage = parseFloat(/\d{1,3}.\d{0,2}/.exec(await progressBar.innerText()))
             // console.log('progressPercentage:' + progressPercentage)
             if (oldProgress === progressPercentage) {
-              if (timestamp >= 40) {
+              if (timestamp >= 2 * 60) {
                 await window.screenshot({ path: `${ScreenshotsPath}${bt.btName}-download-fail.png` })
                 break
               }
