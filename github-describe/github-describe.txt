@@ -1,9 +1,18 @@
-add UrlConvert
-fix build errors for bittorrent-tracker
-adjust wait time
-fix task list test
-remove test logs
-synchronize test code
-fix: ab:// url not converted
-fix credit precision
-add network checking functions #173
+support paydata cancel
+ui adjustment
+#249 hide left drawer task count
+fix #249
+Try to prioritize support for IPv6 connection
+use table-based peer info
+fix init status
+Restore client name to original WebTorrent
+TBD: add our client name to
+https://github.com/webtorrent/bittorrent-peerid/blob/master/index.js
+fix test
+Huge Improvement for Transfer Speed by support Implement Protocol Encryption (PE/MSE)
+Fix #193
+fix task list test error 、phone account test
+rerty account test workflow
+retry account test
+peer table update
+add network diagnotic panel #173
