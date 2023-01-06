@@ -109,7 +109,6 @@ jobs:
       - name: Get message
         id: vars
         run: |
-          git fetch --prune --unshallow
           echo "::set-output name=date::$(TZ=UTC-8 git log -1 --date=format-local:"%Y%m%d%H%M" --format="%cd")"
           echo "::set-output name=event-name::${{ github.event_name }}"
           echo "::set-output name=download-tag::$(git describe --tags --abbrev=0)"
