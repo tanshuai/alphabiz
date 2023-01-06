@@ -63,6 +63,28 @@ jobs:
         id: slug
         run: |
           echo "::set-output name=sha7::${GITHUB_SHA::7}"
+          DISPLAYNAME=$(cat developer/app.js | perl -wnE"say for /(?<=displayName\:\s)\'?.*\'?(?=,)/gm")
+          APPNAME=$(cat developer/app.js | perl -wnE"say for /(?<=const\sAPP\s=\s\')[a-zA-Z]+/gm")
+          FILENAME=$(cat developer/app.js | perl -wnE"say for /(?<=fileName\:\s)\'?.*\'?(?=,)/gm")
+          echo ${APPNAME}
+          echo ${DISPLAYNAME}
+          echo ${FILENAME}
+          echo "::set-output name=app-name::$(echo ${APPNAME})"
+          echo "::set-output name=app-name-lower::$(echo ${APPNAME} | tr '[:upper:]' '[:lower:]')"
+          if [[ ${DISPLAYNAME} = "APP" ]] ; \
+          then  echo "::set-output name=display-name::$(echo ${APPNAME})" ; \
+                echo "::set-output name=display-name-lower::$(echo ${APPNAME} | tr '[:upper:]' '[:lower:]')" ; \
+          else  DISPLAYNAME=$(echo ${DISPLAYNAME} | perl -wnE"say for /\w+/gm") ; \
+                echo "::set-output name=display-name::$(echo ${DISPLAYNAME})" ; \
+                echo "::set-output name=display-name-lower::$(echo ${DISPLAYNAME} | tr '[:upper:]' '[:lower:]')" ; \
+          fi
+          if [[ ${FILENAME} = "APP" ]] ; \
+          then  echo "::set-output name=file-name::$(echo ${APPNAME})" ; \
+                echo "::set-output name=file-name-lower::$(echo ${APPNAME} | tr '[:upper:]' '[:lower:]')" ; \
+          else  FILENAME=$(echo ${FILENAME} | perl -wnE"say for /\w+/gm") ; \
+                echo "::set-output name=file-name::$(echo ${FILENAME})" ; \
+                echo "::set-output name=file-name-lower::$(echo ${FILENAME} | tr '[:upper:]' '[:lower:]')" ; \
+          fi
         shell: bash
 
       - name: Checkout ${{ steps.slug.outputs.sha7 }} ⬇️
@@ -85,13 +107,13 @@ jobs:
           echo "::set-output name=download-tag::$(git describe --tags --abbrev=0)"
           if [[ ${{ matrix.os }} = "ubuntu-latest" ]] ; \
           then echo "::set-output name=system::ubuntu" ; \
-               echo "::set-output name=package::Alphabiz-linux-x64" ; \
+                echo "::set-output name=package::${{ steps.slug.outputs.display-name }}-linux-x64" ; \
           elif [[ ${{ matrix.os }} = "macos-latest" ]] ; \
           then echo "::set-output name=system::macos" ; \
-               echo "::set-output name=package::Alphabiz-darwin-x64" ; \
+                echo "::set-output name=package::${{ steps.slug.outputs.display-name }}-darwin-x64" ; \
           elif [[ ${{ matrix.os }} = "windows-latest" ]] ; \
           then echo "::set-output name=system::windows" ; \
-               echo "::set-output name=package::Alphabiz-win32-x64" ; \
+                echo "::set-output name=package::${{ steps.slug.outputs.display-name }}-win32-x64" ; \
           fi
           export COMMIT_HEAD=$(git log -1 --pretty=%B | perl -wnE'say for /^\w+/gm')
           if [[ "$COMMIT_HEAD" = "Merge" ]] ; \
@@ -268,7 +290,9 @@ jobs:
 
       #后面的step晚上运行 或 正式发布
       - name: Get recommends from github
-        if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
+        if: |
+          (contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json'))
+          && steps.slug.outputs.app-name == 'Alphabiz'
         run: |
           curl -H 'Authorization: token ${{ secrets.PAT }}' \
           -L https://raw.githubusercontent.com/tanshuai/alphabiz-app/main/test-secret/recommends.txt \
@@ -288,29 +312,27 @@ jobs:
           yarn packager
         shell: bash
 
-      - name: Package for ${{ matrix.os }}-${{ steps.unify.outputs.package-name }} Release 🗜️
+      - name: Package for ${{ steps.vars.outputs.system }}-${{ steps.unify.outputs.tag-name }} Release 🗜️
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
-        run: 7z a -t7z -mx=9 alphabiz-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }}.7z ./build/electron/${{ steps.vars.outputs.package }}
+        run: 7z a -t7z -mx=9 "./out/installers/${{ steps.unify.outputs.tag-name }}/${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }}.7z" "./dist/electron/${{ steps.vars.outputs.package }}"
 
       - name: Pack app 📦
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
           export PATH=$PATH:/c/Program\ Files\ \(x86\)/WiX\ Toolset\ v3.11/bin
-          export BUILD_VERSION=${{ steps.unify.outputs.tag-name }}
           yarn make
         shell: bash
 
-      - name: Release alphabiz-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }}.7z to GitHub 📰
+      - name: Release ${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }} to GitHub 📰
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         uses: softprops/action-gh-release@v1
         with:
           prerelease: true
-          name: alphabiz-${{ steps.unify.outputs.release-name }}
+          name: ${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.release-name }}
           tag_name: ${{ steps.unify.outputs.tag-name }}
           body: ${{ env.DESCRIBE }}
           files: |
-            alphabiz-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }}.7z
-            ./out/installers/${{ steps.unify.outputs.build-version }}/**
+            ./out/installers/${{ steps.unify.outputs.tag-name }}/**
 
       - name: public describe to Twitter
         if: contains(steps.vars.outputs.event-name, 'schedule') && matrix.os == 'ubuntu-latest'
