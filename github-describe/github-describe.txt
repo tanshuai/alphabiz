@@ -1,4 +1,11 @@
-unified versions url
-fix language test in windows
-fix push code workflow
-reduce e2e test refresh times
+fix: #855
+Fixed bug exiting app during installation when app display name has space
+#854
+#858
+#854
+adjust e2e test
+adjust download e2e test
+add download timeout in e2e test
+#851
+#851
+adjust step in internal workflow
