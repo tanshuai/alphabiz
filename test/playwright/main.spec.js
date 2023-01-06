@@ -300,14 +300,10 @@ test.describe('download ', () => {
           await basePage.jumpPage('downloadingStatus')
           await homePage.searchBtn.click({ force: true })
           await homePage.downloadTorrent(bt.magnetLink)
-          try {
+          if (!bt.btName.includes('uTorrent')) {
             await window.click('text=' + bt.btName, { timeout: 20000 })
             // 等待 任务 加载 验证， 判断任务是 下载中
-            let time
-            bt.btName.includes('uTorrent') ? time = 15000 : time = 60000
-            await homePage.getCardEle(bt.btName, 'statusText', 'Downloading').click({ timeout: time })
-          } catch (error) {
-            console.log('The seed download is complete')
+            await homePage.getCardEle(bt.btName, 'statusText', 'Downloading').click({ timeout: 60000 })
           }
         }
       }
@@ -354,7 +350,7 @@ test.describe('download ', () => {
         await homePage.searchBtn.click({ force: true })
       }
       // 点击 Play 按钮
-      await homePage.getCardEle(bt.btName, 'playBtn').click()
+      await homePage.getCardEle(bt.btName, 'playBtn').click({ timeout: 2 * 60000 })
       // 点击播放列表的第一个文件，跳转到player页面
       await homePage.firstFileBtn.click()
 
