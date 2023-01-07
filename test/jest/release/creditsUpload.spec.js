@@ -12,7 +12,7 @@ const { sleep } = require('../../utils/getCode')
 const { calculation } = require('../../utils/calculation')
 
 let client, homePage, accountPage, creditsPage, developmentPage
-jest.setTimeout(60000 * 10)
+jest.setTimeout(60000 * 15)
 
 describe('upload', () => {
   beforeEach(async () => {
@@ -32,23 +32,23 @@ describe('upload', () => {
     const uploadFilePath = path.resolve(__dirname, '../../cypress/fixtures/samples/ChinaCup.1080p.H264.AAC.mp4')
     const torrentName = 'ChinaCup.1080p.H264.AAC.mp4'
     // 判断是否已经登录
-    // await homePage.jumpPage('creditsLink')
-    // if (await client.$('//*[@Name="SIGN IN"]').isDisplayed()) {
-    //   // 未登录
-    //   await accountPage.signIn(process.env.TEST3_EMAIL, process.env.TEST_PASSWORD, 1)
-    // } else {
-    //   // 已登陆,等待拉取数据
-    //   // await client.$('//*[@Name="Settings"]').click()
-    //   if (!await homePage.settingsLink.isDisplayed()) {
-    //     await homePage.menuBtn.click()
-    //   }
-    //   await accountPage.accountSettingsTitle.waitForDisplayed({ timeout: 10000 })
-    // }
+    await homePage.jumpPage('creditsLink')
+    if (await client.$('//*[@Name="SIGN IN"]').isDisplayed()) {
+      // 未登录
+      await accountPage.signIn(process.env.TEST3_EMAIL, process.env.TEST_PASSWORD, 1)
+    } else {
+      // 已登陆,等待拉取数据
+      // await client.$('//*[@Name="Settings"]').click()
+      if (!await homePage.settingsLink.isDisplayed()) {
+        await homePage.menuBtn.click()
+      }
+      await accountPage.accountSettingsTitle.waitForDisplayed({ timeout: 10000 })
+    }
 
-    // // 查看初始积分
-    // await homePage.jumpPage('creditsLink')
-    // const initialCredit = await creditsPage.checkCredits()
-    // console.log('initialCredit:' + initialCredit)
+    // 查看初始积分
+    await homePage.jumpPage('creditsLink')
+    const initialCredit = await creditsPage.checkCredits()
+    console.log('initialCredit:' + initialCredit)
     // 判断是否已经上传
     await homePage.jumpPage('uploadingStatusTab')
     if (await homePage.getTask(torrentName) === null) {

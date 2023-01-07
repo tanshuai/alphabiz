@@ -13,7 +13,7 @@ const obj = require('./TestEnvironment')
 
 let client, homePage, accountPage, creditsPage, developmentPage
 const torrentName = 'ChinaCup.1080p.H264.AAC.mp4'
-jest.setTimeout(60000 * 10)
+jest.setTimeout(60000 * 15)
 
 describe('download', () => {
   beforeEach(async () => {
@@ -114,7 +114,7 @@ describe('download', () => {
         taskTitle.click()
 
         // 等待其他客户端上传bt种子
-        const taskPeers = await homePage.getTaskPeers(torrentName, 60000 * 5)
+        const taskPeers = await homePage.getTaskPeers(torrentName, 60000 * 10)
 
         // 使用开发版本的付费积分功能
         await homePage.downloadPaymentProd(taskPeers, 0)
