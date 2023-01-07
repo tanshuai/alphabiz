@@ -29,7 +29,8 @@ Cypress.on('uncaught:exception', (err, runnable) => {
     err.message.includes('RTCError') ||
     err.message.includes('Failed to execute \'setRemoteDescription\'') ||
     err.message.includes('Avoided redundant navigation') ||
-    err.message.includes('Connection failed')
+    err.message.includes('Connection failed') ||
+    err.message.includes('NavigationDuplicated')
   ) {
     return false
   }

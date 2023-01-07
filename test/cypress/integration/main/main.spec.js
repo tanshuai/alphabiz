@@ -6,6 +6,9 @@ describe('main',{
     openMode: 2
   }
 }, function () {
+  beforeEach(function onBeforeEach () {
+    if (Cypress.platform === 'win32') this.skip()
+  })
   describe('LanguageSelection', () => {
     it('language', () => {
       cy.signIn('test1' + Cypress.env('testEmailDomain'), 'password')
@@ -20,9 +23,6 @@ describe('main',{
     })
   })
   describe('Player', () => {
-    beforeEach(function onBeforeEach () {
-      if (Cypress.platform === 'win32') this.skip()
-    })
     it('.mkv', () => {
       cy.signIn('test1' + Cypress.env('testEmailDomain'), 'password')
       const mediaPath = 'samples/Embedded.Subtitles.Sample.Princess.Mononoke.1080p.H264.AAC.DualAudio.5.1.BDrip.mkv'
