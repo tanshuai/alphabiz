@@ -11,7 +11,7 @@ on:
   push:
     paths:
       - "**.js"
-      - "**/push.yml"
+      - "!**/push.yml"
       - "!public/**"
       - "!test/**"
       - "build/**"
@@ -246,16 +246,10 @@ jobs:
 
       - name: E2E Test for Electron 🧪
         if: "!contains(github.event.head_commit.message, 'skip e2e')"
-        uses: nick-fields/retry@v2
-        with:
-          timeout_seconds: 1200
-          max_attempts: 2
-          shell: bash
-          retry_on: error
-          command: |
-            export REPO=alphabiz
-            yarn test:e2e:electron
-            unset REPO
+        run: |
+          export REPO=alphabiz
+          yarn test:e2e:electron
+          unset REPO
 
       - name: E2E Test 🧪
         if: "!contains(github.event.head_commit.message, 'skip e2e')"
