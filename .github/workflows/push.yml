@@ -11,7 +11,7 @@ on:
   push:
     paths:
       - "**.js"
-      - "!**/push.yml"
+      - "**/push.yml"
       - "!public/**"
       - "!test/**"
       - "build/**"
@@ -250,6 +250,7 @@ jobs:
           export REPO=alphabiz
           yarn test:e2e:electron
           unset REPO
+        shell: bash
 
       - name: E2E Test 🧪
         if: "!contains(github.event.head_commit.message, 'skip e2e')"
