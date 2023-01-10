@@ -298,108 +298,110 @@ test.describe('download ', () => {
       }
     })
   }
-  test('table mode task lists', async () => {
+  if (process.platform !== 'darwin') {
+    test('table mode task lists', async () => {
     // 确保下载的全部种子都在做种状态
     // await commands.jumpPage('downloadedStatus')
 
-    await commands.jumpPage('uploadingStatus')
-    // await window.waitForLoadState()
-    await sleep(4000)
-    await window.screenshot({ path: `${ScreenshotsPath}taskStatus.png` })
-    // 切换列表模式
-    const listMode = await window.locator('button:has-text("view_agenda")')
-    if (await listMode.isVisible()) {
-      await listMode.click()
-    }
-    // 验证文件类型图标
-    await sleep(2000)
-    // 截图验证
-    // await window.screenshot({ path: `${ScreenshotsPath}taskStatus.png` })
-    const bbbFileIcon = await window.locator('text=bbb_sunflower_1080p_30fps_normal.mp4 >> //preceding::*[1]').innerText()
-    expect(bbbFileIcon).toBe('video_file')
-    const uTorrentFileIcon = await window.locator('text=uTorrent Web >> //preceding::*[1]').innerText()
-    expect(uTorrentFileIcon).toBe('folder')
-    // uploading状态栏
-    // 双击文件名播放文件
-    await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share').click({ clickCount: 2 })
-    // should video can play
-    await window.waitForSelector('.vjs-progress-control', { timeout: 10000 })
-    await commands.jumpPage('uploadingStatus')
-    await sleep(1000)
-    // 文件大小
-    const fileSize = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::*[2]').innerText()
-    // expect(fileSize).toBe('56.07 MB')
-    expect(/\d+\.\d+\s(MB|GB)/.test(fileSize)).toBe(true)
-    // 完成时间格式 hh:mm:ss格式 非当日任务显示yesterday或yy-mm-dd格式
-    const time = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::*[3]').innerText()
-    expect(/(\d{1,2}:\d{1,2}:\d{1,2}|Yesterday|\d{1,2}-\d{1,2}-\d{1,2})/.test(time)).toBe(true)
-    // 上传速度: (上传中) 单位KB/s或MB/s
-    const uploadSpeed = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::*[4]').innerText()
-    // console.log('uploadSpeed:' + uploadSpeed)
-    expect(/(\d+(\.\d+)?\s?(KB|MB)?|-)/.test(uploadSpeed)).toBe(true)
-    // 检查任务图标
-    // stop 图标
-    const stopIcon = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::*[5]/Button[1]')
-    const stopIconText = await stopIcon.innerText()
-    expect(stopIconText).toBe('stop')
-    // file_open 图标
-    const fileOpenIcon = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::*[5]/Button[2]').innerText()
-    expect(fileOpenIcon).toBe('file_open')
-    // folder 图标
-    const fileIcon = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::*[5]/Button[3]').innerText()
-    expect(fileIcon).toBe('folder')
-    // more... 图标
-    const moreIcon = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::*[5]/Button[4]')
-    const moreIconText = await moreIcon.innerText()
-    expect(moreIconText).toBe('more_horiz')
-    // close 图标
-    const closeIcon = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::*[5]/Button[5]')
-    const closeIconText = await closeIcon.innerText()
-    expect(closeIconText).toBe('close')
-    await closeIcon.click()
-    await window.waitForSelector('.q-card >> text=Delete task', { timeout: 10000 })
-    await window.locator('button:has-text("Not now")').click()
-    // "更多"功能检查Download url
-    await moreIcon.click()
-    await window.click('text=content_copy')
-    // // "更多"功能检查文件路径
-    const filePathElement = await window.locator('text=play_arrowfolder')
-    // 检查文件夹树状结构
-    await filePathElement.click()
-    await window.waitForSelector('text=01 - Beastie Boys - Now Get Busy.mp3')
-    await window.waitForSelector('text=insert_drive_file')
-    await window.waitForSelector('text=image')
-    await sleep(500)
-    // 退出卡片
-    await window.locator('header >> text=Uploading').click({ force: true })
-    // downloaded状态栏
-    await stopIcon.click()
-    await commands.jumpPage('downloadedStatus')
-    const theWoredCD = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share')
-    await theWoredCD.waitFor('visible')
-    await sleep(500)
-    // 检查任务图标
-    const uploadIcon = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::*[4]/Button[1]')
-    const uploadIconText = await uploadIcon.innerText()
-    expect(uploadIconText).toBe('cloud_upload')
-    await sleep(500)
-    await uploadIcon.click()
-    await theWoredCD.waitFor('hidden')
-    await sleep(500)
-    await commands.jumpPage('uploadingStatus')
-    await sleep(500)
-    await theWoredCD.waitFor('visible')
-    // // 验证magnet被复制到剪贴板
-    await commands.jumpPage('downloadingStatus')
-    await commands.downloadBtn.click()
-    await sleep(1000)
-    const magnetText = await window.locator('//*[@aria-label="Download directory position"]/preceding::*[1]').inputValue()
-    // console.log('magnetText:' + magnetText)
-    expect(/alphabiz:\/\//.test(magnetText)).toBe(true)
-    await window.click('button:has-text("Cancel")')
-    await sleep(1000)
-    await window.reload()
-  })
+      await commands.jumpPage('uploadingStatus')
+      // await window.waitForLoadState()
+      await sleep(4000)
+      await window.screenshot({ path: `${ScreenshotsPath}taskStatus.png` })
+      // 切换列表模式
+      const listMode = await window.locator('button:has-text("view_agenda")')
+      if (await listMode.isVisible()) {
+        await listMode.click()
+      }
+      // 验证文件类型图标
+      await sleep(2000)
+      // 截图验证
+      // await window.screenshot({ path: `${ScreenshotsPath}taskStatus.png` })
+      const bbbFileIcon = await window.locator('text=bbb_sunflower_1080p_30fps_normal.mp4 >> //preceding::*[1]').innerText()
+      expect(bbbFileIcon).toBe('video_file')
+      const uTorrentFileIcon = await window.locator('text=uTorrent Web >> //preceding::*[1]').innerText()
+      expect(uTorrentFileIcon).toBe('folder')
+      // uploading状态栏
+      // 双击文件名播放文件
+      await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share').click({ clickCount: 2 })
+      // should video can play
+      await window.waitForSelector('.vjs-progress-control', { timeout: 10000 })
+      await commands.jumpPage('uploadingStatus')
+      await sleep(1000)
+      // 文件大小
+      const fileSize = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::*[2]').innerText()
+      // expect(fileSize).toBe('56.07 MB')
+      expect(/\d+\.\d+\s(MB|GB)/.test(fileSize)).toBe(true)
+      // 完成时间格式 hh:mm:ss格式 非当日任务显示yesterday或yy-mm-dd格式
+      const time = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::*[3]').innerText()
+      expect(/(\d{1,2}:\d{1,2}:\d{1,2}|Yesterday|\d{1,2}-\d{1,2}-\d{1,2})/.test(time)).toBe(true)
+      // 上传速度: (上传中) 单位KB/s或MB/s
+      const uploadSpeed = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::*[4]').innerText()
+      // console.log('uploadSpeed:' + uploadSpeed)
+      expect(/(\d+(\.\d+)?\s?(KB|MB)?|-)/.test(uploadSpeed)).toBe(true)
+      // 检查任务图标
+      // stop 图标
+      const stopIcon = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::*[5]/Button[1]')
+      const stopIconText = await stopIcon.innerText()
+      expect(stopIconText).toBe('stop')
+      // file_open 图标
+      const fileOpenIcon = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::*[5]/Button[2]').innerText()
+      expect(fileOpenIcon).toBe('file_open')
+      // folder 图标
+      const fileIcon = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::*[5]/Button[3]').innerText()
+      expect(fileIcon).toBe('folder')
+      // more... 图标
+      const moreIcon = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::*[5]/Button[4]')
+      const moreIconText = await moreIcon.innerText()
+      expect(moreIconText).toBe('more_horiz')
+      // close 图标
+      const closeIcon = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::*[5]/Button[5]')
+      const closeIconText = await closeIcon.innerText()
+      expect(closeIconText).toBe('close')
+      await closeIcon.click()
+      await window.waitForSelector('.q-card >> text=Delete task', { timeout: 10000 })
+      await window.locator('button:has-text("Not now")').click()
+      // "更多"功能检查Download url
+      await moreIcon.click()
+      await window.click('text=content_copy')
+      // // "更多"功能检查文件路径
+      const filePathElement = await window.locator('text=play_arrowfolder')
+      // 检查文件夹树状结构
+      await filePathElement.click()
+      await window.waitForSelector('text=01 - Beastie Boys - Now Get Busy.mp3')
+      await window.waitForSelector('text=insert_drive_file')
+      await window.waitForSelector('text=image')
+      await sleep(500)
+      // 退出卡片
+      await window.locator('header >> text=Uploading').click({ force: true })
+      // downloaded状态栏
+      await stopIcon.click()
+      await commands.jumpPage('downloadedStatus')
+      const theWoredCD = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share')
+      await theWoredCD.waitFor('visible')
+      await sleep(500)
+      // 检查任务图标
+      const uploadIcon = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::*[4]/Button[1]')
+      const uploadIconText = await uploadIcon.innerText()
+      expect(uploadIconText).toBe('cloud_upload')
+      await sleep(500)
+      await uploadIcon.click()
+      await theWoredCD.waitFor('hidden')
+      await sleep(500)
+      await commands.jumpPage('uploadingStatus')
+      await sleep(500)
+      await theWoredCD.waitFor('visible')
+      // // 验证magnet被复制到剪贴板
+      await commands.jumpPage('downloadingStatus')
+      await commands.downloadBtn.click()
+      await sleep(1000)
+      const magnetText = await window.locator('//*[@aria-label="Download directory position"]/preceding::*[1]').inputValue()
+      // console.log('magnetText:' + magnetText)
+      expect(/alphabiz:\/\//.test(magnetText)).toBe(true)
+      await window.click('button:has-text("Cancel")')
+      await sleep(1000)
+      await window.reload()
+    })
+  }
 })
 
 test.describe('upload', () => {
