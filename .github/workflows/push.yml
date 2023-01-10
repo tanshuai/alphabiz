@@ -63,6 +63,7 @@ jobs:
         id: sha
         run: |
           echo "::set-output name=sha7::${GITHUB_SHA::7}"
+        shell: bash
 
       - name: Checkout ${{ steps.sha.outputs.sha7 }} ⬇️
         uses: actions/checkout@v3
@@ -73,7 +74,6 @@ jobs:
       - name: Get app name
         id: slug
         run: |
-          echo "::set-output name=sha7::${GITHUB_SHA::7}"
           DISPLAYNAME=$(cat developer/app.js | perl -wnE"say for /(?<=displayName\:\s)\'?.*\'?(?=,)/gm")
           APPNAME=$(cat developer/app.js | perl -wnE"say for /(?<=const\sAPP\s=\s\')[a-zA-Z]+/gm")
           FILENAME=$(cat developer/app.js | perl -wnE"say for /(?<=fileName\:\s)\'?.*\'?(?=,)/gm")
