@@ -48,7 +48,7 @@ describe('upload', () => {
     // const torrentName = 'ChinaCup.1080p.H264.AAC.mp4'
     // 判断是否已经登录
     await sleep(10000)
-    await accountPage.ensureSignIn(process.env.TEST1_EMAIL, process.env.TEST_PASSWORD, { isWaitAlert: true })
+    await accountPage.ensureSignIn(process.env.TEST2_EMAIL, process.env.TEST_PASSWORD, { isWaitAlert: true })
 
     // 查看初始积分
     await homePage.jumpPage('creditsLink')
