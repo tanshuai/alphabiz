@@ -1,3 +1,2 @@
-send an email when oauth is associated #849
 #853
-fix release e2e test
+log e2e test uncaught error
