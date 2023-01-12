@@ -11,7 +11,7 @@ on:
   push:
     paths:
       - "**.js"
-      - "!**/push.yml"
+      - "**/push.yml"
       - "!patches/**"
       - "!public/**"
       - "!wix/**"
@@ -62,7 +62,7 @@ jobs:
       - name: Get short SHA 🔑
         id: sha
         run: |
-          echo "::set-output name=sha7::${GITHUB_SHA::7}"
+          echo "sha7=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
         shell: bash
 
       - name: Checkout ${{ steps.sha.outputs.sha7 }} ⬇️
@@ -80,26 +80,26 @@ jobs:
           echo ${APPNAME}
           echo ${DISPLAYNAME}
           echo ${FILENAME}
-          echo "::set-output name=app-name::$(echo ${APPNAME})"
-          echo "::set-output name=app-name-lower::$(echo ${APPNAME} | tr '[:upper:]' '[:lower:]')"
+          echo "app-name=${APPNAME}" >> $GITHUB_OUTPUT
+          echo "app-name-lower=$(echo ${APPNAME} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
           if [[ ${DISPLAYNAME} = "APP" ]] ; \
-          then  echo "::set-output name=display-name::$(echo ${APPNAME})" ; \
-                echo "::set-output name=display-name-lower::$(echo ${APPNAME} | tr '[:upper:]' '[:lower:]')" ; \
+          then  echo "display-name=${APPNAME}" >> $GITHUB_OUTPUT ; \
+            echo "display-name-lower=$(echo ${APPNAME} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT ; \
           else  DISPLAYNAME=$(echo ${DISPLAYNAME} | perl -wnE"say for /\w+/gm") ; \
-                echo "::set-output name=display-name::$(echo ${DISPLAYNAME})" ; \
-                echo "::set-output name=display-name-lower::$(echo ${DISPLAYNAME} | tr '[:upper:]' '[:lower:]')" ; \
+            echo "display-name=${DISPLAYNAME}" >> $GITHUB_OUTPUT ; \
+            echo "display-name-lower=$(echo ${DISPLAYNAME} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT ; \
           fi
           if [[ ${FILENAME} = "APP" ]] ; \
-          then  echo "::set-output name=file-name::$(echo ${APPNAME})" ; \
-                echo "::set-output name=file-name-lower::$(echo ${APPNAME} | tr '[:upper:]' '[:lower:]')" ; \
+          then  echo "file-name=${APPNAME}" >> $GITHUB_OUTPUT ; \
+            echo "file-name-lower=$(echo ${APPNAME} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT ; \
           else  FILENAME=$(echo ${FILENAME} | perl -wnE"say for /\w+/gm") ; \
-                echo "::set-output name=file-name::$(echo ${FILENAME})" ; \
-                echo "::set-output name=file-name-lower::$(echo ${FILENAME} | tr '[:upper:]' '[:lower:]')" ; \
+            echo "file-name=${FILENAME}" >> $GITHUB_OUTPUT ; \
+            echo "file-name-lower=$(echo ${FILENAME} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT ; \
           fi
         shell: bash
 
       - name: Setup Node.js ${{ matrix.node-version }} 📮
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
           cache: "yarn"
@@ -109,18 +109,18 @@ jobs:
       - name: Get message
         id: vars
         run: |
-          echo "::set-output name=date::$(TZ=UTC-8 git log -1 --date=format-local:"%Y%m%d%H%M" --format="%cd")"
-          echo "::set-output name=event-name::${{ github.event_name }}"
-          echo "::set-output name=download-tag::$(git describe --tags --abbrev=0)"
+          echo "date=$(TZ=UTC-8 git log -1 --date=format-local:"%Y%m%d%H%M" --format="%cd")" >> $GITHUB_OUTPUT
+          echo "event-name=${{ github.event_name }}" >> $GITHUB_OUTPUT
+          echo "download-tag=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
           if [[ ${{ matrix.os }} = "ubuntu-latest" ]] ; \
-          then echo "::set-output name=system::ubuntu" ; \
-                echo "::set-output name=package::${{ steps.slug.outputs.display-name }}-linux-x64" ; \
+          then echo "name=ubuntu" >> $GITHUB_OUTPUT ; \
+            echo "package=${{ steps.slug.outputs.display-name }}-linux-x64" >> $GITHUB_OUTPUT ; \
           elif [[ ${{ matrix.os }} = "macos-latest" ]] ; \
-          then echo "::set-output name=system::macos" ; \
-                echo "::set-output name=package::${{ steps.slug.outputs.display-name }}-darwin-x64" ; \
+          then echo "name=macos" >> $GITHUB_OUTPUT ; \
+            echo "package=${{ steps.slug.outputs.display-name }}-darwin-x64" >> $GITHUB_OUTPUT ; \
           elif [[ ${{ matrix.os }} = "windows-latest" ]] ; \
-          then echo "::set-output name=system::windows" ; \
-                echo "::set-output name=package::${{ steps.slug.outputs.display-name }}-win32-x64" ; \
+          then echo "name=windows" >> $GITHUB_OUTPUT ; \
+            echo "package=${{ steps.slug.outputs.display-name }}-win32-x64" >> $GITHUB_OUTPUT ; \
           fi
           export COMMIT_HEAD=$(git log -1 --pretty=%B | perl -wnE'say for /^\w+/gm')
           if [[ "$COMMIT_HEAD" = "Merge" ]] ; \
@@ -145,7 +145,7 @@ jobs:
           else content="${content//$'\n'/'%0A'}" ; \
           fi
           content="${content//$'\r'/'%0D'}"
-          echo "::set-output name=releaseJson::$content"
+          echo "releaseJson=$content" >> $GITHUB_ENV
         shell: bash
 
       - name: Get package.json version
@@ -162,8 +162,8 @@ jobs:
           git checkout ${{ fromJson(steps.release.outputs.releaseJson).targetTagName }}
           git show --name-only
           echo "--------------------------"
-          echo "::set-output name=target-tag-name::${{ fromJson(steps.release.outputs.releaseJson).targetTagName }}"
-          echo "::set-output name=new-tag-name::${{ fromJson(steps.release.outputs.releaseJson).newTagName }}"
+          echo "target-tag-name=${{ fromJson(steps.release.outputs.releaseJson).targetTagName }}" >> $GITHUB_ENV
+          echo "new-tag-name=${{ fromJson(steps.release.outputs.releaseJson).newTagName }}" >> $GITHUB_ENV
         shell: bash
 
       - name: Get unpackaged/version.json property
@@ -176,19 +176,19 @@ jobs:
           else content="${content//$'\n'/'%0A'}" ; \
           fi
           content="${content//$'\r'/'%0D'}"
-          echo "::set-output name=versionJson::$content"
+          echo "versionJson=$content" >> $GITHUB_ENV
         shell: bash
 
       - name: Checkout unpackaged/version.json
         id: versionJson
         run: |
-          echo "::set-output name=package-version::${{ fromJson(steps.unpackaged.outputs.versionJson).packageVer }}"
+          echo "package-version=${{ fromJson(steps.unpackaged.outputs.versionJson).packageVer }}" >> $GITHUB_ENV
 
       # stable version x.y.z+1
       - name: Get UnstableVersion
         id: unstable
         run: |
-          echo "::set-output name=unstable-version::$(echo ${{ steps.versionJson.outputs.package-version }} | awk -F. -v OFS=. 'NF==1{print ++$NF}; NF>1{$NF=sprintf("%0*d", length($NF), ($NF+1)); print}')"
+          echo "unstable-version=$(echo ${{ steps.versionJson.outputs.package-version }} | awk -F. -v OFS=. 'NF==1{print ++$NF}; NF>1{$NF=sprintf("%0*d", length($NF), ($NF+1)); print}')" >> $GITHUB_ENV
         shell: bash
 
       # after git checkout
@@ -196,7 +196,7 @@ jobs:
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         id: nightly
         run: |
-          echo "::set-output name=commit-sha7::$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /(?<=-)\w{7}(?=\s)|^\w{7}(?=\s)/g')"
+          echo "commit-sha7=$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /(?<=-)\w{7}(?=\s)|^\w{7}(?=\s)/g')" >> $GITHUB_ENV
           export DESCRIBE=$(cat github-describe/github-describe.txt)
           echo "$DESCRIBE"
           echo "DESCRIBE<<EOF" >> $GITHUB_ENV
@@ -212,15 +212,15 @@ jobs:
         id: unify
         run: |
           if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
-          then echo "::set-output name=tag-name::${{ steps.checkout.outputs.new-tag-name }}" ; \
-               if ${{ contains(steps.checkout.outputs.new-tag-name, 'nightly') }} ; \
-               then echo "::set-output name=release-name::$(echo '${{ steps.checkout.outputs.new-tag-name }}' | perl -wnE'say for /^\d+\.\d+\.\d+\-?\w*/g' )-${{ steps.nightly.outputs.commit-sha7 }}" ; \
-               else echo "::set-output name=release-name::${{ steps.checkout.outputs.new-tag-name }}" ; \
-               fi
-               echo "::set-output name=package-name::${{ steps.checkout.outputs.new-tag-name }}" ; \
-          else echo "::set-output name=tag-name::${{ steps.unstable.outputs.unstable-version }}-nightly-${{ steps.vars.outputs.date }}" ; \
-               echo "::set-output name=release-name::${{ steps.unstable.outputs.unstable-version }}-nightly-${{ steps.nightly.outputs.commit-sha7 }}" ;  \
-               echo "::set-output name=package-name::${{ steps.unstable.outputs.unstable-version }}-nightly-${{ steps.vars.outputs.date }}" ; \
+          then echo "tag-name=${{ steps.checkout.outputs.new-tag-name }}" >> $GITHUB_ENV ; \
+            if ${{ contains(steps.checkout.outputs.new-tag-name, 'nightly') }} ; \
+            then echo "release-name=$(echo '${{ steps.checkout.outputs.new-tag-name }}' | perl -wnE'say for /^\d+\.\d+\.\d+\-?\w*/g' )-${{ steps.nightly.outputs.commit-sha7 }}" >> $GITHUB_ENV ; \
+            else echo "release-name=${{ steps.checkout.outputs.new-tag-name }}" >> $GITHUB_ENV ; \
+            fi
+            echo "package-name=${{ steps.checkout.outputs.new-tag-name }}" >> $GITHUB_ENV ; \
+          else echo "tag-name=${{ steps.unstable.outputs.unstable-version }}-nightly-${{ steps.vars.outputs.date }}" >> $GITHUB_ENV ; \
+            echo "release-name=${{ steps.unstable.outputs.unstable-version }}-nightly-${{ steps.nightly.outputs.commit-sha7 }}" >> $GITHUB_ENV ;  \
+            echo "package-name=${{ steps.unstable.outputs.unstable-version }}-nightly-${{ steps.vars.outputs.date }}" >> $GITHUB_ENV ; \
           fi
         shell: bash
 
@@ -240,19 +240,19 @@ jobs:
           echo "----------------------"
           echo "MODIFIED_FILE_LIST: ${{ env.MODIFIED_FILE_LIST }}"
           if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
-          then echo "::set-output name=isRunAppium::1" ; \
-          else echo "::set-output name=isRunAppium::0" ; \
+          then echo "isRunAppium=1" >> $GITHUB_ENV ; \
+          else echo "isRunAppium=0" >> $GITHUB_ENV ; \
           fi
           if ${{ contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json') }};\
           then  echo "----------------------" ; \
-                echo "tag-name: ${{ steps.unify.outputs.tag-name }}" ; \
-                echo "release-name: ${{ steps.unify.outputs.release-name }}" ; \
-                echo "package-name: ${{ steps.unify.outputs.package-name }}" ; \
-                echo "----------------------" ; \
-                echo "commit-sha7: ${{ steps.nightly.outputs.commit-sha7 }}" ; \
-                echo "----------------------" ; \
-                echo "target-tag-name: ${{ steps.checkout.outputs.target-tag-name }}" ; \
-                echo "new-tag-name: ${{ steps.checkout.outputs.new-tag-name }}" ; \
+            echo "tag-name: ${{ steps.unify.outputs.tag-name }}" ; \
+            echo "release-name: ${{ steps.unify.outputs.release-name }}" ; \
+            echo "package-name: ${{ steps.unify.outputs.package-name }}" ; \
+            echo "----------------------" ; \
+            echo "commit-sha7: ${{ steps.nightly.outputs.commit-sha7 }}" ; \
+            echo "----------------------" ; \
+            echo "target-tag-name: ${{ steps.checkout.outputs.target-tag-name }}" ; \
+            echo "new-tag-name: ${{ steps.checkout.outputs.new-tag-name }}" ; \
           fi
         shell: bash
       
@@ -311,9 +311,9 @@ jobs:
         run: |
           if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
           then if ${{ contains(steps.checkout.outputs.new-tag-name, 'nightly') }} ; \
-               then yarn node update-version.js --newTag ${{ steps.unify.outputs.tag-name }} --SHA7 ${{ steps.slug.outputs.sha7 }} --buildTime ${{ steps.vars.outputs.date }} ; \
-               else yarn node update-version.js --newTag ${{ steps.unify.outputs.tag-name }} --SHA7 ${{ steps.slug.outputs.sha7 }} --buildTime ${{ steps.vars.outputs.date }} --stable; \
-               fi
+            then yarn node update-version.js --newTag ${{ steps.unify.outputs.tag-name }} --SHA7 ${{ steps.slug.outputs.sha7 }} --buildTime ${{ steps.vars.outputs.date }} ; \
+            else yarn node update-version.js --newTag ${{ steps.unify.outputs.tag-name }} --SHA7 ${{ steps.slug.outputs.sha7 }} --buildTime ${{ steps.vars.outputs.date }} --stable; \
+            fi
           else yarn node update-version.js --buildTime ${{ steps.vars.outputs.date }} ; \
           fi
           yarn packager
@@ -386,7 +386,7 @@ jobs:
     steps:
       - name: appium_test_job Get short SHA 🔑
         run: |
-          echo "::set-output name=sha7::${GITHUB_SHA::7}"
+          echo "sha7=${GITHUB_SHA::7}" >> $GITHUB_ENV
           echo "nightly_job"
           echo "isRunAppium: ${{needs.nightly_job.outputs.output2}}"
         shell: bash
