@@ -145,9 +145,7 @@ jobs:
           else content="${content//$'\n'/'%0A'}" ; \
           fi
           content="${content//$'\r'/'%0D'}"
-          echo "releaseJson<<EOF" >> $GITHUB_ENV
-          echo "$content" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          echo "::set-output name=releaseJson::$content"
         shell: bash
 
       - name: Get package.json version
@@ -178,9 +176,7 @@ jobs:
           else content="${content//$'\n'/'%0A'}" ; \
           fi
           content="${content//$'\r'/'%0D'}"
-          echo "versionJson<<EOF" >> $GITHUB_ENV
-          echo "$content" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          echo "::set-output name=versionJson::$content"
         shell: bash
 
       - name: Checkout unpackaged/version.json
