@@ -138,12 +138,9 @@ jobs:
         id: release
         # if: contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
-          content=$(cat ./release.json)
-          content=${content//[$'\t\r\n ']}
-          content="${content/"/\"}"
-          echo "$content"
-          JSON=$(cat ./release.json)
-          echo "releaseJson=${JSON//'%'/'%25'}" >> $GITHUB_ENV
+          echo 'releaseJson<<EOF' >> $GITHUB_ENV
+          cat ./release.json >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
         shell: bash
       # echo "releaseJson=$(echo "${content//[$'\t\r\n ']}")" >> $GITHUB_ENV
 
@@ -168,8 +165,9 @@ jobs:
       - name: Get unpackaged/version.json property
         id: unpackaged
         run: |
-          JSON=$(cat ./build/electron/UnPackaged/version.json)
-          echo "releaseJson=${JSON//'%'/'%25'}" >> $GITHUB_ENV
+          echo 'versionJson<<EOF' >> $GITHUB_ENV
+          cat ./build/electron/UnPackaged/version.json >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
         shell: bash
           # content=`cat ./build/electron/UnPackaged/version.json`
           # echo "versionJson=$(echo "${content//[$'\t\r\n ']}")" >> $GITHUB_ENV
