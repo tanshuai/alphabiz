@@ -132,16 +132,15 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
         shell: bash
 
-      # because json file Multiline
-      # need convert to a single line,then get property use fromJson().property
       - name: Get release.json property
         id: release
         # if: contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
-          export CONTENT=$(cat ./release.json)
-          echo "versionJson<<EOF" >> $GITHUB_ENV
-          echo "$CONTENT" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          CONTENT=$(cat ./release.json)
+          TARGET_TAG_NAME=$(echo "$CONTENT" | perl -wnE"say for /(?<=targetTagName\"\:\s\").*(?=\",)/gm")
+          NEW_TAG_NAME=$(echo "$CONTENT" | perl -wnE"say for /(?<=newTagName\"\:\s\").*(?=\")/gm")
+          echo "target-tag-name=${TARGET_TAG_NAME}" >> $GITHUB_ENV
+          echo "new-tag-name=${NEW_TAG_NAME}" >> $GITHUB_ENV
         shell: bash
       # echo "releaseJson=$(echo "${content//[$'\t\r\n ']}")" >> $GITHUB_ENV
 
@@ -156,34 +155,23 @@ jobs:
         id: checkout
         # if: contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
-          git checkout ${{ fromJson(env.releaseJson).targetTagName }}
+          git checkout ${{ steps.release.outputs.target-tag-name }}
           git show --name-only
-          echo "--------------------------"
-          echo "target-tag-name=${{ fromJson(env.releaseJson).targetTagName }}" >> $GITHUB_ENV
-          echo "new-tag-name=${{ fromJson(env.releaseJson).newTagName }}" >> $GITHUB_ENV
         shell: bash
 
       - name: Get unpackaged/version.json property
         id: unpackaged
         run: |
-          export CONTENT=$(cat ./build/electron/UnPackaged/version.json)
-          echo "versionJson<<EOF" >> $GITHUB_ENV
-          echo "$CONTENT" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          CONTENT=$(cat ./build/electron/UnPackaged/version.json)
+          PACKAGE_VERSION=$(echo "$CONTENT" | perl -wnE"say for /(?<=packageVer\"\:\s\").*(?=\")/gm")
+          echo "package-version=${PACKAGE_VERSION}" >> $GITHUB_ENV
         shell: bash
-          # content=`cat ./build/electron/UnPackaged/version.json`
-          # echo "versionJson=$(echo "${content//[$'\t\r\n ']}")" >> $GITHUB_ENV
-
-      - name: Checkout unpackaged/version.json
-        id: versionJson
-        run: |
-          echo "package-version=${{ fromJson(env.versionJson).packageVer }}" >> $GITHUB_ENV
 
       # stable version x.y.z+1
       - name: Get UnstableVersion
         id: unstable
         run: |
-          echo "unstable-version=$(echo ${{ steps.versionJson.outputs.package-version }} | awk -F. -v OFS=. 'NF==1{print ++$NF}; NF>1{$NF=sprintf("%0*d", length($NF), ($NF+1)); print}')" >> $GITHUB_ENV
+          echo "unstable-version=$(echo ${{ steps.unpackaged.outputs.package-version }} | awk -F. -v OFS=. 'NF==1{print ++$NF}; NF>1{$NF=sprintf("%0*d", length($NF), ($NF+1)); print}')" >> $GITHUB_ENV
         shell: bash
 
       # after git checkout
@@ -207,12 +195,12 @@ jobs:
         id: unify
         run: |
           if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
-          then echo "tag-name=${{ steps.checkout.outputs.new-tag-name }}" >> $GITHUB_ENV ; \
-            if ${{ contains(steps.checkout.outputs.new-tag-name, 'nightly') }} ; \
-            then echo "release-name=$(echo '${{ steps.checkout.outputs.new-tag-name }}' | perl -wnE'say for /^\d+\.\d+\.\d+\-?\w*/g' )-${{ steps.nightly.outputs.commit-sha7 }}" >> $GITHUB_ENV ; \
-            else echo "release-name=${{ steps.checkout.outputs.new-tag-name }}" >> $GITHUB_ENV ; \
+          then echo "tag-name=${{ steps.release.outputs.new-tag-name }}" >> $GITHUB_ENV ; \
+            if ${{ contains(steps.release.outputs.new-tag-name, 'nightly') }} ; \
+            then echo "release-name=$(echo '${{ steps.release.outputs.new-tag-name }}' | perl -wnE'say for /^\d+\.\d+\.\d+\-?\w*/g' )-${{ steps.nightly.outputs.commit-sha7 }}" >> $GITHUB_ENV ; \
+            else echo "release-name=${{ steps.release.outputs.new-tag-name }}" >> $GITHUB_ENV ; \
             fi
-            echo "package-name=${{ steps.checkout.outputs.new-tag-name }}" >> $GITHUB_ENV ; \
+            echo "package-name=${{ steps.release.outputs.new-tag-name }}" >> $GITHUB_ENV ; \
           else echo "tag-name=${{ steps.unstable.outputs.unstable-version }}-nightly-${{ steps.vars.outputs.date }}" >> $GITHUB_ENV ; \
             echo "release-name=${{ steps.unstable.outputs.unstable-version }}-nightly-${{ steps.nightly.outputs.commit-sha7 }}" >> $GITHUB_ENV ;  \
             echo "package-name=${{ steps.unstable.outputs.unstable-version }}-nightly-${{ steps.vars.outputs.date }}" >> $GITHUB_ENV ; \
@@ -238,13 +226,12 @@ jobs:
           echo "system: ${{ steps.vars.outputs.system }}"
           echo "package: ${{ steps.vars.outputs.package }}"
           echo "release----------------------"
-          echo "releaseJson: ${{ steps.release.outputs.releaseJson }}"
+          echo "target-tag-name: ${{ steps.release.outputs.target-tag-name }}"
+          echo "new-tag-name: ${{ steps.release.outputs.new-tag-name }}"
           echo "version----------------------"
           echo "package.json version: ${{ steps.version.outputs.prop }}"
           echo "unpackaged----------------------"
-          echo "versionJson: ${{ steps.unpackaged.outputs.versionJson }}"
-          echo "versionJson----------------------"
-          echo "unpackage.version: ${{ steps.versionJson.outputs.package-version }}"
+          echo "unpackage.version: ${{ steps.unpackaged.outputs.package-version }}"
           echo "unstable----------------------"
           echo "unstable-version: ${{ steps.unstable.outputs.unstable-version }}"
           echo "----------------------"
@@ -253,17 +240,15 @@ jobs:
           then echo "isRunAppium=1" >> $GITHUB_ENV ; \
           else echo "isRunAppium=0" >> $GITHUB_ENV ; \
           fi
-          if ${{ contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json') }};\
-          then  echo "unify----------------------" ; \
-            echo "tag-name: ${{ steps.unify.outputs.tag-name }}" ; \
-            echo "release-name: ${{ steps.unify.outputs.release-name }}" ; \
-            echo "package-name: ${{ steps.unify.outputs.package-name }}" ; \
-            echo "nightly----------------------" ; \
-            echo "commit-sha7: ${{ steps.nightly.outputs.commit-sha7 }}" ; \
-            echo "checkout----------------------" ; \
-            echo "target-tag-name: ${{ steps.checkout.outputs.target-tag-name }}" ; \
-            echo "new-tag-name: ${{ steps.checkout.outputs.new-tag-name }}" ; \
-          fi
+          echo "unify----------------------"
+          echo "tag-name: ${{ steps.unify.outputs.tag-name }}"
+          echo "release-name: ${{ steps.unify.outputs.release-name }}"
+          echo "package-name: ${{ steps.unify.outputs.package-name }}"
+          echo "nightly----------------------"
+          echo "commit-sha7: ${{ steps.nightly.outputs.commit-sha7 }}"
+          echo "checkout----------------------"
+          echo "target-tag-name: ${{ steps.release.outputs.target-tag-name }}"
+          echo "new-tag-name: ${{ steps.release.outputs.new-tag-name }}"
         shell: bash
       
       - name: Install dependencies 👨🏻‍💻
@@ -320,7 +305,7 @@ jobs:
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
           if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
-          then if ${{ contains(steps.checkout.outputs.new-tag-name, 'nightly') }} ; \
+          then if ${{ contains(steps.release.outputs.new-tag-name, 'nightly') }} ; \
             then yarn node update-version.js --newTag ${{ steps.unify.outputs.tag-name }} --SHA7 ${{ steps.sha.outputs.sha7 }} --buildTime ${{ steps.vars.outputs.date }} ; \
             else yarn node update-version.js --newTag ${{ steps.unify.outputs.tag-name }} --SHA7 ${{ steps.sha.outputs.sha7 }} --buildTime ${{ steps.vars.outputs.date }} --stable; \
             fi
