@@ -1,2 +1,10 @@
+#851
 #853
-log e2e test uncaught error
+fix AppUpdater
+#853
+#853
+#861
+#861
+#861
+#861
+#863
