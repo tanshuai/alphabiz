@@ -123,7 +123,11 @@ const app = {
       height: '245px'
     }
   },
-  dynamicConfig: require('./dynamicConfig')
+  dynamicConfig: require('./dynamicConfig'),
+  /**
+   * Microsoft Store Product ID
+   */
+  microsoftStoreProductId: '9PBCCV3MHK04'
 }
 
 console.log('INIT APP CONFIG')
