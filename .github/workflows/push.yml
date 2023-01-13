@@ -145,9 +145,8 @@ jobs:
           else content="${content//$'\n'/'%0A'}" ; \
           fi
           content="${content//$'\r'/'%0D'}"
-          echo "::set-output name=releaseJson::$content"
-          echo "target-tag-name=${{ fromJson($content).targetTagName }}" >> $GITHUB_ENV
-          echo "new-tag-name=${{ fromJson($content).newTagName }}" >> $GITHUB_ENV
+          echo "$content"
+          echo "releaseJson=$(echo "$content")"  >> $GITHUB_ENV
         shell: bash
 
       - name: Get package.json version
@@ -178,14 +177,19 @@ jobs:
           else content="${content//$'\n'/'%0A'}" ; \
           fi
           content="${content//$'\r'/'%0D'}"
-          echo "package-version=$(${{ fromJson($content).packageVer }})" >> $GITHUB_ENV
+          echo "versionJson=$(echo "$content")" >> $GITHUB_ENV
         shell: bash
+
+      - name: Checkout unpackaged/version.json
+        id: versionJson
+        run: |
+          echo "package-version=$(${{ fromJson(steps.unpackaged.outputs.versionJson).packageVer }})" >> $GITHUB_ENV
 
       # stable version x.y.z+1
       - name: Get UnstableVersion
         id: unstable
         run: |
-          echo "unstable-version=$(echo ${{ steps.unpackaged.outputs.package-version }} | awk -F. -v OFS=. 'NF==1{print ++$NF}; NF>1{$NF=sprintf("%0*d", length($NF), ($NF+1)); print}')" >> $GITHUB_ENV
+          echo "unstable-version=$(echo ${{ steps.versionJson.outputs.package-version }} | awk -F. -v OFS=. 'NF==1{print ++$NF}; NF>1{$NF=sprintf("%0*d", length($NF), ($NF+1)); print}')" >> $GITHUB_ENV
         shell: bash
 
       # after git checkout
@@ -241,12 +245,12 @@ jobs:
           echo "package: ${{ steps.vars.outputs.package }}"
           echo "release----------------------"
           echo "releaseJson: ${{ steps.release.outputs.releaseJson }}"
-          echo "target-tag-name: ${{ steps.release.outputs.target-tag-name }}"
-          echo "new-tag-name: ${{ steps.release.outputs.new-tag-name }}"
           echo "version----------------------"
           echo "package.json version: ${{ steps.version.outputs.prop }}"
           echo "unpackaged----------------------"
-          echo "unpackage.version: ${{ steps.unpackaged.outputs.package-version }}"
+          echo "versionJson: ${{ steps.unpackaged.outputs.versionJson }}"
+          echo "versionJson----------------------"
+          echo "unpackage.version: ${{ steps.versionJson.outputs.package-version }}"
           echo "unstable----------------------"
           echo "unstable-version: ${{ steps.unstable.outputs.unstable-version }}"
           echo "----------------------"
