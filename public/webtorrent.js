@@ -150,7 +150,7 @@ const initClient = (retries = 0) => {
   const payedUserShareRate = Number(localStorage.getItem('payedUserShareRate'))
   // block local IP
   conf.blocklist = utils.getLocalIPList() || []
-  conf.secure = true
+  // conf.secure = true
 
   info('init client', conf)
   client = new WebTorrent(conf)
@@ -217,9 +217,9 @@ const queueTimeout = (cb, timeout) => {
   requestAnimationFrame(run)
 }
 let shouldSendInfo = true
-const updateTorrent = () => {
+const updateTorrent = (once = false) => {
   // console.time('torrent status')
-  if (!shouldSendInfo) {
+  if (!shouldSendInfo && !once) {
     queueTimeout(updateTorrent, 1000)
     return info('skip send')
   } else {
@@ -280,6 +280,7 @@ const updateTorrent = () => {
   if (client.torrents.length > 50) {
     client.maxConns = Math.min(client.maxConns, 10)
   }
+  if (once) return
   if (client.torrents.length > 100) {
     client.maxConns = Math.min(client.maxConns, 5)
     queueTimeout(updateTorrent, 2000)
@@ -344,6 +345,7 @@ const onInfoHash = (infoHash, tr, conf, isSeeding) => {
     }
   } else ipcRenderer.send('webtorrent-infohash', infoHash, { ...conf, isSeeding })
   infoHashes.push(infoHash)
+  updateTorrent(true)
 }
 /**
  * @function addListeners
@@ -522,6 +524,7 @@ const stopTorrent = infoHash => {
   if (infoHashes.includes(infoHash)) {
     infoHashes.splice(infoHashes.indexOf(infoHash), 1)
   }
+  updateTorrent(true)
 }
 /**
  * @param { string } infoHash
@@ -554,20 +557,24 @@ const deleteTorrent = (infoHash, destroyStore) => {
   while (infoHashes.includes(infoHash)) {
     infoHashes.splice(infoHashes.indexOf(infoHash), 1)
   }
+  updateTorrent(true)
 }
 /**
  * @param { string } token
  * @param { string[] } files
- * @param { object } options
+ * @param { TorrentInfo } options
  * @param { boolean } isAutoUpload
  * @param { function } callback
  */
 const seedTorrent = (token, files, options, isAutoUpload = false, callback = null) => {
-  if (options.infoHash) {
-    if (locked.has(options.infoHash)) return
-    else locked.add(options.infoHash)
+  if (options.infoHash && client.get(options.infoHash)) return console.log('skip existed', options.infoHash)
+  const _torrentId = options.infoHash || options.token || options.origin
+  if (_torrentId) {
+    if (locked.has(_torrentId)) return
+    else locked.add(_torrentId)
   }
   let tr = null
+  const announce = [...(options.trackers || []), ...WEBTORRENT_ANNOUCEMENT]
   if (options.infoHash && !options.upload && options.files.length) {
     console.log('[seed] add torrent with token')
     console.log(options)
@@ -578,7 +585,7 @@ const seedTorrent = (token, files, options, isAutoUpload = false, callback = nul
       strategy: 'sequential',
       skipVerify: options.progress === 1,
       maxWebConns: client.maxConns,
-      announce: [...(options.trackers || []), ...WEBTORRENT_ANNOUCEMENT]
+      announce
     })
   } else if (options.isSeeding && options.torrentPath && fs.existsSync(options.torrentPath)) {
     console.log('[seed] add torrent with torrentPath')
@@ -588,7 +595,7 @@ const seedTorrent = (token, files, options, isAutoUpload = false, callback = nul
       storeCacheSlots: 10,
       skipVerify: true,
       maxWebConns: client.maxConns,
-      announce: [...(options.trackers || []), ...WEBTORRENT_ANNOUCEMENT]
+      announce
     })
   } else if (options.isSeeding && options.magnetURI && !options.isUploadByFiles) {
     console.log('[seed] add torrent with magnetURI')
@@ -598,20 +605,20 @@ const seedTorrent = (token, files, options, isAutoUpload = false, callback = nul
       storeCacheSlots: 10,
       skipVerify: true,
       maxWebConns: client.maxConns,
-      announce: [...(options.trackers || []), ...WEBTORRENT_ANNOUCEMENT]
+      announce
     })
     tr.upload = true
     tr.isSeeding = true
   } else {
-    console.log('[seed] Seed torrent with files')
+    console.log('[seed] Seed torrent with files', !!options.infoHash)
     tr = client.seed(files, {
       ...options,
       store: FSChunkStore,
       storeCacheSlots: 10,
-      skipVerify: true,
+      skipVerify: !!options.infoHash,
       maxWebConns: client.maxConns,
       // announce to default list only
-      announce: [...(options.trackers || []), ...WEBTORRENT_ANNOUCEMENT]
+      announce
     })
     tr.isUploadByFiles = true
   }
@@ -625,10 +632,8 @@ const seedTorrent = (token, files, options, isAutoUpload = false, callback = nul
   tr.file = files
   tr.createdTime = options.createdTime || Date.now()
   addListeners(tr, options, true)
-  if (options.infoHash) {
-    tr.once('infoHash', () => locked.delete(options.infoHash))
-  }
   tr.once('infoHash', () => {
+    locked.delete(_torrentId)
     if (callback) callback()
   })
   tr.once('metadata', () => {
@@ -694,6 +699,7 @@ const saveTorrentFile = (infoHash, dir) => {
     })
   }
   const torrentPath = path.resolve(dir, `${tr.name}.torrent`)
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
   fs.writeFileSync(torrentPath, tr.torrentFile)
   ipcRenderer.send(channel, {
     code: 0,

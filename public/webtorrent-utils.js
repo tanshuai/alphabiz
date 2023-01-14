@@ -133,7 +133,7 @@ const torrentToJson = (tr, deltaTime, speeder) => {
     return tr.byteMap[index] !== byte
   })) {
     tr.byteMap = byteMap
-    console.log('change byteMap', byteMap)
+    // console.log('change byteMap', byteMap)
     tr.emit('byte-map-change')
   }
   o.byteMap = tr.byteMap
