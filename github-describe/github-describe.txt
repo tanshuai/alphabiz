@@ -1,18 +1,16 @@
-support paydata cancel
-ui adjustment
-#249 hide left drawer task count
-fix #249
-Try to prioritize support for IPv6 connection
-use table-based peer info
-fix init status
-Restore client name to original WebTorrent
-TBD: add our client name to
-https://github.com/webtorrent/bittorrent-peerid/blob/master/index.js
-fix test
-Huge Improvement for Transfer Speed by support Implement Protocol Encryption (PE/MSE)
-Fix #193
-fix task list test error 、phone account test
-rerty account test workflow
-retry account test
-peer table update
-add network diagnotic panel #173
+fix credit test error
+fix task list error
+try use win-2019
+fix account workflow error
+test payDataCancel
+save torrent file to userData for upload tasks
+avoid adding multiple tasks
+prevent update tray after destroyed
+hide pause button for autoUpload tasks
+avoid removing auto-upload directory
+payDataCancel
+fix: #247
+try yarn in windows-latest
+ui adjustment & network error notify
+add i18n, status checking for network diagnotic, resolve #173
+restore account test
