@@ -23,7 +23,7 @@
     "make": "node make.js --make",
     "make:win": "yarn make:squirrel && yarn make:msi",
     "make:squirrel": "electron-forge make --skip-package --targets @electron-forge/maker-squirrel",
-    "make:msi": "electron-forge make --skip-package --targets @electron-forge/maker-wix",
+    "make:msi": "node ./wix/make.js",
     "make:dmg": "electron-forge make --skip-package --targets @electron-forge/maker-dmg",
     "make:deb": "electron-forge make --skip-package --targets @electron-forge/maker-deb",
     "postmake": "node make.js --postmake"
@@ -60,6 +60,7 @@
     "electron": "17.0.0",
     "electron-packager": "^15.4.0",
     "electron-rebuild": "^3.2.7",
+    "electron-wix-msi": "^4.0.0",
     "eslint": "^8.7.0",
     "eslint-config-standard": "^16.0.3",
     "http-server": "^14.1.0",
@@ -78,6 +79,9 @@
   "optionalDependencies": {
     "electron-installer-debian": "^3.1.0",
     "exe-icon-extractor": "^1.0.8"
+  },
+  "resolutions": {
+    "electron-wix-msi": "^4.0.0"
   },
   "config": {
     "forge": "./forge.config.js"

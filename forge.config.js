@@ -6,6 +6,15 @@ const { default: rebuild } = require('electron-rebuild')
 const { name, description, author, productName } = package
 const version = require('./public/version.json').packageVer
 const icoPath = resolve(__dirname, 'public/platform-assets/windows/icon.ico')
+const wixLangPath = resolve(__dirname, 'wix/localizations')
+// Add localization files here
+const wixLocalizationFiles = [
+  'zh-CN.wxl',
+  'zh-TW.wxl',
+  'en-US.wxl'
+].map(f => {
+  return resolve(wixLangPath, f)
+})
 
 // The .deb package requires a .desktop template, see here:
 // node_modules/electron-installer-debian/resources/desktop.ejs
@@ -178,61 +187,63 @@ module.exports = {
     //   name: "@electron-forge/maker-rpm",
     //   config: {}
     // },
-    {
-      name: "@electron-forge/maker-wix",
-      config: {
-        name: productName,
-        shortName: productName,
-        arch: 'x64',
-        description,
-        exe: productName,
-        manufacturer: 'Alphabiz Team',
-        shortcutFolderName: '',
-        programFilesFolderName: productName,
-        appIconPath: resolve(__dirname, 'public/platform-assets/windows/icon.ico'),
-        /**
-         * This code is randomly generate by [uuid](https://www.npmjs.com/package/uuid).
-         * The Windows MSI installer uses it to upgrade an existed software.
-         * Do NOT change this unless you know what will happen.
-        */
-        upgradeCode: '4d8a65aa-fc5b-421c-94ab-cb722ef737e2',
-        version,
-        ui: {
-          chooseDirectory: true,
-          images: {
-            background: resolve(__dirname, 'public/platform-assets/windows/splash/background_493x312.png'),
-            banner: resolve(__dirname, 'public/platform-assets/windows/splash/banner_493x58.png'),
-            exclamationIcon: resolve(__dirname, 'public/icons/favicon-32x32.png'),
-            infoIcon: resolve(__dirname, 'public/icons/favicon-32x32.png'),
-            newIcon: resolve(__dirname, 'public/icons/favicon-16x16.png'),
-            upIcon: resolve(__dirname, 'public/icons/favicon-16x16.png')
-          }
-        },
-        beforeCreate (wix) {
-          // console.log(wix.wixTemplate || wix)
-          // Remove appName tail created by wix
-          if (wix.wixTemplate) {
-            const iconTemplate = `\n<Icon Id="icon.ico" SourceFile="${icoPath}"/>`
-              + `\n<Property Id="ARPPRODUCTICON" Value="icon.ico" />`
-            // console.log(wix.getRegistryKeys)
-            const _getRegistryKeys = wix.getRegistryKeys
-            wix.getRegistryKeys = (function getRegistryKeys (...args) {
-              const registry = _getRegistryKeys.bind(wix)(...args)
-              const icon = registry.find(i => i.id === 'UninstallDisplayIcon')
-              if (icon) icon.value = '[APPLICATIONROOTDIRECTORY]Alphabiz.exe'
-              console.log(icon, registry.find)
-              return registry
-            }).bind(wix)
-            wix.uiTemplate = wix.uiTemplate
-              .replace('<DialogRef Id="MsiRMFilesInUse" />', '<!-- <DialogRef Id="MsiRMFilesInUse" /> -->')
-            wix.wixTemplate = wix.wixTemplate
-              .replace('"{{ApplicationName}} (Machine - MSI)"','"{{ApplicationName}}"')
-              .replace('"{{ApplicationName}} (Machine)"','"{{ApplicationName}}"')
-              .replace('</Product>', iconTemplate +'\n</Product>')
-          }
-        }
-      }
-    }
+    // {
+    //   name: "@electron-forge/maker-wix",
+    //   config: {
+    //     name: productName,
+    //     shortName: productName,
+    //     arch: 'x64',
+    //     description,
+    //     exe: productName,
+    //     manufacturer: 'Alphabiz Team',
+    //     shortcutFolderName: '',
+    //     programFilesFolderName: productName,
+    //     appIconPath: resolve(__dirname, 'public/platform-assets/windows/icon.ico'),
+    //     /**
+    //      * This code is randomly generate by [uuid](https://www.npmjs.com/package/uuid).
+    //      * The Windows MSI installer uses it to upgrade an existed software.
+    //      * Do NOT change this unless you know what will happen.
+    //     */
+    //     upgradeCode: '4d8a65aa-fc5b-421c-94ab-cb722ef737e2',
+    //     version,
+    //     cultures: 'zh-cn;zh-tw;en-us',
+    //     ui: {
+    //       chooseDirectory: true,
+    //       images: {
+    //         background: resolve(__dirname, 'public/platform-assets/windows/splash/background_493x312.png'),
+    //         banner: resolve(__dirname, 'public/platform-assets/windows/splash/banner_493x58.png'),
+    //         exclamationIcon: resolve(__dirname, 'public/icons/favicon-32x32.png'),
+    //         infoIcon: resolve(__dirname, 'public/icons/favicon-32x32.png'),
+    //         newIcon: resolve(__dirname, 'public/icons/favicon-16x16.png'),
+    //         upIcon: resolve(__dirname, 'public/icons/favicon-16x16.png')
+    //       },
+    //       localizations: wixLocalizationFiles
+    //     },
+    //     beforeCreate (wix) {
+    //       // console.log(wix.wixTemplate || wix)
+    //       // Remove appName tail created by wix
+    //       if (wix.wixTemplate) {
+    //         const iconTemplate = `\n<Icon Id="icon.ico" SourceFile="${icoPath}"/>`
+    //           + `\n<Property Id="ARPPRODUCTICON" Value="icon.ico" />`
+    //         // console.log(wix.getRegistryKeys)
+    //         const _getRegistryKeys = wix.getRegistryKeys
+    //         wix.getRegistryKeys = (function getRegistryKeys (...args) {
+    //           const registry = _getRegistryKeys.bind(wix)(...args)
+    //           const icon = registry.find(i => i.id === 'UninstallDisplayIcon')
+    //           if (icon) icon.value = '[APPLICATIONROOTDIRECTORY]Alphabiz.exe'
+    //           console.log(icon, registry.find)
+    //           return registry
+    //         }).bind(wix)
+    //         wix.uiTemplate = wix.uiTemplate
+    //           .replace('<DialogRef Id="MsiRMFilesInUse" />', '<!-- <DialogRef Id="MsiRMFilesInUse" /> -->')
+    //         wix.wixTemplate = wix.wixTemplate
+    //           .replace('"{{ApplicationName}} (Machine - MSI)"', '"{{ApplicationName}}"')
+    //           .replace('"{{ApplicationName}} (Machine)"', '"{{ApplicationName}}"')
+    //           .replace('</Product>', iconTemplate + '\n</Product>')
+    //       }
+    //     }
+    //   }
+    // }
   ],
   publishers: []
 }
