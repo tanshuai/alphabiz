@@ -367,8 +367,8 @@ test.describe('download ', () => {
 })
 test.describe('task', () => {
   test.beforeEach(async ({ }, testInfo) => {
-    if (process.platform === 'darwin') test.setTimeout(60000 * 5)
-    else test.setTimeout(60000 * 3)
+    if (process.platform === 'darwin') test.setTimeout(60000 * 8)
+    else test.setTimeout(60000 * 5)
     await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
     await window.waitForLoadState()
     await window.waitForTimeout(1000)
@@ -447,6 +447,7 @@ test.describe('task', () => {
     if (await listMode.isVisible()) {
       await listMode.click()
     }
+    await window.waitForTimeout(1000)
     // 验证文件类型图标
     const bbbFileIcon = await homePage.getListEle(btData[2].btName, 'fileIcon').innerText()
     expect(bbbFileIcon).toBe('video_file')
@@ -721,6 +722,7 @@ test.describe('account', () => {
 
     // 登录收款人账号
     await basePage.signIn(payee, payeePassword, 1)
+    await window.waitForTimeout(3000)
     await basePage.jumpPage('creditsLink')
     await creditsPage.creditsText.click({ force: true })
     // await window.waitForTimeout(10000)
@@ -735,6 +737,7 @@ test.describe('account', () => {
     await window.waitForTimeout(1000)
     // 登录付款人账号
     await basePage.signIn(transferee, transfereePassword, 1)
+    await window.waitForTimeout(3000)
     await basePage.jumpPage('creditsLink')
     await creditsPage.creditsText.click({ force: true })
     // await window.waitForTimeout(10000)
@@ -760,7 +763,9 @@ test.describe('account', () => {
     await window.waitForTimeout(1000)
     // 登录收款人账号
     await basePage.signIn(payee, payeePassword, 1)
+    await window.waitForTimeout(3000)
     await basePage.jumpPage('creditsLink')
+    await creditsPage.creditsText.click({ force: true })
     await window.waitForTimeout(2000)
     // 查看账单
     await creditsPage.checkBillDetail([transfereeID, 'Transfer', transferAmount.toString(), 'finish'], 'income')
