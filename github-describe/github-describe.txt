@@ -1,6 +1,5 @@
-#835
-fix account e2e test
-fix quit error in ubuntu close #870
-fix error building snap with displayName with spaces
-update snapcraft template
-add no-sandbox
+e2e test add waiting time
+sync e2e test
+e2e test - reconfirm transfer
+fix e2e test error
+fix test account has no credits
