@@ -337,7 +337,9 @@ jobs:
             ./out/installers/${{ steps.unify.outputs.tag-name }}/**
 
       - name: public describe to Twitter
-        if: contains(steps.vars.outputs.event-name, 'schedule') && matrix.os == 'ubuntu-latest'
+        if: |
+          contains(steps.vars.outputs.event-name, 'schedule') && matrix.os == 'ubuntu-latest'
+          && steps.slug.outputs.app-name == 'Alphabiz'
         run: yarn node publicTwitter.js
 
   appium_test_job:
