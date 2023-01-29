@@ -725,7 +725,7 @@ test.describe('account', () => {
     await basePage.jumpPage('creditsLink')
     await window.waitForTimeout(6000)
     const firstHeaderTitle = await basePage.headerTitle.innerText()
-    if (!/Credits/.test(firstHeaderTitle)) await walletPage.jumpPage('creditsLink')
+    if (!/Credits/.test(firstHeaderTitle)) await basePage.jumpPage('creditsLink')
     await creditsPage.creditsText.click({ force: true })
     // await window.waitForTimeout(10000)
     // 获取收款人id
@@ -742,7 +742,7 @@ test.describe('account', () => {
     await basePage.jumpPage('creditsLink')
     await window.waitForTimeout(6000)
     const secondHeaderTitle = await basePage.headerTitle.innerText()
-    if (!/Credits/.test(secondHeaderTitle)) await walletPage.jumpPage('creditsLink')
+    if (!/Credits/.test(secondHeaderTitle)) await basePage.jumpPage('creditsLink')
     await creditsPage.creditsText.click({ force: true })
     // await window.waitForTimeout(10000)
     // 获取转账人id
@@ -770,7 +770,7 @@ test.describe('account', () => {
     await basePage.jumpPage('creditsLink')
     await window.waitForTimeout(6000)
     const thirdHeaderTitle = await basePage.headerTitle.innerText()
-    if (!/Credits/.test(thirdHeaderTitle)) await walletPage.jumpPage('creditsLink')
+    if (!/Credits/.test(thirdHeaderTitle)) await basePage.jumpPage('creditsLink')
     await window.waitForTimeout(2000)
     // 查看账单
     await creditsPage.checkBillDetail([transfereeID, 'Transfer', transferAmount.toString(), 'finish'], 'income')
