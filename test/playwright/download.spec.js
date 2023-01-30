@@ -53,8 +53,7 @@ test.beforeAll(async () => {
   windows = electronApp.windows()
 
   for (const win of windows) {
-    const winToolbar = await win.locator('[role="toolbar"] .application-bar-title').count()
-    if (winToolbar) window = win
+    if (await win.title() === 'Alphabiz') window = win
   }
   console.log('windows title:' + await window.title())
   // new Pege Object Model
