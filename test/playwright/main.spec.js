@@ -101,7 +101,8 @@ test.beforeAll(async () => {
 
   for (const win of windows) {
     console.log(await win.title())
-    if (await win.title() === app.name) window = win
+    const winToolbar = await win.locator('[role="toolbar"] .application-bar-title').count()
+    if (winToolbar) window = win
   }
   // new Pege Object Model
   basePage = new BasePage(window)
