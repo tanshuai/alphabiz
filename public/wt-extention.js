@@ -113,6 +113,34 @@ ipcRenderer.on('finish-payment', (e, info) => {
     }
   }
 })
+ipcRenderer.on('close-payment', (e, info) => {
+  const tr = client.get(info.infoHash)
+  if (!tr || !tr.wires.length) return console.log('close: tr not found')
+  for (const wire of tr.wires) {
+    if (wire.remoteSub && wire.remoteSub === info.remoteSub) {
+      if (!wire['alphabiz_protocol']) continue
+      wire['alphabiz_protocol']._send({
+        ab_payment_close: JSON.stringify({
+          infoHash: info.infoHash,
+          id: info.id
+        })
+      })
+    }
+  }
+})
+const removeTransaction = info => {
+  console.log('To remove', info)
+  if (!info || !info.infoHash) return
+  const infoHash = info.infoHash
+  const transactions = transactionMap.get(infoHash)
+  for (let i = 0; i < transactions.length; i++) {
+    if (transactions[i].id === info.id) {
+      const removed = transactions.splice(i, 1)
+      console.log('Removed transaction', removed)
+      return
+    }
+  }
+}
 
 /**
  * @function useAlphabizProtocol
@@ -365,6 +393,10 @@ export const useAlphabizProtocol = (client, torrent) => {
         })
       }
     }
+    _onPaymentClosed (info) {
+      console.log('Close', info)
+      removeTransaction(info)
+    }
     _onRenew (subId) {
       // dont renew if almost done
       if (torrent.length - torrent.downloaded < torrent.downloadSpeed * 5) return
@@ -408,6 +440,9 @@ export const useAlphabizProtocol = (client, torrent) => {
       if (dict.ab_payment_finish) {
         // finish payment
         return this._onPaymentFinished(dict.ab_payment_finish.toString())
+      }
+      if (dict.ab_payment_close) {
+        return this._onPaymentClosed(JSON.parse(dict.ab_payment_close.toString()))
       }
       if (dict.ab_task_done) {
         return this._onTaskDone(dict.ab_task_done.toString())

@@ -340,6 +340,18 @@ const onMetadata = (tr, conf) => {
 }
 const onWire = (wire, tr) => {
   wire.use(useAlphabizProtocol(client, tr))
+  if (wire.type === 'webrtc') {
+    console.log('onwire', wire.remoteAddress, wire.peerId)
+    const setAddress = () => {
+      if (wire.remoteAddress) return
+      const peer = tr._peers[wire.peerId]
+      if (!peer) return setTimeout(setAddress, 1000)
+      const address = peer.conn?._pc?.currentRemoteDescription?.sdp?.match(/c=IN\sIP\d\s(.*)/)?.[1]
+      if (!address) return setTimeout(setAddress, 1000)
+      wire.remoteAddress = address
+    }
+    setAddress()
+  }
 }
 const onInfoHash = (infoHash, tr, conf, isSeeding) => {
   info('infoHash', infoHash)
