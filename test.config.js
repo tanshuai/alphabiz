@@ -1,8 +1,11 @@
 const path = require('path')
 
-const AlphabizAppPath = path.resolve(__dirname, 'Alphabiz-win32-x64/Alphabiz.exe')
-const AlphabizAppEXEPath = (process.env.HOME + '/AppData/Local/Alphabiz/Alphabiz.exe').replace(/\\/g, '/')
-const AlphabizAppMSIPath = 'C:/Program Files/Alphabiz/Alphabiz.exe'
+const appConfig = require('./developer/app')
+const productName = appConfig.displayName
+
+const AlphabizAppPath = path.resolve(__dirname, `dist/electron/${productName}-win32-x64/${productName}.exe`)
+const AlphabizAppEXEPath = (process.env.HOME + `/AppData/Local/${productName}/${productName}.exe`).replace(/\\/g, '/')
+const AlphabizAppMSIPath = `C:/Program Files/${productName}/${productName}.exe`
 const electronMainPath = 'build/electron/UnPackaged/electron-main.js'
 
 const appDirectoryRootPath = 'build'
