@@ -4,6 +4,9 @@
 const fs = require('fs')
 const path = require('path')
 
+const modulesAppConfigPath = path.resolve(__dirname, 'build/electron/UnPackaged/node_modules/developer')
+const unPackagedAppConfigPath = path.resolve(__dirname, 'build/electron/UnPackaged/developer')
+
 const copyModule = async () => {
   ['webtorrent',
     'bittorrent-tracker',
@@ -33,13 +36,11 @@ const copyModule = async () => {
 }
 const copyDeveloper = async () => {
   const src = path.resolve(__dirname, 'developer')
-  const dest = path.resolve(__dirname, 'build/electron/UnPackaged/node_modules/developer')
-  const dest2 = path.resolve(__dirname, 'build/electron/UnPackaged/developer')
   // console.log('src:' + src)
   // console.log('dest:' + dest)
   if (!fs.existsSync(src)) return
-  if (fs.existsSync(dest)) fs.rmSync(dest, { recursive: true })
-  if (fs.existsSync(dest2)) fs.rmSync(dest2, { recursive: true })
+  if (fs.existsSync(modulesAppConfigPath)) fs.rmSync(modulesAppConfigPath, { recursive: true })
+  if (fs.existsSync(unPackagedAppConfigPath)) fs.rmSync(unPackagedAppConfigPath, { recursive: true })
   const copyRecursive = (src, dest) => {
     if (fs.statSync(src).isDirectory()) {
       fs.readdirSync(src).forEach(dir => {
@@ -53,8 +54,11 @@ const copyDeveloper = async () => {
       fs.copyFileSync(src, dest)
     }
   }
-  copyRecursive(src, dest)
-  copyRecursive(src, dest2)
+  copyRecursive(src, modulesAppConfigPath)
+  copyRecursive(src, unPackagedAppConfigPath)
+
+  resetRegisterMode(modulesAppConfigPath)
+  resetRegisterMode(unPackagedAppConfigPath)
 }
 
 const copyVersionJSON = async () => {
@@ -73,6 +77,18 @@ const deleteVersionJSON = async () => {
   })
 }
 
+// any one can register when run e2e test
+const resetRegisterMode = (folder) => {
+  const appConfigPath = path.resolve(folder, './app.js')
+  console.log(appConfigPath)
+  const appConfigContent = fs.readFileSync(appConfigPath, 'utf-8')
+  const registerMode = appConfigContent.substring(appConfigContent.indexOf('register: {'), appConfigContent.indexOf('Country code list'))
+
+  const newRegisterMode = registerMode.replace(/mode:\s\'.*\'\,/gm, 'mode: \'none\',')
+  const newAppConfigContent = appConfigContent.replace(registerMode, newRegisterMode)
+  fs.writeFileSync(appConfigPath, newAppConfigContent)
+}
+
 if (process.argv.includes('--pre')) {
   console.log('run copy-patch.js --pre')
   if (process.platform !== 'darwin') copyVersionJSON()
@@ -81,14 +97,12 @@ if (process.argv.includes('--pre')) {
 } else if (process.argv.includes('--post')) {
   console.log('run copy-patch.js --post')
   if (process.platform === 'darwin') deleteVersionJSON()
-  const dest = path.resolve(__dirname, 'build/electron/UnPackaged/node_modules/developer')
-  const dest2 = path.resolve(__dirname, 'build/electron/UnPackaged/developer')
-  if (fs.existsSync(dest)) {
-    console.log(dest)
-    fs.rmSync(dest, { recursive: true })
+  if (fs.existsSync(modulesAppConfigPath)) {
+    console.log(modulesAppConfigPath)
+    fs.rmSync(modulesAppConfigPath, { recursive: true })
   }
-  if (fs.existsSync(dest2)) {
-    console.log(dest2)
-    fs.rmSync(dest2, { recursive: true })
+  if (fs.existsSync(unPackagedAppConfigPath)) {
+    console.log(unPackagedAppConfigPath)
+    fs.rmSync(unPackagedAppConfigPath, { recursive: true })
   }
 }
