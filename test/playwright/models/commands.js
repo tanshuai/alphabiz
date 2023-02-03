@@ -22,6 +22,7 @@ class Commands {
     this.downloadBtn = page.locator('button:has-text("Download")')
     // credits
     // account
+    this.SignOutAnywayBtn = page.locator('button:has-text("Sign out anyway")')
   }
 
   /**
@@ -69,8 +70,21 @@ class Commands {
   async signOut () {
     await this.jumpPage('accountMore')
     await this.page.click('text=Sign out')
+    if (!await this.SignOutAnywayBtn.isVisible()) { await this.SignOutAnywayBtn.click() }
     await this.page.locator('.q-notification__message >> text=Signed out').waitFor()
     await this.page.evaluate(() => localStorage.clear())
+  }
+
+  // Determine whether to log in and log in for download tests
+  async ensureLoginStatus (username, password, isWaitAlert) {
+    // if not logged in
+    if (await this.downloadingStatus.isHidden()) await this.menuIcon.click()
+    if (!await this.accountSignUp.isHidden()) {
+      await this.signIn(username, password, isWaitAlert)
+    }
+    // else {
+    //   console.log('logined')
+    // }
   }
 
   // credits
