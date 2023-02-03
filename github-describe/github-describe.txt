@@ -1,6 +1,8 @@
-fix web tab icon customization
-apply `VirtualScrollGrid` for Lib Index Page
-add footer for Index page
-use  `VirtualScrollGrid`
-fixed #878
-update snap maker configs
+#866
+fix footer for Library pages
+add fetchNext to Index Page
+improve `VirtualScrollGrid`
+improve `VirtualScrollGrid`
+fix scrollTop of `VirtualScrollGrid`
+Update VirtualScrollGrid.vue
+#884
