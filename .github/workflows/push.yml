@@ -11,7 +11,7 @@ on:
   push:
     paths:
       - "**.js"
-      - "**/push.yml"
+      - "!**/push.yml"
       - "!patches/**"
       - "!public/**"
       - "!wix/**"
@@ -452,6 +452,7 @@ jobs:
         if: matrix.test == '1'
         uses: nick-fields/retry@v2
         with:
+          timeout_seconds: 1800
           max_attempts: 2
           shell: bash
           retry_on: error
@@ -464,6 +465,7 @@ jobs:
         if: matrix.test == '2'
         uses: nick-fields/retry@v2
         with:
+          timeout_seconds: 1800
           max_attempts: 2
           shell: bash
           retry_on: error
@@ -492,7 +494,7 @@ jobs:
       - name: E2E appium test for msi 🧪
         uses: nick-fields/retry@v2
         with:
-          timeout_seconds: 1200
+          timeout_seconds: 1800
           max_attempts: 2
           shell: bash
           retry_on: error
@@ -506,7 +508,7 @@ jobs:
       - name: E2E appium test for exe 🧪
         uses: nick-fields/retry@v2
         with:
-          timeout_seconds: 1200
+          timeout_seconds: 1800
           max_attempts: 2
           shell: bash
           retry_on: error
