@@ -1,8 +1,6 @@
-#866
-fix footer for Library pages
-add fetchNext to Index Page
-improve `VirtualScrollGrid`
-improve `VirtualScrollGrid`
-fix scrollTop of `VirtualScrollGrid`
-Update VirtualScrollGrid.vue
+fix snap path error
+#868
+try sync snapcraft folder
+separate app root directory
 #884
+Update test.js
