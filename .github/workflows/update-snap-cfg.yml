@@ -178,7 +178,6 @@ jobs:
         run: cat snap/snapcraft.yaml
       
       - name: push snapcraft.yaml to publiv repo 📰
-        if: steps.vars.outputs.isPush == 1 && !contains(steps.vars.outputs.event-name, 'schedule')
         uses: cpina/github-action-push-to-another-repository@main
         env:
           API_TOKEN_GITHUB: ${{ secrets.PAT }}
