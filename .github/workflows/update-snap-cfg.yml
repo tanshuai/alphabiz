@@ -175,7 +175,7 @@ jobs:
         run: yarn node snapcraft
 
       - name: log snapcraft.yaml 📰
-        run: cat snapcraft/snapcraft.yaml
+        run: cat snap/snapcraft.yaml
       
       - name: push snapcraft.yaml to publiv repo 📰
         if: steps.vars.outputs.isPush == 1 && !contains(steps.vars.outputs.event-name, 'schedule')
@@ -185,10 +185,10 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.PAT }}
           GITHUB_PAT: ${{ secrets.PAT }}
         with:
-          source-directory: snapcraft
+          source-directory: snap
           destination-github-username: "tanshuai"
           destination-repository-name: "alphabiz"
           user-name: Alphabiz-Team
           user-email: git@alpha.biz
-          target-directory: snapcraft
-          commit-message: "${{ steps.slug.outputs.sha7 }} update snapcraft config"
+          target-directory: snap
+          commit-message: "${{ steps.slug.outputs.sha7 }} update snap config"
