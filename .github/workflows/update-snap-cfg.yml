@@ -1,4 +1,4 @@
-name: CI/CT/CD
+name: update-snap-cfg
 # env:
 #   name: staging_environment
 
@@ -165,6 +165,12 @@ jobs:
           yarn packager
         shell: bash
       
+      - name: prepare Snap
+        run: |
+          sudo apt install snapd
+          sudo snap install snapcraft
+          sudo snap install multipass
+
       - name: generate snapcraft.yaml
         run: yarn node snapcraft
 
