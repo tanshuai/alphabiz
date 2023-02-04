@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name={{displayName}}
+Exec={{snapName}} %U
+Icon=${SNAP}/meta/gui/icon.png
+Type=Application
+StartupNotify=true

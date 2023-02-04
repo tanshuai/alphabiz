@@ -1,0 +1,78 @@
+name: {{snapName}}
+title: {{displayName}}
+version: {{version}}
+summary: {{description}}
+description: {{description}}
+grade: stable
+confinement: strict
+base: core18
+
+apps:
+  {{snapName}}:
+    plugs:
+      - desktop
+      - desktop-legacy
+      - gsettings
+      - home
+      - mount-observe
+      - network
+      - network-bind
+      - unity7
+      - x11
+      - browser-support
+      - wayland
+    extensions: [gnome-3-28]
+    command: bin/desktop-launch $SNAP/{{snapName}}/{{appName}} --no-sandbox
+
+parts:
+  desktop-gnome-platform:
+    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+    source-type: git
+    source-depth: 1
+    source-subdir: gtk
+    plugin: make
+    make-parameters: ["FLAVOR=gtk3"]
+    build-packages:
+      - gcc
+    override-build: |
+      snapcraftctl build
+      mkdir -pv $SNAPCRAFT_PART_INSTALL/gnome-platform
+
+  {{snapName}}:
+    source: out/make/snapcraft
+    after:
+      - desktop-gnome-platform
+    source-type: local
+    plugin: dump
+    build-packages:
+      - libasound2
+    stage-packages:
+      - libnotify4
+      - libnss3
+      - libpcre3
+      - libxss1
+      - libxtst6
+      - libdrm2
+      - libgbm1
+      - libwayland-server0
+      - libasound2
+    organize:
+      {{appName}}: {{snapName}}
+
+plugs:
+  gnome-3-28-1804:
+    default-provider: gnome-3-28-1804
+    interface: content
+    target: $SNAP/gnome-platform
+  gtk-3-themes:
+    default-provider: gtk-common-themes
+    interface: content
+    target: $SNAP/data-dir/themes
+  icon-themes:
+    default-provider: gtk-common-themes
+    interface: content
+    target: $SNAP/data-dir/icons
+  sound-themes:
+    default-provider: gtk-common-themes
+    interface: content
+    target: $SNAP/data-dir/sounds
