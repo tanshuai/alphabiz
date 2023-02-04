@@ -50,7 +50,7 @@ const getCommit = async () => {
 }
 const getSourceCommit = async () => {
   return new Promise((resolve, reject) => {
-    exec('git log -1 --pretty=%B --author=Alphabiz-Team', (error, stdout, stderr) => {
+    exec('git log -5 --pretty=%B --author=Alphabiz-Team', (error, stdout, stderr) => {
       if (error) {
         console.error(`exec error: ${error}`)
         return
@@ -59,7 +59,7 @@ const getSourceCommit = async () => {
         console.error(`Error from Git: ${stderr}`)
         return
       }
-      const sha7 = /(?<=-)\w{7}(?=\s)|^\w{7}(?=\s)|^\w{7}/.exec(stdout.trim())
+      const sha7 = /(?<=-)\w{7}(?=\s)|^\w{7}(?=\s)|^\w{7}/gm.exec(stdout.trim())
       resolve(sha7[0])
     })
   })
