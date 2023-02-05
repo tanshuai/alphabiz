@@ -4,7 +4,7 @@ Alphabiz: decentralized media platform and marketplace
 
 [![CI/CT/CD](https://github.com/tanshuai/alphabiz/actions/workflows/push.yml/badge.svg)](https://github.com/tanshuai/alphabiz/actions/workflows/push.yml)[![CodeQL](https://github.com/tanshuai/alphabiz/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/tanshuai/alphabiz/actions/workflows/codeql-analysis.yml)[![Backup Weekly](https://github.com/tanshuai/alphabiz/actions/workflows/weekly.yml/badge.svg)](https://github.com/tanshuai/alphabiz/actions/workflows/weekly.yml)
 
-- **Marketplace** built on credit system
+- **Marketplace** built on credit system with decentralized technologies
 - **Streaming Media** with P2P technologies
 - **Media Player** supports mainstream formats & subtitles
 
