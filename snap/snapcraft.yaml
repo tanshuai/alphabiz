@@ -32,7 +32,7 @@ parts:
     source-subdir: gtk
     plugin: make
     after:
-      - alphabiz
+      - prepare-alphabiz
     make-parameters: ["FLAVOR=gtk3"]
     build-packages:
       - gcc
@@ -40,12 +40,9 @@ parts:
       snapcraftctl build
       mkdir -pv $SNAPCRAFT_PART_INSTALL/gnome-platform
 
-  alphabiz:
-    plugin: nodejs
+  prepare-alphabiz:
+    plugin: dump
     source: https://nodejs.org/dist/v16.19.0/node-v16.19.0-linux-x64.tar.xz
-    nodejs-version: 16.19.0
-    nodejs-package-manager: yarn
-    nodejs-yarn-version: v1.22.19
     override-build: |
       find ~ -type d -name "*build/alphabiz*" -print
       echo "---------------------------"
@@ -66,7 +63,7 @@ parts:
       yarn packager
       yarn node snapcraft
 
-  alphabiz-build:
+  alphabiz:
     source: out/make/snapcraft
     after:
       - desktop-gnome-platform
