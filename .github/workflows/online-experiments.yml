@@ -288,9 +288,9 @@ jobs:
 
       - name: Build snap 📦
         run: |
-        yarn node snapcraft
-        sg lxd -c 'snapcraft snap --output=./out/installers/app.snap --use-lxd'
-        yarn node snapcraft --post
+          yarn node snapcraft
+          sg lxd -c 'snapcraft snap --output=./out/installers/app.snap --use-lxd'
+          yarn node snapcraft --post
 
       - name: Release ${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }} to GitHub 📰
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
