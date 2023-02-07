@@ -271,6 +271,9 @@ jobs:
           yarn packager
         shell: bash
 
+      - name: fix lxd dir error
+        run: sudo ln -s /var/snap/lxd/common/lxd /var/lib/lxd
+
       - name: Install Snapcraft
         uses: samuelmeuli/action-snapcraft@v1
         with:
