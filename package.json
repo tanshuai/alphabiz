@@ -37,6 +37,7 @@
     "make:dmg": "electron-forge make --skip-package --targets @electron-forge/maker-dmg",
     "make:deb": "electron-forge make --skip-package --targets @electron-forge/maker-deb",
     "make:snap": "node snapcraft && snapcraft snap --output=./out/installers/app.snap && node snapcraft --post",
+    "make:snap:ci": "node snapcraft && sg lxd -c 'snapcraft snap --output=./out/installers/app.snap --use-lxd' && node snapcraft --post",
     "postmake": "node make.js --postmake"
   },
   "dependencies": {

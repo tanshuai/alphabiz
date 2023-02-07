@@ -127,3 +127,6 @@ out/*
 # !out/make
 # out/make/*
 # !out/make/snapcraft/
+
+snap/**/*
+*.snap
