@@ -331,6 +331,28 @@ jobs:
           export PATH=$PATH:/c/Program\ Files\ \(x86\)/WiX\ Toolset\ v3.11/bin
           yarn make
         shell: bash
+      
+      # build snapcraft
+      - name: Install Snapcraft
+        if: |
+          (contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json'))
+          && contains(steps.vars.outputs.system, 'ubuntu')
+        uses: samuelmeuli/action-snapcraft@v1
+        with:
+          use_lxd: true
+
+      - name: Install Snapcraft env
+        if: |
+          (contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json'))
+          && contains(steps.vars.outputs.system, 'ubuntu')
+        run: |
+          sudo snap install multipass --classic
+
+      - name: Build snap 📦
+        if: |
+          (contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json'))
+          && contains(steps.vars.outputs.system, 'ubuntu')
+        run: yarn make:snap:ci
 
       - name: Release ${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }} to GitHub 📰
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
