@@ -368,6 +368,7 @@ jobs:
     env:
       NODE_AUTH_TOKEN: ${{ secrets.PAT }}
       GITHUB_PAT: ${{ secrets.PAT }}
+      SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_TOKEN }}
     steps:
       - name: Get short SHA 🔑
         id: sha
@@ -469,7 +470,7 @@ jobs:
         with:
           use_lxd: true
 
-      - name: Build snap 📦
+      - name: Pack snap 📦
         run: yarn make:snap:ci
 
       - name: Release ${{ needs.nightly_job.outputs.file-name-lower }}-${{ needs.nightly_job.outputs.package-name }}-${{ steps.vars.outputs.system }} to GitHub 📰
@@ -481,6 +482,16 @@ jobs:
           body: ${{ env.DESCRIBE }}
           files: |
             ./out/installers/${{ needs.nightly_job.outputs.tag-name }}/**
+
+      # Generate snap token
+      # snapcraft export-login --snaps [SNAP_NAME] --channels candidate,edge -
+
+      - name: Upload snap to SnapCraft 📰
+        if: env.SNAPCRAFT_STORE_CREDENTIALS != ''
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_TOKEN }}
+        run: |
+          snapcraft upload --release=stable ./out/installers/*.snap
 
   appium_test_job:
     needs: [nightly_job, release_job]
