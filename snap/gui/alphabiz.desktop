@@ -1,6 +1,0 @@
-[Desktop Entry]
-Name=Alphabiz
-Exec=alphabiz %U
-Icon=${SNAP}/meta/gui/icon.png
-Type=Application
-StartupNotify=true
