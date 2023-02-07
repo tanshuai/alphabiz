@@ -1,8 +1,5 @@
-allow choose directory for external url and drag-and-drop tasks, fix #256
-fix installInfo.json missed in msi installer
 fix #259
-use force use ascii chars in url, show webrtc address for peers #259
-close #260
-normalize alphabiz url
-pause all torrents and disable adding tasks if user logged out #257
-feedback to public repo
+adjust e2e test
+remove onwire log
+fix #264
+force user to login, popup login panel if user is not logged in #257
