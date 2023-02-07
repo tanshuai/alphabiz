@@ -21,7 +21,7 @@ jobs:
     strategy:
       matrix:
         # os: [ubuntu-latest, windows-latest, macos-latest]
-        os: [ubuntu-20.04]
+        os: [ubuntu-22.04]
         node-version: [16]
     environment:
       name: CICD
@@ -271,17 +271,16 @@ jobs:
           yarn packager
         shell: bash
 
+      # fix lxd dir error in ubuntu20.04 or ubuntu22.04
       - name: fix lxd dir error
-        run: sudo ln -s /var/snap/lxd/common/lxd /var/lib/lxd
+        run: |
+          sudo ln -s /var/snap/lxd/common/lxd /var/lib/lxd
+          sudo snap install multipass --classic
 
       - name: Install Snapcraft
         uses: samuelmeuli/action-snapcraft@v1
         with:
           use_lxd: true
-
-      - name: Install Snapcraft env
-        run: |
-          sudo snap install multipass --classic
 
       - name: Build snap 📦
         run: yarn make:snap:ci
