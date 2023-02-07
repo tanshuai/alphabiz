@@ -21,7 +21,7 @@ jobs:
     strategy:
       matrix:
         # os: [ubuntu-latest, windows-latest, macos-latest]
-        os: [ubuntu-latest]
+        os: [ubuntu-18.04]
         node-version: [16]
     environment:
       name: CICD
@@ -271,11 +271,24 @@ jobs:
           yarn packager
         shell: bash
 
+      # - name: Install Snapcraft
+      #   uses: samuelmeuli/action-snapcraft@v1
+
       - name: Install Snapcraft env
         run: |
           sudo apt install snapd
           sudo snap install snapcraft --classic
           sudo snap install multipass --classic
+
+      - name: check env
+        run: |
+          snap info multipass
+
+      - name: start multipass
+        run: |
+          systemctl stop systemd-resolved.service
+          systemctl restart snap.multipass.multipassd.service
+          systemctl start systemd-resolved.service
 
       - name: Pack snap 📦
         run: yarn make:snap
