@@ -58,11 +58,11 @@ describe('download', () => {
     const DownloadFilePath = path.resolve(__dirname, '../../download')
 
     // 判断是否已经登录
-    await homePage.jumpPage('creditsLink')
     if (await client.$('//*[@Name="SIGN IN"]').isDisplayed()) {
       // 未登录
       await accountPage.signIn(process.env.TEST2_EMAIL, process.env.TEST_PASSWORD, 1)
     } else {
+      await homePage.jumpPage('creditsLink')
       // 已登陆,等待拉取数据
       // await client.$('//*[@Name="Settings"]').click()
       if (!await homePage.settingsLink.isDisplayed()) {

@@ -3,7 +3,7 @@
 
 describe('LanguageSelection', () => {
   beforeEach(() => {
-    cy.visit('/')
+    cy.signIn('test1' + Cypress.env('testEmailDomain'), 'password')
     cy.get('[aria-label="Menu"]').click()
     cy.contains('Settings').click()
     cy.contains('Basic').click()

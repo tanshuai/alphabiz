@@ -1,12 +1,9 @@
 /* eslint-disable no-undef */
-// /* eslint-disable no-undef */
-// /* eslint-disable jest/no-focused-tests */
-/* eslint-disable jest/no-disabled-tests */
+
 const wdio = require('webdriverio')
 const path = require('path')
 const fs = require('fs')
 
-import appPackage from '../../../package.json'
 const { HomePage } = require('./Pages/HomePage')
 const { AccountPage } = require('./Pages/AccountPage')
 const { CreditsPage } = require('./Pages/CreditsPage')
@@ -47,6 +44,21 @@ describe('upload', () => {
     }
     await sleep(2000)
     await client.saveScreenshot(outputPath + '/homePage.png')
+  })
+  it('ensure sign in', async () => {
+    // 判断是否已经登录
+    if (await client.$('//*[@Name="SIGN IN"]').isDisplayed()) {
+      // 未登录
+      await accountPage.signIn(process.env.TEST1_EMAIL, process.env.TEST_PASSWORD, 1)
+    } else {
+      await homePage.jumpPage('creditsLink')
+      // 已登陆,等待拉取数据
+      // await client.$('//*[@Name="Settings"]').click()
+      if (!await homePage.settingsLink.isDisplayed()) {
+        await homePage.menuBtn.click()
+      }
+      await accountPage.accountSettingsTitle.waitForDisplayed({ timeout: 10000 })
+    }
   })
   it('version number', async () => {
     const version = await homePage.getAppVersion()

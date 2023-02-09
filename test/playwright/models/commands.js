@@ -78,9 +78,13 @@ class Commands {
   // Determine whether to log in and log in for download tests
   async ensureLoginStatus (username, password, isWaitAlert) {
     // if not logged in
-    if (await this.downloadingStatus.isHidden()) await this.menuIcon.click()
-    if (!await this.accountSignUp.isHidden()) {
+    if (await this.page.locator('[aria-label="Phone number or email"]').isVisible()) {
       await this.signIn(username, password, isWaitAlert)
+    } else {
+      if (await this.downloadingStatus.isHidden()) await this.menuIcon.click()
+      if (!await this.accountSignUp.isHidden()) {
+        await this.signIn(username, password, isWaitAlert)
+      }
     }
     // else {
     //   console.log('logined')

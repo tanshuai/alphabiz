@@ -22,8 +22,11 @@ class AccountPage {
         return (await this.username.isDisplayed()) === false
       }, {
         timeout: 40000,
-        timeoutMsg: 'signInCard is hidden'
+        timeoutMsg: 'signInCard is not hidden'
       })
+      if (!(await this.page.$('//*[@Name="Credits"]').isDisplayed())) {
+        await this.page.$('//Button[@Name="Menu"]').click()
+      }
       await this.accountSettingsTitle.waitForDisplayed()
     }
   }

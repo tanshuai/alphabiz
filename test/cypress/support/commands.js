@@ -76,15 +76,23 @@ Cypress.Commands.add('toCredits', () => {
   cy.get('.q-linear-progress__model', { timeout: 10000 }).should('be.visible')
   cy.get('.q-linear-progress__model', { timeout: 10000 }).should('not.exist')
 })
-
+Cypress.Commands.add('toMoreHoriz', () => {
+  cy.get('[aria-label="Menu"]').click()
+  cy.contains('more_horiz', { timeout: 20000 }).click()
+  cy.get('[data-cy=account-settings-btn]').click()
+})
 // cacheSession = true => call session()
 // cacheSession = true => call session()
 Cypress.Commands.add('signIn', (username, password, { cacheSession = true } = {}) => {
   const login = () => {
     cy.visit('/')
-    // toggle sign in page
-    cy.toSignIn()
-    // sign in start
+    cy.get('.q-card', { timeout: 5000 }).then(($element) => {
+      if (!$element.is(':visible')) {
+        // toggle sign in page
+        cy.toSignIn()
+        // sign in start
+      }
+    })
     let user
     if (/@/.test(username)) {
       user = username
@@ -108,8 +116,7 @@ Cypress.Commands.add('signIn', (username, password, { cacheSession = true } = {}
       }
     })
     cy.get('.q-notification__message', { timeout: 30000 }).should('have.text', 'Signed in')
-    cy.contains('more_horiz', { timeout: 20000 }).click()
-    cy.get('[data-cy=account-settings-btn]').click()
+    cy.toMoreHoriz()
     // cy.location('pathname', { timeout: 30000 }).should('eq', '/account/settings')
     // sign in end
   }
@@ -123,31 +130,28 @@ Cypress.Commands.add('signIn', (username, password, { cacheSession = true } = {}
         } else {
           user = '+1' + Cypress.env(username)
         }
-        cy.get('[aria-label="Menu"]').click()
-        cy.contains('more_horiz', { timeout: 20000 }).click()
-        cy.get('[data-cy=account-settings-btn]').click()
+        cy.toMoreHoriz()
         // cy.location('pathname', { timeout: 12000 }).should('eq', '/account/settings')
         cy.get('.account-setting__verification').contains(user)
       }
     })
     cy.visit('/')
-    cy.get('[aria-label="Menu"]').click()
-    cy.contains('more_horiz', { timeout: 20000 }).click()
-    cy.get('[data-cy=account-settings-btn]').click()
+    cy.toMoreHoriz()
     // cy.location('pathname', { timeout: 12000 }).should('eq', '/account/settings')
   } else {
     login()
   }
 })
 Cypress.Commands.add('signOut', () => {
-  // sign out start
   cy.get('[aria-label="Menu"]').click()
-  cy.get('.corner > .q-item').click()
+  cy.contains('more_horiz').click()
   cy.get("[data-cy='sign-out-btn']").click()
-  // cy.intercept('https://cognito-idp.ca-central-1.amazonaws.com/').as('completed')
-  // cy.wait('@completed', { timeout: 10000 })
+  cy.contains('Sign out anyway').then(($element) => {
+    if ($element.is(':visible')) {
+      cy.contains('Sign out anyway').click()
+    }
+  })
   cy.contains('Signed out', { timeout: 30000 }).should('be.visible')
-  // sign out end
 })
 
 Cypress.Commands.add('getAccountStatus', () => {
