@@ -4,7 +4,7 @@
   "version": "0.2.0",
   "description": "Alphabiz Blockchain Cryptocurrency Application",
   "productName": "Alphabiz",
-  "author": "Alphabiz Team <dev@alpha.biz>",
+  "author": "Alphabiz Team <ab@alpha.biz>",
   "scripts": {
     "preunpackaged": "node update-version.js",
     "postinstall": "patch-package --error-on-fail && node ./node_modules/symlink-dir/dist/cli.js node_modules/@zeeis/velectron node_modules/electron && ./node_modules/.bin/electron-rebuild -v 17.0.0",
