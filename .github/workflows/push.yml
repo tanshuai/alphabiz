@@ -484,14 +484,14 @@ jobs:
             ./out/installers/${{ needs.nightly_job.outputs.tag-name }}/**
 
       # Generate snap token
-      # snapcraft export-login --snaps [SNAP_NAME] --channels candidate,edge -
+      # snapcraft export-login --snaps [SNAP_NAME] --channels edge -
 
       - name: Upload snap to SnapCraft 📰
         if: env.SNAPCRAFT_STORE_CREDENTIALS != ''
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_TOKEN }}
         run: |
-          snapcraft upload --release=candidate,edge ./out/installers/${{ needs.nightly_job.outputs.tag-name }}/*.snap
+          snapcraft upload --release=edge ./out/installers/${{ needs.nightly_job.outputs.tag-name }}/*.snap
 
   appium_test_job:
     needs: [nightly_job, release_job]
