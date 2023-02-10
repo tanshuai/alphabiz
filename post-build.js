@@ -18,7 +18,7 @@ const appName = appConfig.name;
 
 const buildDarwin = () => {
   const plist = require('plist')
-  const appPath = resolve(__dirname, `../dist/electron/${appName}-darwin-x64/${appName}.app`)
+  const appPath = resolve(__dirname, `build/electron/${appName}-darwin-x64/${appName}.app`)
   const contentsPath = resolve(appPath, 'Contents')
   const resourcesPath = resolve(contentsPath, 'Resources')
   const infoPlistPath = resolve(contentsPath, 'Info.plist')
