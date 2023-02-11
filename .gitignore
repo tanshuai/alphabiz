@@ -118,8 +118,11 @@ test/output/**
 build/**/node_modules
 build/electron/*-*-*/**
 build/electron/**/yarn.lock
-patches/@quasar+app+2.2.11.patch
 build/electron/UnPackaged/developer
+
+# patches/
+patches/@quasar+app+2.2.11.patch
+patches/@quasar+app+2.2.11.dev.patch
 
 # out/
 # Ignore out/ except for out/make/snapcraft/
