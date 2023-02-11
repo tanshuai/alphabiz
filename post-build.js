@@ -10,7 +10,7 @@ const audioExt = [
 const videoExt = [
   'mp4', 'mkv', 'flv', 'avi', 'mov', 'wmv', 'rmvb', 'flv', 'webm'
 ]
-const srcIconPath = resolve(__dirname, 'public/favicon.ico')
+const srcIconPath = resolve(__dirname, 'developer/favicon.ico')
 const iconPath = 'favicon.ico'
 
 const appConfig = require('./developer/app');
