@@ -267,25 +267,25 @@ jobs:
             fi
           else yarn node update-version.js --buildTime ${{ steps.vars.outputs.date }} ; \
           fi
-          BUILD_ARCH=arm64 yarn packager
+          ./universal/build-mac.sh
         shell: bash
 
       - name: check
         run: |
           cd build
           ls
+          echo "---------------"
           cd electron
           ls
         shell: bash
 
-      - name: Upload packager Results 🗃
-        if: always()
-        uses: actions/upload-artifact@v2
-        with:
-          name: "${{ matrix.os }}-output"
-          path: |
-            build/electron/Alphabiz*
-            build/Alphabiz*
+      # - name: Upload packager Results 🗃
+      #   if: always()
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: "${{ matrix.os }}-output"
+      #     path: |
+      #       ./out/installers/**
 
       # # fix lxd dir error in ubuntu20.04
       # - name: fix lxd dir error
@@ -301,16 +301,19 @@ jobs:
       # - name: Build snap 📦
       #   run: yarn make:snap:ci
 
-      # - name: Release ${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }} to GitHub 📰
-      #   if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
-      #   uses: softprops/action-gh-release@v1
-      #   with:
-      #     prerelease: true
-      #     name: ${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.release-name }}
-      #     tag_name: ${{ steps.unify.outputs.tag-name }}
-      #     body: ${{ env.DESCRIBE }}
-      #     files: |
-      #       ./out/installers/${{ steps.unify.outputs.tag-name }}/**
+      - name: Release ${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }} to GitHub 📰
+        if: |
+          contains(steps.vars.outputs.event-name, 'schedule')
+          || contains(env.MODIFIED_FILE_LIST, 'release.json')
+          || contains(github.event.head_commit.message, 'try release')
+        uses: softprops/action-gh-release@v1
+        with:
+          prerelease: true
+          name: ${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.release-name }}
+          tag_name: ${{ steps.unify.outputs.tag-name }}
+          body: ${{ env.DESCRIBE }}
+          files: |
+            ./out/installers/${{ steps.unify.outputs.tag-name }}/**
 
   appium-test:
     needs: build-1
