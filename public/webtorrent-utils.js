@@ -141,7 +141,28 @@ const torrentToJson = (tr, deltaTime, speeder) => {
 
   // trackers
   if (tr.trackerMap) {
-    o.trackerList = [...tr.trackerMap.values()]
+    o.trackerList = [...tr.trackerMap.values()].map(i => {
+      const info = { ...i }
+      if (info.url.includes('@6')) {
+        info.isIpv6 = true
+      } else {
+        info.isIpv6 = info.url.startsWith('ws') && info.url.includes('ipv6')
+      }
+      return info
+    // }).filter(i => {
+    //   return i.isIpv6 ? i.status !== 'connecting' : true
+    }).filter(({ url, status }) => {
+      if (status !== 'error') return true
+      let _url = url
+      if (url.includes('@6')) {
+        _url = url.replace('@6', '')
+      } else {
+        _url += '@6'
+      }
+      const tracker = tr.trackerMap.get(_url)
+      if (tracker && tracker.status !== 'error') return false
+      return true
+    }).sort((a, b) => a.url.localeCompare(b.url))
   } else {
     o.trackerList = []
   }
@@ -250,11 +271,15 @@ const addTracker = (tr, url) => {
   if (client._trackers.find(i => i.announceUrl === url)) return
   if (!client._createTracker) return
   try {
-    const tracker = client._createTracker(url)
-    if (!tracker) return
-    client._trackers.push(tracker)
-    tracker.setInterval()
-    tracker.announce(client._defaultAnnounceOpts())
+    const ipFamalies = [4]
+    if (url.startsWith('http')) ipFamalies.push(6)
+    for (const family of ipFamalies) {
+      const tracker = client._createTracker(url, family)
+      if (!tracker) continue
+      client._trackers.push(tracker)
+      tracker.setInterval()
+      tracker.announce(client._defaultAnnounceOpts())
+    }
   } catch (e) {
     console.error('addTracker error', e)
   }
