@@ -1,7 +1,8 @@
-add GoogleAnalytics
-add wait time for quick start
-Update index.template.html
+fix error when `--dev` is not set in build-mac.sh
+add attr: location
 #886
+#886
+Update index.js
 #897
-modify subtitles prompt
-fix e2e test download error
+#886 add log
+#893 add some log
