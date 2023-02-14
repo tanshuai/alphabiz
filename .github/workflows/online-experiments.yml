@@ -270,12 +270,22 @@ jobs:
           BUILD_ARCH=arm64 yarn packager
         shell: bash
 
+      - name: check
+        run: |
+          cd build
+          ls
+          cd electron
+          ls
+        shell: bash
+
       - name: Upload packager Results 🗃
         if: always()
         uses: actions/upload-artifact@v2
         with:
           name: "${{ matrix.os }}-output"
-          path: build/electron/Alphabiz*
+          path: |
+            build/electron/Alphabiz*
+            build/Alphabiz*
 
       # # fix lxd dir error in ubuntu20.04
       # - name: fix lxd dir error

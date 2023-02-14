@@ -30,6 +30,28 @@ packageJson.productName = appName
 //   console.log('Restore package.json before quasar build exit')
 //   fs.writeFileSync(packagePath, package)
 // })
+const unsupportedModules = [
+  'lzma-native',
+  'utp-native'
+]
+const pruneNative = dir => {
+  if (!fs.existsSync(dir)) return
+  const files = fs.readdirSync(dir)
+  files.forEach(file => {
+    const p = resolve(dir, file)
+    if (fs.statSync(p).isDirectory()) return pruneNative(p)
+    if (
+      !p.endsWith('.node')
+      // || (
+      //   unsupportedModules.some(m => p.includes(`node_modules/${m}`)) &&
+      //   !p.includes('arm') && !p.includes('x64')
+      // )
+    ) {
+      fs.rmSync(p)
+      // console.log('[Prune] remove', p)
+    }
+  })
+}
 
 const beforeBuild = async () => {
   const { platform, arch } = process
@@ -162,7 +184,7 @@ packager({
   afterCopy: [(buildPath, electronVersion, platform, arch, callback) => {
     console.log('Copy patches to', buildPath)
     fs.cpSync(resolve(__dirname, 'patches'), resolve(buildPath, 'patches'), { recursive: true })
-    if (platform === 'darwin') {fs.rmSync(resolve(buildPath, 'patches/electron-wix-msi+4.0.0.dev.patch'))}
+    if (platform !== 'win32') {fs.rmSync(resolve(buildPath, 'patches/electron-wix-msi+4.0.0.dev.patch'))}
     const result = execSync('npx patch-package', { cwd: buildPath })
     console.log(`Patch package result: ${result.toString()}`)
     // const yarnResult = execSync('yarn install --production', { cwd: buildPath })
