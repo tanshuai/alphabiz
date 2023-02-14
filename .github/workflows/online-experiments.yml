@@ -120,7 +120,6 @@ jobs:
 
       - name: Get release.json property
         id: release
-        if: contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
           CONTENT=$(cat ./release.json)
           TARGET_TAG_NAME=$(echo "$CONTENT" | perl -wnE"say for /(?<=targetTagName\"\:\s\").*(?=\",)/gm")
@@ -140,7 +139,6 @@ jobs:
 
       - name: Checkout release.json target tag
         id: checkout
-        if: contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
           git checkout ${{ steps.release.outputs.target-tag-name }}
           git show --name-only
@@ -164,7 +162,6 @@ jobs:
 
       # after git checkout
       - name: Get last commit date \ today all commit message
-        if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         id: nightly
         run: |
           echo "commit-sha7=$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /(?<=-)\w{7}(?=\s)|^\w{7}(?=\s)/g')" >> $GITHUB_OUTPUT
@@ -179,7 +176,6 @@ jobs:
       # nightly-release use tag_name: $packageJsonVersion-internal/nightly-$dateTime-$commitId
       # official-release use tag_name: ./release.json property newTagName
       - name: Unified Tag format
-        if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         id: unify
         run: |
           if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
@@ -302,10 +298,6 @@ jobs:
       #   run: yarn make:snap:ci
 
       - name: Release ${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }} to GitHub 📰
-        if: |
-          contains(steps.vars.outputs.event-name, 'schedule')
-          || contains(env.MODIFIED_FILE_LIST, 'release.json')
-          || contains(github.event.head_commit.message, 'try release')
         uses: softprops/action-gh-release@v1
         with:
           prerelease: true
