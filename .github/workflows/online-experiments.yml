@@ -263,8 +263,8 @@ jobs:
             fi
           else yarn node update-version.js --buildTime ${{ steps.vars.outputs.date }} ; \
           fi
-          chmod +x ./universal/build-mac.sh
-          ./universal/build-mac.sh
+          brew install coreutils
+          chmod +x ./universal/build-mac.sh && ./universal/build-mac.sh --dev
         shell: bash
 
       - name: check
@@ -276,13 +276,12 @@ jobs:
           ls
         shell: bash
 
-      # - name: Upload packager Results 🗃
-      #   if: always()
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: "${{ matrix.os }}-output"
-      #     path: |
-      #       ./out/installers/**
+      - name: Upload packager Results 🗃
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: "${{ matrix.os }}-output"
+          path: ./mac-build.log
 
       # # fix lxd dir error in ubuntu20.04
       # - name: fix lxd dir error
