@@ -4149,7 +4149,7 @@ bittorrent-peerid@^1.3.3:
   resolved "https://registry.yarnpkg.com/bittorrent-peerid/-/bittorrent-peerid-1.3.4.tgz#81c1597a06a1d424a6ddd1bb196eead98c250d01"
   integrity sha512-Xzk1FJFHmsc9H8IKFtDUkfAZIT1HW8r6UqajfZBBxWmpA1v7FsPO8xPFtnFzCqcXlPN3yi8dDmlqZCemyB7P8w==
 
-bittorrent-protocol@^3.4.3:
+bittorrent-protocol@3.5.1, bittorrent-protocol@^3.4.3:
   version "3.5.1"
   resolved "https://registry.yarnpkg.com/bittorrent-protocol/-/bittorrent-protocol-3.5.1.tgz#795131c236010f91371b6e2a2e6beb4b108eeb3b"
   integrity sha512-euVSavQL0jBqRcbsNs5zUP9Ygm+OW5vCDDaatC6vrONtXp+eVe4sO1wA58Gig3IYOdRSBKl53auniWEAJ9quxg==
@@ -4395,7 +4395,7 @@ buffer@^6.0.3:
     base64-js "^1.3.1"
     ieee754 "^1.2.1"
 
-bufferutil@^4.0.1, bufferutil@^4.0.3:
+bufferutil@4.0.6, bufferutil@^4.0.1, bufferutil@^4.0.3:
   version "4.0.6"
   resolved "https://registry.yarnpkg.com/bufferutil/-/bufferutil-4.0.6.tgz#ebd6c67c7922a0e902f053e5d8be5ec850e48433"
   integrity sha512-jduaYOYtnio4aIAyc6UbvPCVcgq7nYpVnucyxr6eCYg/Woad9Hf/oxxBRDnGGjPfjUm6j5O/uBWhIu4iLebFaw==
@@ -5045,7 +5045,7 @@ crc@^3.4.4:
   dependencies:
     buffer "^5.1.0"
 
-create-torrent@^5.0.1:
+create-torrent@5.0.1, create-torrent@^5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/create-torrent/-/create-torrent-5.0.1.tgz#a09e47af1af347b57fae7bd9ea67025df5cd121d"
   integrity sha512-fVvg1YYSogo3TlU1WFeTt937nhGQlf5KtB6M2HyDa/U02dbeMBE2AY9PcPlMufXNQoM/UCO28y26EmuApM7ZmA==
@@ -6556,7 +6556,7 @@ from@~0:
   resolved "https://registry.yarnpkg.com/from/-/from-0.1.7.tgz#83c60afc58b9c56997007ed1a768b3ab303a44fe"
   integrity sha1-g8YK/Fi5xWmXAH7Rp2izqzA6RP4=
 
-fs-chunk-store@^2.0.4:
+fs-chunk-store@2.0.4, fs-chunk-store@^2.0.4:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/fs-chunk-store/-/fs-chunk-store-2.0.4.tgz#ca797b7032a3752d1e7553cb9cec8970395cc34a"
   integrity sha512-JfeKRPPWkLaUoNKZdi+eLPKzZkZK1pdj2Y5lidEw9fUCkglvK/muLe6ONjdvn8yAGrDsk4tkjNp52GS658yy0g==
@@ -12610,7 +12610,7 @@ ut_pex@^3.0.2:
     compact2string "^1.4.1"
     string2compact "^1.3.2"
 
-utf-8-validate@^5.0.2, utf-8-validate@^5.0.5:
+utf-8-validate@5.0.8, utf-8-validate@^5.0.2, utf-8-validate@^5.0.5:
   version "5.0.8"
   resolved "https://registry.yarnpkg.com/utf-8-validate/-/utf-8-validate-5.0.8.tgz#4a735a61661dbb1c59a0868c397d2fe263f14e58"
   integrity sha512-k4dW/Qja1BYDl2qD4tOMB9PFVha/UJtxTc1cXYOe3WwA/2m0Yn4qB7wLMpJyLJ/7DR0XnTut3HsCSzDT4ZvKgA==

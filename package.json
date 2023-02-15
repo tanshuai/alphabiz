@@ -100,7 +100,12 @@
     "exe-icon-extractor": "^1.0.8"
   },
   "resolutions": {
-    "electron-wix-msi": "^4.0.0"
+    "bittorrent-protocol": "3.5.1",
+    "bufferutil": "4.0.6",
+    "create-torrent": "5.0.1",
+    "electron-wix-msi": "^4.0.0",
+    "fs-chunk-store": "2.0.4",
+    "utf-8-validate": "5.0.8"
   },
   "config": {
     "forge": "./forge.config.js"
