@@ -175,7 +175,7 @@ const doPostmake = () => {
     files.forEach(file => {
       toMoves.push([resolve(squirrelDir, file), resolve(destDir, file.replace(' Setup', '').replace(appConfig.name, appConfig.fileName.toLowerCase()).replace(productName, appConfig.fileName.toLowerCase()).replace('-full', '').replace('-delta', '').replace(versionHeader[0], version))])
     })
-  } else if (platform === 'darwin') {
+  } else if (platform === 'darwin' || platform === 'mas') {
     // move darwin installers
     toMoves.push([
       resolve(outDir, `${productName}.dmg`),
