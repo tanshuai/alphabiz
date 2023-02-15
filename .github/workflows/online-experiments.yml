@@ -265,7 +265,6 @@ jobs:
           fi
           brew install coreutils
           chmod +x ./universal/build-mac.sh && ./universal/build-mac.sh --dev
-        shell: bash
 
       - name: check
         run: |
