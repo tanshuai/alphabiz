@@ -182,7 +182,7 @@ packager({
     callback()
   }],
   afterCopy: [(buildPath, electronVersion, platform, arch, callback) => {
-    console.log('Copy patches to', buildPath)
+    console.log('Copy patches to', buildPath, arch)
     fs.cpSync(resolve(__dirname, 'patches'), resolve(buildPath, 'patches'), { recursive: true })
     fs.rmSync(resolve(buildPath, 'patches/electron-wix-msi+4.0.0.dev.patch'))
     const result = execSync('npx patch-package', { cwd: buildPath })
