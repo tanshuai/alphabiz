@@ -254,6 +254,11 @@ jobs:
           command: yarn unpackaged
           on_retry_command: rm -rf C:/Users/runneradmin/AppData/Local/node-gyp/
 
+      - name: check arch
+        run: |
+          uname -a
+          arch
+
       - name: Run electron-packager
         run: |
           if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
