@@ -25,7 +25,7 @@ describe('upload', () => {
     developmentPage = new DevelopmentPage(client)
   }, 120000)
   afterAll(async () => {
-    await client.deleteSession()
+    client && await client.deleteSession()
   })
   beforeEach(async () => {
     isSuccess = false
@@ -36,7 +36,7 @@ describe('upload', () => {
       if (!fs.existsSync(outputPath)) {
         fs.mkdirSync(outputPath, { recursive: true })
       }
-      await client.saveScreenshot(outputPath + `/${expect.getState().currentTestName}.png`)
+      client && await client.saveScreenshot(outputPath + `/${expect.getState().currentTestName}.png`)
     }
   })
   it.skip('test1', async () => {
