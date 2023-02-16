@@ -1,1 +1,9 @@
-ignore maximum endpoint uncaught error
+fix jest download test error
+add condition when jest test error
+fix drop file error #866
+fix jest test
+process exit when jest test fail
+add microsoft store recommend list
+add CustomSMSSender trigger #899
+fix uppercase extension errors
+init build-scripts #900
