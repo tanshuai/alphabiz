@@ -35,7 +35,10 @@ describe('main', () => {
   })
   afterEach(async () => {
     console.log('isSuccess', expect.getState().currentTestName, isSuccess)
-    if (!isSuccess) await client.saveScreenshot(outputPath + `/${expect.getState().currentTestName}.png`)
+    if (!isSuccess) {
+      client && await client.saveScreenshot(outputPath + `/${expect.getState().currentTestName}.png`)
+      process.exit(1)
+    }
   })
   it('title', async () => {
     const windowTitle = await client.getTitle()
