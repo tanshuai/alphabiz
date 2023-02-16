@@ -518,7 +518,7 @@ jobs:
     strategy:
       matrix:
         test: [1, 2]
-        node-version: [14]
+        node-version: [16]
         os: [windows-latest]
         include:
           - test: 1
@@ -567,12 +567,6 @@ jobs:
           scope: "@zeeis"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PAT }}
-
-      - name: update node-gyp on windows to support Visual Studio 2019
-        shell: powershell
-        run: |
-          npm install --global node-gyp@8.4.1
-          npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
 
       - name: Get message
         run: |
