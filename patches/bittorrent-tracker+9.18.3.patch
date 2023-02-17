@@ -1,18 +1,36 @@
 diff --git a/node_modules/bittorrent-tracker/client.js b/node_modules/bittorrent-tracker/client.js
-index c091c31..9d65376 100644
+index c091c31..16fecfc 100644
 --- a/node_modules/bittorrent-tracker/client.js
 +++ b/node_modules/bittorrent-tracker/client.js
-@@ -76,50 +76,59 @@ class Client extends EventEmitter {
+@@ -74,52 +74,75 @@ class Client extends EventEmitter {
+       return announceUrl
+     })
      // remove duplicates by converting to Set and back
-     announce = Array.from(new Set(announce))
- 
+-    announce = Array.from(new Set(announce))
+-
 -    const webrtcSupport = this._wrtc !== false && (!!this._wrtc || Peer.WEBRTC_SUPPORT)
++    announce = Array.from(new Set(announce)).map(url => {
++      if (url.startsWith('ws')) return { url, family: 4 }
++      if (url.match(/(\d{1,3}\.){3}\d{1,3}/)) {
++        // ipv4 only
++        return { url, family: 4 }
++      }
++      // if (url.includes('[') && url.includes(']')) {
++      //   // ipv6 only ://[::]/announce
++      //   return { url, family: 6 }
++      // }
++      return [
++        { url, family: 4 },
++        { url, family: 6 }
++      ]
++    }).flat()
++
 +    this._createTracker = this._createTracker.bind(this)
 +    /**
 +     * @type { Array<HTTPTracker|UDPTracker|WebSocketTracker> }
 +     */
 +    this._trackers = announce
-+      .map(this._createTracker)
++      .map(({ url, family }) => this._createTracker(url, family))
 +      .filter(Boolean)
 +  }
  
@@ -21,7 +39,7 @@ index c091c31..9d65376 100644
 +   * @param { string } announceUrl
 +   * @returns { HTTPTracker | UDPTracker | WebSocketTracker }
 +   */
-+  _createTracker (announceUrl) {
++  _createTracker (announceUrl, family = 4) {
      const nextTickWarn = err => {
        queueMicrotask(() => {
          this.emit('warning', err)
@@ -81,9 +99,9 @@ index c091c31..9d65376 100644
 +    const protocol = parsedUrl.protocol
 +    if ((protocol === 'http:' || protocol === 'https:') &&
 +      typeof HTTPTracker === 'function') {
-+      return new HTTPTracker(this, announceUrl)
++      return new HTTPTracker(this, announceUrl, family)
 +    } else if (protocol === 'udp:' && typeof UDPTracker === 'function') {
-+      return new UDPTracker(this, announceUrl)
++      return new UDPTracker(this, announceUrl, family)
 +    } else if ((protocol === 'ws:' || protocol === 'wss:') && webrtcSupport) {
 +      // Skip ws:// trackers on https:// sites because they throw SecurityError
 +      if (protocol === 'ws:' && typeof window !== 'undefined' &&
@@ -100,110 +118,136 @@ index c091c31..9d65376 100644
  
    /**
 diff --git a/node_modules/bittorrent-tracker/lib/client/http-tracker.js b/node_modules/bittorrent-tracker/lib/client/http-tracker.js
-index 6fcea8d..482a179 100644
+index 6fcea8d..e022dd4 100644
 --- a/node_modules/bittorrent-tracker/lib/client/http-tracker.js
 +++ b/node_modules/bittorrent-tracker/lib/client/http-tracker.js
-@@ -50,7 +50,7 @@ class HTTPTracker extends Tracker {
+@@ -19,7 +19,7 @@ const HTTP_SCRAPE_SUPPORT = /\/(announce)[^/]*$/
+  * @param {Object} opts         options object
+  */
+ class HTTPTracker extends Tracker {
+-  constructor (client, announceUrl) {
++  constructor (client, announceUrl, family) {
+     super(client, announceUrl)
+ 
+     debug('new http tracker %s', announceUrl)
+@@ -34,6 +34,8 @@ class HTTPTracker extends Tracker {
+       this.scrapeUrl = `${pre}/scrape${post}`
+     }
+ 
++    this.family = family || 4
++
+     this.cleanupFns = []
+     this.maybeDestroyCleanup = null
+   }
+@@ -50,7 +52,7 @@ class HTTPTracker extends Tracker {
      if (this._trackerId) params.trackerid = this._trackerId
  
      this._request(this.announceUrl, params, (err, data) => {
 -      if (err) return this.client.emit('warning', err)
-+      if (err) return this.client.emit('warning', err, this.announceUrl)
++      if (err) return this.client.emit('warning', err, this.announceUrl, this.family)
        this._onAnnounceResponse(data)
      })
    }
-@@ -59,7 +59,7 @@ class HTTPTracker extends Tracker {
+@@ -59,7 +61,7 @@ class HTTPTracker extends Tracker {
      if (this.destroyed) return
  
      if (!this.scrapeUrl) {
 -      this.client.emit('error', new Error(`scrape not supported ${this.announceUrl}`))
-+      this.client.emit('error', new Error(`scrape not supported ${this.announceUrl}`), this.announceUrl)
++      this.client.emit('error', new Error(`scrape not supported ${this.announceUrl}`), this.announceUrl, this.family)
        return
      }
  
-@@ -70,7 +70,7 @@ class HTTPTracker extends Tracker {
+@@ -70,7 +72,7 @@ class HTTPTracker extends Tracker {
        info_hash: infoHashes
      }
      this._request(this.scrapeUrl, params, (err, data) => {
 -      if (err) return this.client.emit('warning', err)
-+      if (err) return this.client.emit('warning', err, this.announceUrl)
++      if (err) return this.client.emit('warning', err, this.announceUrl, this.family)
        this._onScrapeResponse(data)
      })
    }
-@@ -167,7 +167,7 @@ class HTTPTracker extends Tracker {
+@@ -127,6 +129,7 @@ class HTTPTracker extends Tracker {
+       url: parsedUrl.toString(),
+       agent,
+       timeout: common.REQUEST_TIMEOUT,
++      family: this.family,
+       headers: {
+         'user-agent': this.client._userAgent || ''
+       }
+@@ -167,7 +170,7 @@ class HTTPTracker extends Tracker {
        const warning = data['warning message']
        if (warning) {
          debug(`warning from ${requestUrl} (${warning})`)
 -        self.client.emit('warning', new Error(warning))
-+        self.client.emit('warning', new Error(warning), this.announceUrl)
++        self.client.emit('warning', new Error(warning), self.announceUrl, self.family)
        }
  
        debug(`response from ${requestUrl}`)
-@@ -190,7 +190,7 @@ class HTTPTracker extends Tracker {
+@@ -190,7 +193,7 @@ class HTTPTracker extends Tracker {
        announce: this.announceUrl,
        infoHash: common.binaryToHex(data.info_hash)
      })
 -    this.client.emit('update', response)
-+    this.client.emit('update', response, this.announceUrl)
++    this.client.emit('update', response, this.announceUrl, this.family)
  
      let addrs
      if (Buffer.isBuffer(data.peers)) {
-@@ -198,15 +198,15 @@ class HTTPTracker extends Tracker {
+@@ -198,15 +201,15 @@ class HTTPTracker extends Tracker {
        try {
          addrs = compact2string.multi(data.peers)
        } catch (err) {
 -        return this.client.emit('warning', err)
-+        return this.client.emit('warning', err, this.announceUrl)
++        return this.client.emit('warning', err, this.announceUrl, this.family)
        }
        addrs.forEach(addr => {
 -        this.client.emit('peer', addr)
-+        this.client.emit('peer', addr, this.announceUrl)
++        this.client.emit('peer', addr, this.announceUrl, this.family)
        })
      } else if (Array.isArray(data.peers)) {
        // tracker returned normal response
        data.peers.forEach(peer => {
 -        this.client.emit('peer', `${peer.ip}:${peer.port}`)
-+        this.client.emit('peer', `${peer.ip}:${peer.port}`, this.announceUrl)
++        this.client.emit('peer', `${peer.ip}:${peer.port}`, this.announceUrl, this.family)
        })
      }
  
-@@ -215,10 +215,10 @@ class HTTPTracker extends Tracker {
+@@ -215,10 +218,10 @@ class HTTPTracker extends Tracker {
        try {
          addrs = compact2string.multi6(data.peers6)
        } catch (err) {
 -        return this.client.emit('warning', err)
-+        return this.client.emit('warning', err, this.announceUrl)
++        return this.client.emit('warning', err, this.announceUrl, this.family)
        }
        addrs.forEach(addr => {
 -        this.client.emit('peer', addr)
-+        this.client.emit('peer', addr, this.announceUrl)
++        this.client.emit('peer', addr, this.announceUrl, this.family)
        })
      } else if (Array.isArray(data.peers6)) {
        // tracker returned normal response
-@@ -226,7 +226,7 @@ class HTTPTracker extends Tracker {
+@@ -226,7 +229,7 @@ class HTTPTracker extends Tracker {
          const ip = /^\[/.test(peer.ip) || !/:/.test(peer.ip)
            ? peer.ip /* ipv6 w/ brackets or domain name */
            : `[${peer.ip}]` /* ipv6 without brackets */
 -        this.client.emit('peer', `${ip}:${peer.port}`)
-+        this.client.emit('peer', `${ip}:${peer.port}`, this.announceUrl)
++        this.client.emit('peer', `${ip}:${peer.port}`, this.announceUrl, this.family)
        })
      }
    }
-@@ -238,7 +238,7 @@ class HTTPTracker extends Tracker {
+@@ -238,7 +241,7 @@ class HTTPTracker extends Tracker {
  
      const keys = Object.keys(data)
      if (keys.length === 0) {
 -      this.client.emit('warning', new Error('invalid scrape response'))
-+      this.client.emit('warning', new Error('invalid scrape response'), this.announceUrl)
++      this.client.emit('warning', new Error('invalid scrape response'), this.announceUrl, this.family)
        return
      }
  
-@@ -249,11 +249,11 @@ class HTTPTracker extends Tracker {
+@@ -249,11 +252,11 @@ class HTTPTracker extends Tracker {
          announce: this.announceUrl,
          infoHash: common.binaryToHex(infoHash)
        })
 -      this.client.emit('scrape', response)
-+      this.client.emit('scrape', response, this.announceUrl)
++      this.client.emit('scrape', response, this.announceUrl, this.family)
      })
    }
  }
@@ -213,57 +257,80 @@ index 6fcea8d..482a179 100644
  
  module.exports = HTTPTracker
 diff --git a/node_modules/bittorrent-tracker/lib/client/udp-tracker.js b/node_modules/bittorrent-tracker/lib/client/udp-tracker.js
-index 65d97e4..84eb778 100644
+index 65d97e4..5fdb036 100644
 --- a/node_modules/bittorrent-tracker/lib/client/udp-tracker.js
 +++ b/node_modules/bittorrent-tracker/lib/client/udp-tracker.js
-@@ -168,7 +168,7 @@ class UDPTracker extends Tracker {
+@@ -18,10 +18,12 @@ const Tracker = require('./tracker')
+  * @param {Object} opts         options object
+  */
+ class UDPTracker extends Tracker {
+-  constructor (client, announceUrl) {
++  constructor (client, announceUrl, family = 4) {
+     super(client, announceUrl)
+     debug('new udp tracker %s', announceUrl)
+ 
++    this.family = family
++
+     this.cleanupFns = []
+     this.maybeDestroyCleanup = null
+   }
+@@ -118,7 +120,7 @@ class UDPTracker extends Tracker {
+       if (err) return onError(err)
+ 
+       proxySocket = s
+-      socket = dgram.createSocket('udp4')
++      socket = dgram.createSocket(self.family === 6 ? 'udp6' : 'udp4')
+       relay = info
+ 
+       timeout = setTimeout(() => {
+@@ -168,7 +170,7 @@ class UDPTracker extends Tracker {
          if (err.message) err.message += ` (${self.announceUrl})`
        } catch (ignoredErr) {}
        // errors will often happen if a tracker is offline, so don't treat it as fatal
 -      self.client.emit('warning', err)
-+      self.client.emit('warning', err, self.announceUrl)
++      self.client.emit('warning', err, self.announceUrl, self.family)
      }
  
      function onSocketMessage (msg) {
-@@ -204,16 +204,16 @@ class UDPTracker extends Tracker {
+@@ -204,16 +206,16 @@ class UDPTracker extends Tracker {
              announce: self.announceUrl,
              complete: msg.readUInt32BE(16),
              incomplete: msg.readUInt32BE(12)
 -          })
-+          }, self.announceUrl)
++          }, self.announceUrl, self.family)
  
            let addrs
            try {
              addrs = compact2string.multi(msg.slice(20))
            } catch (err) {
 -            return self.client.emit('warning', err)
-+            return self.client.emit('warning', err, self.announceUrl)
++            return self.client.emit('warning', err, self.announceUrl, self.family)
            }
            addrs.forEach(addr => {
 -            self.client.emit('peer', addr)
-+            self.client.emit('peer', addr, self.announceUrl)
++            self.client.emit('peer', addr, self.announceUrl, self.family)
            })
  
            break
-@@ -236,7 +236,7 @@ class UDPTracker extends Tracker {
+@@ -236,7 +238,7 @@ class UDPTracker extends Tracker {
                complete: msg.readUInt32BE(8 + (i * 12)),
                downloaded: msg.readUInt32BE(12 + (i * 12)),
                incomplete: msg.readUInt32BE(16 + (i * 12))
 -            })
-+            }, self.announceUrl)
++            }, self.announceUrl, self.family)
            }
  
            break
-@@ -246,7 +246,7 @@ class UDPTracker extends Tracker {
+@@ -246,7 +248,7 @@ class UDPTracker extends Tracker {
            if (self.destroyed) return
  
            if (msg.length < 8) return onError(new Error('invalid error message'))
 -          self.client.emit('warning', new Error(msg.slice(8).toString()))
-+          self.client.emit('warning', new Error(msg.slice(8).toString()), self.announceUrl)
++          self.client.emit('warning', new Error(msg.slice(8).toString()), self.announceUrl, self.family)
  
            break
          }
-@@ -302,7 +302,7 @@ class UDPTracker extends Tracker {
+@@ -302,7 +304,7 @@ class UDPTracker extends Tracker {
    }
  }
  
