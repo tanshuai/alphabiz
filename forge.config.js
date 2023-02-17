@@ -3,6 +3,8 @@ const fs = require('fs')
 const { resolve } = require('path')
 const { default: rebuild } = require('electron-rebuild')
 
+const publicVersion = require('./public/version.json').version
+const versionHeader = publicVersion.match(/\d+\.\d+\.\d+/gm)
 const { version } = package
 const appConfig = require('./developer/app');
 const productName = appConfig.displayName;
@@ -220,7 +222,7 @@ module.exports = {
         packageName: appConfig.name,
         packageDisplayName: appConfig.displayName,
         packageDescription: description,
-        packageVersion: version + '.0', // appx uses a version like 1.2.3.4
+        packageVersion: versionHeader[0] + '.0', // appx uses a version like 1.2.3.4
         packageExecutable: `app\\${productName}.exe`,
         manifest: 'appx/template.xml'
       }
