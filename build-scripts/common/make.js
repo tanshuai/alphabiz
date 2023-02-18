@@ -4,7 +4,6 @@ const { resolve } = require('path')
 const { version: pkgVersion } = require('../../package.json')
 const publicVersion = require('../../public/version.json').version
 const versionHeader = publicVersion.match(/\d+\.\d+\.\d+/gm)
-const appDirectoryRootPath = require('../../test.config.js').appDirectoryRootPath
 const appConfig = require('../../developer/app');
 const productName = appConfig.displayName;
 const displayName = appConfig.displayName;
@@ -78,7 +77,7 @@ const treatMacFiles = (arm, x64) => {
 }
 const makeMacUniversal = async () => {
   if (platform === 'darwin' || platform === 'mas') {
-    const dist = resolve(__rootdir, `${appDirectoryRootPath}/electron`)
+    const dist = resolve(__rootdir, `dist/electron`)
     const x64Dist = resolve(dist, `${productName}-${platform}-x64`)
     const armDist = resolve(dist, `${productName}-${platform}-arm64`)
     if (existsSync(x64Dist) && existsSync(armDist)) {
@@ -108,10 +107,10 @@ const doMake = async () => {
       : 'make:deb'
   // console.log('make:win')
   console.log(`Make for \x1b[36m${platform}-${arch}\x1b[0m`)
-  const packageDir = resolve(__rootdir, `${appDirectoryRootPath}/electron/${productName}-${platform}-${arch}`)
+  const packageDir = resolve(__rootdir, `dist/electron/${productName}-${platform}-${arch}`)
   if (!existsSync(packageDir)) {
     console.error('\x1b[41m Error \x1b[0m Cannot find packaged app. Run \x1b[90myarn build\x1b[0m before make.')
-    console.log(`  Ensure that the build result contains a folder of\x1b[33m ${appDirectoryRootPath}/electron/${productName}-${platform}-${arch}\x1b[0m`)
+    console.log(`  Ensure that the build result contains a folder of\x1b[33m dist/electron/${productName}-${platform}-${arch}\x1b[0m`)
     process.exit(1)
   }
   const destDir = resolve(__rootdir, `out/${productName}-${platform}-${arch}`)

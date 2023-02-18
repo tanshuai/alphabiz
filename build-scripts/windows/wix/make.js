@@ -14,8 +14,6 @@ const uuid = require('uuid')
 const Wix = require('electron-wix-msi/lib/creator')
 const __rootdir = resolve(__dirname, '../../..')
 
-const appDirectoryRootPath = require(resolve(__rootdir, 'test.config.js')).appDirectoryRootPath
-
 const isTesting = !!process.env.WIX_TEST
 // Write logs in one line, disabled when testing
 /** @param { string[] } strs */
@@ -55,7 +53,7 @@ const { version, description } = require(resolve(__rootdir, 'package.json'))
 
 const WiSubStg = resolve(__dirname, 'WiSubStg.vbs')
 const WiLangId = resolve(__dirname, 'WiLangId.vbs')
-const appDirectory = resolve(__rootdir, `${appDirectoryRootPath}/electron/${productName}-win32-x64`)
+const appDirectory = resolve(__rootdir, `dist/electron/${productName}-win32-x64`)
 const outputDirectory = resolve(__rootdir, 'out/make/wix/', process.arch)
 
 const ensureDirectory = async () => {
