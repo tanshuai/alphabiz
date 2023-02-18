@@ -81,6 +81,20 @@ const options = {
   platform: buildPlatform,
   appBundleId: app.appIdentifier,
 
+  win32metadata: {
+    /**
+     * In some cases the process name may be changed to `Electron` in windows.
+     * This tells windows to show process name as `displayName` correctly.
+     */
+    FileDescription: app.displayName
+  },
+
+  /**
+   * The extended `Info.plist` includes some file associations for macOS build.
+   * This file also sets application category to "public.app-category.entertainment".
+   * @see https://developer.apple.com/documentation/bundleresources/information_property_list/lsapplicationcategorytype
+   */
+  extendInfo: resolve(__rootdir, 'build-scripts/macos/app/Info.plist'),
   extraResource: [
     resolve(__rootdir, 'developer/icon-1024.png'),
     resolve(__rootdir, 'developer/favicon.ico'),
@@ -114,11 +128,11 @@ const options = {
       copyRecursive(src, dest)
     })
     const packageJsonPath = resolve(buildPath, 'package.json')
-    fs.writeFileSync(packageJsonPath, fs.readFileSync(packageJsonPath).toString().replace(/Alphabiz/g, appName))
+    fs.writeFileSync(packageJsonPath, fs.readFileSync(packageJsonPath).toString().replace(/Alphabiz/g, app.displayName))
     const indexPath = resolve(buildPath, 'index.html')
     if (fs.existsSync(indexPath)) {
       const index = fs.readFileSync(indexPath).toString('utf-8')
-      fs.writeFileSync(indexPath, index.replace(/Alphabiz/g, appName))
+      fs.writeFileSync(indexPath, index.replace(/Alphabiz/g, app.displayName))
     }
     callback()
   }],

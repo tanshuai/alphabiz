@@ -57,6 +57,6 @@ echo "\nBuilding universal app..."
 find "dist/electron" -type d -name "$APP-$BUILD_PLATFORM-arm64" -maxdepth 1 -exec rm -r "{}" \;
 find "dist" -type d -name "$APP-$BUILD_PLATFORM-x64" -maxdepth 1 -exec cp -a "{}" "dist/electron/" \;
 find "dist" -type d -name "$APP-$BUILD_PLATFORM-arm64" -maxdepth 1 -exec cp -a "{}" "dist/electron/" \;
-echo "\x1b[32m  Runing \x1b[36m node make --make-universal \x1b[32m This may take minutes\x1b[0m"
+echo "\x1b[32m  Runing \x1b[36mBUILD_PLATFORM=$BUILD_PLATFORM node build-scripts/common/make --make-universal\x1b[32m This may take minutes\x1b[0m"
 sleep 1
-BUILD_PLATFORM=$BUILD_PLATFORM node make --make-universal
+BUILD_PLATFORM=$BUILD_PLATFORM node build-scripts/common/make --make-universal
