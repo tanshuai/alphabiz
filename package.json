@@ -40,7 +40,7 @@
     "make:deb": "yarn pkg-fmt -f deb && electron-forge make --skip-package --targets @electron-forge/maker-deb",
     "make:snap": "yarn pkg-fmt -f snap && node build-scripts/linux/snapcraft && snapcraft snap --output=./out/installers/app.snap && node build-scripts/linux/snapcraft --post",
     "make:snap:ci": "yarn pkg-fmt -f snap && node build-scripts/linux/snapcraft && sg lxd -c 'snapcraft snap --output=./out/installers/app.snap --use-lxd' && node build-scripts/linux/snapcraft --post",
-    "postmake": "node make.js --postmake",
+    "postmake": "node build-scripts/common/make.js --postmake",
     "pkg-fmt": "node build-scripts/common/getPackageFormat.js"
   },
   "dependencies": {
