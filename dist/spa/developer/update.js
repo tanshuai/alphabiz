@@ -1,0 +1,1 @@
+module.exports={github:{username:"tanshuai",repo:"alphabiz",branch:"main",internalRepo:"alphabiz-app"},bucketUrl:"https://s3.amazonaws.com/internal.alpha.biz",s3DownloadUrl:"https://d2v5t3td4po4es.cloudfront.net/releases/"};
