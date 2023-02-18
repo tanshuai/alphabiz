@@ -24,13 +24,12 @@ const main = async () => {
 main()
 
 function getTargetDirList () {
-  const appDirectoryRootPath = require(path.resolve(__rootdir, 'test.config.js')).appDirectoryRootPath
   const appConfig = require(path.resolve(__rootdir, 'developer/app'))
   const productName = appConfig.displayName
   const arch = process.env.BUILD_ARCH || process.arch
   const platform = process.env.BUILD_PLATFORM || process.platform
-  const packageDir = process.platform ==='darwin' ? path.resolve(__rootdir, `${appDirectoryRootPath}/electron/${productName}-${platform}-${arch}/${productName}.app/Contents`)
-    : path.resolve(__rootdir, `${appDirectoryRootPath}/electron/${productName}-${platform}-${arch}`)
+  const packageDir = process.platform ==='darwin' ? path.resolve(__rootdir, `dist/electron/${productName}-${platform}-${arch}/${productName}.app/Contents`)
+    : path.resolve(__rootdir, `dist/electron/${productName}-${platform}-${arch}`)
   const destDir =  process.platform ==='darwin' ? path.resolve(__rootdir, `out/${productName}-${platform}-${arch}/${productName}.app/Contents`)
     : path.resolve(__rootdir, `out/${productName}-${platform}-${arch}`)
   return [

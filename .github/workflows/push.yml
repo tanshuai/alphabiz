@@ -18,7 +18,7 @@ on:
       - "!snapcraft/**"
       - "!developer/**"
       - "!test/**"
-      - "build/**"
+      - "dist/**"
       - "release.json"
     branches: [main]
 
@@ -170,7 +170,7 @@ jobs:
       - name: Get unpackaged/version.json property
         id: unpackaged
         run: |
-          CONTENT=$(cat ./build/electron/UnPackaged/version.json)
+          CONTENT=$(cat ./dist/electron/UnPackaged/version.json)
           PACKAGE_VERSION=$(echo "$CONTENT" | perl -wnE"say for /(?<=packageVer\"\:\s\").*(?=\")/gm")
           echo "package-version=${PACKAGE_VERSION}"
           echo "package-version=${PACKAGE_VERSION}" >> $GITHUB_OUTPUT
@@ -343,7 +343,7 @@ jobs:
 
       - name: Package for ${{ steps.vars.outputs.system }}-${{ steps.unify.outputs.tag-name }} Release 🗜️
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
-        run: 7z a -t7z -mx=9 "./out/installers/${{ steps.unify.outputs.tag-name }}/${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }}.7z" "./build/electron/${{ steps.vars.outputs.package }}"
+        run: 7z a -t7z -mx=9 "./out/installers/${{ steps.unify.outputs.tag-name }}/${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }}.7z" "./dist/electron/${{ steps.vars.outputs.package }}"
 
       - name: get md5 file
         if: |
