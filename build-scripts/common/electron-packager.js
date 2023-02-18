@@ -124,7 +124,13 @@ const options = {
   }],
   afterCopy: [(buildPath, electronVersion, platform, arch, callback) => {
     console.log('Copy patches to', buildPath)
-    copyRecursive(resolve(__rootdir, 'patches'), resolve(buildPath, 'patches'))
+    const patches = fs.readdirSync(resolve(__rootdir, 'patches'))
+    for (const patch of patches) {
+      if (!/\.dev\.patch$/gm.test(patch)) {
+        copyRecursive(resolve(__rootdir, `patches/${patch}`), resolve(buildPath, `patches/${patch}`))
+      }
+    }
+    // copyRecursive(resolve(__rootdir, 'patches'), resolve(buildPath, 'patches'))
     // patch-package does not work in quasar production mode
     // we should manually copy our patched webtorrent to build path
     const result = execSync('npx patch-package', {
