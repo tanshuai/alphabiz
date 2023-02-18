@@ -15,7 +15,7 @@ class Commands {
     this.advancedLink = page.locator('text=AdvancedAdvanced')
     this.developmentLink = page.locator('text=developer_modeDevelopment Developer Mode for Internal Use')
     this.accountLink = page.locator('.corner')
-    this.accountSignUp = page.locator('button:has-text("Sign in")')
+    this.accountSignIn = page.locator('.corner-account >> button:has-text("Sign in")')
     this.accountMore = page.locator('button:has-text("more_horiz")')
     this.accountSettings = page.locator('[data-cy="account-settings-btn"]')
     // home
@@ -56,11 +56,11 @@ class Commands {
   }
 
   async signIn (username, password, isWaitAlert) {
-    if (await this.page.locator('[aria-label="Phone number or email"]').isHidden()) this.jumpPage('accountSignUp')
+    if (await this.page.locator('[aria-label="Phone number or email"]').isHidden()) this.jumpPage('accountSignIn')
     await this.page.waitForTimeout(500)
     await this.page.fill('[aria-label="Phone number or email"]', username)
     await this.page.fill('[aria-label="Password"]', password)
-    await this.page.click('.q-card >> button:has-text("Sign in")')
+    await this.page.click('button:has-text("Sign up") >> //preceding::Button[1]')
 
     if (isWaitAlert) {
       await this.page.locator('.q-notification__message >> text=Signed in').waitFor({ timeout: 40000 })
@@ -68,17 +68,15 @@ class Commands {
   }
 
   async signOut () {
-    try {
+    if (process.platform !== 'darwin') {
       await this.jumpPage('accountMore')
       await this.page.click('text=Sign out')
       await this.page.waitForTimeout(1000)
       if (await this.SignOutAnywayBtn.isVisible()) { await this.SignOutAnywayBtn.click() }
       await this.page.locator('.q-notification__message >> text=Signed out').waitFor()
-      await this.page.evaluate(() => localStorage.clear())
-    } catch (e) {
-      await window.evaluate(() => localStorage.clear())
-      await window.reload()
     }
+    await this.page.evaluate(() => localStorage.clear())
+    await this.page.reload()
   }
 
   // Determine whether to log in and log in for download tests
@@ -88,7 +86,7 @@ class Commands {
       await this.signIn(username, password, isWaitAlert)
     } else {
       if (await this.downloadingStatus.isHidden()) await this.menuIcon.click()
-      if (!await this.accountSignUp.isHidden()) {
+      if (!await this.accountSignIn.isHidden()) {
         await this.signIn(username, password, isWaitAlert)
       }
     }
