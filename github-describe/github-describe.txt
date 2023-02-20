@@ -1,14 +1,6 @@
-move pkg_fmt.js to build-scripts/common/ #900
-fix path error
-push build-scripts to public repo
-modify build-scripts commit message
-move make.js to build-scripts/common/ #900
-delete appDirectoryRootPath #900
 #893
-fix quick-start errors #897
-skip e2e
-dev patch is not copied
-#893
-ignore web e2e test uncaught error
-fix display name errors
-add Info.plist for macOS file associations
+fix web e2e test
+skip wallet web e2e test for now
+fix #897
+add shasum for every build target, resolve #901
+fix displayName errors in task list
