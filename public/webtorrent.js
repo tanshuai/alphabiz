@@ -4,6 +4,7 @@ const { ipcRenderer } = require('electron')
 const crypto = require('crypto')
 const fs = require('fs')
 const path = require('path')
+const { setSecure } = require('webtorrent/lib/peer')
 // const diskusage = require('diskusage')
 const FSChunkStore = require('fs-chunk-store')
 
@@ -150,7 +151,16 @@ const initClient = (retries = 0) => {
   const payedUserShareRate = Number(localStorage.getItem('payedUserShareRate'))
   // block local IP
   conf.blocklist = utils.getLocalIPList() || []
+
+  // Secure setting
   // conf.secure = true
+  const secureOption = localStorage.getItem('webtorrent-secure') || 'auto'
+  if (['auto', 'enable', 'disable'].includes(secureOption)) {
+    setSecure(secureOption)
+  } else {
+    setSecure('auto')
+    localStorage.setItem('webtorrent-secure', 'auto')
+  }
 
   info('init client', conf)
   client = new WebTorrent(conf)
@@ -965,7 +975,8 @@ const stopServer = () => {
     maximumConnectionsNum,
     DHTlistenPort,
     BTlistenPort,
-    payedUserShareRate
+    payedUserShareRate,
+    secureOption
   }) => {
     // old versions use string, but now number
     const dhtPort = parseInt(DHTlistenPort)
@@ -976,7 +987,8 @@ const stopServer = () => {
       maximumConnectionsNum,
       dhtPort,
       torrentPort,
-      payedUserShareRate
+      payedUserShareRate,
+      secureOption
     })
     if (payedUserShareRate) {
       const shareRate = Number(payedUserShareRate) || 0.7
@@ -1009,6 +1021,11 @@ const stopServer = () => {
     if (torrentPort && torrentPort !== parseInt(localStorage.getItem('torrentPort'))) {
       shouldRestart = true
       localStorage.setItem('torrentPort', torrentPort.toString())
+    }
+    if (typeof secureOption === 'string') {
+      localStorage.setItem('webtorrent-secure', secureOption)
+      setSecure(secureOption)
+      console.log('set secure', secureOption)
     }
     if (shouldRestart) {
       // process.exit(0)
