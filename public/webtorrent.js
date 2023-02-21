@@ -112,7 +112,7 @@ const VERSION_STR = wtVersion
   .slice(0, 4)
 const peerId = Buffer.from(`-WW${VERSION_STR}-${crypto.randomBytes(9).toString('base64')}`)
 
-/** @type { WebTorrent } */
+/** @type { WebTorrent.Instance } */
 let client = null
 const initClient = (retries = 0) => {
   if (retries > 10) return
