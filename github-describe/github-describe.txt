@@ -1,6 +1,3 @@
-#893
-fix web e2e test
-skip wallet web e2e test for now
-fix #897
-add shasum for every build target, resolve #901
-fix displayName errors in task list
+modify send user info email #906
+test amplify push
+fix env errors and add BUILD_VERSION env
