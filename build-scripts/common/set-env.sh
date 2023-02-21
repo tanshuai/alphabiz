@@ -3,8 +3,8 @@
 set -e # Exit when error
 
 function ensureExists () {
-  if [ ! -e $1 ]; then
-    echo "Error: $1 does not exists. Make sure you have already craeted or built."
+  if [ ! -e "$1" ]; then
+    echo "Error: "$1" does not exists. Make sure you have already craeted or built."
     if [[ -z "$2" ]]; then
       echo "  $2"
     fi
