@@ -1,3 +1,7 @@
+diff --git a/node_modules/webtorrent/.DS_Store b/node_modules/webtorrent/.DS_Store
+new file mode 100644
+index 0000000..3465689
+Binary files /dev/null and b/node_modules/webtorrent/.DS_Store differ
 diff --git a/node_modules/webtorrent/index.js b/node_modules/webtorrent/index.js
 index 3e07d04..a4eb60f 100644
 --- a/node_modules/webtorrent/index.js
@@ -84,7 +88,7 @@ index 3e07d04..a4eb60f 100644
  
    _onListening () {
 diff --git a/node_modules/webtorrent/lib/conn-pool.js b/node_modules/webtorrent/lib/conn-pool.js
-index 1c6ac79..051a674 100644
+index 1c6ac79..45d4da5 100644
 --- a/node_modules/webtorrent/lib/conn-pool.js
 +++ b/node_modules/webtorrent/lib/conn-pool.js
 @@ -18,7 +18,7 @@ const debug = debugFactory('webtorrent:conn-pool')
@@ -92,7 +96,7 @@ index 1c6ac79..051a674 100644
  class ConnPool {
    constructor (client) {
 -    debug('create pool (port %s)', client.torrentPort)
-+    console.log('create pool (port %s)', client.torrentPort)
++    // console.log('create pool (port %s)', client.torrentPort)
  
      this._client = client
  
@@ -101,7 +105,7 @@ index 1c6ac79..051a674 100644
      // Start TCP
      this.tcpServer.listen(client.torrentPort, () => {
 -      debug('creating tcpServer in port %s', this.tcpServer.address().port)
-+      console.log('creating tcpServer in port %s', this.tcpServer.address().port)
++      // console.log('creating tcpServer in port %s', this.tcpServer.address().port)
        if (this._client.utp) {
          // Setup uTP
          this.utpServer = utp.createServer()
@@ -110,7 +114,7 @@ index 1c6ac79..051a674 100644
  
          // Start uTP
 -        debug('creating utpServer in port %s', this.tcpServer.address().port)
-+        console.log('creating utpServer in port %s', this.tcpServer.address().port)
++        // console.log('creating utpServer in port %s', this.tcpServer.address().port)
          this.utpServer.listen(this.tcpServer.address().port)
        } else {
          this._onListening()
@@ -225,7 +229,7 @@ index a3682b1..3c39167 100644
        this.push(buffer)
  
 diff --git a/node_modules/webtorrent/lib/file.js b/node_modules/webtorrent/lib/file.js
-index cbbc484..afe17c7 100644
+index cbbc484..8c6f2e7 100644
 --- a/node_modules/webtorrent/lib/file.js
 +++ b/node_modules/webtorrent/lib/file.js
 @@ -11,9 +11,16 @@ const mime = require('mime')
@@ -241,7 +245,7 @@ index cbbc484..afe17c7 100644
  class File extends EventEmitter {
    constructor (torrent, file) {
      super()
-+    console.log('init file', torrent, file)
++    // console.log('init file', torrent, file)
  
      this._torrent = torrent
      this._destroyed = false
@@ -493,7 +497,7 @@ index 7e08906..960994c 100644
      }
  
 diff --git a/node_modules/webtorrent/lib/torrent.js b/node_modules/webtorrent/lib/torrent.js
-index ac7cb97..e48641e 100644
+index ac7cb97..82113ce 100644
 --- a/node_modules/webtorrent/lib/torrent.js
 +++ b/node_modules/webtorrent/lib/torrent.js
 @@ -64,6 +64,79 @@ try {
@@ -516,7 +520,7 @@ index ac7cb97..e48641e 100644
 +        console.log('Completed verifying', tr.name || tr.origin || tr.token, err)
 +        if (err) {
 +          // Mark file error
-+          console.log('Verify error occurred. Mark all as unverified.', tr)
++          // console.log('Verify error occurred. Mark all as unverified.', tr)
 +          const l = tr.pieces.length
 +          tr.pieces.map((p, i) => {
 +            if (!p) {
@@ -631,10 +635,10 @@ index ac7cb97..e48641e 100644
 +            current: 0,
 +            total: this.pieces.length
 +          }
-+          console.log('Reverify', this)
++          // console.log('Reverify', this)
 +          this._verifyPieces(cb, true)
 +        } else {
-+          console.log('Verify done', this)
++          // console.log('Verify done', this)
 +          cb(...args)
 +        }
        }
