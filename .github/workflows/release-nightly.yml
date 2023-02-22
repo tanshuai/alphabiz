@@ -356,7 +356,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           prerelease: true
-          name: ${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.tag-name }}-${{ steps.slug.outputs.sha7 }}
+          name: ${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.tag-name }}-${{ steps.sha.outputs.sha7 }}
           tag_name: ${{ steps.unify.outputs.tag-name }}
           body: ${{ env.DESCRIBE }}
           files: |
