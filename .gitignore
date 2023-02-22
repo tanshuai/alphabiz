@@ -116,3 +116,4 @@ build/**/node_modules
 build/electron/Alphabiz-win32-x64/**
 build/electron/**/yarn.lock
 out/
+patches/@quasar+app+2.2.11.patch
