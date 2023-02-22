@@ -1,3 +1,9 @@
-modify send user info email #906
-test amplify push
-fix env errors and add BUILD_VERSION env
+fix web whitescreen, close #907
+uniform version specification
+fix e2e test error
+try quit app on system shutdown
+set BUILD_VERSION to force building specific version
+fix event emitter errors in web mode
+add condition to display Internal Release Notice #908
+collate workflow file name
+[mobile] Add support for safe areas for full-screen app
