@@ -1,4 +1,4 @@
-name: CI/CT/CD
+name: CI/CT/CD test and nightly release
 # env:
 #   name: staging_environment
 
@@ -11,7 +11,7 @@ on:
   push:
     paths:
       - "**.js"
-      - "!**/push.yml"
+      - "!**/release-nightly.yml"
       - "!patches/**"
       - "!public/**"
       - "!wix/**"
