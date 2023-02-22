@@ -579,6 +579,9 @@ test.describe('task', () => {
     await stopIcon.click()
     await stopIcon.waitFor('hidden')
     await basePage.jumpPage('downloadedStatus')
+    await window.waitForTimeout(1000)
+    const headerTitle = await basePage.headerTitle.innerText()
+    if (!/Downloaded/.test(headerTitle)) await basePage.jumpPage('downloadedStatus')
     if (!testBt.isStreaming) {
       const btDataOne = await window.locator(`text=${testBt.btName}`)
       await btDataOne.waitFor('visible')
