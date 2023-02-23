@@ -128,7 +128,7 @@ class BasePage {
   }
 
   async closeInternalNotice () {
-    const internalNoticeCss = '.q-card:has-text("Internal Release Notice")'
+    const internalNoticeCss = '.q-card:has-text("INTERNAL DEMO ONLY")'
     await this.page.locator(internalNoticeCss).waitFor('visible')
     await this.page.locator(`${internalNoticeCss} button:has-text("close")`).click()
     expect(await this.page.locator(internalNoticeCss)).toHaveCount(0)

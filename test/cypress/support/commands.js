@@ -82,7 +82,7 @@ Cypress.Commands.add('newVisit', (isWebsite = false) => {
       cy.get('#version').then(($el) => {
         const text = $el.text()
         if (text.includes('internal') || text.includes('nightly')) {
-          cy.contains('Internal Release Notice', { timeout: 20000 })
+          cy.contains('INTERNAL DEMO ONLY', { timeout: 20000 })
           cy.get('.q-card button').contains('close').click()
         }
       })
