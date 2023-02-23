@@ -122,7 +122,7 @@ test.beforeAll(async () => {
   creditsPage = new CreditsPage(window)
   basicPage = new BasicPage(window)
   // // fix electron test - ServiceWorker is not defined
-  // await window.reload()
+  // await basePage.newReload()
 })
 test.afterAll(async () => {
 })
@@ -136,6 +136,7 @@ test.afterEach(async ({}, testInfo) => {
   }
 })
 test('close set default', async () => {
+  await basePage.newReload()
   try {
     await basePage.defaultAppAlert.waitFor({ timeout: 3000 })
     await basePage.noShowAgainBtn.click()
@@ -195,7 +196,7 @@ test.describe('save Language', () => {
       await basePage.quickSaveLanguage('CN')
       const signIncardCss = '.q-card:has-text("登录账户")'
       await window.locator(signIncardCss).waitFor()
-      await window.reload()
+      await basePage.newReload()
       await window.waitForLoadState()
       await window.locator(signIncardCss).waitFor()
     })
@@ -203,7 +204,7 @@ test.describe('save Language', () => {
       await basePage.quickSaveLanguage('TW')
       const signIncardCss = '.q-card:has-text("登錄賬戶")'
       await window.locator(signIncardCss).waitFor()
-      await window.reload()
+      await basePage.newReload()
       await window.waitForLoadState()
       await window.locator(signIncardCss).waitFor()
     })
@@ -211,14 +212,14 @@ test.describe('save Language', () => {
       await basePage.quickSaveLanguage('EN')
       const signIncardCss = '.q-card:has-text("sign in")'
       await window.locator(signIncardCss).waitFor()
-      await window.reload()
+      await basePage.newReload()
       await window.waitForLoadState()
       await window.locator(signIncardCss).waitFor()
       if (process.platform === 'darwin') {
         await basePage.clearLocalstorage()
         await window.waitForTimeout(3000)
         await basePage.quickSaveLanguage('EN')
-        await window.reload()
+        await basePage.newReload()
         await window.waitForLoadState()
         await window.locator(signIncardCss).waitFor()
         await window.screenshot({ path: `${ScreenshotsPath}signInPageStatus.png` })
@@ -735,7 +736,7 @@ test.describe('account', () => {
     const payeePassword = process.env.TEST_PASSWORD
     const transferAmount = 1
     await window.evaluate(() => localStorage.clear())
-    await window.reload()
+    await basePage.newReload()
 
     // 登录收款人账号
     await basePage.signIn(payee, payeePassword, 1)

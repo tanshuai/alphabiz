@@ -131,14 +131,16 @@ class BasePage {
     const internalNoticeCss = '.q-card:has-text("Internal Release Notice")'
     await this.page.locator(internalNoticeCss).waitFor('visible')
     await this.page.locator(`${internalNoticeCss} button:has-text("close")`).click()
-    await this.page.locator(internalNoticeCss).waitFor('hidden')
+    expect(await this.page.locator(internalNoticeCss)).toHaveCount(0)
   }
 
   async newReload () {
     await this.page.reload()
-    const version = await this.versionBtn.innerText()
-    if (version.includes('internal') || version.includes('nightly')) {
-      await this.closeInternalNotice()
+    if (app.displayName === 'Alphabiz') {
+      const version = await this.versionBtn.innerText()
+      if (version.includes('internal') || version.includes('nightly')) {
+        await this.closeInternalNotice()
+      }
     }
   }
 

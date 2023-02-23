@@ -83,7 +83,7 @@ test.beforeAll(async () => {
   basicPage = new BasicPage(window)
   accountPage = new AccountPage(window)
   // // fix electron test - ServiceWorker is not defined
-  // await window.reload()
+  // await basePage.newReload()
 })
 test.beforeEach(async () => {
   test.setTimeout(60000 * 4)
