@@ -2,7 +2,8 @@
 
 const { existsSync, readdirSync, writeFileSync } = require('fs')
 const { resolve } = require('path')
-const getShasum = require('../../src-electron/utils/shasum')
+const getShasum = existsSync(resolve(__dirname, '../../src-electron/utils/shasum.js')) ? require('../../src-electron/utils/shasum')
+  : require('../../shasum')
 
 /**
  * @function generateShasums
