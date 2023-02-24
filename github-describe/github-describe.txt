@@ -1,14 +1,4 @@
-fix playwright e2e test error
-fix reload error
-clear build version env
-use AmplifyCli v10.7.3
-modify github release name
-add store default recommend list
-e2e test - close internal notice
-fix Generate shasum files in public repo
-amplify fallback to v5.6.0
-update amplify: config oauth
-fix versionState
-fix pinpoint
-fix e2e test error
-fix build errors with customizations in ios target
+fix displayName
+fix jest test close internal notice
+fix phone sign up e2e test
+add jest test timeout
