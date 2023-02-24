@@ -99,7 +99,7 @@ describe('download', () => {
           const statusText = await homePage.getTaskStatus(torrentName)
           return statusText.include('Downloading')
         }, {
-          timeout: 60000 * 10,
+          timeout: 60000 * 30,
           timeoutMsg: 'task not start'
         })
 
@@ -132,7 +132,7 @@ describe('download', () => {
           const statusText = await homePage.getTaskStatus(torrentName)
           return statusText.includes('Downloading')
         }, {
-          timeout: 60000 * 20,
+          timeout: 60000 * 30,
           timeoutMsg: 'task not start'
         })
 
