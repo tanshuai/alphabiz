@@ -8,7 +8,7 @@ name: Online experiments
 on:
   push:
     paths:
-      - "!**/online-experiments.yml"
+      - "**/online-experiments.yml"
     branches: [main]
 
 jobs:
@@ -16,7 +16,7 @@ jobs:
     timeout-minutes: 60
     runs-on: ${{ matrix.os }}
     outputs:
-      tag-name: '0.2.1-nightly-202302151843'
+      tag-name: '0.2.2-nightly-202302241344'
       release-name: ${{ steps.unify.outputs.release-name }}
       package-name: ${{ steps.unify.outputs.package-name }}
       isRunAppium: ${{ steps.check.outputs.isRunAppium }}
@@ -407,14 +407,14 @@ jobs:
 
       - name: Run appium
         run: |
-          Start-Process PowerShell -ArgumentList "yarn test:appium"
+          Start-Process PowerShell -ArgumentList "$env:JEST_TEST = 'true' && yarn test:appium"
           Start-Sleep -s 10
 
       - name: E2E appium creditDownload test for 7z 🧪
         if: matrix.test == '1'
         uses: nick-fields/retry@v2
         with:
-          timeout_seconds: 1800
+          timeout_seconds: 6000
           max_attempts: 2
           shell: bash
           retry_on: error
@@ -427,7 +427,7 @@ jobs:
         if: matrix.test == '2'
         uses: nick-fields/retry@v2
         with:
-          timeout_seconds: 1800
+          timeout_seconds: 6000
           max_attempts: 2
           shell: bash
           retry_on: error
