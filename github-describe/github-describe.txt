@@ -1,4 +1,2 @@
-fix displayName
-fix jest test close internal notice
-fix phone sign up e2e test
-add jest test timeout
+add env in account workflow
+try fix credit errors
