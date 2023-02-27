@@ -1,2 +1,3 @@
-add env in account workflow
-try fix credit errors
+fix #915
+remove `go to recommend` dialog close #912
+prepend reload task to queue after verify error, close #917
