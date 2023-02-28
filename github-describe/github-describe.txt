@@ -1,3 +1,6 @@
-fix #915
-remove `go to recommend` dialog close #912
-prepend reload task to queue after verify error, close #917
+fix app config in jest test
+add a third-party SMS method #899
+clear useless config
+fix i18n in src-common
+feat: set env REDIRECT_LOG to save electron logs to local
+remove exit logs and add init locale check
