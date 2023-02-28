@@ -42,7 +42,7 @@ class AccountPage extends HomePage {
       await this.username.waitUntil(async () => {
         return (await this.username.isDisplayed()) === false
       }, {
-        timeout: 40000,
+        timeout: 60000,
         timeoutMsg: 'signInCard is not hidden'
       })
       await sleep(2000)
@@ -50,7 +50,7 @@ class AccountPage extends HomePage {
       await this.importCloudKeyOKBtn.waitUntil(async () => {
         return (await this.importCloudKeyOKBtn.isDisplayed()) === false
       }, {
-        timeout: 40000,
+        timeout: 60000,
         timeoutMsg: 'importCloudKeyCard is not hidden'
       })
       if (await this.importCloudKeyOKBtn.isDisplayed()) {
@@ -58,7 +58,7 @@ class AccountPage extends HomePage {
         await this.importCloudKeyOKBtn.waitUntil(async () => {
           return (await this.importCloudKeyOKBtn.isDisplayed()) === false
         }, {
-          timeout: 40000,
+          timeout: 60000,
           timeoutMsg: 'The second attempt - importCloudKeyCard is not hidden'
         })
       }
