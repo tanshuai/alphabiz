@@ -1,17 +1,10 @@
-try fix sign out test in macos
-fix sign out in macos
-fix playwright test
-trigger account test workflow
-trigger internal workflow
-check for update everyday, resolve #266
-Upgrade GitHub Actions from v2 to v3
-Update account-test.yml
-cache: 'yarn'
-yarn global add node-gyp@8.4.1
-show progress for file verify
-Update account-test.yml
-Try node v16
-Just repeat run workflow again manually
-Repeat run workflow with yarn cached
-try output manifest.txt
-add security encryptions and options, resolve #254
+try ignoring patches in push workflow
+try windows not use cache
+try use node16 in windows
+rerun internal test
+resolve #255, close #268
+add timeout for wait notification
+keep user pause status after logout, resolve #267
+add checking for delete account
+fix: pause-all still resume after login
+fix setting syncing errors #255 #262
