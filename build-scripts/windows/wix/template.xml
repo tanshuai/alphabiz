@@ -100,12 +100,12 @@
 
       <!-- Start Menu -->
       <Directory Id="ProgramMenuFolder">
-        <Directory Id="ApplicationProgramsFolder" Name="{{ShortcutFolderName}}"/>
+        <!-- <Directory Id="ApplicationProgramsFolder" Name="{{ShortcutFolderName}}"/> -->
       </Directory>
     </Directory>
 
     <!-- Step 3: Add app to Start Menu -->
-    <DirectoryRef Id="ApplicationProgramsFolder">
+    <DirectoryRef Id="ProgramMenuFolder">
       <Component Id="ApplicationShortcut" Guid="{{ApplicationShortcutGuid}}" Win64="{{Win64YesNo}}">
         <Shortcut Id="ApplicationStartMenuShortcut"
                   Name="{{ShortcutName}}"
@@ -114,7 +114,7 @@
                   WorkingDirectory="APPLICATIONROOTDIRECTORY">
 <!-- {{ShortcutProperties}} -->
         </Shortcut>
-        <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
+        <RemoveFolder Id="ProgramMenuFolder" On="uninstall"/>
         <RegistryValue Root="HKCU"
                        Key="Software\Microsoft\{{ApplicationShortName}}"
                        Name="installed"
