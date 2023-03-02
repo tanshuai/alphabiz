@@ -928,6 +928,10 @@ const stopServer = () => {
 }
 
 (function init () {
+  ipcRenderer.once('redirect-log', (e, logPath) => {
+    console.log('Write webtorrent logs to', logPath)
+    utils.useRedirectLogs(logPath)
+  })
   ipcRenderer.on('add-torrent', (e, token, torrentInfo) => {
     if (torrentInfo.magnetURI && !torrentInfo.torrentPath) {
       const preloaded = preloader.loadCache(torrentInfo.magnetURI, torrentInfo.path)
