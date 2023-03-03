@@ -31,5 +31,5 @@ if [[ ! -z "$APPLE_ID" ]] && [[ ! -z "$APPLE_ASP" ]]; then
   sleep 1
   xcrun altool --validate-app -f "$RESULT_PATH" -t osx -u "$APPLE_ID" -p "$APPLE_ASP"
 else
-  printf "You can validate your package via \x1b[32mxcrun altool --validate-app -f \"%1\" -t osx -u YOUR_APPLE_ID -p YOUR_APP_SPEC_PASS\x1b[0m" "$RESULT_PATH"
+  printf "You can validate your package via \x1b[32mxcrun altool --validate-app -f \"%s\" -t osx -u YOUR_APPLE_ID -p YOUR_APP_SPEC_PASS\x1b[0m" "$RESULT_PATH"
 fi
