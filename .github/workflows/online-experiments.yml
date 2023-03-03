@@ -400,7 +400,7 @@ jobs:
           else yarn node update-version.js --buildTime ${{ steps.vars.outputs.date }} ; \
           fi
           node ./build-scripts/macos/get-env.js --darwin
-          cp ./build-scripts/macos/.env ./dist/.env
+          cp ./build-scripts/macos/.env ./.env
         shell: bash
 
       - name: Pack app 📦
