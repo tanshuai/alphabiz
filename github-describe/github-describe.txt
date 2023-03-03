@@ -1,3 +1,7 @@
-run jest test skip checking Launch Logs
-Update README.md
-allow redirecting app logs to specific directory #918
+add platform argv
+unified version Name
+disable reCaptcha
+try fix dmg build script printf
+fix: #914
+add ec2 script
+upgrade capacitor to v4 and add clipboard plugin for mobile
