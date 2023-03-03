@@ -7,10 +7,11 @@ const { writeFileSync } = require('fs')
 const { resolve } = require('path')
 
 const publicVersion = require('../../public/version.json').version
+const targetPlatform = process.argv.includes('--darwin') ? 'darwin' : 'mas'
 
 const envs = [
   `APP="${appConfig.displayName}"`,
-  `BUILD_PLATFORM="mas"`,
+  `BUILD_PLATFORM="${targetPlatform}"`,
   `PLATFORM="mas"`,
   `VERSION="${publicVersion}"`
 ]
