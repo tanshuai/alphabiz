@@ -348,6 +348,7 @@ jobs:
         id: vars
         run: |
           echo "system=macos" >> $GITHUB_OUTPUT
+          echo "date=$(TZ=UTC-8 git log -1 --date=format-local:"%Y%m%d%H%M" --format="%cd")" >> $GITHUB_OUTPUT
 
       - name: Get release.json property
         id: release
