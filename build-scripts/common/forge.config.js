@@ -69,6 +69,17 @@ const buildArch = process.env.BUILD_ARCH || process.arch
 const buildPlatform = process.env.BUILD_PLATFORM || process.platform
 console.log(resolve(__rootdir, `out/${productName}-${buildPlatform}-${buildArch}/${productName}.app`))
 
+const macProtocols = [{
+  name: protocol,
+  schemes: [protocol, appConfig.shortProtocol]
+}]
+if (buildPlatform !== 'mas') {
+  macProtocols.push({
+    name: 'magnet',
+    schemes: ['magnet']
+  })
+}
+
 module.exports = {
   hooks: {
     packageAfterPrune: (conf, buildPath, electronVersion, platform, arch, callback) => {
@@ -124,13 +135,7 @@ module.exports = {
       // /aws-/,
       /@zeeis\/velectron/
     ],
-    protocols: [{
-      name: protocol, schemes: [`${protocol}`]
-    }, {
-      name: 'magnet', schemes: ['magnet']
-    }, {
-      name: 'thunder', schemes: ['thunder']
-    }]
+    protocols: macProtocols
   },
   plugins: [
     ['@electron-forge/plugin-local-electron', {
