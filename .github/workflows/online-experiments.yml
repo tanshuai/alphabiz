@@ -426,6 +426,13 @@ jobs:
           tag_name: ${{needs.nightly_job.outputs.tag-name}}
           files: |
             ./out/installers/${{ needs.nightly_job.outputs.tag-name }}/**
+      
+      - name: Upload Test Results 🗃
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: "build-output"
+          path: build.log
 
   appium_test_job:
     needs: [release_dmg_job]

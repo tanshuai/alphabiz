@@ -2,9 +2,12 @@ const packager = require('electron-packager')
 const fs = require('fs')
 const path = require('path')
 
+const buildArch = process.env.BUILD_ARCH || process.arch
+const buildPlatform = process.env.BUILD_PLATFORM || process.platform
+console.log('Packager Build!', buildPlatform, buildArch)
+
 const app = require('./developer/app')
 const appName = app.name
-const buildArch = process.env.BUILD_ARCH || process.arch
 
 const packagerOptions = require('./build-scripts/common/electron-packager')
 packagerOptions.dir = `./dist/electron/UnPackaged`
