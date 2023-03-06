@@ -12,6 +12,21 @@ const ec2 = new AWS.EC2()
 const instanceParams = {
     InstanceIds: ['i-086697780493ba746']
 }
+
+function describeInstances () {
+  return new Promise((resolve, reject) => {
+    ec2.describeInstanceStatus(instanceParams, function(err, data) {
+      if (err) {
+        console.log(err, err.stack); // an error occurred
+        reject(err)
+      } else {
+        // console.log(JSON.stringify(data));           // successful response
+        resolve(data)
+      }
+    })
+  })
+}
+
 function startInstances () {
   return new Promise((resolve, reject) => {
     ec2.startInstances(instanceParams, (err, data) => {
@@ -159,14 +174,20 @@ async function allocate () {
     }
   }
 
-  // Modify Instance Placement
-  console.log(`\x1b[36m Modify Instance Placement... \x1b[0m`)
-  console.log('targetHostId', targetHostId)
-  const modifyInstancePlacementResult = await modifyInstancePlacement({
-    InstanceId: instanceParams.InstanceIds[0], /* required */
-    HostId: targetHostId,
-  })
-  if (modifyInstancePlacementResult.Return) console.log(`\x1b[36m Modify Instance Placement Success ! \x1b[0m`)
+  console.log(`\x1b[36m describe Instances... \x1b[0m`)
+  const describeInstancesResult = await describeInstances()
+  const instanceState = describeInstancesResult.InstanceStatuses[0].InstanceState
+  console.log('instanceState', instanceState)
+  if (instanceState.Name === 'stopped') {
+    // Modify Instance Placement
+    console.log(`\x1b[36m Modify Instance Placement... \x1b[0m`)
+    console.log('targetHostId', targetHostId)
+    const modifyInstancePlacementResult = await modifyInstancePlacement({
+      InstanceId: instanceParams.InstanceIds[0], /* required */
+      HostId: targetHostId,
+    })
+    if (modifyInstancePlacementResult.Return) console.log(`\x1b[36m Modify Instance Placement Success ! \x1b[0m`)
+  }
 
   // Start Instances
   console.log(`\x1b[36m Start Instances... \x1b[0m`)
