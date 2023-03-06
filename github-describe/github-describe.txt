@@ -1,6 +1,8 @@
-remove all magnet and torrent associations for mas build
-automatically run yarn in src-capacitor
-remove outlines for follow button
-use native clipboard access instead of web api
-add ec2 release host method
-remove .cxx folder
+add wait email timeout
+e2e test add timeout
+add allocate host method
+fix throw Error
+fix account e2e test
+check Instance state
+add border for follow button, close #919
+fix download button error
