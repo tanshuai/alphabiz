@@ -210,7 +210,10 @@ async function release () {
   console.log(`\x1b[36m Release Host... \x1b[0m`)
   const releaseHostResult = await releaseHost(HostsIdArr)
   console.log('releaseHostResult!', releaseHostResult)
-  if (releaseHostResult.Unsuccessful.length) throw error('Release Host Unsuccessful!')
+  if (releaseHostResult.Unsuccessful[0].Error) {
+    console.log('Error!', releaseHostResult.Unsuccessful[0].Error)
+    throw Error('Release Host Unsuccessful!')
+  }
 }
 
 if (process.argv.includes('--start')) {
