@@ -43,18 +43,12 @@ function stopInstances () {
 //https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/EC2.html#allocateHosts-property
 function allocateHosts (params) {
   return new Promise((resolve, reject) => {
-    const params = {
-      AvailabilityZone: 'us-east-1b', /* required */
-      Quantity: 1, /* required */
-      InstanceFamily: 'mac2',
-      InstanceType: 'mac2.metal'
-    }
     ec2.allocateHosts(params, function(err, data) {
       if (err) {
         console.log(err, err.stack); // an error occurred
         reject(err)
       } else {
-        console.log(data)           // successful response
+        // console.log(data)           // successful response
         resolve(data)
       }
     })
@@ -62,17 +56,8 @@ function allocateHosts (params) {
 }
 
 //https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/EC2.html#modifyInstancePlacement-property
-function modifyInstancePlacement (param) {
+function modifyInstancePlacement (params) {
   return new Promise((resolve, reject) => {
-    const params = {
-      InstanceId: 'STRING_VALUE', /* required */
-      GroupId: 'STRING_VALUE',
-      GroupName: 'STRING_VALUE',
-      HostId: 'STRING_VALUE',
-      HostResourceGroupArn: 'STRING_VALUE',
-      PartitionNumber: 'NUMBER_VALUE',
-      Tenancy: dedicated | host
-    }
     ec2.modifyInstancePlacement(params, function(err, data) {
       if (err) {
         console.log(err, err.stack); // an error occurred
@@ -93,7 +78,7 @@ function describeHosts (params) {
         console.log(err, err.stack)
         reject(err)
       } else {  // successful response
-        console.log(data)
+        // console.log(data)
         resolve(data?.Hosts)
       }           
     })
@@ -130,10 +115,70 @@ async function stop () {
 }
 
 async function allocate () {
+  console.log(`\x1b[36m Allocate Hosts start... \x1b[0m`)
+  let targetHostId = ''
 
+  // Describes all dedicated hosts
+  const HostsArr = await describeHosts({
+    Filter: [
+      {
+        Name: 'instance-type',
+        Values: [
+          'mac2.metal',
+        ]
+      },{
+        Name: 'state',
+        Values: [
+          'pending',
+          'failed ',
+          'available',
+          'unavailable'
+        ]
+      }
+    ]
+  })
+  console.log('HostsArr!', HostsArr)
+  if (Array.isArray(HostsArr) && HostsArr.length) {
+    const HostsIdArr = HostsArr.map((currentValue) => {
+      return currentValue.HostId
+    })
+    targetHostId = HostsIdArr[0]
+  }
+
+  // Allocate new dedicated host
+  if (!targetHostId) {
+    console.log(`\x1b[36m Allocate Hosts... \x1b[0m`)
+    const allocateResult = await allocateHosts({
+      AvailabilityZone: 'us-east-1b', /* required */
+      Quantity: 1, /* required */
+      InstanceType: 'mac2.metal'
+    })
+    console.log('allocateResult! ', allocateResult)
+    if (Array.isArray(allocateResult.HostIds) && allocateResult.HostIds.length) {
+      targetHostId = allocateResult.HostIds[0]
+    }
+  }
+
+  // Modify Instance Placement
+  console.log(`\x1b[36m Modify Instance Placement... \x1b[0m`)
+  console.log('targetHostId', targetHostId)
+  const modifyInstancePlacementResult = await modifyInstancePlacement({
+    InstanceId: instanceParams.InstanceIds[0], /* required */
+    HostId: targetHostId,
+  })
+  if (modifyInstancePlacementResult.Return) console.log(`\x1b[36m Modify Instance Placement Success ! \x1b[0m`)
+
+  // Start Instances
+  console.log(`\x1b[36m Start Instances... \x1b[0m`)
+  await startInstances()
 }
 
 async function release () {
+  // Stop Instances
+  console.log(`\x1b[36m Stop Instances... \x1b[0m`)
+  const result = await stopInstances()
+  console.log('result', result)
+
   // Describes all dedicated hosts
   console.log(`\x1b[36m Describe Hosts... \x1b[0m`)
   const HostsArr = await describeHosts({
@@ -154,14 +199,14 @@ async function release () {
       }
     ]
   })
-  console.log('HostsArr!', HostsArr)
-
+  // console.log('HostsArr!', HostsArr)
   if (!Array.isArray(HostsArr) || !HostsArr.length) return
   const HostsIdArr = HostsArr.map((currentValue) => {
     return currentValue.HostId
   })
   console.log('HostsIdArr!', HostsIdArr)
 
+  // Release all dedicated hosts
   console.log(`\x1b[36m Release Host... \x1b[0m`)
   const releaseHostResult = await releaseHost(HostsIdArr)
   console.log('releaseHostResult!', releaseHostResult)
@@ -172,6 +217,8 @@ if (process.argv.includes('--start')) {
   start()
 } else if (process.argv.includes('--stop')) {
   stop()
+} else if (process.argv.includes('--allocate'))  {
+  allocate()
 } else if (process.argv.includes('--release')) {
   release()
 }
