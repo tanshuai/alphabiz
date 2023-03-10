@@ -2,7 +2,8 @@
 /// <reference path="../../support/index.d.ts" />
 
 describe('Player', () => {
-  beforeEach(() => {
+  beforeEach(function onBeforeEach () {
+    cy.setCookie('TestEnv', 'true')
   })
   it('.mkv', () => {
     cy.signIn('test1' + Cypress.env('testEmailDomain'), 'password', { isWebsite: true })

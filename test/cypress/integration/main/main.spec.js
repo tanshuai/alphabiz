@@ -7,6 +7,7 @@ describe('main',{
   }
 }, function () {
   beforeEach(function onBeforeEach () {
+    cy.setCookie('TestEnv', 'true')
     if (Cypress.platform === 'win32') this.skip()
   })
   describe('LanguageSelection', () => {
