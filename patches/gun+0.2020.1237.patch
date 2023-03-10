@@ -1,5 +1,5 @@
 diff --git a/node_modules/gun/gun.js b/node_modules/gun/gun.js
-index b323e92..5e3886e 100644
+index b323e92..5cd2175 100644
 --- a/node_modules/gun/gun.js
 +++ b/node_modules/gun/gun.js
 @@ -1,5 +1,53 @@
@@ -57,7 +57,19 @@ index b323e92..5e3886e 100644
    /* UNBUILD */
    function USE(arg, req){
      return req? require(arg) : arg.slice? USE[R(arg)] : function(mod, path){
-@@ -70,13 +118,24 @@
+@@ -62,27 +110,39 @@
+ 			return l;
+ 		}
+ 		;(function(){ // max ~1ms or before stack overflow 
+-			var u, sT = setTimeout, l = 0, c = 0, sI = (typeof setImmediate !== ''+u && setImmediate) || sT; // queueMicrotask faster but blocks UI
++			var u, sT = setTimeout, l = 0, c = 0, sI = (typeof requestIdleCallback !== ''+u && requestIdleCallback) || sT; // queueMicrotask faster but blocks UI
+ 			sT.hold = sT.hold || 9;
+ 			sT.poll = sT.poll || function(f){ //f(); return; // for testing
+-				if((sT.hold >= (+new Date - l)) && c++ < 3333){ f(); return }
+-				sI(function(){ l = +new Date; f() },c=0)
++				// if((sT.hold >= (Date.now() - l)) && c++ < 333){ f(); return }
++				// sI(function(){ l = Date.now(); f() },c=0)
++				sI(f)
  			}
  		}());
  		;(function(){ // Too many polls block, this "threads" them in turns over a single thread in time.
@@ -88,17 +100,43 @@ index b323e92..5e3886e 100644
  				if(s.length){ p(T) }
  			}
  		}());
-@@ -194,12 +253,17 @@
+ 		;(function(){
+ 			var u, sT = setTimeout, T = sT.turn;
+-			(sT.each = sT.each || function(l,f,e,S){ S = S || 9; (function t(s,L,r){
++			(sT.each = sT.each || function(l,f,e,S){ S = 30; (function t(s,L,r){
+ 			  if(L = (s = (l||[]).splice(0,S)).length){
+ 			  	for(var i = 0; i < L; i++){
+ 			  		if(u !== (r = f(s[i]))){ break }
+@@ -150,7 +210,7 @@
+ 	;USE(function(module){
+ 		USE('./shim');
+ 		function State(){
+-			var t = +new Date;
++			var t = Date.now();
+ 			if(last < t){
+ 				return N = 0, last = t + State.drift;
+ 			}
+@@ -187,19 +247,24 @@
+ 			}
+ 			var dt = dup.track = function(id){
+ 				var it = s[id] || (s[id] = {});
+-				it.was = dup.now = +new Date;
++				it.was = dup.now = Date.now();
+ 				if(!dup.to){ dup.to = setTimeout(dup.drop, opt.age + 9) }
+ 				return it;
+ 			}
  			dup.drop = function(age){
  				dup.to = null;
- 				dup.now = +new Date;
+-				dup.now = +new Date;
 -				var l = Object.keys(s);
-+				// var l = Object.keys(s);
- 				console.STAT && console.STAT(dup.now, +new Date - dup.now, 'dup drop keys'); // prev ~20% CPU 7% RAM 300MB // now ~25% CPU 7% RAM 500MB
+-				console.STAT && console.STAT(dup.now, +new Date - dup.now, 'dup drop keys'); // prev ~20% CPU 7% RAM 300MB // now ~25% CPU 7% RAM 500MB
 -				setTimeout.each(l, function(id){ var it = s[id]; // TODO: .keys( is slow?
 -					if(it && (age || opt.age) > (dup.now - it.was)){ return }
 -					delete s[id];
 -				},0,99);
++				dup.now = Date.now();
++				// var l = Object.keys(s);
++				console.STAT && console.STAT(dup.now, Date.now() - dup.now, 'dup drop keys'); // prev ~20% CPU 7% RAM 300MB // now ~25% CPU 7% RAM 500MB
 +				// setTimeout.each(l, function(id){ var it = s[id]; // TODO: .keys( is slow?
 +				// 	if(it && (age || opt.age) > (dup.now - it.was)){ return }
 +				// 	delete s[id];
@@ -111,9 +149,24 @@ index b323e92..5e3886e 100644
  			}
  			return dup;
  		}
-@@ -297,8 +361,24 @@
+@@ -286,19 +351,37 @@
+ 				(msg.$ && (msg.$ === (msg.$._||'').$)) || (msg.$ = gun);
+ 				if(msg['@'] && !msg.put){ ack(msg) }
+ 				if(!at.ask(msg['@'], msg)){ // is this machine listening for an ack?
+-					DBG && (DBG.u = +new Date);
++					DBG && (DBG.u = Date.now());
+ 					if(msg.put){ put(msg); return } else
+ 					if(msg.get){ Gun.on.get(msg, gun) }
+ 				}
+-				DBG && (DBG.uc = +new Date);
++				DBG && (DBG.uc = Date.now());
+ 				eve.to.next(msg);
+-				DBG && (DBG.ua = +new Date);
++				DBG && (DBG.ua = Date.now());
+ 				if(msg.nts || msg.NTS){ return } // TODO: This shouldn't be in core, but fast way to prevent NTS spread. Delete this line after all peers have upgraded to newer versions.
  				msg.out = universe; at.on('out', msg);
- 				DBG && (DBG.ue = +new Date);
+-				DBG && (DBG.ue = +new Date);
++				DBG && (DBG.ue = Date.now());
  			}
 +			// let logged = false
  			function put(msg){
@@ -130,14 +183,40 @@ index b323e92..5e3886e 100644
 +						delete msg.put[key];
 +					}
 +				}
++				if (Object.keys(msg.put).length === 0) return
 +				// if (Object.keys(msg.put).some(k => k.startsWith('undefined'))) {
 +				// 	// return console.log('skip')
 +				// 	return
 +				// }
++				// console.log('@put', msg)
  				var ctx = msg._||'', root = ctx.root = ((ctx.$ = msg.$||'')._||'').root;
  				if(msg['@'] && ctx.faith && !ctx.miss){ // TODO: AXE may split/route based on 'put' what should we do here? Detect @ in AXE? I think we don't have to worry, as DAM will route it on @.
  					msg.out = universe;
-@@ -337,7 +417,8 @@
+@@ -307,7 +390,7 @@
+ 				}
+ 				ctx.latch = root.hatch; ctx.match = root.hatch = [];
+ 				var put = msg.put;
+-				var DBG = ctx.DBG = msg.DBG, S = +new Date; CT = CT || S;
++				var DBG = ctx.DBG = msg.DBG, S = Date.now(); CT = CT || S;
+ 				if(put['#'] && put['.']){ /*root && root.on('put', msg);*/ return } // TODO: BUG! This needs to call HAM instead.
+ 				DBG && (DBG.p = S);
+ 				ctx['#'] = msg['#'];
+@@ -315,12 +398,12 @@
+ 				ctx.all = 0;
+ 				ctx.stun = 1;
+ 				var nl = Object.keys(put);//.sort(); // TODO: This is unbounded operation, large graphs will be slower. Write our own CPU scheduled sort? Or somehow do it in below? Keys itself is not O(1) either, create ES5 shim over ?weak map? or custom which is constant.
+-				console.STAT && console.STAT(S, ((DBG||ctx).pk = +new Date) - S, 'put sort');
++				console.STAT && console.STAT(S, ((DBG||ctx).pk = Date.now()) - S, 'put sort');
+ 				var ni = 0, nj, kl, soul, node, states, err, tmp;
+ 				(function pop(o){
+ 					if(nj != ni){ nj = ni;
+ 						if(!(soul = nl[ni])){
+-							console.STAT && console.STAT(S, ((DBG||ctx).pd = +new Date) - S, 'put');
++							console.STAT && console.STAT(S, ((DBG||ctx).pd = Date.now()) - S, 'put');
+ 							fire(ctx);
+ 							return;
+ 						}
+@@ -337,7 +420,8 @@
  						return;
  					}
  					var i = 0, key; o = o || 0;
@@ -147,7 +226,7 @@ index b323e92..5e3886e 100644
  						if('_' === key){ continue }
  						var val = node[key], state = states[key];
  						if(u === state){ err = ERR+cut(key)+"on"+cut(soul)+"no state."; break }
-@@ -345,6 +426,10 @@
+@@ -345,6 +429,10 @@
  						//ctx.all++; //ctx.ack[soul+key] = '';
  						ham(val, key, soul, state, msg);
  						++C; // courtesy count;
@@ -158,13 +237,14 @@ index b323e92..5e3886e 100644
  					}
  					if((kl = kl.slice(i)).length){ turn(pop); return }
  					++ni; kl = null; pop(o);
-@@ -360,11 +445,12 @@
+@@ -360,21 +448,22 @@
  
  				var now = State(), u;
  				if(state > now){
 +					console.log('state > now', state, now)
  					setTimeout(function(){ ham(val, key, soul, state, msg) }, (tmp = state - now) > MD? MD : tmp); // Max Defer 32bit. :(
- 					console.STAT && console.STAT(((DBG||ctx).Hf = +new Date), tmp, 'future');
+-					console.STAT && console.STAT(((DBG||ctx).Hf = +new Date), tmp, 'future');
++					console.STAT && console.STAT(((DBG||ctx).Hf = Date.now()), tmp, 'future');
  					return;
  				}
 -				if(state < was){ /*old;*/ if(!ctx.miss){ return } } // but some chains have a cache miss that need to re-fire. // TODO: Improve in future. // for AXE this would reduce rebroadcast, but GUN does it on message forwarding.
@@ -172,13 +252,25 @@ index b323e92..5e3886e 100644
  				if(!ctx.faith){ // TODO: BUG? Can this be used for cache miss as well? // Yes this was a bug, need to check cache miss for RAD tests, but should we care about the faith check now? Probably not.
  					if(state === was && (val === known || L(val) <= L(known))){ /*console.log("same");*/ /*same;*/ if(!ctx.miss){ return } } // same
  				}
-@@ -417,7 +503,12 @@
+ 				ctx.stun++; // TODO: 'forget' feature in SEA tied to this, bad approach, but hacked in for now. Any changes here must update there.
+ 				var aid = msg['#']+ctx.all++, id = {toString: function(){ return aid }, _: ctx}; id.toJSON = id.toString; // this *trick* makes it compatible between old & new versions.
+-				DBG && (DBG.ph = DBG.ph || +new Date);
++				DBG && (DBG.ph = DBG.ph || Date.now());
+ 				root.on('put', {'#': id, '@': msg['@'], put: {'#': soul, '.': key, ':': val, '>': state}, _: ctx});
+ 			}
+ 			function map(msg){
+-				var DBG; if(DBG = (msg._||'').DBG){ DBG.pa = +new Date; DBG.pm = DBG.pm || +new Date}
++				var DBG; if(DBG = (msg._||'').DBG){ DBG.pa = Date.now(); DBG.pm = DBG.pm || Date.now()}
+       	var eve = this, root = eve.as, graph = root.graph, ctx = msg._, put = msg.put, soul = put['#'], key = put['.'], val = put[':'], state = put['>'], id = msg['#'], tmp;
+       	if((tmp = ctx.msg) && (tmp = tmp.put) && (tmp = tmp[soul])){ state_ify(tmp, key, state, val, soul) } // necessary! or else out messages do not get SEA transforms.
+ 				graph[soul] = state_ify(graph[soul], key, state, val, soul);
+@@ -417,7 +506,12 @@
  			var ERR = "Error: Invalid graph!";
  			var cut = function(s){ return " '"+(''+s).slice(0,9)+"...' " }
  			var L = JSON.stringify, MD = 2147483647, State = Gun.state;
 -			var C = 0, CT, CF = function(){if(C>999 && (C/-(CT - (CT = +new Date))>1)){Gun.window && console.log("Warning: You're syncing 1K+ records a second, faster than DOM can update - consider limiting query.");CF=function(){C=0}}};
 +			var C = 0, CT, CF = function(){
-+				if(C>999 && (C/-(CT - (CT = +new Date))>1)){
++				if(C>999 && (C/-(CT - (CT = Date.now()))>1)){
 +					Gun.window && console.log("Warning: You're syncing 1K+ records a second, faster than DOM can update - consider limiting query.");
 +					CF=function(){C=0}
 +				}
@@ -186,7 +278,46 @@ index b323e92..5e3886e 100644
  
  		}());
  
-@@ -825,7 +916,7 @@
+@@ -444,7 +538,7 @@
+ 					at.Q = {};
+ 				}*/
+ 				var ctx = msg._||{}, DBG = ctx.DBG = msg.DBG;
+-				DBG && (DBG.g = +new Date);
++				DBG && (DBG.g = Date.now());
+ 				//console.log("GET:", get, node, has);
+ 				if(!node){ return root.on('get', msg) }
+ 				if(has){
+@@ -459,12 +553,12 @@
+ 				root.on('get', msg); // send GET to storage adapters.
+ 			}
+ 			function ack(msg, node){
+-				var S = +new Date, ctx = msg._||{}, DBG = ctx.DBG = msg.DBG;
++				var S = Date.now(), ctx = msg._||{}, DBG = ctx.DBG = msg.DBG;
+ 				var to = msg['#'], id = text_rand(9), keys = Object.keys(node||'').sort(), soul = ((node||'')._||'')['#'], kl = keys.length, j = 0, root = msg.$._.root, F = (node === root.graph[soul]);
+-				console.STAT && console.STAT(S, ((DBG||ctx).gk = +new Date) - S, 'got keys');
++				console.STAT && console.STAT(S, ((DBG||ctx).gk = Date.now()) - S, 'got keys');
+ 				// PERF: Consider commenting this out to force disk-only reads for perf testing? // TODO: .keys( is slow
+ 				node && (function go(){
+-					S = +new Date;
++					S = Date.now();
+ 					var i = 0, k, put = {}, tmp;
+ 					while(i < 9 && (k = keys[i++])){
+ 						state_ify(put, k, state_is(node, k), node[k], soul);
+@@ -473,10 +567,10 @@
+ 					(tmp = {})[soul] = put; put = tmp;
+ 					var faith; if(F){ faith = function(){}; faith.ram = faith.faith = true; } // HNPERF: We're testing performance improvement by skipping going through security again, but this should be audited.
+ 					tmp = keys.length;
+-					console.STAT && console.STAT(S, -(S - (S = +new Date)), 'got copied some');
+-					DBG && (DBG.ga = +new Date);
++					console.STAT && console.STAT(S, -(S - (S = Date.now())), 'got copied some');
++					DBG && (DBG.ga = Date.now());
+ 					root.on('in', {'@': to, '#': id, put: put, '%': (tmp? (id = text_rand(9)) : u), $: root.$, _: faith, DBG: DBG});
+-					console.STAT && console.STAT(S, +new Date - S, 'got in');
++					console.STAT && console.STAT(S, Date.now() - S, 'got in');
+ 					if(!tmp){ return }
+ 					setTimeout.turn(go);
+ 				}());
+@@ -825,7 +919,7 @@
  			var gun, tmp;
  			if(typeof key === 'string'){
  				if(key.length == 0) {	
@@ -195,7 +326,7 @@ index b323e92..5e3886e 100644
  					if(cb){ cb.call(gun, gun._.err) }
  					return gun;
  				}
-@@ -969,9 +1060,6 @@
+@@ -969,9 +1063,6 @@
  			if(tmp = (seen = this.seen || (this.seen = {}))[at]){ return true }
  			seen[at] = true;
  			return;
@@ -205,7 +336,15 @@ index b323e92..5e3886e 100644
  		}
  		var empty = {}, valid = Gun.valid, u;
  	})(USE, './get');
-@@ -1068,11 +1156,6 @@
+@@ -979,6 +1070,7 @@
+ 	;USE(function(module){
+ 		var Gun = USE('./root');
+ 		Gun.chain.put = function(data, cb, as){ // I rewrote it :)
++			console.log('@@put', data, cb, as)
+ 			var gun = this, at = gun._, root = at.root;
+ 			as = as || {};
+ 			as.root = at.root;
+@@ -1068,11 +1160,6 @@
  				}
  				test.run = test.run || as.run;
  				test.stun = test.stun || as.stun; return;
@@ -217,7 +356,7 @@ index b323e92..5e3886e 100644
  			});
  		}
  
-@@ -1112,16 +1195,7 @@
+@@ -1112,16 +1199,7 @@
  				as.via = at.root.$.get(((as.data||'')._||'')['#'] || at.$.back('opt.uuid')())
  			}
  			as.via.put(as.data, as.ack, as);
@@ -234,7 +373,179 @@ index b323e92..5e3886e 100644
  		}
  		function check(d, tmp){ return ((d && (tmp = d.constructor) && tmp.name) || typeof d) }
  
-@@ -1576,13 +1650,16 @@
+@@ -1343,8 +1421,8 @@
+ 		USE('./shim');
+ 
+ 		var noop = function(){}
+-		var parse = JSON.parseAsync || function(t,cb,r){ var u, d = +new Date; try{ cb(u, JSON.parse(t,r), json.sucks(+new Date - d)) }catch(e){ cb(e) } }
+-		var json = JSON.stringifyAsync || function(v,cb,r,s){ var u, d = +new Date; try{ cb(u, JSON.stringify(v,r,s), json.sucks(+new Date - d)) }catch(e){ cb(e) } }
++		var parse = JSON.parseAsync || function(t,cb,r){ var u, d = Date.now(); try{ cb(u, JSON.parse(t,r), json.sucks(Date.now() - d)) }catch(e){ cb(e) } }
++		var json = JSON.stringifyAsync || function(v,cb,r,s){ var u, d = Date.now(); try{ cb(u, JSON.stringify(v,r,s), json.sucks(Date.now() - d)) }catch(e){ cb(e) } }
+ 		json.sucks = function(d){ if(d > 99){ console.log("Warning: JSON blocking CPU detected. Add `gun/lib/yson.js` to fix."); json.sucks = noop } }
+ 
+ 		function Mesh(root){
+@@ -1359,7 +1437,7 @@
+ 
+ 			var dup = root.dup, dup_check = dup.check, dup_track = dup.track;
+ 
+-			var ST = +new Date, LT = ST;
++			var ST = Date.now(), LT = ST;
+ 
+ 			var hear = mesh.hear = function(raw, peer){
+ 				if(!raw){ return }
+@@ -1369,22 +1447,22 @@
+ 						var stat = console.STAT || {};
+ 						//console.log('HEAR:', peer.id, (raw||'').slice(0,250), ((raw||'').length / 1024 / 1024).toFixed(4));
+ 						
+-						//console.log(setTimeout.turn.s.length, 'stacks', parseFloat((-(LT - (LT = +new Date))/1000).toFixed(3)), 'sec', parseFloat(((LT-ST)/1000 / 60).toFixed(1)), 'up', stat.peers||0, 'peers', stat.has||0, 'has', stat.memhused||0, stat.memused||0, stat.memax||0, 'heap mem max');
++						//console.log(setTimeout.turn.s.length, 'stacks', parseFloat((-(LT - (LT = Date.now()))/1000).toFixed(3)), 'sec', parseFloat(((LT-ST)/1000 / 60).toFixed(1)), 'up', stat.peers||0, 'peers', stat.has||0, 'has', stat.memhused||0, stat.memused||0, stat.memax||0, 'heap mem max');
+ 					}catch(e){ console.log('DBG err', e) }}*/
+ 					hear.d += raw.length||0 ; ++hear.c } // STATS!
+-				var S = peer.SH = +new Date;
++				var S = peer.SH = Date.now();
+ 				var tmp = raw[0], msg;
+ 				//raw && raw.slice && console.log("hear:", ((peer.wire||'').headers||'').origin, raw.length, raw.slice && raw.slice(0,50)); //tc-iamunique-tc-package-ds1
+ 				if('[' === tmp){
+ 					parse(raw, function(err, msg){
+ 						if(err || !msg){ return mesh.say({dam: '!', err: "DAM JSON parse error."}, peer) }
+-						console.STAT && console.STAT(+new Date, msg.length, '# on hear batch');
++						console.STAT && console.STAT(Date.now(), msg.length, '# on hear batch');
+ 						var P = opt.puff;
+ 						(function go(){
+-							var S = +new Date;
++							var S = Date.now();
+ 							var i = 0, m; while(i < P && (m = msg[i++])){ mesh.hear(m, peer) }
+ 							msg = msg.slice(i); // slicing after is faster than shifting during.
+-							console.STAT && console.STAT(S, +new Date - S, 'hear loop');
++							console.STAT && console.STAT(S, Date.now() - S, 'hear loop');
+ 							flush(peer); // force send all synchronously batched acks.
+ 							if(!msg.length){ return }
+ 							puff(go, 0);
+@@ -1406,7 +1484,7 @@
+ 				var id, hash, tmp, ash, DBG;
+ 				if(msg.DBG){ msg.DBG = DBG = {DBG: msg.DBG} }
+ 				DBG && (DBG.h = S);
+-				DBG && (DBG.hp = +new Date);
++				DBG && (DBG.hp = Date.now());
+ 				if(!(id = msg['#'])){ id = msg['#'] = String.random(9) }
+ 				if(tmp = dup_check(id)){ return }
+ 				// DAM logic:
+@@ -1422,12 +1500,12 @@
+ 					dup_track(id);
+ 					return;
+ 				}
+-				var S = +new Date;
++				var S = Date.now();
+ 				DBG && (DBG.is = S); peer.SI = id;
+ 				root.on('in', mesh.last = msg);
+ 				//ECHO = msg.put || ECHO; !(msg.ok !== -3740) && mesh.say({ok: -3740, put: ECHO, '@': msg['#']}, peer);
+-				DBG && (DBG.hd = +new Date);
+-				console.STAT && console.STAT(S, +new Date - S, msg.get? 'msg get' : msg.put? 'msg put' : 'msg');
++				DBG && (DBG.hd = Date.now());
++				console.STAT && console.STAT(S, Date.now() - S, msg.get? 'msg get' : msg.put? 'msg put' : 'msg');
+ 				(tmp = dup_track(id)).via = peer; // don't dedup message ID till after, cause GUN has internal dedup check.
+ 				if(msg.get){ tmp.it = msg }
+ 				if(ash){ dup_track(ash) } //dup.track(tmp+hash, true).it = it(msg);
+@@ -1440,12 +1518,12 @@
+ 				var SMIA = 0;
+ 				var loop;
+ 				mesh.hash = function(msg, peer){ var h, s, t;
+-					var S = +new Date;
++					var S = Date.now();
+ 					json(msg.put, function hash(err, text){
+ 						var ss = (s || (s = t = text||'')).slice(0, 32768); // 1024 * 32
+ 					  h = String.hash(ss, h); s = s.slice(32768);
+ 					  if(s){ puff(hash, 0); return }
+-						console.STAT && console.STAT(S, +new Date - S, 'say json+hash');
++						console.STAT && console.STAT(S, Date.now() - S, 'say json+hash');
+ 					  msg._.$put = t;
+ 					  msg['##'] = h;
+ 					  mesh.say(msg, peer);
+@@ -1464,7 +1542,7 @@
+ 					var id, hash, raw, ack = msg['@'];
+ //if(opt.super && (!ack || !msg.put)){ return } // TODO: MANHATTAN STUB //OBVIOUSLY BUG! But squelch relay. // :( get only is 100%+ CPU usage :(
+ 					var meta = msg._||(msg._=function(){});
+-					var DBG = msg.DBG, S = +new Date; meta.y = meta.y || S; if(!peer){ DBG && (DBG.y = S) }
++					var DBG = msg.DBG, S = Date.now(); meta.y = meta.y || S; if(!peer){ DBG && (DBG.y = S) }
+ 					if(!(id = msg['#'])){ id = msg['#'] = String.random(9) }
+ 					!loop && dup_track(id);//.it = it(msg); // track for 9 seconds, default. Earth<->Mars would need more! // always track, maybe move this to the 'after' logic if we split function.
+ 					if(msg.put && (msg.err || (dup.s[id]||'').err)){ return false } // TODO: in theory we should not be able to stun a message, but for now going to check if it can help network performance preventing invalid data to relay.
+@@ -1472,20 +1550,20 @@
+ 					if(!peer && ack){ peer = ((tmp = dup.s[ack]) && (tmp.via || ((tmp = tmp.it) && (tmp = tmp._) && tmp.via))) || ((tmp = mesh.last) && ack === tmp['#'] && mesh.leap) } // warning! mesh.leap could be buggy! mesh last check reduces this.
+ 					if(!peer && ack){ // still no peer, then ack daisy chain lost.
+ 						if(dup.s[ack]){ return } // in dups but no peer hints that this was ack to self, ignore.
+-						console.STAT && console.STAT(+new Date, ++SMIA, 'total no peer to ack to');
++						console.STAT && console.STAT(Date.now(), ++SMIA, 'total no peer to ack to');
+ 						return false;
+ 					} // TODO: Temporary? If ack via trace has been lost, acks will go to all peers, which trashes browser bandwidth. Not relaying the ack will force sender to ask for ack again. Note, this is technically wrong for mesh behavior.
+ 					if(!peer && mesh.way){ return mesh.way(msg) }
+-					DBG && (DBG.yh = +new Date);
++					DBG && (DBG.yh = Date.now());
+ 					if(!(raw = meta.raw)){ mesh.raw(msg, peer); return }
+-					DBG && (DBG.yr = +new Date);
++					DBG && (DBG.yr = Date.now());
+ 					if(!peer || !peer.id){
+ 						if(!Object.plain(peer || opt.peers)){ return false }
+-						var S = +new Date;
++						var S = Date.now();
+ 						var P = opt.puff, ps = opt.peers, pl = Object.keys(peer || opt.peers || {}); // TODO: .keys( is slow
+-						console.STAT && console.STAT(S, +new Date - S, 'peer keys');
++						console.STAT && console.STAT(S, Date.now() - S, 'peer keys');
+ 						;(function go(){
+-							var S = +new Date;
++							var S = Date.now();
+ 							//Type.obj.map(peer || opt.peers, each); // in case peer is a peer list.
+ 							loop = 1; var wr = meta.raw; meta.raw = raw; // quick perf hack
+ 							var i = 0, p; while(i < 9 && (p = (pl||'')[i++])){
+@@ -1494,7 +1572,7 @@
+ 							}
+ 							meta.raw = wr; loop = 0;
+ 							pl = pl.slice(i); // slicing after is faster than shifting during.
+-							console.STAT && console.STAT(S, +new Date - S, 'say loop');
++							console.STAT && console.STAT(S, Date.now() - S, 'say loop');
+ 							if(!pl.length){ return }
+ 							puff(go, 0);
+ 							ack && dup_track(ack); // keep for later
+@@ -1506,7 +1584,7 @@
+ 					if(id === peer.last){ return } peer.last = id;  // was it just sent?
+ 					if(peer === meta.via){ return false } // don't send back to self.
+ 					if((tmp = meta.yo) && (tmp[peer.url] || tmp[peer.pid] || tmp[peer.id]) /*&& !o*/){ return false }
+-					console.STAT && console.STAT(S, ((DBG||meta).yp = +new Date) - (meta.y || S), 'say prep');
++					console.STAT && console.STAT(S, ((DBG||meta).yp = Date.now()) - (meta.y || S), 'say prep');
+ 					!loop && ack && dup_track(ack); // streaming long responses needs to keep alive the ack.
+ 					if(peer.batch){
+ 						peer.tail = (tmp = peer.tail || 0) + raw.length;
+@@ -1517,13 +1595,13 @@
+ 						flush(peer);
+ 					}
+ 					peer.batch = '['; // Prevents double JSON!
+-					var ST = +new Date;
++					var ST = Date.now();
+ 					setTimeout(function(){
+-						console.STAT && console.STAT(ST, +new Date - ST, '0ms TO');
++						console.STAT && console.STAT(ST, Date.now() - ST, '0ms TO');
+ 						flush(peer);
+ 					}, opt.gap); // TODO: queuing/batching might be bad for low-latency video game performance! Allow opt out?
+ 					send(raw, peer);
+-					console.STAT && (ack === peer.SI) && console.STAT(S, +new Date - peer.SH, 'say ack');
++					console.STAT && (ack === peer.SI) && console.STAT(S, Date.now() - peer.SH, 'say ack');
+ 				}
+ 				mesh.say.c = mesh.say.d = 0;
+ 				// TODO: this caused a out-of-memory crash!
+@@ -1553,10 +1631,10 @@
+ 						tmp.put = ':])([:';
+ 						json(tmp, function(err, raw){
+ 							if(err){ return } // TODO: Handle!!
+-							var S = +new Date;
++							var S = Date.now();
+ 							tmp = raw.indexOf('"put":":])([:"');
+ 							res(u, raw = raw.slice(0, tmp+6) + put + raw.slice(tmp + 14));
+-							console.STAT && console.STAT(S, +new Date - S, 'say slice');
++							console.STAT && console.STAT(S, Date.now() - S, 'say slice');
+ 						});
+ 						return;
+ 					}
+@@ -1576,13 +1654,16 @@
  				if(!tmp){ return }
  				if(t? 3 > tmp.length : !tmp.length){ return } // TODO: ^
  				if(!t){try{tmp = (1 === tmp.length? tmp[0] : JSON.stringify(tmp));
@@ -252,7 +563,7 @@ index b323e92..5e3886e 100644
  				if(peer.say){
  					peer.say(raw);
  				} else
-@@ -1591,7 +1668,7 @@
+@@ -1591,7 +1672,7 @@
  				}
  				mesh.say.d += raw.length||0; ++mesh.say.c; // STATS!
  			}catch(e){
@@ -261,7 +572,7 @@ index b323e92..5e3886e 100644
  			}}
  
  			mesh.hi = function(peer){
-@@ -1689,20 +1766,63 @@
+@@ -1689,20 +1770,63 @@
  			var wire = mesh.wire || opt.wire;
  			mesh.wire = opt.wire = open;
  			function open(peer){ try{
@@ -330,7 +641,7 @@ index b323e92..5e3886e 100644
  					if(!msg){ return }
  					opt.mesh.hear(msg.data || msg, peer);
  				};
-@@ -1712,12 +1832,23 @@
+@@ -1712,12 +1836,23 @@
  			setTimeout(function(){ !opt.super && root.on('out', {dam:'hi'}) },1); // it can take a while to open a socket, so maybe no longer lazy load for perf reasons?
  
  			var wait = 2 * 999;
@@ -339,6 +650,7 @@ index b323e92..5e3886e 100644
  				clearTimeout(peer.defer);
 -				if(!opt.peers[peer.url]){ return }
 -				if(doc && peer.retry <= 0){ return }
+-				peer.retry = (peer.retry || opt.retry+1 || 60) - ((-peer.tried + (peer.tried = +new Date) < wait*4)?1:0);
 +				clearTimeout(peer.wire && peer.wire.timeout);
 +				// if (peer.__disable) return
 +				// if(!opt.peers[peer.url]){ return }
@@ -350,13 +662,13 @@ index b323e92..5e3886e 100644
 +						Object.values(opt.peers).forEach(peer => (peer.retry = 60))
 +					}
 +				}
- 				peer.retry = (peer.retry || opt.retry+1 || 60) - ((-peer.tried + (peer.tried = +new Date) < wait*4)?1:0);
++				peer.retry = (peer.retry || opt.retry+1 || 60) - ((-peer.tried + (peer.tried = Date.now()) < wait*4)?1:0);
  				peer.defer = setTimeout(function to(){
 +					opt.peers[peer.url] = peer
  					if(doc && doc.hidden){ return setTimeout(to,wait) }
  					open(peer);
  				}, wait);
-@@ -1767,7 +1898,8 @@
+@@ -1767,7 +1902,8 @@
  				this.to.next(msg); // remember to call next middleware adapter
  				var put = msg.put, soul = put['#'], key = put['.'], id = msg['#'], tmp; // pull data off wire envelope
  				disk[soul] = Gun.state.ify(disk[soul], key, put['>'], put[':'], soul); // merge into disk object
@@ -366,6 +678,15 @@ index b323e92..5e3886e 100644
  				if(!msg['@']){ acks.push(id) } // then ack any non-ack write. // TODO: use batch id.
  				if(to){ return }
  				to = setTimeout(flush, 9+(size / 333)); // 0.1MB = 0.3s, 5MB = 15s 
+@@ -1948,7 +2084,7 @@
+ 		}
+ 	}());
+ 	Type.time = Type.time || {};
+-	Type.time.is = Type.time.is || function(t){ DEP('time'); return t? t instanceof Date : (+new Date().getTime()) }
++	Type.time.is = Type.time.is || function(t){ DEP('time'); return t? t instanceof Date : (Date.now()().getTime()) }
+ 
+ 	var fn_is = Type.fn.is;
+ 	var list_is = Type.list.is;
 diff --git a/node_modules/gun/lib/radisk.js b/node_modules/gun/lib/radisk.js
 index cdb8e2d..1e3d1d2 100644
 --- a/node_modules/gun/lib/radisk.js
