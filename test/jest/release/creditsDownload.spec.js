@@ -10,14 +10,17 @@ const { AccountPage } = require('./Pages/AccountPage')
 const { CreditsPage } = require('./Pages/CreditsPage')
 const { DevelopmentPage } = require('./Pages/DevelopmentPage')
 const obj = require('./TestEnvironment')
+const appConfig = require('../../../developer/app')
 
 let client, homePage, accountPage, creditsPage, developmentPage
 // const torrentName = 'ChinaCup.1080p.H264.AAC.mp4'
 const torrentName = 'GoneNutty.avi'
+const downloadUser = (appConfig.name === 'Alphabiz' ? 'down1' : 'down3') +  process.env.TEST_EMAIL_DOMAIN
 const outputFile = process.env.APP_TYPE === 'exe' ? '/exe' : process.env.APP_TYPE === 'msi' ? '/msi' : '/7z'
 const outputPath = path.resolve(__dirname, '../../output/release' + outputFile)
-jest.setTimeout(60000 * 30)
 let isSuccess = false
+
+jest.setTimeout(60000 * 30)
 describe('download', () => {
   beforeAll(async () => {
     client = await wdio.remote(obj.opts)
@@ -72,7 +75,7 @@ describe('download', () => {
   it('download seeding', async () => {
     const DownloadFilePath = path.resolve(__dirname, '../../download')
     await sleep(10000)
-    await accountPage.ensureSignIn(process.env.TEST1_EMAIL, process.env.TEST_PASSWORD, { isWaitAlert: true })
+    await accountPage.ensureSignIn(downloadUser, process.env.TEST_PASSWORD, { isWaitAlert: true })
 
     // 查看初始积分
     await homePage.jumpPage('creditsLink')
