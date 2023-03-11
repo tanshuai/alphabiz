@@ -712,6 +712,7 @@ jobs:
       TEST1_EMAIL: ${{ secrets.TEST1_EMAIL }}
       TEST2_EMAIL: ${{ secrets.TEST2_EMAIL }}
       TEST3_EMAIL: ${{ secrets.TEST3_EMAIL }}
+      TEST_EMAIL_DOMAIN: ${{ secrets.TEST_EMAIL_DOMAIN }}
       TEST1_PHONE_NUMBER: ${{ secrets.TEST1_PHONE_NUMBER }}
       TEST2_PHONE_NUMBER: ${{ secrets.TEST2_PHONE_NUMBER }}
       TEST3_PHONE_NUMBER: ${{ secrets.TEST3_PHONE_NUMBER }}
