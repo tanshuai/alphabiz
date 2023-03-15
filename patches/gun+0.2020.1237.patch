@@ -802,7 +802,7 @@ index f86634b..3ee09b8 100644
   
      root.on('put', function(msg){
 diff --git a/node_modules/gun/lib/webrtc.js b/node_modules/gun/lib/webrtc.js
-index abc887c..2c8bf5c 100644
+index abc887c..5e64a2e 100644
 --- a/node_modules/gun/lib/webrtc.js
 +++ b/node_modules/gun/lib/webrtc.js
 @@ -5,8 +5,9 @@
@@ -816,7 +816,7 @@ index abc887c..2c8bf5c 100644
  
  		var env;
  		if(typeof window !== "undefined"){ env = window }
-@@ -17,11 +18,12 @@
+@@ -17,16 +18,17 @@
  		var rtcsd = opt.RTCSessionDescription || env.RTCSessionDescription || env.webkitRTCSessionDescription || env.mozRTCSessionDescription;
  		var rtcic = opt.RTCIceCandidate || env.RTCIceCandidate || env.webkitRTCIceCandidate || env.mozRTCIceCandidate;
  		if(!rtcpc || !rtcsd || !rtcic){ return }
@@ -826,11 +826,18 @@ index abc887c..2c8bf5c 100644
  		opt.RTCIceCandidate = rtcic;
  		opt.rtc = opt.rtc || {'iceServers': [
 -      {urls: 'stun:stun.l.google.com:19302'},
+-      {urls: "stun:stun.sipgate.net:3478"}/*,
 +			{ urls: ['stun:stun.l.google.com:19302', 'stun:global.stun.twilio.com:3478'] },
-       {urls: "stun:stun.sipgate.net:3478"}/*,
++      {urls: "stun:stun.sipgate.net:3478"},
        {urls: "stun:stun.stunprotocol.org"},
        {urls: "stun:stun.sipgate.net:10000"},
-@@ -34,14 +36,19 @@
+       {urls: "stun:217.10.68.152:10000"},
+-      {urls: 'stun:stun.services.mozilla.com'}*/ 
++      {urls: 'stun:stun.services.mozilla.com'}
+     ]};
+     // TODO: Select the most appropriate stuns. 
+     // FIXME: Find the wire throwing ICE Failed
+@@ -34,21 +36,29 @@
      opt.rtc.dataChannel = opt.rtc.dataChannel || {ordered: false, maxRetransmits: 2};
      opt.rtc.sdp = opt.rtc.sdp || {mandatory: {OfferToReceiveAudio: false, OfferToReceiveVideo: false}};
      opt.announce = function(to){
@@ -850,15 +857,18 @@ index abc887c..2c8bf5c 100644
  			if(msg.rtc){ open(msg) }
  			this.to.next(msg);
  		});
-@@ -49,6 +56,7 @@
+ 
  		function open(msg){
- 			var rtc = msg.rtc, peer, tmp;
+-			var rtc = msg.rtc, peer, tmp;
++			var rtc = msg.rtc, tmp;
++			/** @type { RTCPeerConnection } */
++			var peer
  			if(!rtc || !rtc.id){ return }
 +			// console.log('[gun wrtc]', rtc)
  			delete opt.announce[rtc.id]; /// remove after connect
  			if(tmp = rtc.answer){
  				if(!(peer = opt.peers[rtc.id] || open[rtc.id]) || peer.remoteSet){ return }
-@@ -57,25 +65,48 @@
+@@ -57,25 +67,62 @@
  			}
  			if(tmp = rtc.candidate){
  				peer = opt.peers[rtc.id] || open[rtc.id] || open({rtc: {id: rtc.id}});
@@ -885,16 +895,30 @@ index abc887c..2c8bf5c 100644
 +			// console.log('on open', msg, peer)
  			var wire = peer.wire = peer.createDataChannel('dc', opt.rtc.dataChannel);
  			open[rtc.id] = peer;
++			let destroyed = false
++			const destroy = () => {
++				if (destroyed) return
++				destroyed = true
++				peer.close()
++				if (peer.wire) {
++					peer.wire.close()
++					peer.wire = null
++				}
++				peer.onicecandidate = null
++				peer.ondatachannel = null
++			}
  			wire.onclose = function(){
 -				delete open[rtc.id];
 +				// console.log('rtc close', rtc)
 +				// delete open[rtc.id];
++				destroy()
  				mesh.bye(peer);
  				//reconnect(peer);
  			};
 -			wire.onerror = function(err){};
 +			wire.onerror = function(err){
 +				// console.log('rtc error', rtc, err)
++				destroy()
 +				delete open[rtc.id]
 +			};
  			wire.onopen = function(e){
@@ -913,7 +937,7 @@ index abc887c..2c8bf5c 100644
  				mesh.hear(msg.data || msg, peer);
  			};
  			peer.onicecandidate = function(e){ // source: EasyRTC!
-@@ -89,7 +120,8 @@
+@@ -89,7 +136,8 @@
  				rc.onclose = wire.onclose;
  			}
  			if(tmp = rtc.offer){
@@ -923,7 +947,7 @@ index abc887c..2c8bf5c 100644
  				peer.setRemoteDescription(new opt.RTCSessionDescription(tmp)); 
  				peer.createAnswer(function(answer){
  					peer.setLocalDescription(answer);
-@@ -98,6 +130,7 @@
+@@ -98,6 +146,7 @@
  				return;
  			}
  			peer.createOffer(function(offer){
