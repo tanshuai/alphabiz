@@ -1,3 +1,1 @@
-bump @zeeis/alphabiz-libdb to v0.0.91
-fix pause player
-upgrade version
+try fix library errors in android
