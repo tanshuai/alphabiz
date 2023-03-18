@@ -1,1 +1,6 @@
-try fix library errors in android
+add axios
+move capacitor yarn to postinstall
+push code
+skip e2e
+disable google analytics on dev
+enable Google Analytics on Dev
