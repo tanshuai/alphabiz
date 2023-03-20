@@ -1,6 +1,4 @@
-add axios
-move capacitor yarn to postinstall
-push code
-skip e2e
-disable google analytics on dev
-enable Google Analytics on Dev
+fix white screen in web mode
+restore wallet web e2e test
+stop ask for player
+try fix wallet e2e test
