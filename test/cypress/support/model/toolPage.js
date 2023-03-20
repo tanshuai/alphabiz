@@ -8,7 +8,7 @@ Cypress.Commands.add('toTool', () => {
 
 Cypress.Commands.add('openTool', () => {
   cy.get('#version').click()
-  for (let n = 0; n < 6; n++) {
+  for (let n = 0; n < 8; n++) {
     cy.get('.alphabiz-logo').click()
   }
   cy.contains('is enabled', { timeout: 30000 }).should('be.visible')
