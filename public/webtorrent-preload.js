@@ -14,11 +14,11 @@ const downloadThreshold = 30_000_000
 // Wait a torrent for 10 mins to ready
 const maxWaitTime = 60_000
 // Only allow downloading `maxTask` tasks at same time
-const maxTask = 10
+const maxTask = 5
 
 // If tasks count is larger than this, remove oldest task from disk
 // Set to 0 and call `removeOldIfNeeded` will remove all preload tasks
-let maxPreload = 40
+let maxPreload = 20
 // Load config from local storage when launched
 if (typeof localStorage.getItem('library-max-preload') === 'string') {
   const n = Number(localStorage.getItem('library-max-preload'))
@@ -27,7 +27,7 @@ if (typeof localStorage.getItem('library-max-preload') === 'string') {
 // Store path
 let storePath = ''
 const preloadClient = new WebTorrent({
-  maxConns: 10,
+  maxConns: 5,
   downloadLimit: 3000_000,
   uploadLimit: 300_000
 })
@@ -96,7 +96,7 @@ const removeOldIfNeeded = () => {
  */
 const queueTask = ({ url, path, origin, postTitle }) => {
   if (maxPreload <= 0) return
-  if (taskQueue.find(i => i.url === url)) return console.log('[Preload] Skip existed')
+  if (taskQueue.find(i => i.url === url)) return console.log('[Preload] Skip existed', url)
   if (taskQueue.length >= maxTask) {
     // Destroy oldest one
     const task = taskQueue.shift()
