@@ -1,4 +1,3 @@
-fix white screen in web mode
-restore wallet web e2e test
-stop ask for player
-try fix wallet e2e test
+fix: `globalThis` -> `window`
+fix import excel card i18n
+add basic recommend list
