@@ -1,2 +1,3 @@
-#924
-no dynamic functions in io fetching #918
+fix io events error
+improve virtualScroll
+improve virtualScroll
