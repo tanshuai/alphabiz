@@ -1,0 +1,13 @@
+diff --git a/node_modules/big-json/lib/index.js b/node_modules/big-json/lib/index.js
+index 9e2a2a5..35038a5 100644
+--- a/node_modules/big-json/lib/index.js
++++ b/node_modules/big-json/lib/index.js
+@@ -10,7 +10,7 @@ const intoStream = require('into-stream');
+ const JSONStream = require('JSONStream');
+ const through2 = require('through2');
+ const once = require('once').strict;
+-const JsonStreamStringify = require('json-stream-stringify');
++const JsonStreamStringify = require('json-stream-stringify').default;
+ 
+ // promisified implementations of callback APIs.
+ const _parsePromisified = util.promisify(_parse);
