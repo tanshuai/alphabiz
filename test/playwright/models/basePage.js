@@ -220,6 +220,8 @@ class BasePage {
   // Determine whether to log in and log in for download tests
   async ensureLoginStatus (username, password, isWaitAlert, isSetToken = true) {
     await this.page.waitForTimeout(500)
+    const count = await this.page.locator('.q-card:has-text("INTERNAL DEMO ONLY")').count()
+    if (count) await this.closeInternalNotice()
     // if not logged in
     if (await this.accountInput.isVisible()) {
       await this.signIn(username, password, isWaitAlert, isSetToken)
