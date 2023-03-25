@@ -1,3 +1,8 @@
-improve credit txn
-fix stuck when saving library graph #918
-fix stuck when updating task list
+remove english content from other langs
+remove english content from other langs
+fix useCredit
+fix i18n error in library
+e2e test close Internal Notice
+fix dp$utils
+improve DataPayment
+single instance of DataPaymentMixin
