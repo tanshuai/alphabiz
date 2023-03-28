@@ -3,7 +3,6 @@
 
 describe('LanguageSelection', () => {
   beforeEach(function onBeforeEach () {
-    cy.setCookie('TestEnv', 'true')
   })
   it('lang', () => {
     cy.signIn('test1' + Cypress.env('testEmailDomain'), 'password', { isWebsite: true })

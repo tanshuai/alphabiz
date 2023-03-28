@@ -23,9 +23,10 @@ Cypress.Commands.add('openWallet', () => {
 
 Cypress.Commands.add('checkOpenWallet', () => {
   cy.get('.q-drawer__content').then(($element) => {
-    if (!$element.text().includes(TOOL_TITLE)) {
-      cy.openTool()
-    }
+    // if (!$element.text().includes(TOOL_TITLE)) {
+    //   cy.openTool()
+    // }
+    if (Cypress.platform !== 'darwin') cy.openTool()
     if (!$element.text().includes(WALLET_TITLE)) {
       cy.openWallet()
     }

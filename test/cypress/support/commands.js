@@ -67,11 +67,27 @@ Cypress.Commands.add('toMoreHoriz', () => {
 })
 
 Cypress.Commands.add('newVisit', (isWebsite = false) => {
-  if (isWebsite) {
-    cy.visit('https://web.alpha.biz')
-  } else {
-    cy.visit('/')
+  const setCookieToContentWindow = (
+    contentWindow,
+    name,
+    value,
+    { expireMinutes = 1 } = {},
+  ) => {
+    const date = new Date();
+    const expireTime = expireMinutes * 60 * 1000;
+    date.setTime(date.getTime() + expireTime);
+    const assignment = `${name}=${encodeURIComponent(value)}`;
+    const expires = `expires=${date.toGMTString()}`;
+    const path = 'path=/';
+    contentWindow.document.cookie = [assignment, expires, path].join(';');
   }
+
+  cy.visit(isWebsite ? 'https://web.alpha.biz' : '/', {
+    onBeforeLoad: (contentWindow) => {
+      setCookieToContentWindow(contentWindow, 'TestEnv', 'true')
+    }
+  })
+
   cy.task('appconfig').then(app => {
     const libraryName = app.name === 'Alphabiz' ? 'ab' : app.name.toLowerCase()
     window.localStorage.setItem(`library-pair@${libraryName}-test-cate-v4-2`, '{"epub":"8idxYmEadAwjoU7U1J056cyHzUeoXSslOBCAP73WZyc.mdvNkj-aK7AyEEJFo0vSm752BIgUPZHoDs7IbZuopTs","pub":"fBH0GXG8L38EBkqkBSyXbMFVHkEYUK7s4ynPupdvp8E.XD52mHLI7O-Ad1JzAkDn2brY5-GLfbkSgP-3pB6k4Qs","epriv":"rsdtLTMMiDthgCttGqsKJTYcMRgu6Z8GD8SP4GW3VYk","priv":"m6mRg3N8qLRq_wsr1wiazT6YYVUhqZJGEUKu_drxINQ"}')
