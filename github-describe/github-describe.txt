@@ -1,3 +1,1 @@
-fix quit on mac sleep
-fix #927
-try send finish event after done
+update build scripts, fix crashes after signed
