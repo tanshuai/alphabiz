@@ -96,12 +96,7 @@ const options = {
    * This file also sets application category to "public.app-category.entertainment".
    * @see https://developer.apple.com/documentation/bundleresources/information_property_list/lsapplicationcategorytype
    */
-  extendInfo: resolve(
-    __rootdir,
-    'build-scripts/macos/app/',
-    // The plist for mas does not include bindings to magnet url and torrent file
-    isMas ? 'Info.mas.plist' : 'Info.plist'
-  ),
+  extendInfo: require('./extendInfo'),
   extraResource: [
     resolve(__rootdir, 'developer/icon-1024.png'),
     resolve(__rootdir, 'developer/favicon.ico'),
