@@ -64,7 +64,7 @@ const normalInfo = {
       LSHandlerRank: 'Owner'
     },
     {
-      CFBundleTypeName: `${appConfig.name} Downloading File`,
+      CFBundleTypeName: `${appConfig.displayName} Downloading File`,
       CFBundleTypeExtensions: `${appConfig.shortProtocol}-downloading`,
       CFBundleTypeRole: 'Viewer',
       CFBundleTypeIconFile: 'electron.ico',
@@ -117,6 +117,8 @@ const normalInfo = {
 const masInfo = {
   // This avoids MAS reporting encryption compliance requirements
   ITSAppUsesNonExemptEncryption: false,
+  NSSystemAdministrationUsageDescription: `${appConfig.displayName} require accessing file system to save downloaded files.`,
+  NSDownloadsFolderUsageDescription: `${appConfig.displayName} require accessing file system to save downloaded files.`,
   /**
    * The XCode props should match current version of XCode. Values can be
    * found at [XCode Releases](https://xcodereleases.com).
@@ -168,7 +170,7 @@ const masInfo = {
       LSHandlerRank: 'Owner'
     },
     {
-      CFBundleTypeName: `${appConfig.name} Downloading File`,
+      CFBundleTypeName: `${appConfig.displayName} Downloading File`,
       CFBundleTypeExtensions: `${appConfig.shortProtocol}-downloading`,
       CFBundleTypeRole: 'Viewer',
       CFBundleTypeIconFile: 'electron.ico',
