@@ -1,2 +1,3 @@
-add infomations for build and fix launchpad icon error
-fix error when opening url when clipboard is not empty
+#54
+fix EPERM error for mas visiting ~/Downloads
+update build doc for macOS
