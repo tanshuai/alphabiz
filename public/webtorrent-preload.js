@@ -211,7 +211,12 @@ ipcRenderer.on('preload-restore', (e, path) => {
   if (existsSync(p)) {
     const tasks = JSON.parse(readFileSync(p))
     for (const task of tasks) {
-      if (!existsSync(task.torrentPath)) continue
+      if (!existsSync(task.torrentPath) || !existsSync(task.downloadPath)) {
+        if (existsSync(task.torrentPath)) rmSync(task.torrentPath)
+        if (existsSync(task.downloadPath)) rmSync(task.downloadPath, { recursive: true })
+        continue
+      }
+      if (task.removed) continue
       const { mtimeMs } = statSync(task.torrentPath)
       // Remove old caches
       if (mtimeMs < oneWeekAgo) {
@@ -254,9 +259,18 @@ export default {
   loadCache (url, downloadDirectory) {
     if (preloadTasks.has(url)) {
       // Copy preloaded files to `downloadDirectory` and return the preloaded torrent file
-      const { torrentPath, downloadPath } = preloadTasks.get(url)
+      const { torrentPath, downloadPath, removed } = preloadTasks.get(url)
+      if (removed) {
+        console.log('Preload task is removed!')
+        return torrentPath
+      }
       console.log('copy', downloadPath, downloadDirectory)
       cpSync(downloadPath, downloadDirectory, { recursive: true })
+      // Remove preloaded task as it is added
+      setTimeout(() => {
+        rmSync(downloadPath, { recursive: true })
+        preloadTasks.set(url, { torrentPath, removed: true })
+      }, 5000)
       return torrentPath
     }
     return null

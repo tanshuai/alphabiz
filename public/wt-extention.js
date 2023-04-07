@@ -334,6 +334,11 @@ export const useAlphabizProtocol = (client, torrent) => {
       }
       wire.on('upload', onUpload)
       const onDone = () => {
+        ipcRenderer.send('webtorrent-task-done', {
+          infoHash: torrent.infoHash,
+          name: torrent.name,
+          payments: this._wire.transactions
+        })
         if (!this._wire.transactions) return
         this._send({ ab_task_done: this._wire.transactions.join('$') })
       }
