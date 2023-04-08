@@ -1,5 +1,5 @@
-scroll to top when search
-remove preload files after adding task
-try fix #926
-fix #927
-#926
+remove logs
+catch preload init errors
+try move default download directory to AppDownloads for MAS
+disable update for MAS
+lock version for random-access-file
