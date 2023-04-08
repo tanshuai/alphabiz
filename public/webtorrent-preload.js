@@ -204,43 +204,47 @@ const queueTask = ({ url, path, origin, postTitle }) => {
 // Restore saved tasks after relaunch
 ipcRenderer.on('preload-restore', (e, path) => {
   console.log('[Preload] Restore', path)
-  const p = resolve(path, 'preload-tasks.json')
-  const now = new Date()
-  now.setDate(now.getDate() - 7)
-  const oneWeekAgo = now.valueOf()
-  if (existsSync(p)) {
-    const tasks = JSON.parse(readFileSync(p))
-    for (const task of tasks) {
-      if (!existsSync(task.torrentPath) || !existsSync(task.downloadPath)) {
-        if (existsSync(task.torrentPath)) rmSync(task.torrentPath)
-        if (existsSync(task.downloadPath)) rmSync(task.downloadPath, { recursive: true })
-        continue
+  try {
+    const p = resolve(path, 'preload-tasks.json')
+    const now = new Date()
+    now.setDate(now.getDate() - 7)
+    const oneWeekAgo = now.valueOf()
+    if (existsSync(p)) {
+      const tasks = JSON.parse(readFileSync(p))
+      for (const task of tasks) {
+        if (!existsSync(task.torrentPath) || !existsSync(task.downloadPath)) {
+          if (existsSync(task.torrentPath)) rmSync(task.torrentPath)
+          if (existsSync(task.downloadPath)) rmSync(task.downloadPath, { recursive: true })
+          continue
+        }
+        if (task.removed) continue
+        const { mtimeMs } = statSync(task.torrentPath)
+        // Remove old caches
+        if (mtimeMs < oneWeekAgo) {
+          rmSync(task.torrentPath)
+          if (existsSync(task.downloadPath)) rmSync(task.downloadPath, { recursive: true })
+          continue
+        }
+        if (task.torrent && task.torrent.downloaded < downloadThreshold) {
+          // This task was not loaded before
+          queueTask({
+            url: task.url,
+            origin: task.origin,
+            path: task.downloadPath,
+            postTitle: task.torrent.postTitle || task.torrent.name
+          })
+          console.log('[Preload] Restart', task.url)
+        } else {
+          console.log('[Preload] Restore', task.url)
+          preloadTasks.set(task.url, task)
+        }
       }
-      if (task.removed) continue
-      const { mtimeMs } = statSync(task.torrentPath)
-      // Remove old caches
-      if (mtimeMs < oneWeekAgo) {
-        rmSync(task.torrentPath)
-        if (existsSync(task.downloadPath)) rmSync(task.downloadPath, { recursive: true })
-        continue
-      }
-      if (task.torrent && task.torrent.downloaded < downloadThreshold) {
-        // This task was not loaded before
-        queueTask({
-          url: task.url,
-          origin: task.origin,
-          path: task.downloadPath,
-          postTitle: task.torrent.postTitle || task.torrent.name
-        })
-        console.log('[Preload] Restart', task.url)
-      } else {
-        console.log('[Preload] Restore', task.url)
-        preloadTasks.set(task.url, task)
-      }
+      console.log(`[Preload] Restore ${tasks.length} tasks`)
     }
-    console.log(`[Preload] Restore ${tasks.length} tasks`)
+    storePath = p
+  } catch (e) {
+    console.log(`Failed to load preloads from ${path}`, e)
   }
-  storePath = p
 })
 ipcRenderer.on('preload-task', (e, { url, path, origin, postTitle }) => {
   if (!preloadTasks.has(url)) {
