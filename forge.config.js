@@ -183,6 +183,18 @@ module.exports = {
         desktopTemplate: debDesktopTemplate
       }
     },
+    {
+      name: '@electron-forge/maker-appx',
+      config: {
+        publisher: 'CN=zeeis',
+        assets: resolve(__dirname, 'public/platform-assets/windows/icon'),
+        devCert: resolve(__dirname, 'appx/default.pfx'),
+        deploy: false,
+        makePri: true,
+        packageName: productName,
+        manifest: 'appx/template.xml'
+      }
+    }
     // {
     //   name: "@electron-forge/maker-rpm",
     //   config: {}

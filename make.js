@@ -1,7 +1,7 @@
 const { exec, execSync } = require('child_process')
 const { existsSync, copyFileSync, mkdirSync, unlinkSync, readFileSync, writeFileSync } = require('fs')
 const { resolve } = require('path')
-const { productName } = require('./package.json')
+const { productName, description } = require('./package.json')
 const publicVersion = require('./public/version.json').version
 const pkgVersion = require('./public/version.json').packageVer
 const readline = require('readline')
@@ -36,7 +36,8 @@ const doMake = async () => {
      */
     // execSync(`cp -r "${packageDir}/" "${resolve(__dirname, 'out')}/"`)
     copySync(packageDir, destDir, { recursive: true })
-  } else await symlinkDir(packageDir, destDir)
+  } else copySync(packageDir, destDir, { recursive: true })
+  // } else await symlinkDir(packageDir, destDir)
   console.log(`Executing: \x1b[32myarn ${arg}\x1b[0m`)
   const prefix = `\x1b[32m  * make \x1b[0m`
   const res = exec(`yarn ${arg}`)
@@ -73,6 +74,8 @@ const doPostmake = () => {
     const wixDir = resolve(outDir, `wix/${arch}`)
     toMoves.push([resolve(wixDir, `${productName}.msi`), resolve(destDir, `${productName.toLowerCase()}-${version}.msi`)])
     const squirrelDir = resolve(outDir, `squirrel.windows/${arch}`)
+    const appxDir = resolve(outDir, `appx/${arch}`)
+    toMoves.push([resolve(appxDir, `${productName}.appx`), resolve(destDir, `${productName.toLowerCase()}-${version}.appx`)])
     const files = [
       `${productName}-${pkgVersion} Setup.exe`,
       `${productName}-${pkgVersion}-full.nupkg`,
@@ -114,7 +117,16 @@ if (process.argv.includes('--make')) {
     writeFileSync(packagePath, packageObj)
     console.log('Restored package.json before exit')
   })
-  
+  // if windows modify appxManifest
+  if (platform === 'win32') {
+    const xmlFilePath = resolve(__dirname, 'appx/template.xml')
+    const appxTemplate = readFileSync(resolve(__dirname, 'appx/template.xml'), 'utf-8')
+    writeFileSync(xmlFilePath, appxTemplate.replace('{{pkgVersion}}', pkgVersion + '.0').replace('{{description}}', description))
+    process.on('exit', () => {
+      writeFileSync(xmlFilePath, appxTemplate)
+      console.log('Restored appx/template.xml before exit')
+    })
+  }
   doMake()
 } else if (process.argv.includes('--postmake')) {
   doPostmake()
