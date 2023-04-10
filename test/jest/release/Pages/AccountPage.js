@@ -62,7 +62,7 @@ class AccountPage extends HomePage {
           timeoutMsg: 'The second attempt - importCloudKeyCard is not hidden'
         })
       }
-      await sleep(3000)
+      await sleep(5000)
       if (!(await this.page.$('//*[@Name="Credits"]').isDisplayed())) {
         await this.page.$('//Button[@Name="Menu"]').click()
       }
