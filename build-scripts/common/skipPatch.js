@@ -28,7 +28,7 @@ if (filePaths) {
   }
 }
 
-const result = execSync('npx patch-package', {
+const result = execSync('npx patch-package --error-on-fail', {
   cwd: __rootdir
 })
 console.log(`Patch package result: ${result.toString()}`)
