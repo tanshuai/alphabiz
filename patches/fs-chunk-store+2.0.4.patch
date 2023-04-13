@@ -1,5 +1,5 @@
 diff --git a/node_modules/fs-chunk-store/index.js b/node_modules/fs-chunk-store/index.js
-index 10d782b..c1fd471 100644
+index 10d782b..5c4b4f5 100644
 --- a/node_modules/fs-chunk-store/index.js
 +++ b/node_modules/fs-chunk-store/index.js
 @@ -11,6 +11,44 @@ const randombytes = require('randombytes')
@@ -64,7 +64,7 @@ index 10d782b..c1fd471 100644
      self.files = opts.files.slice(0).map(function (file, i, files) {
        if (file.path == null) throw new Error('File is missing `path` property')
        if (file.length == null) throw new Error('File is missing `length` property')
-@@ -47,6 +92,10 @@ function Storage (chunkLength, opts) {
+@@ -47,6 +92,14 @@ function Storage (chunkLength, opts) {
        if (self.path) {
          file.path = self.addUID ? path.resolve(path.join(self.path, self.name, file.path)) : path.resolve(path.join(self.path, file.path))
        }
@@ -72,10 +72,14 @@ index 10d782b..c1fd471 100644
 +        file.path = file.path.replace(opts.torrent.name, escapePath(opts.postTitle)) + extName
 +        console.log('change file path to', file.path, opts.torrent.name, opts.postTitle)
 +      }
++      if (fs.existsSync(file.path)) return file
++      const downloadingFile = file.path + '.downloading'
++      console.log('Apply file with .downloading', downloadingFile)
++      file.path = downloadingFile
        return file
      })
      self.length = self.files.reduce(function (sum, file) { return sum + file.length }, 0)
-@@ -69,10 +118,17 @@ function Storage (chunkLength, opts) {
+@@ -69,10 +122,17 @@ function Storage (chunkLength, opts) {
    self.files.forEach(function (file) {
      file.open = thunky(function (cb) {
        if (self.closed) return cb(new Error('Storage is closed'))
