@@ -1,5 +1,2 @@
-get all channels before login
-set fs-xattr as optional
-fix win optional module patch
-fix search error with `&nbsp;`
-add set-download hint for MAS version
+try load all channels in prepareData
+add `.downloading` postfix for tasks
