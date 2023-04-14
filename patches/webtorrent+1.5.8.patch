@@ -496,7 +496,7 @@ index 7e08906..960994c 100644
      }
  
 diff --git a/node_modules/webtorrent/lib/torrent.js b/node_modules/webtorrent/lib/torrent.js
-index ac7cb97..8c307bd 100644
+index ac7cb97..22e5eb0 100644
 --- a/node_modules/webtorrent/lib/torrent.js
 +++ b/node_modules/webtorrent/lib/torrent.js
 @@ -49,8 +49,17 @@ const PIPELINE_MAX_DURATION = 1
@@ -821,6 +821,19 @@ index ac7cb97..8c307bd 100644
      while (wireStack.length > 0 && numInterestedUnchoked < this._rechokeNumSlots - 1) {
        const wire = wireStack.pop() // next best quality peer
  
+@@ -1672,6 +1819,12 @@ class Torrent extends EventEmitter {
+         if (!this.bitfield.get(i)) return
+       }
+       file.done = true
++      if (file.path.endsWith('.downloading')) {
++        const target = file.path.replace(/\.downloading$/, '')
++        fs.renameSync(file.path, target)
++        file.path = target
++        console.log('Rename', file.path)
++      }
+       file.emit('done')
+       this._debug(`file done: ${file.name}`)
+     })
 diff --git a/node_modules/webtorrent/lib/utp.js b/node_modules/webtorrent/lib/utp.js
 index 2cde3f4..21956e3 100644
 --- a/node_modules/webtorrent/lib/utp.js
