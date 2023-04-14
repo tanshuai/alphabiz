@@ -1,2 +1,4 @@
-try load all channels in prepareData
-add `.downloading` postfix for tasks
+remove .downloading postfix after task done
+use a larger spin for library loading
+try improve library loading
+update ios configs
