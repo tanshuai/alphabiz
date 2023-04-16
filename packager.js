@@ -46,6 +46,7 @@ packager({
     [
       'webtorrent',
       'bittorrent-tracker',
+      'gun',
       'torrent-discovery', // this builds with self-dep bittorrent-tracker
       '@videojs'
     ].forEach(dep => {

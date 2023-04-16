@@ -30,6 +30,7 @@
     "postmake": "node make.js --postmake"
   },
   "dependencies": {
+    "gun": "^0.2020.1236",
     "symlink-dir": "^5.0.1",
     "video.js": "^7.13.3",
     "videojs-ass": "^0.8.0",

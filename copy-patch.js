@@ -5,26 +5,30 @@ const fs = require('fs')
 const path = require('path')
 
 const copyModule = async () => {
-  ['webtorrent', '@videojs'].forEach(dep => {
-    const src = path.resolve(__dirname, 'node_modules', dep)
-    const dest = path.resolve(__dirname, 'build/electron/UnPackaged/node_modules', dep)
-    if (!fs.existsSync(src)) return
-    if (fs.existsSync(dest)) fs.rmSync(dest, { recursive: true })
-    const copyRecursive = (src, dest) => {
-      if (fs.statSync(src).isDirectory()) {
-        fs.readdirSync(src).forEach(dir => {
-          copyRecursive(path.resolve(src, dir), path.resolve(dest, dir))
-        })
-      } else {
-      // ensure directory exists
-        if (!fs.existsSync(path.dirname(dest))) {
-          fs.mkdirSync(path.dirname(dest), { recursive: true })
+  ['webtorrent',
+    'bittorrent-tracker',
+    'gun',
+    'torrent-discovery', // this builds with self-dep bittorrent-tracker
+    '@videojs'].forEach(dep => {
+      const src = path.resolve(__dirname, 'node_modules', dep)
+      const dest = path.resolve(__dirname, 'build/electron/UnPackaged/node_modules', dep)
+      if (!fs.existsSync(src)) return
+      if (fs.existsSync(dest)) fs.rmSync(dest, { recursive: true })
+      const copyRecursive = (src, dest) => {
+        if (fs.statSync(src).isDirectory()) {
+          fs.readdirSync(src).forEach(dir => {
+            copyRecursive(path.resolve(src, dir), path.resolve(dest, dir))
+          })
+        } else {
+          // ensure directory exists
+          if (!fs.existsSync(path.dirname(dest))) {
+            fs.mkdirSync(path.dirname(dest), { recursive: true })
+          }
+          fs.copyFileSync(src, dest)
         }
-        fs.copyFileSync(src, dest)
       }
-    }
-    copyRecursive(src, dest)
-  })
+      copyRecursive(src, dest)
+    })
 }
 const copyVersionJSON = async () => {
   const src = path.resolve(__dirname, 'public/version.json')
@@ -44,7 +48,7 @@ if (process.argv.includes('--pre')) {
   console.log('run copy-patch.js --pre')
   copyVersionJSON()
   copyModule()
-} else if(process.argv.includes('--post')) {
+} else if (process.argv.includes('--post')) {
   console.log('run copy-patch.js --post')
   deleteVersionJSON()
 }
