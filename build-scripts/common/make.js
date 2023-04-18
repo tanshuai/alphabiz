@@ -252,7 +252,11 @@ if (process.argv.includes('--make')) {
         }
       }
     }
-    appxTemplate = appxTemplate.replace('{{description}}', description).replace('{{appxPackageIdentityName}}', appConfig.appxPackageIdentityName)
+    appxTemplate = appxTemplate
+      .replace('{{description}}', description)
+      .replace('{{appxPackageIdentityName}}', appConfig.appxPackageIdentityName)
+      .replace(/{{protocol}}/g, appConfig.protocol)
+      .replace(/{{shortProtocol}}/g, appConfig.shortProtocol)
     writeFileSync(xmlFilePath, appxTemplate)
     process.on('exit', () => {
       writeFileSync(xmlFilePath, oldAppxTemplate)
