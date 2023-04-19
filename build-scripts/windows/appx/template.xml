@@ -33,12 +33,13 @@
       </uap:VisualElements>
       <Extensions>
         <uap:Extension Category="windows.protocol">
-          <uap:Protocol name="{{protocol}}"></uap:Protocol>
-          <uap:DisplayName>{{packageDisplayName}} URI</uap:DisplayName>
+          <uap:Protocol Name="magnet"></uap:Protocol>
         </uap:Extension>
         <uap:Extension Category="windows.protocol">
-          <uap:Protocol name="{{shortProtocol}}"></uap:Protocol>
-          <uap:DisplayName>{{packageDisplayName}} URI</uap:DisplayName>
+          <uap:Protocol Name="{{protocol}}"></uap:Protocol>
+        </uap:Extension>
+        <uap:Extension Category="windows.protocol">
+          <uap:Protocol Name="{{shortProtocol}}"></uap:Protocol>
         </uap:Extension>
       </Extensions>
     </Application>
