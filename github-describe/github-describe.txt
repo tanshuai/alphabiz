@@ -1,6 +1,1 @@
-i18n for YearMonthPicker
-improve loadingState
-change appx config `name` to `Name`
-add magnet
-add wait timeout
-fix errors in iOS sandbox
+add promiseDeliveryStatus
