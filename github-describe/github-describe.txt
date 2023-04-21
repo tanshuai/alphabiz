@@ -1,1 +1,2 @@
-add promiseDeliveryStatus
+sync changes for ios builds
+notifyDeliveryStatus when signUp
