@@ -1,1 +1,3 @@
-support reconnect network for gun
+copy gun patch
+trim
+improve gun
