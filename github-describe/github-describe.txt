@@ -1,3 +1,2 @@
-copy gun patch
-trim
-improve gun
+fix client id bug
+Update GunDB.js
