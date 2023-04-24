@@ -1,2 +1,2 @@
-sync changes for ios builds
-notifyDeliveryStatus when signUp
+fix deliveryStatusPromise
+i18n for delivery status
