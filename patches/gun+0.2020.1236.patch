@@ -1,8 +1,21 @@
 diff --git a/node_modules/gun/gun.js b/node_modules/gun/gun.js
-index 5db12d4..98c8c2a 100644
+index 5db12d4..55a5f76 100644
 --- a/node_modules/gun/gun.js
 +++ b/node_modules/gun/gun.js
-@@ -1686,16 +1686,22 @@
+@@ -1635,7 +1635,11 @@
+ 			root.on('bye', function(peer, tmp){
+ 				peer = opt.peers[peer.id || peer] || peer;
+ 				this.to.next(peer);
+-				peer.bye? peer.bye() : (tmp = peer.wire) && tmp.close && tmp.close();
++				if (peer.bye) {
++          peer.bye();
++        } else if(peer.wire && peer.wire.close){
++          peer.wire.close();
++        }
+ 				delete opt.peers[peer.id];
+ 				peer.wire = null;
+ 			});
+@@ -1686,16 +1690,22 @@
  
  			var wire = mesh.wire || opt.wire;
  			mesh.wire = opt.wire = open;
@@ -21,7 +34,7 @@ index 5db12d4..98c8c2a 100644
  				};
  				wire.onerror = function(error){
 -					reconnect(peer);
-+          console.log('wire.onerror', error)
++          // console.log('wire.onerror', error)
 +          // disable internal reconnect
 +					// reconnect(peer);
  				};
