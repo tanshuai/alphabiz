@@ -1,2 +1,1 @@
-fix client id bug
-Update GunDB.js
+support automatic update
