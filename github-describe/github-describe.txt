@@ -1,2 +1,2 @@
-Update i18n.js
-fix bug when playing downloading file
+fix bugs in ios
+fix error when using webtorrent in node env
