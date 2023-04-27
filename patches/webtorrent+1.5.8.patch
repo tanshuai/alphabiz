@@ -2,7 +2,7 @@ diff --git a/node_modules/webtorrent/.DS_Store b/node_modules/webtorrent/.DS_Sto
 new file mode 100644
 index 0000000..e69de29
 diff --git a/node_modules/webtorrent/index.js b/node_modules/webtorrent/index.js
-index 3e07d04..a4eb60f 100644
+index 3e07d04..7abb69e 100644
 --- a/node_modules/webtorrent/index.js
 +++ b/node_modules/webtorrent/index.js
 @@ -98,7 +98,10 @@ class WebTorrent extends EventEmitter {
@@ -31,7 +31,7 @@ index 3e07d04..a4eb60f 100644
      const torrent = this.add(null, opts, onTorrent)
      let streams
  
-+    if (input instanceof File) input = [input]
++    if (typeof File !== 'undefined' && input instanceof File) input = [input]
      if (isFileList(input)) input = Array.from(input)
      else if (!Array.isArray(input)) input = [input]
 +    torrent.isSeeding = true
