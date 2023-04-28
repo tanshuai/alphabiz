@@ -262,6 +262,8 @@ const updateTorrent = (once = false) => {
         if (prev.uploaded === 0) t.uploadSpeed = 0
         else t.uploadSpeed = Math.floor((tr.uploaded - prev.uploaded) / deltaTime)
         // if (!t.upload) info(prev.downloaded, tr.downloaded, t.downloadSpeed, deltaTime)
+        if (t.downloadSpeed < 0) t.downloadSpeed = 0
+        if (t.uploadSpeed < 0) t.uploadSpeed = 0
         totalDownloadSpeed += t.downloadSpeed
         totalUploadSpeed += t.uploadSpeed
         speeder.set(t.infoHash, {
@@ -279,8 +281,8 @@ const updateTorrent = (once = false) => {
     ipcRenderer.send('webtorrent-torrents', [])
   }
   ipcRenderer.send('webtorrent-client-info', {
-    downloadSpeed: totalDownloadSpeed,
-    uploadSpeed: totalUploadSpeed,
+    downloadSpeed: totalDownloadSpeed < 0 ? 0 : totalDownloadSpeed,
+    uploadSpeed: totalUploadSpeed < 0 ? 0 : totalUploadSpeed,
     progress: client.progress,
     taskNum: client.torrents.length
   })

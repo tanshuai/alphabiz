@@ -176,7 +176,9 @@ const torrentToJson = (tr, deltaTime, speeder) => {
     if (speeder.has(wire._debugId)) {
       const prev = speeder.get(wire._debugId)
       downloadSpeed = (wire.downloaded - prev.downloaded) / deltaTime
+      if (downloadSpeed < 0) downloadSpeed = 0
       uploadSpeed = (wire.uploaded - prev.uploaded) / deltaTime
+      if (uploadSpeed < 0) uploadSpeed = 0
     }
     speeder.set(wire._debugId, {
       downloaded: wire.downloaded,
