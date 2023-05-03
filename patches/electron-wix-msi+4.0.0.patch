@@ -1,8 +1,8 @@
 diff --git a/node_modules/electron-wix-msi/lib/creator.js b/node_modules/electron-wix-msi/lib/creator.js
-index 93195c1..ab2d64f 100644
+index 93195c1..d2bc271 100644
 --- a/node_modules/electron-wix-msi/lib/creator.js
 +++ b/node_modules/electron-wix-msi/lib/creator.js
-@@ -50,7 +50,8 @@ class MSICreator {
+@@ -50,10 +50,12 @@ class MSICreator {
          this.wxsFile = '';
          this.arch = 'x86';
          this.files = [];
@@ -12,7 +12,11 @@ index 93195c1..ab2d64f 100644
          this.directories = [];
          this.registry = [];
          this.components = [];
-@@ -78,7 +79,7 @@ class MSICreator {
++        this.exeComponentID = '';
+         this.appDirectory = path.normalize(options.appDirectory);
+         this.certificateFile = options.certificateFile;
+         this.certificatePassword = options.certificatePassword;
+@@ -78,7 +80,7 @@ class MSICreator {
          this.windowsCompliantVersion = (0, version_util_1.getWindowsCompliantVersion)(options.version);
          this.arch = options.arch || 'x86';
          this.defaultInstallMode = options.defaultInstallMode || 'perMachine';
@@ -21,7 +25,7 @@ index 93195c1..ab2d64f 100644
          this.rebootMode = options.rebootMode || 'ReallySuppress';
          this.installLevel = options.installLevel || 2;
          this.bundled = options.bundled || false;
-@@ -106,12 +107,17 @@ class MSICreator {
+@@ -106,12 +108,17 @@ class MSICreator {
              const registry = this.getRegistryKeys();
              const specialFiles = yield this.getSpecialFiles();
              this.files = files;
@@ -40,7 +44,7 @@ index 93195c1..ab2d64f 100644
              const supportBinaries = this.specialFiles.filter((f) => f.path.endsWith('.exe')).map((f) => f.path);
              return { wxsContent, wxsFile, supportBinaries };
          });
-@@ -126,9 +132,9 @@ class MSICreator {
+@@ -126,9 +133,9 @@ class MSICreator {
                  console.warn(`for information on how to install the Wix toolkit, which is required.\n`);
                  throw new Error(`Could not find light.exe or candle.exe`);
              }
@@ -53,7 +57,15 @@ index 93195c1..ab2d64f 100644
              if (!this.wxsFile) {
                  throw new Error(`wxsFile not found. Did you run create() yet?`);
              }
-@@ -372,8 +378,9 @@ class MSICreator {
+@@ -196,6 +203,7 @@ class MSICreator {
+                 '{{RandomGuid}}': (0, uuid_1.v4)().toString(),
+                 '{{RebootMode}}': this.rebootMode,
+                 '{{InstallLevel}}': this.installLevel.toString(10),
++                '{{exeComponentID}}': this.exeComponentID,
+                 '\r?\n.*{{remove newline}}': ''
+             };
+             const completeTemplate = (0, replace_1.replaceInString)(this.wixTemplate, scaffoldReplacements);
+@@ -372,8 +380,9 @@ class MSICreator {
          });
      }
      getFileComponent(file, indent) {
@@ -65,7 +77,17 @@ index 93195c1..ab2d64f 100644
          const xml = (0, replace_1.replaceInString)(this.fileComponentTemplate, {
              '<!-- {{I}} -->': (0, lodash_1.padStart)('', indent),
              '{{ComponentId}}': componentId,
-@@ -412,14 +419,14 @@ class MSICreator {
+@@ -382,6 +391,9 @@ class MSICreator {
+             '{{Guid}}': guid,
+             '{{SourcePath}}': file.path
+         });
++        if (file.name.includes(this.exe)) {
++            this.exeComponentID = componentId;
++        }
+         return { guid, componentId, xml, file, featureAffinity: file.featureAffinity || 'main' };
+     }
+     getRegistryComponent(registry, indent) {
+@@ -412,14 +424,14 @@ class MSICreator {
          });
          return xml;
      }
@@ -82,7 +104,7 @@ index 93195c1..ab2d64f 100644
          return uniqueId.replace(/[^A-Za-z0-9_\.]/g, '_');
      }
      getSpecialFiles() {
-@@ -436,6 +443,7 @@ class MSICreator {
+@@ -436,6 +448,7 @@ class MSICreator {
                      featureAffinity: 'autoUpdate'
                  });
              }
@@ -90,3 +112,15 @@ index 93195c1..ab2d64f 100644
              return specialFiles;
          });
      }
+diff --git a/node_modules/electron-wix-msi/static/ui.xml b/node_modules/electron-wix-msi/static/ui.xml
+index 85829c2..519781a 100644
+--- a/node_modules/electron-wix-msi/static/ui.xml
++++ b/node_modules/electron-wix-msi/static/ui.xml
+@@ -13,6 +13,7 @@
+       <DialogRef Id="ResumeDlg" />
+       <DialogRef Id="UserExit" />
+       <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
++      <Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" Value="LaunchApplication">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
+       <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="CustomizeDlg">NOT Installed</Publish>
+       <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">Installed AND PATCH</Publish>
+       <Publish Dialog="CustomizeDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="1">Installed</Publish>
