@@ -1,2 +1,2 @@
-fix bugs in ios
-fix error when using webtorrent in node env
+try fix url error when opening file in windows #125
+fix ios bugs
