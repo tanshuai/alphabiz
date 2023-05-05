@@ -53,8 +53,28 @@ index 3e07d04..5c871bc 100644
    }
  
    _onListening () {
+diff --git a/node_modules/webtorrent/lib/conn-pool.js b/node_modules/webtorrent/lib/conn-pool.js
+index 1c6ac79..772b721 100644
+--- a/node_modules/webtorrent/lib/conn-pool.js
++++ b/node_modules/webtorrent/lib/conn-pool.js
+@@ -118,6 +118,7 @@ class ConnPool {
+    * on the infoHash in that handshake, route the peer to the right swarm.
+    */
+   _onConnection (conn, type) {
++    // console.log('onConn', conn, type)
+     const self = this
+ 
+     // If the connection has already been closed before the `connect` event is fired,
+@@ -142,6 +143,7 @@ class ConnPool {
+     wire.once('handshake', onHandshake)
+ 
+     function onPe3 (infoHashHash) {
++      console.log('onPe3', infoHashHash)
+       const torrent = self._client._getByHash(infoHashHash)
+       if (torrent) {
+         peer.swarm = torrent
 diff --git a/node_modules/webtorrent/lib/peer.js b/node_modules/webtorrent/lib/peer.js
-index 19cb5ff..d182474 100644
+index 19cb5ff..19a6e5d 100644
 --- a/node_modules/webtorrent/lib/peer.js
 +++ b/node_modules/webtorrent/lib/peer.js
 @@ -16,6 +16,20 @@ exports.enableSecure = () => {
@@ -91,6 +111,15 @@ index 19cb5ff..d182474 100644
    /**
     * Called once the peer is connected (i.e. fired 'connect' event)
     * @param {Socket} conn
+@@ -159,7 +179,7 @@ class Peer extends EventEmitter {
+     if (this.destroyed) return
+     this.connected = true
+ 
+-    debug('Peer %s connected', this.id)
++    debug('Peer %s connected', this.id, this.type)
+ 
+     clearTimeout(this.connectTimeout)
+ 
 @@ -177,7 +197,7 @@ class Peer extends EventEmitter {
        this.destroy(err)
      })
@@ -100,7 +129,7 @@ index 19cb5ff..d182474 100644
  
      wire.once('end', () => {
        this.destroy()
-@@ -213,10 +233,13 @@ class Peer extends EventEmitter {
+@@ -213,51 +233,63 @@ class Peer extends EventEmitter {
  
      if (this.swarm) {
        if (this.type === 'tcpOutgoing') {
@@ -115,7 +144,57 @@ index 19cb5ff..d182474 100644
    }
  
    sendPe1 () {
-@@ -267,8 +290,11 @@ class Peer extends EventEmitter {
++    // console.log(this.swarm.infoHash, 'sendPe1')
+     this.wire.sendPe1()
+     this.sentPe1 = true
+   }
+ 
+   onPe1 () {
++    console.log('onPe1')
+     this.sendPe2()
+   }
+ 
+   sendPe2 () {
++    // console.log(this.swarm.infoHash, 'sendPe2')
+     this.wire.sendPe2()
+     this.sentPe2 = true
+   }
+ 
+   onPe2 () {
+     this.sendPe3()
++    console.log(this.swarm.infoHash, 'onPe2')
+   }
+ 
+   sendPe3 () {
+     this.wire.sendPe3(this.swarm.infoHash)
+     this.sentPe3 = true
++    console.log(this.swarm.infoHash, 'sendPe3')
+   }
+ 
+   onPe3 (infoHashHash) {
+     if (this.swarm) {
+       if (this.swarm.infoHashHash !== infoHashHash) {
++        console.log('error infoHashHash', infoHashHash, this.swarm.infoHashHash)
+         this.destroy(new Error('unexpected crypto handshake info hash for this swarm'))
+       }
+       this.sendPe4()
+     }
++    console.log(this.swarm.infoHash, 'onPe3', infoHashHash, this.swarm.infoHashHash)
+   }
+ 
+   sendPe4 () {
+     this.wire.sendPe4(this.swarm.infoHash)
+     this.sentPe4 = true
++    console.log(this.swarm.infoHash, 'sendPe4')
+   }
+ 
+   onPe4 () {
+     if (!this.sentHandshake) this.handshake()
++    console.log(this.swarm.infoHash, 'onPe4')
+   }
+ 
+   clearPipes () {
+@@ -267,8 +299,11 @@ class Peer extends EventEmitter {
  
    setThrottlePipes () {
      const self = this
@@ -128,7 +207,7 @@ index 19cb5ff..d182474 100644
        .pipe(new Transform({
          transform (chunk, _, callback) {
            self.emit('download', chunk.length)
-@@ -277,7 +303,7 @@ class Peer extends EventEmitter {
+@@ -277,7 +312,7 @@ class Peer extends EventEmitter {
          }
        }))
        .pipe(this.wire)
@@ -137,7 +216,7 @@ index 19cb5ff..d182474 100644
        .pipe(new Transform({
          transform (chunk, _, callback) {
            self.emit('upload', chunk.length)
-@@ -381,7 +407,12 @@ class Peer extends EventEmitter {
+@@ -381,7 +416,12 @@ class Peer extends EventEmitter {
        conn.on('error', () => {})
        conn.destroy()
      }
@@ -152,7 +231,7 @@ index 19cb5ff..d182474 100644
    }
  }
 diff --git a/node_modules/webtorrent/lib/torrent.js b/node_modules/webtorrent/lib/torrent.js
-index ac7cb97..498de6c 100644
+index ac7cb97..652d627 100644
 --- a/node_modules/webtorrent/lib/torrent.js
 +++ b/node_modules/webtorrent/lib/torrent.js
 @@ -64,6 +64,56 @@ try {
@@ -295,7 +374,15 @@ index ac7cb97..498de6c 100644
    }
  
    addPeer (peer) {
-@@ -1144,6 +1212,7 @@ class Torrent extends EventEmitter {
+@@ -893,6 +961,7 @@ class Torrent extends EventEmitter {
+    * peer that has already sent a handshake.
+    */
+   _addIncomingPeer (peer) {
++    console.log('income', peer)
+     if (this.destroyed) return peer.destroy(new Error('torrent is destroyed'))
+     if (this.paused) return peer.destroy(new Error('torrent is paused'))
+ 
+@@ -1144,6 +1213,7 @@ class Torrent extends EventEmitter {
      })
  
      wire.once('close', () => {
