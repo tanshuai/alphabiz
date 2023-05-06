@@ -1,2 +1,1 @@
-improve deliveryStatus
-fix bugs and improve performance
+fix bugs in ios and improve UI in mobile mode
