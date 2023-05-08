@@ -5,4 +5,5 @@
   <String Id="CompletePackage" Overridable="yes">完整安裝</String>
   <String Id="MainComponents" Overridable="yes">運行程式所需的全部組件</String>
   <String Id="DowngradeWarning" Overridable="yes">一個更新的版本已安裝, 本程式將退出</String>
+  <String Id="LaunchAfterInstall" Overridable="yes">安裝完成後打開應用</String>
 </WixLocalization>

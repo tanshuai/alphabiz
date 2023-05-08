@@ -69,14 +69,20 @@
     </Property>
     <!-- Lets change the product name depending on the perUser installMode. 
     This way the user and admins can see in which scope the MSI was installed. -->
-    <SetProperty Action="SetVisibleProductName" Id="VisibleProductName" Sequence="both" Before="AppSearch"  Value="{{ApplicationName}} (User)">
+    <SetProperty Action="SetVisibleProductName" Id="VisibleProductName" Sequence="both" Before="AppSearch"  Value="{{ApplicationName}}">
       <![CDATA[MSIINSTALLPERUSER = "1"]]>
     </SetProperty>
     <!-- Again we give thee MSI generaten entry a slightly different name to help 
     differentiate between the public one and the invisible one. -->
-    <SetProperty Action="SetProductName" Id="ProductName" Sequence="both" Before="AppSearch"  Value="{{ApplicationName}} (User - MSI)">
+    <SetProperty Action="SetProductName" Id="ProductName" Sequence="both" Before="AppSearch"  Value="{{ApplicationName}}">
       <![CDATA[MSIINSTALLPERUSER = "1"]]>
     </SetProperty>
+    <Property Id="WixSilentExecCmdLine" Value="&quot;\windows\system32\cmd.exe&quot; /c taskkill /f /im {{ApplicationName}}.exe" Hidden="yes"/>
+    <CustomAction Id="SilentExec" BinaryKey="WixCA" DllEntry="WixSilentExec" Execute="immediate" Return="ignore" />
+    <InstallExecuteSequence>
+      <Custom Action="SilentExec" Before="InstallValidate"/>
+    </InstallExecuteSequence>
+    <!-- <util:CloseApplication Id="CloseApp" CloseMessage="yes" Target="{{ApplicationName}}.exe" Description="Please close {{ApplicationName}} before continuing." RebootPrompt="no" ElevatedCloseMessage="yes" PromptToContinue="yes" TerminateProcess="9" /> -->
 
     <Media Id="1" Cabinet="product.cab" EmbedCab="yes"/>
 
@@ -158,5 +164,10 @@
 <!-- {{AutoUpdateFeature}} -->
     </Feature> 
     <!-- {{IconTemplate}} -->
+    <!-- Optional Launch app feature -->
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="!(loc.LaunchAfterInstall)" />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
+    <Property Id="WixShellExecTarget" Value="[#{{exeComponentID}}]" />
+    <CustomAction Id="LaunchApplication" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
   </Product>
 </Wix>

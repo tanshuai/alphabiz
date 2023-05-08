@@ -10,4 +10,5 @@
   <String Id="CompletePackage" Overridable="yes">The complete package.</String>
   <String Id="MainComponents" Overridable="yes">The main components to run the applications.</String>
   <String Id="DowngradeWarning" Overridable="yes">A later version of this product is already installed. Setup will now exit.</String>
+  <String Id="LaunchAfterInstall" Overridable="yes">Launch app after install</String>
 </WixLocalization>
