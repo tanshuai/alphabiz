@@ -1,2 +1,6 @@
-#131
-ios ui update
+#130
+fix version info
+improve logger
+log for subtitle
+fix server error in ios and add file transferer
+#126
