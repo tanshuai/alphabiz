@@ -1,3 +1,1 @@
-skip network status check for non-capacitor
-fix aws network check
-try fix metadata errors for streaming and add entitlements config for ios
+fix stream server errors and add gun-server hint
