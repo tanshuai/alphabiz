@@ -1,1 +1,2 @@
-fix stream server errors and add gun-server hint
+fix deliveryStatusPromise
+update app version
