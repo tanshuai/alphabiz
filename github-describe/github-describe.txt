@@ -1,1 +1,2 @@
-fix scroll page error in credits
+fix errors and add hints for library key
+try login github in web e2e test #932
