@@ -1,2 +1,2 @@
-fix errors and add hints for library key
-try login github in web e2e test #932
+add sign in with github web e2e test by playwright #932
+try fix credit errors
