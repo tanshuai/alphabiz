@@ -14,7 +14,7 @@ const config = {
 
   // Forbid test.only on CI
   // forbidOnly: !!process.env.CI,
-
+  outputDir: './test/output/playwright',
   // Two retries for each test
   retries: 2,
 
