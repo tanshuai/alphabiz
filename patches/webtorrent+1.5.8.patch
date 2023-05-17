@@ -82,7 +82,7 @@ index 1c6ac79..b85b5c3 100644
          peer.swarm = torrent
          torrent._addIncomingPeer(peer)
 diff --git a/node_modules/webtorrent/lib/peer.js b/node_modules/webtorrent/lib/peer.js
-index 19cb5ff..1955dd8 100644
+index 19cb5ff..9bc5480 100644
 --- a/node_modules/webtorrent/lib/peer.js
 +++ b/node_modules/webtorrent/lib/peer.js
 @@ -16,6 +16,20 @@ exports.enableSecure = () => {
@@ -144,7 +144,7 @@ index 19cb5ff..1955dd8 100644
 -    wire.once('pe3', () => {
 -      this.onPe3()
 +    wire.once('pe3', (ihh) => {
-+      console.log('wire.onPe3', ihh)
++      // console.log('wire.onPe3', ihh)
 +      this.onPe3(ihh)
      })
      wire.once('pe4', () => {
@@ -170,7 +170,7 @@ index 19cb5ff..1955dd8 100644
    }
  
    onPe1 () {
-+    console.log('onPe1')
++    // console.log('onPe1')
      this.sendPe2()
    }
  
@@ -182,43 +182,43 @@ index 19cb5ff..1955dd8 100644
  
    onPe2 () {
      this.sendPe3()
-+    console.log(this.swarm.infoHash, 'onPe2')
++    // console.log(this.swarm.infoHash, 'onPe2')
    }
  
    sendPe3 () {
      this.wire.sendPe3(this.swarm.infoHash)
      this.sentPe3 = true
-+    console.log(this.swarm.infoHash, 'sendPe3')
++    // console.log(this.swarm.infoHash, 'sendPe3')
    }
  
    onPe3 (infoHashHash) {
-+    console.log('peer.js: onPe3', infoHashHash);
++    // console.log('peer.js: onPe3', infoHashHash);
 +    if (!infoHashHash) return console.log('skip without infoHashHash')
 +    // setTimeout(() => {
      if (this.swarm) {
-+      console.log('use swarm', this.swarm.infoHashHash, infoHashHash)
++      // console.log('use swarm', this.swarm.infoHashHash, infoHashHash)
        if (this.swarm.infoHashHash !== infoHashHash) {
-+        console.log('error infoHashHash', infoHashHash, this.swarm.infoHashHash)
++        // console.log('error infoHashHash', infoHashHash, this.swarm.infoHashHash)
          this.destroy(new Error('unexpected crypto handshake info hash for this swarm'))
        }
        this.sendPe4()
 +    } else {
-+      console.log('noSwarm')
++      // console.log('noSwarm')
 +      this.destroy(new Error('No swarm available'))
      }
-+    console.log(this.swarm, 'onPe3', infoHashHash, this.swarm?.infoHashHash)
++    // console.log(this.swarm, 'onPe3', infoHashHash, this.swarm?.infoHashHash)
 +    // }, 500)
    }
  
    sendPe4 () {
      this.wire.sendPe4(this.swarm.infoHash)
      this.sentPe4 = true
-+    console.log(this.swarm.infoHash, 'sendPe4')
++    // console.log(this.swarm.infoHash, 'sendPe4')
    }
  
    onPe4 () {
      if (!this.sentHandshake) this.handshake()
-+    console.log(this.swarm.infoHash, 'onPe4')
++    // console.log(this.swarm.infoHash, 'onPe4')
    }
  
    clearPipes () {
@@ -296,7 +296,7 @@ index 19cb5ff..1955dd8 100644
    }
  }
 diff --git a/node_modules/webtorrent/lib/torrent.js b/node_modules/webtorrent/lib/torrent.js
-index ac7cb97..652d627 100644
+index ac7cb97..0d8bbca 100644
 --- a/node_modules/webtorrent/lib/torrent.js
 +++ b/node_modules/webtorrent/lib/torrent.js
 @@ -64,6 +64,56 @@ try {
@@ -330,7 +330,7 @@ index ac7cb97..652d627 100644
 +  if (tr) {
 +    tr.waiting = true
 +    tr.once('destroy', () => {
-+      console.log('remove')
++      // console.log('remove')
 +      const index = toVerify.findIndex(i => i === callFn)
 +      if (index !== -1) {
 +        toVerify.splice(index, 1)
@@ -376,7 +376,7 @@ index ac7cb97..652d627 100644
 -      // Specify length for the last piece in case it is zero-padded
 -      if (index === this.pieces.length - 1) {
 -        getOpts.length = this.lastPieceLength
-+    console.log('verify pieces')
++    // console.log('verify pieces')
 +    this.verifyStatus = {
 +      current: 0,
 +      total: this.pieces.length
@@ -443,7 +443,7 @@ index ac7cb97..652d627 100644
     * peer that has already sent a handshake.
     */
    _addIncomingPeer (peer) {
-+    console.log('income', peer)
++    // console.log('income', peer)
      if (this.destroyed) return peer.destroy(new Error('torrent is destroyed'))
      if (this.paused) return peer.destroy(new Error('torrent is paused'))
  
