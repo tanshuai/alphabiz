@@ -50,6 +50,7 @@ const delayPaments = []
  */
 const transactionMap = new Map()
 // window.payedMap = payedMap
+window.transactionMap = transactionMap
 
 const storedUser = typeof localStorage !== 'undefined' ? localStorage.getItem('userInfo') : null
 const userInfo = storedUser ? JSON.parse(storedUser) : {
@@ -453,6 +454,9 @@ export const useAlphabizProtocol = (client, torrent) => {
     renew (ab_count = 10) {
       if (this._subId === this.remoteSub) {
         console.log('[wt-renew] Remote account is same as local')
+        return
+      } else if (!this._subId) {
+        console.warn('Cannot get subId')
         return
       }
       this._send({
