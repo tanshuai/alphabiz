@@ -1,2 +1,3 @@
-add sign in with github web e2e test by playwright #932
-try fix credit errors
+fix import subtitle error
+update credit download
+add twitter login test #932
