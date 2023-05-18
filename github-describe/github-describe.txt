@@ -1,6 +1,10 @@
-sync wix file
-update torrent immediately #280 #286
-fix #274
-change scroll area #278
-try fix stucks with encrypted connections #290
-support set host peer; fix searching bug
+fix open vlc in windows
+fix /player router
+fix build-spa router error
+fix name case error
+fix playwright player test
+update package version
+reset lock if change state failed #286
+fix #278
+disable webRTC; import yson
+remove test logs, send stop command if torrent not found
