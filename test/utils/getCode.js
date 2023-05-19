@@ -34,6 +34,37 @@ function makeid (length) {
   return result
 }
 
+function getCode(mail, options) {
+  const { type, to, from, oauth } = options;
+  const emailTo = mail.to;
+  const emailFrom = mail.from;
+
+  switch (oauth) {
+    case 'github':
+      if (to && emailTo.text && !emailTo.text.includes(to)) return null;
+      const githubCodeReg = /(?<=Verification code: )\d{6}/gm;
+      const githubCode = githubCodeReg.exec(mail.text);
+      return githubCode ? githubCode[0] : null;
+
+    case 'twitter':
+      if (to && emailTo.text && !emailTo.text.includes(to)) return null;
+      const twitterCodeReg = /(?<=Your Twitter confirmation code is )\w{8}/gm;
+      const twitterCode = twitterCodeReg.exec(mail.subject);
+      return twitterCode ? twitterCode[0] : null;
+
+    default:
+      if (to && emailTo.text === to || from && emailFrom.text && emailFrom.text.includes(from)) {
+        const targetStr = type ? mail.html : mail.text;
+        const codeReg = type ? /\d{6}(?=\sis\syour\sAlphabiz)/gm : /(?<=\bYou\sreceived\san\sinvitation\scode:\s)\w+\b/;
+        const code = codeReg.exec(targetStr);
+        return code ? code[0] : null;
+      } else {
+        return null;
+      }
+  }
+}
+
+
 // 获取email
 // type: 1  =>  subject:email Verification        =>  mail.html
 // type: 0  =>  subject:email Invitation          =>  mail.text
@@ -45,9 +76,10 @@ function makeid (length) {
  * @param { string } to email TO
  * @return { string } verification/invitation code
  */
-function mailListener (type, time, to) {
+async function mailListener (options) {
+  const { type, time, to, from } = options
   return new Promise((resolve, reject) => {
-    var mailListener = new MailListener({
+    const mailListener = new MailListener({
       username: process.env.GOOGLE_EMAIL_USERNAME,
       password: process.env.GOOGLE_EMAIL_PASSWORD,
       host: 'imap.gmail.com',
@@ -62,8 +94,8 @@ function mailListener (type, time, to) {
       markSeen: true
     })
     mailListener.start() // start listening
-    // 连接30秒后，返回0，并关闭连接
-    sleep(30000).then(res => {
+    // 连接60秒后，返回0，并关闭连接
+    sleep(90000).then(res => {
       resolve(0)
       mailListener.stop()
     })
@@ -71,42 +103,28 @@ function mailListener (type, time, to) {
     mailListener.on('server:connected', function () {
       mailListener.imap.search([['SINCE', datestring()]], function (err, list) {
         if (err) throw err
-        if (list.length !== 0) {
-          var f = mailListener.imap.fetch(list, { bodies: '' })
-          f.on('message', function (msg, seqno) {
-            msg.on('body', function (stream, info) {
-              simpleParser(stream).then(mail => {
-                if (err) throw err
-                // 判断email to
-                const emailto = mail.to
-                if (emailto.text === to) {
-                  // 点击获取邮件 时间之后 收到的邮件
-                  if (!type || Date.parse(time) < Date.parse(mail.date)) {
-                    const str = (type ? mail.html : mail.text)
-                    // (verification|invitation)
-                    // const codeType = (type ? 'verification' : 'invitation')
-                    // const codeword = (type ? 'code' : 'code')
-                    // const reg = new RegExp('(?<=\\bYour\\s' + codeType + '\\s' + codeword + '\\sis\\s)\\w+\\b')
-                    const codeReg = type ? new RegExp('\\d{6}')
-                      : new RegExp('(?<=\\bYou\\sreceived\\san\\sinvitation\\scode:\\s)\\w+\\b')
-                    const code = codeReg.exec(str)
-                    console.log('code:' + code)
-                    if (code) { // if code != null
-                      resolve(code[0])
-                      mailListener.stop()
-                    }
-                  }
-                }
-              }).catch(err => {
-                console.log(err)
-              })
+        if (list.length === 0) return
+        var f = mailListener.imap.fetch(list, { bodies: '' })
+        f.on('message', function (msg, seqno) {
+          msg.on('body', function (stream, info) {
+            simpleParser(stream).then(mail => {
+              if (err) throw err
+              // 点击获取邮件 时间之后 收到的邮件
+              if (Date.parse(time) >= Date.parse(mail.date)) return
+              const code = getCode(mail, options)
+              if (code) { // if code != null
+                resolve(code)
+                mailListener.stop()
+              }
+            }).catch(err => {
+              console.log(err)
             })
           })
-          // 抓取完一封邮件后触发
-          f.on('error', function (err) {
-            if (err) throw err
-          })
-        }
+        })
+        // 抓取完一封邮件后触发
+        f.on('error', function (err) {
+          if (err) throw err
+        })
       })
     })
     // 连接结束时
@@ -115,28 +133,16 @@ function mailListener (type, time, to) {
     })
     mailListener.on('error', function (err) {
       console.log(err)
+      resolve(0)
     })
     // 新邮件到达时
     mailListener.on('mail', function (mail, seqno, attributes) {
-      const emailto = mail.to
-      // console.log(emailto[0].address)
-      if (emailto[0].address === to) {
-        // mail processing code goes here
-        if (Date.parse(time) < Date.parse(mail.date)) {
-          const str = (type ? mail.html : mail.text)
-          // (verification|invitation)
-          // const codeType = (type ? 'verification' : 'invitation')
-          // const codeword = (type ? 'code' : 'code')
-          // const reg = new RegExp('(?<=\\bYour\\s' + codeType + '\\s' + codeword + '\\sis\\s)\\w+\\b')
-          const codeReg = type ? new RegExp('\\d{6}')
-            : new RegExp('(?<=\\bYou\\sreceived\\san\\sinvitation\\scode:\\s)\\w+\\b')
-          const code = codeReg.exec(str)
-          console.log('code:' + code)
-          if (code) { // if code = null
-            resolve(code[0])
-            mailListener.stop()
-          }
-        }
+      // 点击获取邮件 时间之后 收到的邮件
+      if (Date.parse(time) >= Date.parse(mail.date)) return
+      const code = getCode(mail, options)
+      if (code) { // if code != null
+        resolve(code)
+        mailListener.stop()
       }
     })
   })
@@ -177,16 +183,22 @@ function getSMS (type, time) {
  * @param { string } to email TO
  * @return { string } verification/invitation code
  */
-async function getMailCode ({ type, time, to }) {
-  let res = await mailListener(type, time, to)
+async function getMailCode (options) {
+  let res = await mailListener(options)
   // 如果未获取到邮件，等待5秒后，重新调用mailListener
   if (!res) {
     await sleep(5000)
     console.log('mailListener again')
-    res = await mailListener(type, time, to)
+    res = await mailListener(options)
+  }
+  if (!res) {
+    await sleep(5000)
+    console.log('mailListener again')
+    res = await mailListener(options)
   }
   return res
 }
+
 /**
  * @function getSMSCode
  * @description failed to get the sms message and try again
