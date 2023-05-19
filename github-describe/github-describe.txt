@@ -1,3 +1,11 @@
-fix import subtitle error
-update credit download
-add twitter login test #932
+delete useless variables
+custom cache node
+#136
+#140
+try get verify code when login oauth account #932
+Update setting-base.ts
+fix variables error
+save data
+modify the method of get elements
+Update Index.js
+automatically add https protocol if user not provide for gun server
