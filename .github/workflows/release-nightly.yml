@@ -11,7 +11,7 @@ on:
   push:
     paths:
       - "**.js"
-      - "!**/release-nightly.yml"
+      - "**/release-nightly.yml"
       - "!patches/**"
       - "!public/**"
       - "!wix/**"
