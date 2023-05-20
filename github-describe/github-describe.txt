@@ -1,11 +1,17 @@
-delete useless variables
-custom cache node
-#136
-#140
-try get verify code when login oauth account #932
-Update setting-base.ts
-fix variables error
-save data
-modify the method of get elements
-Update Index.js
-automatically add https protocol if user not provide for gun server
+#104
+set test env in oauth test
+add test log,skip push to public
+run oauth test in self-runner, skip push to public
+retry oauth rest, skip push to public
+retry oauth test - 2, skip push to public
+retry oauth test - 3, skip push to public
+retry oauth test - 4,add test timeout , skip push to public
+retry oauth test - 5, skip push to public
+skip verify code - 6, skip push to public
+#137
+retry oauth test - 7, skip push to public
+Update mixinKeychainLib.js
+catch navigation error - 8, skip push to public
+#141
+add oauth test #932
+add webtorrent debugs
