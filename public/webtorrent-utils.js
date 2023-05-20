@@ -235,6 +235,27 @@ const torrentToJson = (tr, deltaTime, speeder) => {
   })
 
   if (tr.verifyStatus) o.verifyStatus = tr.verifyStatus
+  if (tr.pieces) {
+    o.verifiedPieces = tr.pieces.reduce((pre, cur, index) => {
+      if (cur === null) {
+        const last = pre[pre.length - 1]
+        if (Array.isArray(last)) {
+          // last is a range like [start, end]
+          if (last[1] === index - 1) last[1] = index
+          else pre.push(index)
+        } else {
+          // last is a number
+          if (last === index - 1) {
+            pre[pre.length - 1] = [last, index]
+          } else {
+            pre.push(index)
+          }
+        }
+      }
+      return pre
+    }, [])
+    // console.log(o.verifiedPieces)
+  }
   return o
 }
 
