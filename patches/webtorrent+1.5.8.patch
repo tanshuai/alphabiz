@@ -257,7 +257,7 @@ index cbbc484..8c6f2e7 100644
      this.offset = file.offset
  
 diff --git a/node_modules/webtorrent/lib/peer.js b/node_modules/webtorrent/lib/peer.js
-index 19cb5ff..e56bf06 100644
+index 19cb5ff..82b52da 100644
 --- a/node_modules/webtorrent/lib/peer.js
 +++ b/node_modules/webtorrent/lib/peer.js
 @@ -16,6 +16,20 @@ exports.enableSecure = () => {
@@ -339,7 +339,7 @@ index 19cb5ff..e56bf06 100644
    }
  
    sendPe1 () {
-+    console.log(this.swarm.infoHash, 'sendPe1')
++    // console.log(this.swarm.infoHash, 'sendPe1')
      this.wire.sendPe1()
      this.sentPe1 = true
    }
@@ -357,7 +357,7 @@ index 19cb5ff..e56bf06 100644
  
    onPe2 () {
      this.sendPe3()
-+    console.log(this.swarm.infoHash, 'onPe2')
++    // console.log(this.swarm.infoHash, 'onPe2')
    }
  
    sendPe3 () {
@@ -367,7 +367,7 @@ index 19cb5ff..e56bf06 100644
    }
  
    onPe3 (infoHashHash) {
-+    console.log('peer.js: onPe3', infoHashHash);
++    // console.log('peer.js: onPe3', infoHashHash);
 +    if (!infoHashHash) return console.log('skip without infoHashHash')
 +    // setTimeout(() => {
      if (this.swarm) {
@@ -379,7 +379,7 @@ index 19cb5ff..e56bf06 100644
 -      this.sendPe4()
 +      else this.sendPe4()
 +    } else {
-+      console.log('noSwarm')
++      // console.log('noSwarm')
 +      this.destroy(new Error('No swarm available'))
      }
 +    // console.log(this.swarm, 'onPe3', infoHashHash, this.swarm?.infoHashHash)
@@ -390,12 +390,12 @@ index 19cb5ff..e56bf06 100644
 +    if (!this.wire || !this.wire.sendPe4) return
      this.wire.sendPe4(this.swarm.infoHash)
      this.sentPe4 = true
-+    console.log(this.swarm.infoHash, 'sendPe4')
++    // console.log(this.swarm.infoHash, 'sendPe4')
    }
  
    onPe4 () {
      if (!this.sentHandshake) this.handshake()
-+    console.log(this.swarm.infoHash, 'onPe4')
++    // console.log(this.swarm.infoHash, 'onPe4')
    }
  
    clearPipes () {
