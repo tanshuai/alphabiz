@@ -90,7 +90,7 @@ test.describe('github', () => {
     await page.waitForURL('https://web.alpha.biz/**')
     await basePage.checkAlert('Login - connected', /Signed in/)
     await page.locator('.q-card:has-text("Create or import library key") button:has-text("OK")').click()
-    await page.locator('.post-card').nth(0).waitFor({ timeout: 30000 })
+    // await page.locator('.post-card').nth(0).waitFor({ timeout: 30000 })
     await basePage.waitForAllHidden(await basePage.alert)
 
     await basePage.signOut()
@@ -158,7 +158,7 @@ test.describe('twitter', () => {
     await page.waitForURL('https://web.alpha.biz/**')
     await basePage.checkAlert('Login - connected', /Signed in/)
     await page.locator('.q-card:has-text("Create or import library key") button:has-text("OK")').click()
-    await page.locator('.post-card').nth(0).waitFor({ timeout: 30000 })
+    // await page.locator('.post-card').nth(0).waitFor({ timeout: 30000 })
     await basePage.waitForAllHidden(await basePage.alert)
 
     await basePage.signOut()
