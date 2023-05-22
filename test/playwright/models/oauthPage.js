@@ -67,7 +67,7 @@ class OauthPage extends BasePage {
         await this.page.locator('input[name="password"]').fill(password)
         newTime = new Date()
         await this.page.locator('[data-testid="LoginForm_Login_Button"]').click()
-        await this.page.waitForTimeout(3000)
+        await this.page.waitForTimeout(5000)
       }
       // if (await this.page.locator('text=Check your email').isVisible()) {
       //   console.log('twitter need Device Verification Code!')
