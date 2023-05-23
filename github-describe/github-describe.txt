@@ -1,7 +1,3 @@
-adjust the oauth test sequence
-modify github account
-fix white screen
-add timeout, skip push to public
-add default timeout, skip push to public
-fix #128 and try hide invalid posts #102
-modify oauth e2e test
+#941
+auto select recommend channels for new users #148
+remove debug entry
