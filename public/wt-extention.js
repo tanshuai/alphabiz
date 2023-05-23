@@ -50,7 +50,7 @@ const delayPaments = []
  */
 const transactionMap = new Map()
 // window.payedMap = payedMap
-window.transactionMap = transactionMap
+// window.transactionMap = transactionMap
 
 const storedUser = typeof localStorage !== 'undefined' ? localStorage.getItem('userInfo') : null
 const userInfo = storedUser ? JSON.parse(storedUser) : {
