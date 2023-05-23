@@ -1,10 +1,5 @@
-fix open vlc in windows
-fix /player router
-fix build-spa router error
-fix name case error
-fix playwright player test
-update package version
-reset lock if change state failed #286
-fix #278
-disable webRTC; import yson
-remove test logs, send stop command if torrent not found
+fix web test user #291
+fix drag and drop files to play
+save verify info for initting
+resume upload tasks at one time, reducing init time, fix #280
+fix controlBar custom button i18n
