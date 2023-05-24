@@ -1,5 +1,1 @@
-fix web test user #291
-fix drag and drop files to play
-save verify info for initting
-resume upload tasks at one time, reducing init time, fix #280
-fix controlBar custom button i18n
+fix `Maximum Call Stack Size Exceeded` when verifying pieces
