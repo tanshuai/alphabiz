@@ -8,6 +8,7 @@ const copyModule = async () => {
   ['webtorrent',
     'bittorrent-tracker',
     'gun',
+    'run-parallel-limit',
     'torrent-discovery', // this builds with self-dep bittorrent-tracker
     '@videojs'].forEach(dep => {
       const src = path.resolve(__dirname, 'node_modules', dep)
