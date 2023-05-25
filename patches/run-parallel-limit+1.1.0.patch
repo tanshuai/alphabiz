@@ -1,0 +1,27 @@
+diff --git a/node_modules/run-parallel-limit/index.js b/node_modules/run-parallel-limit/index.js
+index 5501db2..22b6b66 100644
+--- a/node_modules/run-parallel-limit/index.js
++++ b/node_modules/run-parallel-limit/index.js
+@@ -37,11 +37,20 @@ function runParallelLimit (tasks, limit, cb) {
+       if (keys) {
+         key = keys[next]
+         next += 1
+-        tasks[key](function (err, result) { each(key, err, result) })
++        /**
++         * Patch by Alphabiz Team, 21 May, 2022
++         * If we queue too many tasks it may cause `Maximum Call Stack Size Exceeded`
++         * error since direct calls keeps callstack. We use queueMicrotask instead.
++         */
++        queueMicrotask(() => {
++          tasks[key](function (err, result) { each(key, err, result) })
++        })
+       } else {
+         key = next
+         next += 1
+-        tasks[key](function (err, result) { each(key, err, result) })
++        queueMicrotask(() => {
++          tasks[key](function (err, result) { each(key, err, result) })
++        })
+       }
+     }
+   }
