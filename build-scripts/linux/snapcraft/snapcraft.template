@@ -21,7 +21,10 @@ apps:
       - x11
       - browser-support
       - wayland
+      - opengl
     extensions: [gnome-3-28]
+    environment:
+      TMPDIR: $XDG_RUNTIME_DIR
     command: bin/desktop-launch $SNAP/{{snapName}}/{{appName}} --no-sandbox
 
 parts:
@@ -56,6 +59,17 @@ parts:
       - libgbm1
       - libwayland-server0
       - libasound2
+      - libgtk-3-0
+      - xdg-utils
+      - libatspi2.0-0
+      - libuuid1
+      - libappindicator3-1
+      - libsecret-1-0
+      - libx11-xcb1
+      - dbus-x11
+      - tint2
+      - libimlib2
+      - libid3tag0
     organize:
       {{appName}}: {{snapName}}
 
