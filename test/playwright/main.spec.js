@@ -6,9 +6,11 @@ const fs = require('fs')
 
 const electronMainPath = require('../../test.config.js').electronMainPath
 const { Commands } = require('./models/commands')
+const { HomePage } = require('./models/homePage')
+
 const { sleep } = require('../utils/getCode')
 const { calculation } = require('../utils/calculation')
-let window, windows, electronApp, commands
+let window, windows, electronApp, commands, homePage
 const ScreenshotsPath = 'test/output/playwright/main.spec/'
 let from
 let to
@@ -51,6 +53,7 @@ test.beforeAll(async () => {
   }
   // new Pege Object Model
   commands = new Commands(window)
+  homePage = new HomePage(window)
 })
 test.beforeEach(async () => {
   await window.evaluate(() => localStorage.clear())
@@ -103,23 +106,23 @@ test('reset torrent status', async () => {
   await window.waitForLoadState()
   await commands.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
   await commands.jumpPage('downloadingStatus')
-  await window.locator('button:has-text("search")').click({ force: true })
-  if (await window.isEnabled('button:has-text("Remove all") >> nth=0')) {
-    await window.click('button:has-text("Remove all") >> nth=0')
-    await window.click('[aria-label="Also delete files"]')
-    await window.click('text=NOT NOW >> //following::*[1]')
+  await homePage.searchBtn.click({ force: true })
+  if (await homePage.downRemoveAllBtn.isEnabled()) {
+    await homePage.downRemoveAllBtn.click()
+    await homePage.deleteFileChk.click()
+    await homePage.deleteBtn.click()
   }
   await commands.jumpPage('uploadingStatus')
-  if (await window.isEnabled('button:has-text("Remove all") >> nth=1')) {
-    await window.click('button:has-text("Remove all") >> nth=1')
-    await window.click('[aria-label="Also delete files"]')
-    await window.click('[aria-label="Remove auto-upload files"]')
-    await window.click('text=NOT NOW >> //following::*[1]')
+  if (await homePage.upRemoveAllBtn.isEnabled()) {
+    await homePage.upRemoveAllBtn.click()
+    await homePage.removeAutoUploadFilesChk.click()
+    await homePage.deleteFileChk.click()
+    await homePage.deleteBtn.click()
   }
   await commands.jumpPage('downloadedStatus')
-  if (await window.isEnabled('button:has-text("Clear history")')) {
-    await window.click('button:has-text("Clear history")')
-    await window.click('text=NOT NOW >> //following::*[1]')
+  if (await homePage.clearHistoryBtn.isEnabled()) {
+    await homePage.clearHistoryBtn.click()
+    await homePage.deleteBtn.click()
   }
 })
 
@@ -203,7 +206,7 @@ test.describe('download ', () => {
 
       // 跳转到 home
       await commands.jumpPage('downloadingStatus')
-      await window.locator('button:has-text("search")').click({ force: true })
+      await homePage.searchBtn.click({ force: true })
       await window.waitForTimeout(2000)
       // 等待任务卡片加载
       if (await window.$(btCard) == null) {
@@ -231,18 +234,18 @@ test.describe('download ', () => {
           await window.click(btCard + ' >> text=Status: Downloading', { timeout: 60000 })
         } catch (error) {
           await commands.jumpPage('uploadingStatus')
-          await window.locator('button:has-text("search")').click({ force: true })
+          await homePage.searchBtn.click({ force: true })
           await window.click(btCard + ' >> text=Status: Seeding', { timeout: 30000 })
         }
       } else {
         // 判断 任务 在seeding状态
         await commands.jumpPage('uploadingStatus')
-        await window.locator('button:has-text("search")').click({ force: true })
+        await homePage.searchBtn.click({ force: true })
         await window.waitForTimeout(1000)
         if (await window.$(btCard) === null) {
           // 任务不存在  bt未开始下载
           await commands.jumpPage('downloadingStatus')
-          await window.locator('button:has-text("search")').click({ force: true })
+          await homePage.searchBtn.click({ force: true })
           await commands.downloadTorrent(btDate.magnetLink)
           try {
             await window.click('text=' + btDate.btName, { timeout: 20000 })
@@ -290,7 +293,7 @@ test.describe('download ', () => {
       }
       if (btDate.isStreaming !== 1) {
         await commands.jumpPage('uploadingStatus')
-        await window.locator('button:has-text("search")').click({ force: true })
+        await homePage.searchBtn.click({ force: true })
       }
       // 点击 Play 按钮
       await window.click(btCard + ' >> button:has-text("play_circlePlay")')
@@ -303,10 +306,9 @@ test.describe('download ', () => {
       // 是否删除种子
       if (btDate.isDelete) {
         await commands.jumpPage('uploadingStatus')
-        await window.click(btCard + ' >> button:has-text("Delete")')
-        await window.click('[aria-label="Also delete files"]')
-        await sleep(3000)
-        await window.click('text=not now>> //following::Button[1]')
+        await homePage.getCardEle(btDate.btName, 'deleteBtn').click()
+        await homePage.deleteFileChk.click()
+        await homePage.deleteBtn.click()
       }
     })
   }
