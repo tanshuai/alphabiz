@@ -1,1 +1,4 @@
-fix tray icon missing in linux snap
+add VideoJsPlayer
+fix transition
+player: double click
+improve fullscreen
