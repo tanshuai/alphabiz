@@ -5,12 +5,13 @@ const path = require('path')
 const fs = require('fs')
 
 const electronMainPath = require('../../test.config.js').electronMainPath
-const { Commands } = require('./models/commands')
+const { BasePage } = require('./models/basePage')
 const { HomePage } = require('./models/homePage')
+const { CreditsPage } = require('./models/creditsPage')
 
 const { sleep } = require('../utils/getCode')
 const { calculation } = require('../utils/calculation')
-let window, windows, electronApp, commands, homePage
+let window, windows, electronApp, basePage, homePage, creditsPage
 const ScreenshotsPath = 'test/output/playwright/main.spec/'
 let from
 let to
@@ -52,8 +53,9 @@ test.beforeAll(async () => {
     if (await win.title() === 'Alphabiz') window = win
   }
   // new Pege Object Model
-  commands = new Commands(window)
+  basePage = new BasePage(window)
   homePage = new HomePage(window)
+  creditsPage = new CreditsPage(window)
 })
 test.beforeEach(async () => {
   await window.evaluate(() => localStorage.clear())
@@ -92,34 +94,34 @@ test.skip('close auto update', async () => {
 })
 
 test.skip('close Automatically check for update', async () => {
-  await commands.jumpPage('advancedLink')
+  await basePage.jumpPage('advancedLink')
   if (await window.isChecked('[aria-label="Automatically\\ check\\ for\\ update"]')) {
     await window.click('[aria-label="Automatically\\ check\\ for\\ update"]')
     await window.click('button:has-text("Save & Apply")')
     await window.locator('.q-notification__message >> text=Save preferences successfully').waitFor({ timeout: 20000 })
   }
   if (process.platform === 'win32') await sleep(400)
-  await commands.jumpPage('downloadingStatus')
+  await basePage.jumpPage('downloadingStatus')
 })
 
 test('reset torrent status', async () => {
   await window.waitForLoadState()
-  await commands.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
-  await commands.jumpPage('downloadingStatus')
+  await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
+  await basePage.jumpPage('downloadingStatus')
   await homePage.searchBtn.click({ force: true })
   if (await homePage.downRemoveAllBtn.isEnabled()) {
     await homePage.downRemoveAllBtn.click()
     await homePage.deleteFileChk.click()
     await homePage.deleteBtn.click()
   }
-  await commands.jumpPage('uploadingStatus')
+  await basePage.jumpPage('uploadingStatus')
   if (await homePage.upRemoveAllBtn.isEnabled()) {
     await homePage.upRemoveAllBtn.click()
     await homePage.removeAutoUploadFilesChk.click()
     await homePage.deleteFileChk.click()
     await homePage.deleteBtn.click()
   }
-  await commands.jumpPage('downloadedStatus')
+  await basePage.jumpPage('downloadedStatus')
   if (await homePage.clearHistoryBtn.isEnabled()) {
     await homePage.clearHistoryBtn.click()
     await homePage.deleteBtn.click()
@@ -131,7 +133,7 @@ test.describe('play video', () => {
     const media = './test/cypress/fixtures/samples/GoneNutty.avi'
 
     await window.waitForLoadState()
-    await commands.jumpPage('playerLink')
+    await basePage.jumpPage('playerLink')
     // Upload
     await window.setInputFiles('[data-cy="file-input"]', media)
     await window.waitForLoadState()
@@ -142,7 +144,7 @@ test.describe('play video', () => {
   test('BluRay_mkv_type', async () => {
     const media = './test/cypress/fixtures/samples/Test-Sample-Tenet.2020.IMAX.2160p.UHD.BluRay.x265.10bit.HDR.DTS-HD.MA.5.1202111171122322.mkv'
 
-    if (await window.$('[data-cy="file-input"]') === null) await commands.jumpPage('playerLink')
+    if (await window.$('[data-cy="file-input"]') === null) await basePage.jumpPage('playerLink')
     // Upload
     await window.setInputFiles('[data-cy="file-input"]', media)
     await window.waitForLoadState()
@@ -169,12 +171,6 @@ test.describe('download ', () => {
       isDelete: 0,
       fileType: 'folder'
     },
-    // {
-    //   btName: 'uTorrent Web Tutorial Video',
-    //   magnetLink: 'alphabiz://uTorrent Web Tutorial Video/AWGzuIVsSDnt9R9cI0ZZm2vsUkFF&_Td6WFoAAAFpIt42AgAhARwAAAAQz1jM4AH2ANpdABhqCGEMasyA09lDwx5rYF469RTDhk8xcIgNnP2J3Ivpl6BRodn06md7iETYpqKJv8gUn0A0LmqilaAENBBniICpLKEQzrlwjLEB0AoBqsUX7B3_n1cTM2EgRritRAl8SXQxdiabEMBVepqe65AjYT61G49_IrPRbw2e3iwqxzOvN1eGDGHXRjnXXV1D1ZUDYrJPfpF_xVRVNZ+ck7O2J1gBcfJguA7o3tmFj54bURfeVnWZVBnBXGK4mmxorTFFWO+lwh7BLrQH6JYPmGMq8Um2Ui+HIlFnlVzLAAAAd8ehRwAB8gH3AwAAONWYvz4wDYsCAAAAAAFZWg==',
-    //   testName: 'alphabiz- ',
-    //   isDelete: 0
-    // },
     {
       btName: 'bbb_sunflower_1080p_30fps_normal.mp4',
       magnetLink: 'alphabiz://bbb_sunflower_1080p_30fps_normal.mp4/AYhZSqrL3kDvPiUQxHN07AqjlsCO&_Td6WFoAAAFpIt42AgAhARwAAAAQz1jM4AMtAW1dABhgxG8IY8MSV1K_VKsx55jv8ahwgTX5jKB2up6HR8eDRb6BvCkztx6mgEb++b2O2b3K3oD_twGGSig+KBe78TiXxGleWSnbRlWB69ZvfD70oiEhlTlty+AtgRrH+kzx7fD910Bx9Uf4_7Js+dNII8l3GxJ4B175xFepPURPh6AnWzB9cVwPtgxmF4hSxh7Z_thhoZBH4KP2yrr9bIPbiBIfR4rnRGgQhoMYOe1vRpDVUFDC_y_tNp17fwwfvvvAj5elliGbJODzL4qEq_HB_lUhXHCZDoPbg1kCa8TfDkYL+2wWqViHW5YjR6DIxnlf8AAswdMmYa5OLaHRfCaqLtreJ_iohdSxAp2rckxS001Zp7ra+N_aIUxh9H3a96O2YBfWo_2PdmbBhT1A8s20u6d9cVtOTDvkpvOb8aiGcUn+swScBUm1SBP2DgoZJ6zeNvQcBQ9WKwD51ImdTrOxf2ShB64iMvUV0iO_3x3WAAAAAJcI4UEAAYUDrgYAAOI5sWM+MA2LAgAAAAABWVo=',
@@ -193,7 +189,7 @@ test.describe('download ', () => {
   ]
   for (const btDate of btData) {
     test((btDate.testName ? btDate.testName : '') + btDate.btName, async () => {
-      await commands.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
+      await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
       if (btDate.btName === 'uTorrent Web Tutorial Video') {
         test.setTimeout(60000 * 5)
       } else if (btDate.btName === 'The WIRED CD - Rip. Sample. Mash. Share') {
@@ -202,14 +198,13 @@ test.describe('download ', () => {
         test.setTimeout(60000 * 15)
       }
       await window.waitForLoadState()
-      const btCard = 'text=' + btDate.btName + ' >> xpath=..//..//..//..//..'
 
       // 跳转到 home
-      await commands.jumpPage('downloadingStatus')
+      await basePage.jumpPage('downloadingStatus')
       await homePage.searchBtn.click({ force: true })
       await window.waitForTimeout(2000)
       // 等待任务卡片加载
-      if (await window.$(btCard) == null) {
+      if (!await homePage.getCard(btDate.btName).isVisible()) {
         await window.waitForTimeout(2000)
       }
       // download bbb_sunflower_1080p_30fps_normal.mp4 下载中状态多等一会
@@ -217,7 +212,7 @@ test.describe('download ', () => {
         let waitTime = 0
         // await window.reload()
         while (1) {
-          if (await window.$(btCard) == null) {
+          if (!await homePage.getCard(btDate.btName).isVisible()) {
             waitTime += 3
           } else break
           if (waitTime >= 15) break
@@ -225,32 +220,32 @@ test.describe('download ', () => {
         }
       }
       // 判断 任务 在downloading状态
-      if (await window.$(btCard) !== null) {
+      if (await homePage.getCard(btDate.btName).isVisible()) {
         // 等待下载完成
-        const DownloadStatus = await (await window.$(btCard + ' >> text=Status:')).innerText()
+        const DownloadStatus = await (await homePage.getCardEle(btDate.btName, 'statusText')).innerText()
         //  判断 文件存在，下载完成
-        if (DownloadStatus === 'Status: Paused') await window.click(btCard + ' >> button:has-text("Resume")')
+        if (DownloadStatus === 'Status: Paused') await homePage.getCardEle(btDate.btName, 'resumeBtn').click()
         try {
-          await window.click(btCard + ' >> text=Status: Downloading', { timeout: 60000 })
+          await homePage.getCardEle(btDate.btName, 'statusText', 'Downloading').click({ timeout: 60000 })
         } catch (error) {
-          await commands.jumpPage('uploadingStatus')
+          await basePage.jumpPage('uploadingStatus')
           await homePage.searchBtn.click({ force: true })
-          await window.click(btCard + ' >> text=Status: Seeding', { timeout: 30000 })
+          await homePage.getCardEle(btDate.btName, 'statusText', 'Seeding').click({ timeout: 30000 })
         }
       } else {
         // 判断 任务 在seeding状态
-        await commands.jumpPage('uploadingStatus')
+        await basePage.jumpPage('uploadingStatus')
         await homePage.searchBtn.click({ force: true })
         await window.waitForTimeout(1000)
-        if (await window.$(btCard) === null) {
+        if (!await homePage.getCard(btDate.btName).isVisible()) {
           // 任务不存在  bt未开始下载
-          await commands.jumpPage('downloadingStatus')
+          await basePage.jumpPage('downloadingStatus')
           await homePage.searchBtn.click({ force: true })
-          await commands.downloadTorrent(btDate.magnetLink)
+          await homePage.downloadTorrent(btDate.magnetLink)
           try {
             await window.click('text=' + btDate.btName, { timeout: 20000 })
             // 等待 任务 加载 验证， 判断任务是 下载中
-            await window.click(btCard + ' >> text=Status: Downloading', { timeout: 60000 })
+            await homePage.getCardEle(btDate.btName, 'statusText', 'Downloading').click({ timeout: 60000 })
           } catch (error) {
             console.log('The seed download is complete')
           }
@@ -258,21 +253,21 @@ test.describe('download ', () => {
       }
 
       // 等待下载完成
-      if (await window.isVisible(btCard + ' >> text=Status:')) {
-        const btStatus = await (await window.$(btCard + ' >> text=Status:')).innerText()
+      if (await homePage.getCardEle(btDate.btName, 'statusText').isVisible()) {
+        const btStatus = await (await homePage.getCardEle(btDate.btName, 'statusText')).innerText()
         if (btStatus === 'Status: Downloading') {
-          const progressBar = await window.$(btCard + ' >> .progress-text')
+          const progressBar = await homePage.getCardEle(btDate.btName, 'processText')
           let oldProgress = parseFloat(/\d{1,3}.\d{0,2}/.exec(await progressBar.innerText()))
           let timestamp = 0
           // wait download
           while (1) {
-            if (!(await window.$(btCard + ' >> text=Status:'))) break
-            const DownloadStatus = await (await window.$(btCard + ' >> text=Status:')).innerText()
+            if (!await homePage.getCard(btDate.btName).isVisible()) break
+            const DownloadStatus = await (await homePage.getCardEle(btDate.btName, 'statusText')).innerText()
             // console.log('DownloadStatus:' + DownloadStatus)
             if (DownloadStatus !== 'Status: Downloading') {
               break
             }
-            const progressBar = await window.$(btCard + ' >> .progress-text')
+            const progressBar = await homePage.getCardEle(btDate.btName, 'processText')
             const progressPercentage = parseFloat(/\d{1,3}.\d{0,2}/.exec(await progressBar.innerText()))
             // console.log('progressPercentage:' + progressPercentage)
             if (oldProgress === progressPercentage) {
@@ -292,11 +287,11 @@ test.describe('download ', () => {
         }
       }
       if (btDate.isStreaming !== 1) {
-        await commands.jumpPage('uploadingStatus')
+        await basePage.jumpPage('uploadingStatus')
         await homePage.searchBtn.click({ force: true })
       }
       // 点击 Play 按钮
-      await window.click(btCard + ' >> button:has-text("play_circlePlay")')
+      await homePage.getCardEle(btDate.btName, 'playBtn').click()
       // 点击播放列表的第一个文件，跳转到player页面
       await window.click('.q-list > .q-item:nth-child(1)')
 
@@ -305,7 +300,7 @@ test.describe('download ', () => {
       // await window.reload()
       // 是否删除种子
       if (btDate.isDelete) {
-        await commands.jumpPage('uploadingStatus')
+        await basePage.jumpPage('uploadingStatus')
         await homePage.getCardEle(btDate.btName, 'deleteBtn').click()
         await homePage.deleteFileChk.click()
         await homePage.deleteBtn.click()
@@ -314,71 +309,71 @@ test.describe('download ', () => {
   }
   if (process.platform !== 'darwin') {
     test('table mode task lists', async () => {
-    // 确保下载的全部种子都在做种状态
-    // await commands.jumpPage('downloadedStatus')
-      await commands.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
-      await commands.jumpPage('uploadingStatus')
+      // 确保下载的全部种子都在做种状态
+      // await basePage.jumpPage('downloadedStatus')
+      await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
+      await basePage.jumpPage('uploadingStatus')
       // await window.waitForLoadState()
       await sleep(4000)
       await window.screenshot({ path: `${ScreenshotsPath}taskStatus.png` })
       // 切换列表模式
-      const listMode = await window.locator('button:has-text("view_agenda")')
+      const listMode = await homePage.toggleListModeBtn
       if (await listMode.isVisible()) {
         await listMode.click()
       }
       // 验证文件类型图标
       await sleep(2000)
       // 截图验证
-      // await window.screenshot({ path: `${ScreenshotsPath}taskStatus.png` })
-      const bbbFileIcon = await window.locator('text=bbb_sunflower_1080p_30fps_normal.mp4 >> //preceding::*[1]').innerText()
+      const bbbFileIcon = await homePage.getListEle('bbb_sunflower_1080p_30fps_normal.mp4', 'fileIcon').innerText()
+      // const bbbFileIcon = await window.locator('text=bbb_sunflower_1080p_30fps_normal.mp4 >> //preceding::*[1]').innerText()
       expect(bbbFileIcon).toBe('video_file')
-      const uTorrentFileIcon = await window.locator('text=uTorrent Web >> //preceding::*[1]').innerText()
+      const uTorrentFileIcon = await homePage.getListEle('uTorrent Web', 'fileIcon').innerText()
       expect(uTorrentFileIcon).toBe('folder')
       // uploading状态栏
       // 双击文件名播放文件
       await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share').click({ clickCount: 2 })
       // should video can play
       await window.waitForSelector('.vjs-progress-control', { timeout: 10000 })
-      await commands.jumpPage('uploadingStatus')
+      await basePage.jumpPage('uploadingStatus')
       await sleep(1000)
       // 文件大小
-      const fileSize = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::*[2]').innerText()
+      const fileSize = await homePage.getListEle('The WIRED CD - Rip. Sample. Mash. Share', 'fileSize').innerText()
       // expect(fileSize).toBe('56.07 MB')
       expect(/\d+\.\d+\s(MB|GB)/.test(fileSize)).toBe(true)
       // 完成时间格式 hh:mm:ss格式 非当日任务显示yesterday或yy-mm-dd格式
-      const time = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::*[3]').innerText()
+      const time = await homePage.getListEle('The WIRED CD - Rip. Sample. Mash. Share', 'completedTime').innerText()
       expect(/(\d{1,2}:\d{1,2}:\d{1,2}|Yesterday|\d{1,2}-\d{1,2}-\d{1,2})/.test(time)).toBe(true)
       // 上传速度: (上传中) 单位KB/s或MB/s
-      const uploadSpeed = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::*[4]').innerText()
+      const uploadSpeed = await homePage.getListEle('The WIRED CD - Rip. Sample. Mash. Share', 'uploadSpeed').innerText()
       // console.log('uploadSpeed:' + uploadSpeed)
       expect(/(\d+(\.\d+)?\s?(KB|MB)?|-)/.test(uploadSpeed)).toBe(true)
       // 检查任务图标
       // stop 图标
-      const stopIcon = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::Button[1]')
+      const stopIcon = await homePage.getListEle('The WIRED CD - Rip. Sample. Mash. Share', 'oneBtn')
       const stopIconText = await stopIcon.innerText()
       expect(stopIconText).toBe('stop')
       // file_open 图标
-      const fileOpenIcon = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::Button[2]').innerText()
+      const fileOpenIcon = await homePage.getListEle('The WIRED CD - Rip. Sample. Mash. Share', 'twoBtn').innerText()
       expect(fileOpenIcon).toBe('file_open')
       // folder 图标
-      const fileIcon = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::Button[3]').innerText()
+      const fileIcon = await homePage.getListEle('The WIRED CD - Rip. Sample. Mash. Share', 'threeBtn').innerText()
       expect(fileIcon).toBe('folder')
       // more... 图标
-      const moreIcon = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::Button[4]')
+      const moreIcon = await homePage.getListEle('The WIRED CD - Rip. Sample. Mash. Share', 'fourBtn')
       const moreIconText = await moreIcon.innerText()
       expect(moreIconText).toBe('more_horiz')
       // close 图标
-      const closeIcon = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share >> //following::Button[5]')
+      const closeIcon = await homePage.getListEle('The WIRED CD - Rip. Sample. Mash. Share', 'fiveBtn')
       const closeIconText = await closeIcon.innerText()
       expect(closeIconText).toBe('close')
       await closeIcon.click()
-      await window.waitForSelector('.q-card >> text=Delete task', { timeout: 10000 })
-      await window.locator('button:has-text("Not now")').click()
+      await homePage.deleteCard.waitFor({ state: 'visible', timeout: 10000 })
+      await homePage.notNowBtn.click()
       // "更多"功能检查Download url
       await moreIcon.click()
-      await window.click('text=content_copy')
+      await homePage.copyUrlBtn.click()
       // // "更多"功能检查文件路径
-      const filePathElement = await window.locator('text=play_arrowfolder')
+      const filePathElement = await homePage.fileTreeBtn
       // 检查文件夹树状结构
       await filePathElement.click()
       await window.waitForSelector('text=01 - Beastie Boys - Now Get Busy.mp3')
@@ -389,7 +384,7 @@ test.describe('download ', () => {
       await window.locator('header >> text=Uploading').click({ force: true })
       // // downloaded状态栏
       // await stopIcon.click()
-      // await commands.jumpPage('downloadedStatus')
+      // await basePage.jumpPage('downloadedStatus')
       // const theWoredCD = await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share')
       // await theWoredCD.waitFor('visible')
       // await sleep(500)
@@ -401,12 +396,12 @@ test.describe('download ', () => {
       // await uploadIcon.click()
       // await theWoredCD.waitFor('hidden')
       // await sleep(500)
-      // await commands.jumpPage('uploadingStatus')
+      // await basePage.jumpPage('uploadingStatus')
       // await sleep(500)
       // await theWoredCD.waitFor('visible')
       // // // 验证magnet被复制到剪贴板
-      // await commands.jumpPage('downloadingStatus')
-      // await commands.downloadBtn.click()
+      // await basePage.jumpPage('downloadingStatus')
+      // await homePage.downloadBtn.click()
       // await sleep(1000)
       // const magnetText = await window.locator('//*[@aria-label="Download directory position"]/preceding::*[1]').inputValue()
       // // console.log('magnetText:' + magnetText)
@@ -426,7 +421,7 @@ test.describe('upload', () => {
     // const oneFile = new File([''], btAddress, { path: btAddress })
     // const btCard = 'text=' + btName + ' >> xpath=..//..//..//..//.. >> '
 
-    await commands.jumpPage('homeLink')
+    await basePage.jumpPage('homeLink')
     // Click button:has-text("Upload torrent")
     await window.click('button:has-text("Upload torrent")')
 
@@ -504,52 +499,51 @@ test.describe('account', () => {
     }
     await window.waitForLoadState()
     // 登录收款人账号
-    await commands.signIn(payee, payeePassword, 1)
-    await commands.jumpPage('creditsLink')
+    await basePage.signIn(payee, payeePassword, 1)
+    await basePage.jumpPage('creditsLink')
     // await window.waitForTimeout(10000)
     // 获取收款人id
-    const payeeID = await commands.getID()
+    const payeeID = await creditsPage.getID()
     // console.log('payeeID:' + payeeID)
     await window.waitForTimeout(2000)
-    const payeePoint = await window.locator('.text-right > div').innerText()
+    const payeePoint = await creditsPage.creditsText.innerText()
     const payeeAfterPoint = Number(payeePoint) + transferAmount
     // 退出收款人账号
-    await commands.signOut()
+    await basePage.signOut()
     await sleep(1000)
     // 登录付款人账号
-    await commands.signIn(transferee, transfereePassword, 1)
-    await commands.jumpPage('creditsLink')
+    await basePage.signIn(transferee, transfereePassword, 1)
+    await basePage.jumpPage('creditsLink')
     // await window.waitForTimeout(10000)
     // 获取转账人id
-    const transfereeID = await commands.getID()
-    let transfereePoint = await window.locator('.text-right > div').innerText()
+    const transfereeID = await creditsPage.getID()
+    let transfereePoint = await creditsPage.creditsText.innerText()
     if (Number(transfereePoint) <= 0) {
-      await window.click('button:nth-child(3)')
-      await window.locator('.q-table__grid-content > :nth-child(1) > .q-item >> text=BONUS').waitFor('visible')
+      console.log('金额不足')
     }
     await window.waitForTimeout(2000)
-    transfereePoint = await window.locator('.text-right > div').innerText()
+    transfereePoint = await creditsPage.creditsText.innerText()
     const transfereeAfterPoint = Number(transfereePoint) - transferAmount
     // 转账
-    await commands.transfer(payeeID, transferAmount.toString())
+    await creditsPage.transfer(payeeID, transferAmount.toString())
     // 查看账单明细
-    await commands.checkBillDetail([payeeID, 'Transfer', '-' + transferAmount, 'finish'], 'expense')
+    await creditsPage.checkBillDetail([payeeID, 'Transfer', '-' + transferAmount, 'finish'], 'expense')
     // 断言积分变化是否正确
     await sleep(2000)
     await window.waitForLoadState()
-    expect(await window.locator('.text-right > div').innerText()).toBe(calculation('reduce', transfereePoint, transferAmount).toString())
+    expect(await creditsPage.creditsText.innerText()).toBe(calculation('reduce', transfereePoint, transferAmount).toString())
     // 退出付款人账号
-    await commands.signOut()
+    await basePage.signOut()
     // await sleep(1000)
     // // 登录收款人账号
-    // await commands.signIn(payee, payeePassword, 1)
-    // await commands.jumpPage('creditsLink')
+    // await basePage.signIn(payee, payeePassword, 1)
+    // await basePage.jumpPage('creditsLink')
     // await sleep(2000)
     // // 查看账单
-    // await commands.checkBillDetail(transfereeID, 'Transfer', '+' + transferAmount, 'finish')
+    // await creditsPage.checkBillDetail(transfereeID, 'Transfer', '+' + transferAmount, 'finish')
     // // 断言积分变化是否正确
-    // expect(await window.locator('.text-right > div').innerText()).toBe(payeeAfterPoint.toString())
-    // await commands.signOut()
+    // expect(await creditsPage.creditsText.innerText()).toBe(payeeAfterPoint.toString())
+    // await basePage.signOut()
     // await sleep(1000)
   })
 })
