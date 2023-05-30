@@ -8,21 +8,14 @@ const fullIdentifier = teamId + '.' + identifier
 
 const toReplace = { identifier, teamId, fullIdentifier }
 
-const buildEntitlements = async (dist = '', isPkg = false) => {
-  const entitlements = ['mas', 'inherit', 'loginhelper']
-  if (isPkg) {
-    console.log('Is PKG')
-    entitlements[0] = ''
-  }
+const entitlements = ['mas', 'inherit', 'loginhelper']
+
+const buildEntitlements = async (dist = '') => {
   console.log('build to', dist)
   entitlements.forEach(name => {
     console.log('Building', name)
-    const src = name
-      ? resolve(__dirname, `entitlements.${name}.plist`)
-      : resolve(__dirname, `entitlements.plist`)
-    const dest = name ?
-      resolve(dist, `entitlements.${name}.plist`) :
-      resolve(dist, `entitlements.mas.plist`)
+    const src = resolve(__dirname, `entitlements.${name}.plist`)
+    const dest = resolve(dist, `entitlements.${name}.plist`)
     let info = readFileSync(src, 'utf-8')
     for (const key in toReplace) {
       while (info.includes(`{{${key}}}`)) {
@@ -40,4 +33,4 @@ if (process.argv[2] && existsSync(process.argv[2])) {
   console.warn('Warn: dist not be specified or not exists.')
   dist = resolve(tmpdir(), 'electron-build/entitlements')
 }
-buildEntitlements(dist, process.argv.includes('--pkg'))
+buildEntitlements(dist)
