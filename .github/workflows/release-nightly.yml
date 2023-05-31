@@ -353,6 +353,7 @@ jobs:
         run: 7z a -t7z -mx=9 "./out/installers/${{ steps.unify.outputs.tag-name }}/${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }}.7z" "./dist/electron/${{ steps.vars.outputs.package }}"
 
       - name: Setup coreutils
+        if: (contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')) && matrix.os == 'macos-latest' && ${{ env.APPLE_CERT_DATA }}
         run: brew install coreutils
       - name: Create And Sign Pkg
         if: (contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')) && matrix.os == 'macos-latest' && ${{ env.APPLE_CERT_DATA }}
