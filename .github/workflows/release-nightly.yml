@@ -202,12 +202,12 @@ jobs:
           export DESCRIBE=$(cat github-describe/github-describe.txt)
           echo "$DESCRIBE"
 
-          DESCRIBE=$(echo $DESCRIBE | sed ':a;N;$!ba;s/\n/###/g')
-          echo "DESCRIBE=$DESCRIBE" >> "$GITHUB_ENV"
+          # DESCRIBE=$(echo $DESCRIBE | sed ':a;N;$!ba;s/\n/###/g')
+          # echo "DESCRIBE=$DESCRIBE" >> "$GITHUB_ENV"
 
-          # echo "DESCRIBE<<EOF" >> "$GITHUB_ENV"
-          # echo "$DESCRIBE" >> "$GITHUB_ENV"
-          # echo "EOF" >> "$GITHUB_ENV"
+          echo "DESCRIBE<<EOF" >> "$GITHUB_ENV"
+          echo "$DESCRIBE" >> "$GITHUB_ENV"
+          echo "EOF" >> "$GITHUB_ENV"
         shell: bash
 
       # This step for unify the tag name
@@ -449,7 +449,7 @@ jobs:
           prerelease: true
           name: ${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.release-name }}
           tag_name: ${{ steps.unify.outputs.tag-name }}
-          body: ${{ env.DESCRIBE | sed 's/###/\n/g' }}
+          body: ${{ env.DESCRIBE }}
           files: |
             ./out/installers/${{ steps.unify.outputs.tag-name }}/**
 
@@ -756,7 +756,7 @@ jobs:
           prerelease: true
           name: ${{ needs.nightly_job.outputs.file-name-lower }}-${{ needs.nightly_job.outputs.release-name }}
           tag_name: ${{needs.nightly_job.outputs.tag-name}}
-          body: ${{ env.DESCRIBE | sed 's/###/\n/g' }}
+          body: ${{ env.DESCRIBE }}
           files: |
             ./out/installers/${{ needs.nightly_job.outputs.tag-name }}/**
 
