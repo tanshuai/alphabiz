@@ -141,9 +141,9 @@ jobs:
           else export MODIFIED_FILE_LIST=$(git show --pretty="format:" --name-only) ; \
           fi
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-          echo "MODIFIED_FILE_LIST<<EOF" >> $GITHUB_ENV
-          echo "$MODIFIED_FILE_LIST" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          echo "MODIFIED_FILE_LIST<<$EOF" >> "$GITHUB_ENV"
+          echo "$MODIFIED_FILE_LIST" >> "$GITHUB_ENV"
+          echo "$EOF" >> "$GITHUB_ENV"
         shell: bash
 
       - name: Get release.json property
@@ -199,9 +199,9 @@ jobs:
           export DESCRIBE=$(cat github-describe/github-describe.txt)
           echo "$DESCRIBE"
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-          echo "DESCRIBE<<EOF" >> $GITHUB_ENV
-          echo "$DESCRIBE" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          echo "DESCRIBE<<$EOF" >> "$GITHUB_ENV"
+          echo "$DESCRIBE" >> "$GITHUB_ENV"
+          echo "$EOF" >> "$GITHUB_ENV"
         shell: bash
 
       # This step for unify the tag name
