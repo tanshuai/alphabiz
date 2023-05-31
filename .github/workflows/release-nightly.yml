@@ -140,10 +140,13 @@ jobs:
           then export MODIFIED_FILE_LIST=$(git show --pretty="format:" --name-only -2) ; \
           else export MODIFIED_FILE_LIST=$(git show --pretty="format:" --name-only) ; \
           fi
-          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-          echo "MODIFIED_FILE_LIST<<$EOF" >> "$GITHUB_ENV"
-          echo "$MODIFIED_FILE_LIST" >> "$GITHUB_ENV"
-          echo "$EOF" >> "$GITHUB_ENV"
+          MODIFIED_FILE_LIST=$(echo $MODIFIED_FILE_LIST | tr '\n' ' ')
+          echo "MODIFIED_FILE_LIST=$MODIFIED_FILE_LIST" >> "$GITHUB_ENV"
+          
+          # EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          # echo "MODIFIED_FILE_LIST<<$EOF" >> "$GITHUB_ENV"
+          # echo "$MODIFIED_FILE_LIST" >> "$GITHUB_ENV"
+          # echo "$EOF" >> "$GITHUB_ENV"
         shell: bash
 
       - name: Get release.json property
