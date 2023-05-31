@@ -1,5 +1,3 @@
-add code-signing for pkg target
-add execute permission
-improve VideoJsPlayer
-use new Player
-update sign scripts for public release
+#941
+auto select recommend channels for new users #148
+remove debug entry
