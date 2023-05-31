@@ -343,49 +343,17 @@ jobs:
           yarn packager
         shell: bash
 
-      - name: Pack app 📦
-        if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
-        run: |
-          export PATH=$PATH:/c/Program\ Files\ \(x86\)/WiX\ Toolset\ v3.11/bin
-          yarn make
-        shell: bash
-
-      - name: Package for ${{ steps.vars.outputs.system }}-${{ steps.unify.outputs.tag-name }} Release 🗜️
-        if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
-        run: 7z a -t7z -mx=9 "./out/installers/${{ steps.unify.outputs.tag-name }}/${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }}.7z" "./dist/electron/${{ steps.vars.outputs.package }}"
-
       - name: Setup coreutils
-        if: (contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')) && matrix.os == 'macos-latest' && ${{ env.APPLE_CERT_DATA }}
+        if: (contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')) && matrix.os == 'macos-latest'
         run: brew install coreutils
-      - name: Create And Sign Pkg
-        if: (contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')) && matrix.os == 'macos-latest' && ${{ env.APPLE_CERT_DATA }}
+
+      - name: Import cert
+        if: (contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')) && matrix.os == 'macos-latest' && ${{ env.CERT_PASS }}
         env:
           CERT_DATA: ${{ secrets.APPLE_CERT_DATA }}
           CERT_PASS: ${{ secrets.APPLE_CERT_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          APPLE_DISTRIBUTION_KEY: "Developer ID Application"
-          APPLE_INSTALLER_KEY: "Installer"
-          VERSION: ${{ steps.unify.outputs.tag-name }}
-          BUILD_VERSION: ${{ steps.unify.outputs.tag-name }}
-          PLATFORM: darwin
-          BUILD_PLATFORM: darwin
-          ARCH: x64
-          BUILD_ARCH: x64
-          APP: "${{ steps.slug.outputs.display-name }}"
-          APP_BUNDLE_ID: org.alpha.biz
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_ASP: ${{ secrets.APPLE_ASP }}
         run: |
-          # Setup
-          SIGN_APP="./out/${{ env.APP }}-darwin-x64/${{ env.APP }}.app"
-          # Throw error if file does not exist
-          if [ ! -e "$SIGN_APP" ]; then
-            echo "$SIGN_APP does not exist!"
-            exit 5
-          fi
-          SIGN_FILE="out/installers/${{ env.VERSION }}/${{ env.APP }}_${{ env.PLATFORM }}_${{ env.VERSION }}.pkg"
-          UNSIGNED_FILE="out/installers/${{ env.VERSION }}/${{ env.APP }}_${{ env.PLATFORM }}_${{ env.VERSION }}_unsigned.pkg"
-
           # Export certs
           echo "$CERT_DATA" | base64 --decode > /tmp/certs.p12
           echo "exported certs.p12 to /tmp/certs.p12"
@@ -409,25 +377,78 @@ jobs:
           security find-identity -v macos-build.keychain | grep "$APPLE_TEAM_ID" | grep "Developer ID Installer"
           echo "Keychain verified"
 
+      - name: Sign app
+        if: (contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')) && matrix.os == 'macos-latest' && ${{ env.CERT_PASS }}
+        env:
+          CERT_PASS: ${{ secrets.APPLE_CERT_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_DISTRIBUTION_KEY: "Developer ID Application"
+          VERSION: ${{ steps.unify.outputs.tag-name }}
+          BUILD_VERSION: ${{ steps.unify.outputs.tag-name }}
+          PLATFORM: darwin
+          BUILD_PLATFORM: darwin
+          ARCH: x64
+          BUILD_ARCH: x64
+          APP: "${{ steps.slug.outputs.display-name }}"
+          APP_BUNDLE_ID: org.alpha.biz
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ASP: ${{ secrets.APPLE_ASP }}
+        run: |
+          SIGN_APP="./out/${{ env.APP }}-darwin-x64/${{ env.APP }}.app"
+          ./build-scripts/macos/pkg/sign.sh
+          # Throw error if file does not exist
+          if [ ! -e "$SIGN_APP" ]; then
+            echo "$SIGN_APP does not exist!"
+            exit 5
+          fi
           # Force the codesignature
           echo "Codesigning..."
-          # codesign --force -s "$APPLE_TEAM_ID" "$SIGN_APP"
           ./build-scripts/macos/pkg/sign.sh
-
           # Verify the code signature
           echo "Verifying..."
           codesign -v -vvv "$SIGN_APP"
           pkgutil --check-signature "$SIGN_APP"
 
+      - name: Pack app 📦
+        if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
+        run: |
+          export PATH=$PATH:/c/Program\ Files\ \(x86\)/WiX\ Toolset\ v3.11/bin
+          yarn make
+        shell: bash
+
+      - name: Create And Sign Pkg
+        if: (contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')) && matrix.os == 'macos-latest' && ${{ env.CERT_PASS }}
+        env:
+          CERT_DATA: ${{ secrets.APPLE_CERT_DATA }}
+          CERT_PASS: ${{ secrets.APPLE_CERT_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_DISTRIBUTION_KEY: "Developer ID Application"
+          APPLE_INSTALLER_KEY: "Developer ID Installer"
+          VERSION: ${{ steps.unify.outputs.tag-name }}
+          BUILD_VERSION: ${{ steps.unify.outputs.tag-name }}
+          PLATFORM: darwin
+          BUILD_PLATFORM: darwin
+          ARCH: x64
+          BUILD_ARCH: x64
+          APP: "${{ steps.slug.outputs.display-name }}"
+          APP_BUNDLE_ID: org.alpha.biz
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ASP: ${{ secrets.APPLE_ASP }}
+        run: |
+          SIGN_FILE="out/installers/${{ env.VERSION }}/${{ env.APP }}_${{ env.PLATFORM }}_${{ env.VERSION }}.pkg"
+          UNSIGNED_FILE="out/installers/${{ env.VERSION }}/${{ env.APP }}_${{ env.PLATFORM }}_${{ env.VERSION }}_unsigned.pkg"
           echo "Build pkg"
           ./build-scripts/macos/pkg/build.sh
           echo "Check pkg size"
           du -h "$SIGN_FILE"
-
           echo "Remove unsigned pkg"
           if [ -e "$UNSIGNED_FILE" ]; then
             rm "$UNSIGNED_FILE"
           fi
+
+      - name: Package for ${{ steps.vars.outputs.system }}-${{ steps.unify.outputs.tag-name }} Release 🗜️
+        if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
+        run: 7z a -t7z -mx=9 "./out/installers/${{ steps.unify.outputs.tag-name }}/${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }}.7z" "./dist/electron/${{ steps.vars.outputs.package }}"
 
       - name: Generate shasum files
         run: node build-scripts/common/shasum.js out/installers/${{ steps.unify.outputs.tag-name }}

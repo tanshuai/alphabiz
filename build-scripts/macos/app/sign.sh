@@ -1,6 +1,12 @@
 #!/bin/sh
-# Sign .app for releasing
 # shellcheck source=../../common/set-env.sh
+# Sign .app for MAS build
+# This script will sign the MAS build app for Mac App Store. Usually you don't
+# need to run this by your self. The `build-scripts/macos/pkg/build.sh` will run
+# this if you set $PLATFORM to "mas".
+# The app signed by this script cannot be notarized and will crash if is not
+# installed from MAS.
+
 . "$(realpath "$0/../../../common/set-env.sh")"
 
 # Go to root directory
@@ -12,15 +18,7 @@ ensureEnv "VERSION" "x.x.x"
 # Maybe enable other targets in the future
 ensureEnv "PLATFORM" "\"mas\""
 
-# ARM_PATH="dist/electron/$APP-$PLATFORM-arm64/$APP.app"
-# X64_PATH="dist/electron/$APP-$PLATFORM-x64/$APP.app"
 UNV_PATH="dist/electron/$APP-$PLATFORM-universal/$APP.app"
-# if $IS_DEV; then
-#   echo "DEV $IS_DEV"
-#   DEBUG="electron-osx-sign"
-# else
-#   DEBUG=""
-# fi
 
 ensureEnv "APPLE_DISTRIBUTION_KEY" "\"Apple Development: Company Name (XXXXXXXXXX)\""
 
@@ -51,26 +49,6 @@ LOGINHELPER="$ENTITLEMENTS_DIR/entitlements.loginhelper.plist"
 
 cat "$ENTITLEMENT"
 echo ""
-
-# printf "\x1b[32m  Runing \x1b[36m DEBUG=* yarn electron-osx-sign --identity=%s %s\x1b[0m\n" "$APPLE_DISTRIBUTION_KEY" "$ARM_PATH"
-# printf "\x1b[32m  Runing \x1b[36m DEBUG=""$DEBUG"" node build-scripts/macos/app/sign.js %s %s\x1b[0m\n" "$ARM_PATH" "$APPLE_DISTRIBUTION_KEY"
-# sleep 1
-# DEBUG="*" yarn electron-osx-sign --entitlements="$ENTITLEMENT" --identity="$APPLE_DISTRIBUTION_KEY" "$ARM_PATH"
-# DEBUG="$DEBUG" node build-scripts/macos/app/sign.js "$ARM_PATH" "${APPLE_DISTRIBUTION_KEY}"
-
-# printf "\x1b[32m  Runing \x1b[36m DEBUG=* yarn electron-osx-sign --identity=%s %s\x1b[0m\n" "$APPLE_DISTRIBUTION_KEY" "$X64_PATH"
-# printf "\x1b[32m  Runing \x1b[36m DEBUG=""$DEBUG"" node build-scripts/macos/app/sign.js %s %s\x1b[0m\n" "$X64_PATH" "$APPLE_DISTRIBUTION_KEY"
-# sleep 1
-# DEBUG="*" yarn electron-osx-sign --entitlements="$ENTITLEMENT" --identity="$APPLE_DISTRIBUTION_KEY" "$X64_PATH"
-# DEBUG="$DEBUG" node build-scripts/macos/app/sign.js "$X64_PATH" "${APPLE_DISTRIBUTION_KEY}"
-
-# printf "\x1b[32m  Runing \x1b[36m DEBUG=* yarn electron-osx-sign --identity=%s %s\x1b[0m\n" "$APPLE_DISTRIBUTION_KEY" "$UNV_PATH"
-# printf "\x1b[32m  Runing \x1b[36m DEBUG=""$DEBUG"" node build-scripts/macos/app/sign.js %s %s\x1b[0m\n" "$UNV_PATH" "$APPLE_DISTRIBUTION_KEY"
-# sleep 1
-# DEBUG="*" yarn electron-osx-sign --entitlements="$ENTITLEMENT" --entitlements-inherit="$INHERIT" --entitlements-loginhelper="$INHERIT" --provisioning-profile="developer/embedded.provisionprofile" --identity="$APPLE_DISTRIBUTION_KEY" "$UNV_PATH"
-# DEBUG="*" yarn electron-osx-sign --identity="$APPLE_DISTRIBUTION_KEY" "$UNV_PATH"
-# DEBUG="$DEBUG" node build-scripts/macos/app/sign.js "$UNV_PATH" "${APPLE_DISTRIBUTION_KEY}"
-# printf "\x1b[32m  Running \x1b[36m codesign -s \"%s\" --entitlements \"%s\" -f --deep \"%s\"\x1b[0m\n" "$APPLE_DISTRIBUTION_KEY" "$ENTITLEMENT" "$UNV_PATH"
 
 find "$UNV_PATH" -name "*.dylib" -exec codesign -s "$APPLE_DISTRIBUTION_KEY" -f --entitlements "$INHERIT" "{}" \;
 find "$UNV_PATH" -name "*.framework" -exec codesign -s "$APPLE_DISTRIBUTION_KEY" -f --entitlements "$INHERIT" "{}" \;
