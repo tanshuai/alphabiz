@@ -140,10 +140,13 @@ jobs:
           then export MODIFIED_FILE_LIST=$(git show --pretty="format:" --name-only -2) ; \
           else export MODIFIED_FILE_LIST=$(git show --pretty="format:" --name-only) ; \
           fi
-          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-          echo "MODIFIED_FILE_LIST<<$EOF" >> "$GITHUB_ENV"
-          echo "$MODIFIED_FILE_LIST" >> "$GITHUB_ENV"
-          echo "$EOF" >> "$GITHUB_ENV"
+          MODIFIED_FILE_LIST=$(echo $MODIFIED_FILE_LIST | tr '\n' ' ')
+          echo "MODIFIED_FILE_LIST=$MODIFIED_FILE_LIST" >> "$GITHUB_ENV"
+          
+          # EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          # echo "MODIFIED_FILE_LIST<<$EOF" >> "$GITHUB_ENV"
+          # echo "$MODIFIED_FILE_LIST" >> "$GITHUB_ENV"
+          # echo "$EOF" >> "$GITHUB_ENV"
         shell: bash
 
       - name: Get release.json property
@@ -198,10 +201,13 @@ jobs:
           echo "commit-sha7=$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /(?<=-)\w{7,8}(?=\s)|^\w{7,8}(?=\s)/g')" >> $GITHUB_OUTPUT
           export DESCRIBE=$(cat github-describe/github-describe.txt)
           echo "$DESCRIBE"
-          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-          echo "DESCRIBE<<$EOF" >> "$GITHUB_ENV"
+
+          # DESCRIBE=$(echo $DESCRIBE | sed ':a;N;$!ba;s/\n/###/g')
+          # echo "DESCRIBE=$DESCRIBE" >> "$GITHUB_ENV"
+
+          echo "DESCRIBE<<EOF" >> "$GITHUB_ENV"
           echo "$DESCRIBE" >> "$GITHUB_ENV"
-          echo "$EOF" >> "$GITHUB_ENV"
+          echo "EOF" >> "$GITHUB_ENV"
         shell: bash
 
       # This step for unify the tag name

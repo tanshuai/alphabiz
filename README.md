@@ -16,7 +16,7 @@ Alphabiz is an open source desktop & mobile framework & sdk to build web 3 apps.
 
 - Windows 7, 10, 11
 - macOS 11+
-- Ubuntu Linux 18.04+ LTS 
+- Ubuntu Linux 20.04+ LTS 
 
 ## Installation
 
