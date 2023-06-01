@@ -1,3 +1,21 @@
-#941
-auto select recommend channels for new users #148
-remove debug entry
+add stop method
+player: fix bug
+player: use player.stop
+fix parseSource
+Update ErrorPanel.vue
+trigger play by route params
+fix remote play
+add log; fix play in web mode
+fix eslint
+#152
+add log for signedOut
+fix buffer display
+disable player events log
+add timeout for streamaddress
+fix css
+rename to `Player`
+Update index2.vue
+fix #943
+fix download torrent error
+add option to show social community in app, resolve #942
+add subtitle automatically
