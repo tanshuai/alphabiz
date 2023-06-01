@@ -18,7 +18,8 @@ ensureEnv "APP" "your app name"
 ensureEnv "VERSION" "x.x.x"
 # Maybe enable other targets in the future
 ensureEnv "PLATFORM" "\"mas\""
-if [[ -z "$ARCH" ]]; then
+if [ "$PLATFORM" = "mas" ]; then
+  echo "Building mas pkg..."
   ARCH="universal"
   APP_PATH="dist/electron/$APP-$PLATFORM-$ARCH/$APP.app"
   ensureExists "$APP_PATH"
@@ -50,6 +51,7 @@ if [[ -z "$ARCH" ]]; then
     printf "You can validate your package via \x1b[32mxcrun altool --validate-app -f \"%s\" -t osx -u YOUR_APPLE_ID -p YOUR_APP_SPEC_PASS\x1b[0m" "$RESULT_PATH"
   fi
 else
+  echo "Building non-mas pkg..."
   ARCH=$BUILD_ARCH
 
   APP_PATH="out/$APP-$PLATFORM-$ARCH/$APP.app"
