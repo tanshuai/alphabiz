@@ -202,7 +202,7 @@ jobs:
       - name: Checkout vars-date ${{ steps.vars.outputs.date }} ⬇️
         id: check
         run: |
-          echo "isBuildUniversal=1" >> $GITHUB_OUTPUT
+          echo "isBuildUniversal=0" >> $GITHUB_OUTPUT
           echo "repo-name: ${{ github.repository }}"
           echo "repository=${{ github.repository }}" >> $GITHUB_OUTPUT
           echo "slug----------------------"
@@ -365,9 +365,9 @@ jobs:
           command: yarn
           on_retry_command: rm -rf C:/Users/runneradmin/AppData/Local/node-gyp/
 
-      - name: start EC2 Instances
-        run: yarn node ./test/scripts/EC2.js --allocate
-        shell: bash
+      # - name: start EC2 Instances
+      #   run: yarn node ./test/scripts/EC2.js --allocate
+      #   shell: bash
 
   release_dmg_job:
     needs: [nightly_job, strat_instances_job]
