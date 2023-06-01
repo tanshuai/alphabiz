@@ -4,6 +4,7 @@ class BasePage {
     this.page = page
     // menu
     this.menuIcon = page.locator('[aria-label="Menu"]')
+    this.headerTitle = page.locator('.toolbar-title')
     this.homeLink = page.locator('text=HomeDownload/Upload and Media Files')
     this.downloadingStatus = page.locator('.left-drawer-menu >> text=Downloading')
     this.uploadingStatus = page.locator('.left-drawer-menu >> text=Uploading')
@@ -20,7 +21,16 @@ class BasePage {
     this.accountSettings = page.locator('[data-cy="account-settings-btn"]')
 
     // account
-    this.SignOutAnywayBtn = page.locator('button:has-text("Sign out anyway")')
+    this.accountInput = page.locator('[aria-label="Phone number or email"]')
+    this.passwordInput = page.locator('[aria-label="Password"]')
+    this.signInBtn = page.locator('.q-card:has-text("Forgot your password?") >> button:has-text("Sign in")')
+    this.signUpBtn = page.locator('button:has-text("Sign up")')
+    this.signOutAnywayBtn = page.locator('button:has-text("Sign out anyway")')
+    // alert
+    this.signInAlert = page.locator('div[role="alert"]:has-text("Signed in")')
+    this.signOutAlert = page.locator('div[role="alert"]:has-text("check_circleSigned out")')
+    this.defaultAppAlert = page.locator('text=Alphabiz is not your default app for')
+    this.noShowAgainBtn = page.locator('text=SHOW AGAIN')
   }
 
   /**
@@ -41,14 +51,14 @@ class BasePage {
   }
 
   async signIn (username, password, isWaitAlert) {
-    if (await this.page.locator('[aria-label="Phone number or email"]').isHidden()) this.jumpPage('accountSignIn')
+    if (await this.accountInput.isHidden()) this.jumpPage('accountSignIn')
     await this.page.waitForTimeout(500)
-    await this.page.fill('[aria-label="Phone number or email"]', username)
-    await this.page.fill('[aria-label="Password"]', password)
-    await this.page.click('button:has-text("Sign up") >> //preceding::Button[1]')
+    await this.accountInput.fill(username)
+    await this.passwordInput.fill(password)
+    await this.signInBtn.click()
 
     if (isWaitAlert) {
-      await this.page.locator('.q-notification__message >> text=Signed in').waitFor({ timeout: 40000 })
+      await this.signInAlert.waitFor({ timeout: 40000 })
     }
   }
 
@@ -57,8 +67,8 @@ class BasePage {
       await this.jumpPage('accountMore')
       await this.page.click('text=Sign out')
       await this.page.waitForTimeout(1000)
-      if (await this.SignOutAnywayBtn.isVisible()) { await this.SignOutAnywayBtn.click() }
-      await this.page.locator('.q-notification__message >> text=Signed out').waitFor()
+      if (await this.signOutAnywayBtn.isVisible()) { await this.signOutAnywayBtn.click() }
+      await this.signOutAlert.waitFor()
     }
     await this.page.evaluate(() => localStorage.clear())
     await this.page.reload()
@@ -67,7 +77,7 @@ class BasePage {
   // Determine whether to log in and log in for download tests
   async ensureLoginStatus (username, password, isWaitAlert) {
     // if not logged in
-    if (await this.page.locator('[aria-label="Phone number or email"]').isVisible()) {
+    if (await this.accountInput.isVisible()) {
       await this.signIn(username, password, isWaitAlert)
     } else {
       if (await this.downloadingStatus.isHidden()) await this.menuIcon.click()
@@ -75,9 +85,6 @@ class BasePage {
         await this.signIn(username, password, isWaitAlert)
       }
     }
-    // else {
-    //   console.log('logined')
-    // }
   }
 }
 

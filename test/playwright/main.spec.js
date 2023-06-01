@@ -7,11 +7,12 @@ const fs = require('fs')
 const electronMainPath = require('../../test.config.js').electronMainPath
 const { BasePage } = require('./models/basePage')
 const { HomePage } = require('./models/homePage')
+const { PlayerPage } = require('./models/playerPage')
 const { CreditsPage } = require('./models/creditsPage')
 
 const { sleep } = require('../utils/getCode')
 const { calculation } = require('../utils/calculation')
-let window, windows, electronApp, basePage, homePage, creditsPage
+let window, windows, electronApp, basePage, homePage, playerPage, creditsPage
 const ScreenshotsPath = 'test/output/playwright/main.spec/'
 let from
 let to
@@ -55,6 +56,7 @@ test.beforeAll(async () => {
   // new Pege Object Model
   basePage = new BasePage(window)
   homePage = new HomePage(window)
+  playerPage = new PlayerPage(window)
   creditsPage = new CreditsPage(window)
 })
 test.beforeEach(async () => {
@@ -75,33 +77,12 @@ test.afterAll(async () => {
 
 test('close set default', async () => {
   try {
-    await window.waitForSelector('text=Alphabiz is not your default app for', { timeout: 3000 })
-    await window.click('text=SHOW AGAIN')
+    await basePage.defaultAppAlert.waitFor({ timeout: 3000 })
+    await basePage.noShowAgainBtn.click()
     console.log('dont show again')
   } catch (error) {
     console.log('no wait for btn[dont show again]')
   }
-})
-
-test.skip('close auto update', async () => {
-  try {
-    await window.waitForSelector('text=UPDATE LATER', { timeout: 20000 })
-    await window.click('text=UPDATE LATER')
-    console.log('update later')
-  } catch (error) {
-    console.log('no wait for btn[update later]')
-  }
-})
-
-test.skip('close Automatically check for update', async () => {
-  await basePage.jumpPage('advancedLink')
-  if (await window.isChecked('[aria-label="Automatically\\ check\\ for\\ update"]')) {
-    await window.click('[aria-label="Automatically\\ check\\ for\\ update"]')
-    await window.click('button:has-text("Save & Apply")')
-    await window.locator('.q-notification__message >> text=Save preferences successfully').waitFor({ timeout: 20000 })
-  }
-  if (process.platform === 'win32') await sleep(400)
-  await basePage.jumpPage('downloadingStatus')
 })
 
 test('reset torrent status', async () => {
@@ -130,26 +111,28 @@ test('reset torrent status', async () => {
 
 test.describe('play video', () => {
   test('avi_type', async () => {
+    await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
     const media = './test/cypress/fixtures/samples/GoneNutty.avi'
 
     await window.waitForLoadState()
     await basePage.jumpPage('playerLink')
     // Upload
-    await window.setInputFiles('[data-cy="file-input"]', media)
+    await playerPage.fileInput.setInputFiles(media)
     await window.waitForLoadState()
     // should video can play
-    const progressControl = await window.locator('.vjs-progress-control')
+    const progressControl = await playerPage.controlBar
     await expect(progressControl).toBeVisible()
   })
   test('BluRay_mkv_type', async () => {
+    await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
     const media = './test/cypress/fixtures/samples/Test-Sample-Tenet.2020.IMAX.2160p.UHD.BluRay.x265.10bit.HDR.DTS-HD.MA.5.1202111171122322.mkv'
 
-    if (await window.$('[data-cy="file-input"]') === null) await basePage.jumpPage('playerLink')
+    if (!await playerPage.fileInput.isEnabled()) await basePage.jumpPage('playerLink')
     // Upload
-    await window.setInputFiles('[data-cy="file-input"]', media)
+    await playerPage.fileInput.setInputFiles(media)
     await window.waitForLoadState()
     // should video can play
-    const progressControl = await window.locator('.vjs-progress-control')
+    const progressControl = await playerPage.controlBar
     await expect(progressControl).toBeVisible()
   })
 })
@@ -293,10 +276,10 @@ test.describe('download ', () => {
       // 点击 Play 按钮
       await homePage.getCardEle(btDate.btName, 'playBtn').click()
       // 点击播放列表的第一个文件，跳转到player页面
-      await window.click('.q-list > .q-item:nth-child(1)')
+      await homePage.firstFileBtn.click()
 
       // should video can play
-      await window.waitForSelector('.vjs-progress-control', { timeout: 40000 })
+      await playerPage.controlBar.waitFor({ timeout: 40000 })
       // await window.reload()
       // 是否删除种子
       if (btDate.isDelete) {
@@ -333,7 +316,7 @@ test.describe('download ', () => {
       // 双击文件名播放文件
       await window.locator('text=The WIRED CD - Rip. Sample. Mash. Share').click({ clickCount: 2 })
       // should video can play
-      await window.waitForSelector('.vjs-progress-control', { timeout: 10000 })
+      await playerPage.controlBar.waitFor({ timeout: 10000 })
       await basePage.jumpPage('uploadingStatus')
       await sleep(1000)
       // 文件大小
@@ -367,7 +350,7 @@ test.describe('download ', () => {
       const closeIconText = await closeIcon.innerText()
       expect(closeIconText).toBe('close')
       await closeIcon.click()
-      await homePage.deleteCard.waitFor({ state: 'visible', timeout: 10000 })
+      await homePage.deleteCard.waitFor({ timeout: 10000 })
       await homePage.notNowBtn.click()
       // "更多"功能检查Download url
       await moreIcon.click()
@@ -376,12 +359,12 @@ test.describe('download ', () => {
       const filePathElement = await homePage.fileTreeBtn
       // 检查文件夹树状结构
       await filePathElement.click()
-      await window.waitForSelector('text=01 - Beastie Boys - Now Get Busy.mp3')
-      await window.waitForSelector('text=insert_drive_file')
-      await window.waitForSelector('text=image')
+      await filePathElement.locator('text=01 - Beastie Boys - Now Get Busy.mp3').waitFor()
+      await filePathElement.locator('text=insert_drive_file').waitFor()
+      await filePathElement.locator('text=image').waitFor()
       await sleep(500)
       // 退出卡片
-      await window.locator('header >> text=Uploading').click({ force: true })
+      await basePage.headerTitle.click({ force: true })
       // // downloaded状态栏
       // await stopIcon.click()
       // await basePage.jumpPage('downloadedStatus')
@@ -479,7 +462,7 @@ test.describe('account', () => {
   //     username: '+86' + process.env.TEST3_PHONE_NUMBER
   //   }
   // ]
-  test('transfer - check bill details', async () => {
+  test.only('transfer - check bill details', async () => {
     test.setTimeout(60000 * 5)
     // 转账人账号、密码
     // const transferee = userInfo[from].username
@@ -493,7 +476,7 @@ test.describe('account', () => {
     await window.evaluate(() => localStorage.clear())
     await window.reload()
     // 如果应用已经登陆则退出登录状态
-    const isHasAlert = await window.isVisible('div[role="alert"]:has-text("check_circleSigned out")')
+    const isHasAlert = await basePage.signOutAlert.isVisible()
     if (isHasAlert) {
       await window.reload()
     }
