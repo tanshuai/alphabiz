@@ -52,10 +52,19 @@ echo ""
 echo "Start signing..."
 
 # The binary files should be added first
-find "$APP_PATH" -name "* Framework" -exec codesign -vvv -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --options runtime --entitlements "$INHERIT" "{}" \;
-find "$APP_PATH" -name "*.dylib" -exec codesign -vvv -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --entitlements "$INHERIT" "{}" \;
-find "$APP_PATH" -name "*.framework" -exec codesign -vvv -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --options runtime --entitlements "$INHERIT" "{}" \;
-find "$APP_PATH" -name "*.node" -exec codesign -vvv -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --entitlements "$INHERIT" "{}" \;
+find "$APP_PATH" -name "* Framework" -exec codesign --deep -vvv -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --options runtime --entitlements "$INHERIT" "{}" \;
+find "$APP_PATH" -name "*.dylib" -exec codesign --deep -vvv -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --entitlements "$INHERIT" "{}" \;
+find "$APP_PATH" -name "*.framework" -exec codesign --deep -vvv -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --options runtime --entitlements "$INHERIT" "{}" \;
+find "$APP_PATH" -name "*.node" -exec codesign --deep -vvv -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --entitlements "$INHERIT" "{}" \;
+
+codesign --deep -vvv -s "$APPLE_DISTRIBUTION_KEY" -f --options runtime --entitlements "$INHERIT" "$APP_PATH/Contents/Frameworks/$APP Helper.app/Contents/MacOS/$APP Helper"
+codesign --deep -vvv -s "$APPLE_DISTRIBUTION_KEY" -f --options runtime --entitlements "$INHERIT" "$APP_PATH/Contents/Frameworks/$APP Helper.app/"
+codesign --deep -vvv -s "$APPLE_DISTRIBUTION_KEY" -f --options runtime --entitlements "$INHERIT" "$APP_PATH/Contents/Frameworks/$APP Helper (Renderer).app/Contents/MacOS/$APP Helper (Renderer)"
+codesign --deep -vvv -s "$APPLE_DISTRIBUTION_KEY" -f --options runtime --entitlements "$INHERIT" "$APP_PATH/Contents/Frameworks/$APP Helper (Renderer).app/"
+codesign --deep -vvv -s "$APPLE_DISTRIBUTION_KEY" -f --options runtime --entitlements "$INHERIT" "$APP_PATH/Contents/Frameworks/$APP Helper (GPU).app/Contents/MacOS/$APP Helper (GPU)"
+codesign --deep -vvv -s "$APPLE_DISTRIBUTION_KEY" -f --options runtime --entitlements "$INHERIT" "$APP_PATH/Contents/Frameworks/$APP Helper (GPU).app/"
+codesign --deep -vvv -s "$APPLE_DISTRIBUTION_KEY" -f --options runtime --entitlements "$INHERIT" "$APP_PATH/Contents/Frameworks/$APP Helper (Plugin).app/Contents/MacOS/$APP Helper (Plugin)"
+codesign --deep -vvv -s "$APPLE_DISTRIBUTION_KEY" -f --options runtime --entitlements "$INHERIT" "$APP_PATH/Contents/Frameworks/$APP Helper (Plugin).app/"
 
 if [ -e "$APP_PATH/Contents/Library" ]; then
   # This is only available in mas build
@@ -69,8 +78,8 @@ if [ -e "$APP_PATH/Contents/Frameworks/Squirrel.framework/Versions/A/Resources/S
   codesign -vvv -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --options runtime --entitlements "$INHERIT" "$APP_PATH/Contents/Frameworks/Squirrel.framework/Versions/A/Resources/ShipIt"
 fi
 
-echo "Sign binary"
-codesign -vvv -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --options runtime --entitlements "$INHERIT" "$APP_PATH/Contents/MacOS/$APP"
+# echo "Sign binary"
+# codesign -vvv -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --options runtime --entitlements "$INHERIT" "$APP_PATH/Contents/MacOS/$APP"
 # Use --deep for signing all other files
 echo "Sign .app"
 codesign -vvv -s "$APPLE_DISTRIBUTION_KEY" --deep --timestamp --options runtime --entitlements "$ENTITLEMENT" -f "$APP_PATH"
