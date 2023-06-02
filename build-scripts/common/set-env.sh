@@ -43,8 +43,8 @@ if [[ $DEV = "true" ]]; then
   echo "Build logs will print to screen."
 else
   echo "Run in production mode. "
-  # find "." -type f -name "build.log" -maxdepth 1 -exec rm -r "{}" \;
-  # echo "Build logs redirected to $(dirname "$(realpath "$0/..")")/build.log"
+  find "." -type f -name "build.log" -maxdepth 1 -exec rm -r "{}" \;
+  echo "Build logs redirected to $(dirname "$(realpath "$0/..")")/build.log"
 fi
 
 # Check environment variables
