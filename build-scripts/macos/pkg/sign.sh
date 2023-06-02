@@ -52,26 +52,26 @@ echo ""
 echo "Start signing..."
 
 # The binary files should be added first
-find "$APP_PATH" -name "* Framework" -exec codesign -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --options runtime --entitlements "$INHERIT" "{}" \;
-find "$APP_PATH" -name "*.dylib" -exec codesign -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --entitlements "$INHERIT" "{}" \;
-find "$APP_PATH" -name "*.framework" -exec codesign -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --options runtime --entitlements "$INHERIT" "{}" \;
-find "$APP_PATH" -name "*.node" -exec codesign -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --entitlements "$INHERIT" "{}" \;
+find "$APP_PATH" -name "* Framework" -exec codesign -vvv -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --options runtime --entitlements "$INHERIT" "{}" \;
+find "$APP_PATH" -name "*.dylib" -exec codesign -vvv -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --entitlements "$INHERIT" "{}" \;
+find "$APP_PATH" -name "*.framework" -exec codesign -vvv -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --options runtime --entitlements "$INHERIT" "{}" \;
+find "$APP_PATH" -name "*.node" -exec codesign -vvv -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --entitlements "$INHERIT" "{}" \;
 
 if [ -e "$APP_PATH/Contents/Library" ]; then
   # This is only available in mas build
-  codesign -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --options runtime --entitlements "$LOGINHELPER" "$APP_PATH/Contents/Library/LoginItems/$APP Login Helper.app/Contents/MacOS/$APP Login Helper"
-  codesign -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --options runtime --entitlements "$LOGINHELPER" "$APP_PATH/Contents/Library/LoginItems/$APP Login Helper.app"
+  codesign -vvv -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --options runtime --entitlements "$LOGINHELPER" "$APP_PATH/Contents/Library/LoginItems/$APP Login Helper.app/Contents/MacOS/$APP Login Helper"
+  codesign -vvv -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --options runtime --entitlements "$LOGINHELPER" "$APP_PATH/Contents/Library/LoginItems/$APP Login Helper.app"
 fi
 
 # The ShipIt binary file in Squirrel framework requires signing directly
 if [ -e "$APP_PATH/Contents/Frameworks/Squirrel.framework/Versions/A/Resources/ShipIt" ]; then
   # This is only available in non-mas build
-  codesign -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --options runtime --entitlements "$INHERIT" "$APP_PATH/Contents/Frameworks/Squirrel.framework/Versions/A/Resources/ShipIt"
+  codesign -vvv -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --options runtime --entitlements "$INHERIT" "$APP_PATH/Contents/Frameworks/Squirrel.framework/Versions/A/Resources/ShipIt"
 fi
 
-codesign -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --options runtime --entitlements "$INHERIT" "$APP_PATH/Contents/MacOS/$APP"
+codesign -vvv -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --options runtime --entitlements "$INHERIT" "$APP_PATH/Contents/MacOS/$APP"
 # Use --deep for signing all other files
-codesign -s "$APPLE_DISTRIBUTION_KEY" --deep --timestamp --options runtime --entitlements "$ENTITLEMENT" -f "$APP_PATH"
+codesign -vvv -s "$APPLE_DISTRIBUTION_KEY" --deep --timestamp --options runtime --entitlements "$ENTITLEMENT" -f "$APP_PATH"
 
 sleep 1
 echo "Finish signing $APP_PATH"
