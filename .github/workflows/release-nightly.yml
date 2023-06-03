@@ -422,7 +422,7 @@ jobs:
               echo "$SIGN_APP does not exist!"
               exit 5
             fi
-            ./build-scripts/macos/pkg/sign.sh
+            # ./build-scripts/macos/pkg/sign.sh
             # Verify the code signature
             echo "Verifying..."
             codesign -v -vvv "$SIGN_APP"
