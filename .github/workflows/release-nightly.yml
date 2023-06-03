@@ -396,7 +396,7 @@ jobs:
       - name: Pack app 📦
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
-          if [[ ${{ steps.vars.outputs.system }} == *macos* ]] && [[ ${{ env.APPLE_ID }} ]]; then
+          if [[ ${{ steps.vars.outputs.system }} == *macos* ]] && [[ -n "${{ env.APPLE_ID }}" ]]; then
             export PLATFORM=darwin
             export BUILD_PLATFORM=darwin
             export ARCH=x64
@@ -413,7 +413,7 @@ jobs:
           fi
           export PATH=$PATH:/c/Program\ Files\ \(x86\)/WiX\ Toolset\ v3.11/bin
           yarn make
-          if [[ ${{ steps.vars.outputs.system }} == *macos* ]] && [[ ${{ env.APPLE_ID }} ]]; then
+          if [[ ${{ steps.vars.outputs.system }} == *macos* ]] && [[ -n "${{ env.APPLE_ID }}" ]]; then
             SIGN_APP="./out/$APP-$PLATFORM-$ARCH/$APP.app"
             echo "$SIGN_APP"
             echo "$APP"
