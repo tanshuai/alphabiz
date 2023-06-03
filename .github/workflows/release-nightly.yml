@@ -464,6 +464,11 @@ jobs:
           if [ -e "$UNSIGNED_FILE" ]; then
             rm "$UNSIGNED_FILE"
           fi
+          echo "Notarizing dmg..."
+          $SIGNED_DMG="out/installers/$VERSION/${{ steps.unify.outputs.app-name-lower }}-$ARCH-$VERSION.dmg"
+          xcrun notarytool submit "$SIGNED_DMG" -v --apple-id "$APPLE_ID" --password "$APPLE_ASP" --team-id "$APPLE_TEAM_ID" -f json --wait
+          xcrun stapler staple "$SIGNED_DMG"
+          echo "Finish notarizing dmg"
 
       - name: Package for ${{ steps.vars.outputs.system }}-${{ steps.unify.outputs.tag-name }} Release 🗜️
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
