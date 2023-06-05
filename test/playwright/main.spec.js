@@ -293,6 +293,7 @@ test.describe('download ', () => {
   test('card mode task list', async () => {
     await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
     await basePage.jumpPage('uploadingStatus')
+    await homePage.searchBtn.click({ force: true })
     await sleep(1000)
     await window.screenshot({ path: `${ScreenshotsPath}card-mode-taskStatus.png` })
     const cardMode = await homePage.toggleCardModeBtn
@@ -330,12 +331,11 @@ test.describe('download ', () => {
     // 退出卡片
     await basePage.headerTitle.click({ force: true })
   })
-  // if (process.platform !== 'darwin') {
   test('table mode task list', async () => {
     // 确保下载的全部种子都在做种状态
-    // await basePage.jumpPage('downloadedStatus')
     await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
     await basePage.jumpPage('uploadingStatus')
+    await homePage.searchBtn.click({ force: true })
     // await window.waitForLoadState()
     await sleep(1000)
     await window.screenshot({ path: `${ScreenshotsPath}table-mode-taskStatus.png` })
@@ -422,9 +422,33 @@ test.describe('download ', () => {
     // expect(/alphabiz:\/\//.test(magnetText)).toBe(true)
     // await window.click('button:has-text("Cancel")')
     // await sleep(5000)
-    await window.reload()
+    // await window.reload()
   })
-  // }
+  test('pause all', async () => {
+    await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
+    await basePage.jumpPage('uploadingStatus')
+    await homePage.searchBtn.click({ force: true })
+    for (const bt of btData) {
+      await homePage.getCard(bt.btName).waitFor('visible')
+    }
+    await homePage.upPauseAllBtn.click()
+    for (const bt of btData) {
+      await homePage.getCard(bt.btName).waitFor('hidden')
+    }
+    await basePage.jumpPage('downloadedStatus')
+    for (const bt of btData) {
+      await homePage.getCard(bt.btName).waitFor('visible')
+    }
+    await sleep(2000)
+    await homePage.uploadAllBtn.click()
+    for (const bt of btData) {
+      await homePage.getCard(bt.btName).waitFor('hidden')
+    }
+    await basePage.jumpPage('uploadingStatus')
+    for (const bt of btData) {
+      await homePage.getCard(bt.btName).waitFor('visible')
+    }
+  })
 })
 
 test.describe('upload', () => {
