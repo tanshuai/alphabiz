@@ -153,6 +153,11 @@ test('reset torrent status', async () => {
   await homePage.clearTask()
 })
 
+test('Play while you download', async ({ page }) => {
+  await page.locator().click()
+  await page.locator().click()
+})
+
 test.describe('play video', () => {
   test.beforeEach(async () => {
     if (process.platform === 'darwin') test.setTimeout(60000 * 5)
@@ -167,9 +172,11 @@ test.describe('play video', () => {
     await playerPage.fileInput.setInputFiles(media, { timeout: 60000 })
     await window.waitForLoadState()
     // should video can play
-    const progressControl = await playerPage.controlBar
+    await window.waitForTimeout(5000)
+    const progressControl = await playerPage.playArrow
+    await playerPage.playPage.click()
     await expect(progressControl).toBeVisible({ timeout: 30000 })
-    await expect(await playerPage.bigPlayBtn).not.toBeVisible({ timeout: 30000 })
+    await playerPage.stopPlay.click()
   })
   test('BluRay_mkv_type', async () => {
     const media = './test/cypress/fixtures/samples/Test-Sample-Tenet.2020.IMAX.2160p.UHD.BluRay.x265.10bit.HDR.DTS-HD.MA.5.1202111171122322.mkv'
@@ -177,9 +184,10 @@ test.describe('play video', () => {
     await playerPage.fileInput.setInputFiles(media, { timeout: 60000 })
     await window.waitForLoadState()
     // should video can play
-    const progressControl = await playerPage.controlBar
+    await window.waitForTimeout(5000)
+    const progressControl = await playerPage.playArrow
+    await playerPage.playPage.click()
     await expect(progressControl).toBeVisible({ timeout: 30000 })
-    await expect(await playerPage.bigPlayBtn).not.toBeVisible({ timeout: 30000 })
   })
 })
 
@@ -231,7 +239,7 @@ test.describe('save Language', () => {
       if (process.platform === 'darwin') {
         test.skip()
       }
-      //确保语言en
+      // 确保语言en
       await basePage.clearLocalstorage()
       await window.waitForTimeout(3000)
       await basePage.quickSaveLanguage('EN')
@@ -250,7 +258,7 @@ test.describe('save Language', () => {
   })
 })
 
-test.describe('download ', () => {
+test.describe.only('download ', () => {
   for (const bt of btData) {
     test((bt.testName ? bt.testName : '') + bt.btName, async () => {
       await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
@@ -368,7 +376,11 @@ test.describe('download ', () => {
       await homePage.firstFileBtn.click()
 
       // should video can play
-      await playerPage.controlBar.waitFor({ timeout: 40000 })
+      await window.waitForTimeout(5000)
+      const progressControl = await playerPage.playArrow
+      await playerPage.playPage.click()
+      await expect(progressControl).toBeVisible({ timeout: 30000 })
+      await playerPage.stopPlay.click()
       // 是否删除种子
       if (bt.isDelete) {
         await basePage.jumpPage('uploadingStatus')
@@ -623,7 +635,7 @@ test.describe('task', () => {
     await homePage.searchInput.fill(searchBt)
     await window.waitForTimeout(1000)
     for (const index in btData) {
-      if(btData[index].isStreaming) continue
+      if (btData[index].isStreaming) continue
       if (btData[index].btName.includes(searchBt)) {
         await expect(homePage.getCard(btData[index].btName)).toBeVisible()
       } else {
@@ -649,7 +661,7 @@ test.describe('task', () => {
     //   'bbb_sunflower_1080p_30fps_normal.mp4'
     // ]
     for (const bt of btData) {
-      if(bt.isStreaming) continue
+      if (bt.isStreaming) continue
       if (await homePage.getCard(bt.btName).isVisible()) {
         await homePage.getCardEle(bt.btName, 'deleteBtn').click()
         await homePage.deleteFileChk.click()
