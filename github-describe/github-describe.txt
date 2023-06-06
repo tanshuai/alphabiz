@@ -1,5 +1,3 @@
-Repair Test
-fix player progress bar
-fix text color in about dialog close #944
-use same design for select file and select folder
-no keep-alive for downloader
+#941
+auto select recommend channels for new users #148
+remove debug entry
