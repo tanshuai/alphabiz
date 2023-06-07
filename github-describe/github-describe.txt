@@ -1,7 +1,3 @@
-#167
-#163
-#944
-progress bar
-remove useless css
-fix pending task shows paused
-only sync data when remote data is too old
+#941
+auto select recommend channels for new users #148
+remove debug entry
