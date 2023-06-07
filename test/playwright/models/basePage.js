@@ -17,10 +17,10 @@ class BasePage {
     this.developmentLink = page.locator('text=developer_modeDevelopment Developer Mode for Internal Use')
     this.accountLink = page.locator('.corner')
     this.accountSignIn = page.locator('.corner-account >> button:has-text("Sign in")')
-    this.accountMore = page.locator('button:has-text("more_horiz")')
+    this.accountMore = page.locator('.corner-account-info >> button:has-text("more_horiz")')
     this.accountSettings = page.locator('[data-cy="account-settings-btn"]')
 
-    // account
+    // account card
     this.accountInput = page.locator('[aria-label="Phone number or email"]')
     this.passwordInput = page.locator('[aria-label="Password"]')
     this.signInBtn = page.locator('.q-card:has-text("Forgot your password?") >> button:has-text("Sign in")')
@@ -81,10 +81,18 @@ class BasePage {
       await this.signIn(username, password, isWaitAlert)
     } else {
       if (await this.downloadingStatus.isHidden()) await this.menuIcon.click()
-      if (!await this.accountSignIn.isHidden()) {
+      if (await this.accountSignIn.isVisible()) {
+        await this.signIn(username, password, isWaitAlert)
+      }
+      try {
+        await this.accountMore.waitFor()
+      } catch {
+        await this.page.evaluate(() => localStorage.clear())
+        await this.page.reload()
         await this.signIn(username, password, isWaitAlert)
       }
     }
+    console.log('等待登录完成')
   }
 }
 
