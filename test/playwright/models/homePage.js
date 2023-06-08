@@ -34,6 +34,7 @@ class HomePage {
       closeBtn: 'button:has-text("close")'
     }
     // more card
+    this.moreCard = page.locator('.q-card:has-text("Download U")')
     this.copyUrlBtn = page.locator('[role="presentation"]:has-text("content_copy")')
     this.copyShareUrlBtn = page.locator('[role="presentation"]:has-text("share")')
     this.fileTreeBtn = page.locator('.file-tree')

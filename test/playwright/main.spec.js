@@ -228,7 +228,9 @@ test.describe('download ', () => {
           try {
             await window.click('text=' + btDate.btName, { timeout: 20000 })
             // 等待 任务 加载 验证， 判断任务是 下载中
-            await homePage.getCardEle(btDate.btName, 'statusText', 'Downloading').click({ timeout: 60000 })
+            let time
+            btDate.btName.includes('uTorrent') ? time = 20000 : time = 60000
+            await homePage.getCardEle(btDate.btName, 'statusText', 'Downloading').click({ timeout: time })
           } catch (error) {
             console.log('The seed download is complete')
           }
@@ -338,6 +340,8 @@ test.describe('task', () => {
     await homePage.notNowBtn.click()
     // more.. 功能
     await homePage.getCardEle(btData[1].btName, 'moreBtn').click()
+    await homePage.moreCard.waitFor()
+    await sleep(1000)
     // 检查文件路径
     const filePathElement = await homePage.fileTreeBtn
     // 检查文件夹树状结构
@@ -348,6 +352,11 @@ test.describe('task', () => {
     await sleep(500)
     // 退出卡片
     await basePage.headerTitle.click({ force: true })
+    try {
+      await homePage.moreCard.waitFor('hidden')
+    } catch {
+      await basePage.headerTitle.click({ force: true })
+    }
   })
   test('table mode task list', async () => {
     await window.screenshot({ path: `${ScreenshotsPath}table-mode-taskStatus.png` })
@@ -399,6 +408,8 @@ test.describe('task', () => {
     await homePage.notNowBtn.click()
     // "更多"功能检查Download url
     await moreIcon.click()
+    await homePage.moreCard.waitFor()
+    await sleep(1000)
     await homePage.copyUrlBtn.click()
     await homePage.copySuccessAlert.waitFor('visible')
     // "更多"功能检查文件路径

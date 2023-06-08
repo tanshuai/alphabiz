@@ -51,8 +51,9 @@ class BasePage {
   }
 
   async signIn (username, password, isWaitAlert) {
-    if (await this.accountInput.isHidden()) this.jumpPage('accountSignIn')
-    await this.page.waitForTimeout(500)
+    await this.page.waitForLoadState()
+    if (process.platform === 'darwin') await this.page.waitForTimeout(2000)
+    if (!await this.accountInput.isVisible()) this.jumpPage('accountSignIn')
     await this.accountInput.fill(username)
     await this.passwordInput.fill(password)
     await this.signInBtn.click()
@@ -92,7 +93,6 @@ class BasePage {
         await this.signIn(username, password, isWaitAlert)
       }
     }
-    console.log('等待登录完成')
   }
 }
 
