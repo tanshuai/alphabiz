@@ -1,5 +1,5 @@
 diff --git a/node_modules/gun/gun.js b/node_modules/gun/gun.js
-index b323e92..312fa8a 100644
+index b323e92..1ea9bb5 100644
 --- a/node_modules/gun/gun.js
 +++ b/node_modules/gun/gun.js
 @@ -1,5 +1,53 @@
@@ -62,7 +62,7 @@ index b323e92..312fa8a 100644
  		}
  		;(function(){ // max ~1ms or before stack overflow 
 -			var u, sT = setTimeout, l = 0, c = 0, sI = (typeof setImmediate !== ''+u && setImmediate) || sT; // queueMicrotask faster but blocks UI
-+			var u, sT = setTimeout, l = 0, c = 0, sI = (typeof requestIdleCallback !== ''+u && requestIdleCallback) || sT; // queueMicrotask faster but blocks UI
++			var u, sT = setTimeout, l = 0, c = 0, sI = (typeof queueMicrotask !== ''+u && queueMicrotask) || sT; // queueMicrotask faster but blocks UI
  			sT.hold = sT.hold || 9;
  			sT.poll = sT.poll || function(f){ //f(); return; // for testing
 -				if((sT.hold >= (+new Date - l)) && c++ < 3333){ f(); return }
@@ -81,7 +81,7 @@ index b323e92..312fa8a 100644
 -					i = 0;
 +			const ua = navigator.userAgent.toLowerCase()
 +			const isMobile = ua.includes('iphone') || ua.includes('android') || ua.includes('ios')
-+			const rIC = isMobile ? fn => setTimeout(fn, 200) : window.requestIdleCallback ? window.requestIdleCallback : fn => setTimeout(fn, 100)
++			const rIC = isMobile ? fn => setTimeout(fn, 200) : window.queueMicrotask ? window.queueMicrotask : fn => setTimeout(fn, 100)
 +			var sT = setTimeout, t = sT.turn = sT.turn || function (f) { 1 == s.push(f) && p(T) }
 +			, s = t.s = [], p = rIC, i = 0, f, T = function(){
 +				const start = Date.now()
