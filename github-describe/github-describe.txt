@@ -1,3 +1,6 @@
-#941
-auto select recommend channels for new users #148
-remove debug entry
+fix error in wrtc
+fix  #171
+remove player in dev page
+Update ControllerLayout.vue
+try improve gun performance
+ensure delete task
