@@ -6,13 +6,28 @@ const fs = require('fs')
 
 const electronMainPath = require('../../test.config.js').electronMainPath
 const { Commands } = require('./models/commands')
+const { BasePage } = require('./models/basePage')
+const { HomePage } = require('./models/homePage')
 const { sleep } = require('../utils/getCode')
 const { parseCSV, get2DArray } = require('../utils/getCSV')
 // get random email
 
-let window, windows, electronApp, commands
+let window, windows, electronApp, commands, basePage, homePage, magnetArray
 const ScreenshotsPath = 'test/output/playwright/main.spec/'
-
+let from
+let to
+if (process.platform === 'win32') {
+  from = 'test1'
+  to = 'test2'
+} else if (process.platform === 'linux') {
+  from = 'test3'
+  to = 'test4'
+} else {
+  from = 'test5'
+  to = 'test6'
+}
+from = from + process.env.TEST_EMAIL_DOMAIN
+to = to + process.env.TEST_EMAIL_DOMAIN
 test.beforeAll(async () => {
   // Launch Electron app.
   electronApp = await electron.launch({
@@ -40,6 +55,8 @@ test.beforeAll(async () => {
   console.log('windows title:' + await window.title())
   // new Pege Object Model
   commands = new Commands(window)
+  basePage = new BasePage(window)
+  homePage = new HomePage(window)
 })
 test.beforeEach(async () => {
   await window.evaluate(() => localStorage.clear())
@@ -51,105 +68,76 @@ test.afterEach(async ({}, testInfo) => {
     await window.screenshot({ path: `${ScreenshotsPath}${testInfo.title}-retry-${testInfo.retry}-fail.png` })
   }
 })
-test.afterAll(async () => {
-  // // Exit app.
-  // await window.evaluate(() => localStorage.clear())
-
-  // await electronApp.close()
-})
 
 test('close set default', async () => {
-  await window.waitForLoadState()
-  await sleep(1000)
-  const notification = await window.locator('.q-notification__message >> text=Alphabiz is not')
-  if (await notification.isVisible()) {
-    const alert = await notification.innerText()
-    console.log(alert)
-    const targetAlert = 'DON\'T SHOW AGAIN'
-    console.log(targetAlert)
-    if (/Alphabiz is not your default app for torrent and media/.test(alert)) {
-      await window.click('text=DON\'T SHOW AGAIN')
-    }
-    await notification.waitFor('hidden')
+  try {
+    await basePage.defaultAppAlert.waitFor({ timeout: 3000 })
+    await basePage.noShowAgainBtn.click()
+    console.log('dont show again')
+  } catch (error) {
+    console.log('no wait for btn[dont show again]')
   }
 })
-test('read .csv add five torrent task', async () => {
-  test.setTimeout(60000 * 60)
+test('read .csv', async () => {
   const val = await parseCSV('test/samples/Movie list.csv')
-  const magnetArray = get2DArray(val, 6)
-  for (let j = 0, len = magnetArray.length; j < len; j++) {
-    if (j <= 30 && magnetArray[j] !== '') {
-      // await commands.jumpPage('downloadingStatus')
-      await commands.downloadTorrent(magnetArray[j])
-    }
-  }
-  await window.waitForTimeout(5000)
+  magnetArray = get2DArray(val, 6)
 })
-test('5min screenshot task status', async () => {
-  test.setTimeout(60000 * 60 * 2)
-  // 切换列表模式
-  const listMode = await window.locator('button:has-text("view_agenda")')
-  if (await listMode.isVisible()) {
-    await listMode.click()
+const taskGroup = [
+  {
+    groupName: 'group1',
+    startNum: '10',
+    endNum: '15'
   }
-  await window.click('text=Created timeSort')
-  await window.click('div[role="option"]:has-text("Status")')
-  await window.waitForTimeout(5 * 60000)
-  await window.screenshot({ path: `${ScreenshotsPath}1-5min-task-downloading-status.png` })
-  await window.waitForTimeout(5 * 60000)
-  await window.screenshot({ path: `${ScreenshotsPath}1-10min-task-downloading-status.png` })
-  await window.waitForTimeout(10 * 60000)
-  await window.screenshot({ path: `${ScreenshotsPath}1-20min-task-downloading-status.png` })
-  await window.waitForTimeout(10 * 60000)
-  await window.screenshot({ path: `${ScreenshotsPath}1-30min-task-downloading-status.png` })
-  await commands.jumpPage('uploadingStatus')
-  await window.waitForTimeout(2000)
-  await window.screenshot({ path: `${ScreenshotsPath}2-30min-task-uploading-status.png` })
-  await commands.jumpPage('downloadingStatus')
-  await window.waitForTimeout(5 * 60000)
-  await window.screenshot({ path: `${ScreenshotsPath}1-35min-task-downloading-status.png` })
-  await commands.jumpPage('uploadingStatus')
-  await window.waitForTimeout(2000)
-  await window.screenshot({ path: `${ScreenshotsPath}2-35min-task-uploading-status.png` })
-  await commands.jumpPage('downloadingStatus')
-  await window.waitForTimeout(5 * 60000)
-  await window.screenshot({ path: `${ScreenshotsPath}1-40min-task-downloading-status.png` })
-  await commands.jumpPage('uploadingStatus')
-  await window.waitForTimeout(2000)
-  await window.screenshot({ path: `${ScreenshotsPath}2-40min-task-uploading-status.png` })
+]
 
-  await commands.jumpPage('downloadingStatus')
-  await window.waitForTimeout(5 * 60000)
-  await window.screenshot({ path: `${ScreenshotsPath}1-45min-task-downloading-status.png` })
-  await commands.jumpPage('uploadingStatus')
-  await window.waitForTimeout(2000)
-  await window.screenshot({ path: `${ScreenshotsPath}2-45min-task-uploading-status.png` })
+for (const tg of taskGroup) {
+  test.describe(`${tg.groupName}`, () => {
+    test.beforeEach(async () => {
+      await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
+      await window.waitForLoadState()
+      await sleep(2000)
+    })
+    test('reset task', async () => {
+      await basePage.jumpPage('downloadingStatus')
+      await homePage.searchBtn.click({ force: true })
+      if (await homePage.downRemoveAllBtn.isEnabled()) {
+        await homePage.downRemoveAllBtn.click()
+        await homePage.deleteFileChk.click()
+        await homePage.deleteBtn.click()
+      }
+      await basePage.jumpPage('uploadingStatus')
+      if (await homePage.upRemoveAllBtn.isEnabled()) {
+        await homePage.upRemoveAllBtn.click()
+        await homePage.removeAutoUploadFilesChk.click()
+        await homePage.deleteFileChk.click()
+        await homePage.deleteBtn.click()
+      }
+    })
+    test('add task', async () => {
+      await basePage.jumpPage('downloadingStatus')
+      await homePage.searchBtn.click({ force: true })
 
-  await commands.jumpPage('downloadingStatus')
-  await window.waitForTimeout(5 * 60000)
-  await window.screenshot({ path: `${ScreenshotsPath}1-50min-task-downloading-status.png` })
-  await commands.jumpPage('uploadingStatus')
-  await window.waitForTimeout(2000)
-  await window.screenshot({ path: `${ScreenshotsPath}2-50min-task-uploading-status.png` })
-
-  await commands.jumpPage('downloadingStatus')
-  await window.waitForTimeout(10 * 60000)
-  await window.screenshot({ path: `${ScreenshotsPath}1-60min-task-downloading-status.png` })
-  await commands.jumpPage('uploadingStatus')
-  await window.waitForTimeout(2000)
-  await window.screenshot({ path: `${ScreenshotsPath}2-60min-task-uploading-status.png` })
-
-  await commands.jumpPage('downloadingStatus')
-  await window.waitForTimeout(10 * 60000)
-  await window.screenshot({ path: `${ScreenshotsPath}1-70min-task-downloading-status.png` })
-  await commands.jumpPage('uploadingStatus')
-  await window.waitForTimeout(2000)
-  await window.screenshot({ path: `${ScreenshotsPath}2-70min-task-uploading-status.png` })
-
-  await commands.jumpPage('downloadingStatus')
-  await window.waitForTimeout(10 * 60000)
-  await window.screenshot({ path: `${ScreenshotsPath}1-80min-task-downloading-status.png` })
-  await commands.jumpPage('uploadingStatus')
-  await window.waitForTimeout(2000)
-  await window.screenshot({ path: `${ScreenshotsPath}2-80min-task-uploading-status.png` })
-})
+      for (let j = 0, len = magnetArray.length; j < len; j++) {
+        if ((j > tg.startNum && j <= tg.endNum) && magnetArray[j] !== '') {
+          await homePage.downloadTorrent(magnetArray[j])
+        }
+      }
+    })
+    test('wait finish', async () => {
+      test.setTimeout(60000 * 60)
+      // 确认添加了5个任务，等待任务完成
+      const allCard = await homePage.allCard
+      const allCardNum = await allCard.count()
+      console.log('allCardNum: ' + allCardNum)
+      expect(allCardNum).toBe(5)
+      await homePage.waitForAllHidden(allCard, 60000 * 20)
+    })
+    test('check task', async () => {
+      await basePage.jumpPage('uploadingStatus')
+      const allCard = await homePage.allCard
+      const allCardNum = await allCard.count()
+      console.log('allCardNum: ' + allCardNum)
+      expect(allCardNum).toBe(5)
+    })
+  })
+}

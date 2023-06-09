@@ -7,6 +7,7 @@ class HomePage {
     this.toggleListModeBtn = page.locator('button:has-text("view_agenda")')
     this.toggleCardModeBtn = page.locator('button:has-text("view_list")')
     this.sortBtn = page.locator('button:has-text("sort")')
+    this.allCard = page.locator('.torrent-item')
     // cardmode
     this.cardElementObj = {
       moreBtn: 'button:has-text("more_horiz")',
@@ -61,8 +62,7 @@ class HomePage {
   }
 
   getCard (btName) {
-    const btCard = 'text=' + btName + ' >> xpath=..//..//..//..//..'
-    return this.page.locator(btCard).first()
+    return this.page.locator(`.torrent-item:has-text("${btName}")`).first()
   }
 
   getCardEle (btName, target, status) {
@@ -85,6 +85,18 @@ class HomePage {
       await this.page.click('.q-card >> button:has-text("Cancel")')
     }
     await this.page.waitForTimeout(300)
+  }
+
+  async waitForAllHidden (locator, timeout = 10000) {
+    const start = Date.now()
+    const elementsVisible = async () => (await locator.evaluateAll(elements => elements.map(element => element.hidden))).includes(false)
+
+    while (await elementsVisible()) {
+      if (start + timeout < Date.now()) {
+        console.log(`Timeout waiting for all elements to be hidden. Locator: ${locator}. Timeout: ${timeout}ms`)
+      }
+    }
+    console.log(`All elements hidden: ${locator}`)
   }
 }
 module.exports = { HomePage }
