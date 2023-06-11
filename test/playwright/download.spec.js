@@ -1,18 +1,15 @@
 /* eslint-disable no-empty-pattern */
 const { _electron: electron } = require('playwright')
 const { test, expect } = require('@playwright/test')
-const path = require('path')
-const fs = require('fs')
 
 const electronMainPath = require('../../test.config.js').electronMainPath
-const { Commands } = require('./models/commands')
 const { BasePage } = require('./models/basePage')
 const { HomePage } = require('./models/homePage')
 const { sleep } = require('../utils/getCode')
 const { parseCSV, get2DArray } = require('../utils/getCSV')
 // get random email
 
-let window, windows, electronApp, commands, basePage, homePage, magnetArray
+let window, windows, electronApp, basePage, homePage
 const ScreenshotsPath = 'test/output/playwright/main.spec/'
 let from
 let to
@@ -28,6 +25,17 @@ if (process.platform === 'win32') {
 }
 from = from + process.env.TEST_EMAIL_DOMAIN
 to = to + process.env.TEST_EMAIL_DOMAIN
+const taskGroup = [
+  {
+    groupName: 'group1',
+    startNum: '10',
+    endNum: '15'
+  }, {
+    groupName: 'group2',
+    startNum: '18',
+    endNum: '24'
+  }
+]
 test.beforeAll(async () => {
   // Launch Electron app.
   electronApp = await electron.launch({
@@ -54,7 +62,6 @@ test.beforeAll(async () => {
   }
   console.log('windows title:' + await window.title())
   // new Pege Object Model
-  commands = new Commands(window)
   basePage = new BasePage(window)
   homePage = new HomePage(window)
 })
@@ -78,17 +85,6 @@ test('close set default', async () => {
     console.log('no wait for btn[dont show again]')
   }
 })
-test('read .csv', async () => {
-  const val = await parseCSV('test/samples/Movie list.csv')
-  magnetArray = get2DArray(val, 6)
-})
-const taskGroup = [
-  {
-    groupName: 'group1',
-    startNum: '10',
-    endNum: '15'
-  }
-]
 
 for (const tg of taskGroup) {
   test.describe(`${tg.groupName}`, () => {
@@ -116,7 +112,8 @@ for (const tg of taskGroup) {
     test('add task', async () => {
       await basePage.jumpPage('downloadingStatus')
       await homePage.searchBtn.click({ force: true })
-
+      const val = await parseCSV('test/samples/Movie list.csv')
+      const magnetArray = get2DArray(val, 6)
       for (let j = 0, len = magnetArray.length; j < len; j++) {
         if ((j > tg.startNum && j <= tg.endNum) && magnetArray[j] !== '') {
           await homePage.downloadTorrent(magnetArray[j])
@@ -127,17 +124,20 @@ for (const tg of taskGroup) {
       test.setTimeout(60000 * 60)
       // 确认添加了5个任务，等待任务完成
       const allCard = await homePage.allCard
-      const allCardNum = await allCard.count()
-      console.log('allCardNum: ' + allCardNum)
-      expect(allCardNum).toBe(5)
-      await homePage.waitForAllHidden(allCard, 60000 * 20)
+      const downloadNum = await allCard.count()
+      console.log('downloadNum: ' + downloadNum)
+      expect(downloadNum).toBe(5)
+      await homePage.waitForAllHidden(allCard, 60000 * 60)
     })
     test('check task', async () => {
       await basePage.jumpPage('uploadingStatus')
+      await window.waitForLoadState()
+      await sleep(3000)
+
       const allCard = await homePage.allCard
-      const allCardNum = await allCard.count()
-      console.log('allCardNum: ' + allCardNum)
-      expect(allCardNum).toBe(5)
+      const uploadNum = await allCard.count()
+      console.log('uploadNum: ' + uploadNum)
+      expect(uploadNum).toBe(5)
     })
   })
 }

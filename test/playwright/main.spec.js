@@ -299,9 +299,14 @@ test.describe('task', () => {
     await window.waitForLoadState()
     await basePage.jumpPage('uploadingStatus')
     await homePage.searchBtn.click({ force: true })
+    // 确保切换到卡片模式
+    const cardMode = await homePage.toggleCardModeBtn
+    if (await cardMode.isVisible()) {
+      await cardMode.click()
+    }
     try {
       for (const bt of btData) {
-        await homePage.getCard(bt.btName).waitFor('visible')
+        await homePage.getCard(bt.btName).waitFor({ timeout: 20000 })
       }
     } catch {
       await basePage.jumpPage('downloadedStatus')
@@ -313,6 +318,7 @@ test.describe('task', () => {
     }
     await window.waitForLoadState()
     await sleep(2000)
+    console.log('task beforeEach end!')
   })
   test('card mode task list', async () => {
     await window.screenshot({ path: `${ScreenshotsPath}card-mode-taskStatus.png` })
@@ -324,8 +330,8 @@ test.describe('task', () => {
     await homePage.getCardEle(btData[1].btName, 'stopBtn').click()
     await homePage.getCard(btData[1].btName).waitFor('hidden')
     await basePage.jumpPage('downloadedStatus')
-    await homePage.getCard(btData[1].btName).waitFor('visible')
     await sleep(3000)
+    await homePage.getCard(btData[1].btName).waitFor('visible')
     await homePage.getCardEle(btData[1].btName, 'seedBtn').click()
     await homePage.getCard(btData[1].btName).waitFor('hidden')
     await basePage.jumpPage('uploadingStatus')
@@ -349,7 +355,7 @@ test.describe('task', () => {
     await filePathElement.locator('text=01 - Beastie Boys - Now Get Busy.mp3').waitFor()
     await filePathElement.locator('text=insert_drive_file').waitFor()
     await filePathElement.locator('text=image').waitFor()
-    await sleep(500)
+    await sleep(1000)
     // 退出卡片
     await basePage.headerTitle.click({ force: true })
     try {
@@ -419,7 +425,7 @@ test.describe('task', () => {
     await filePathElement.locator('text=01 - Beastie Boys - Now Get Busy.mp3').waitFor()
     await filePathElement.locator('text=insert_drive_file').waitFor()
     await filePathElement.locator('text=image').waitFor()
-    await sleep(500)
+    await sleep(1000)
     // 退出卡片
     await basePage.headerTitle.click({ force: true })
     // downloaded状态栏
@@ -451,19 +457,16 @@ test.describe('task', () => {
     for (const bt of btData) {
       await homePage.getCard(bt.btName).waitFor('visible')
     }
+    await sleep(2000)
     await homePage.upPauseAllBtn.click()
-    for (const bt of btData) {
-      await homePage.getCard(bt.btName).waitFor('hidden')
-    }
+    await homePage.waitForAllHidden(await homePage.allCard, 60000)
     await basePage.jumpPage('downloadedStatus')
     for (const bt of btData) {
       await homePage.getCard(bt.btName).waitFor('visible')
     }
     await sleep(2000)
     await homePage.uploadAllBtn.click()
-    for (const bt of btData) {
-      await homePage.getCard(bt.btName).waitFor('hidden')
-    }
+    await homePage.waitForAllHidden(await homePage.allCard, 60000)
     await basePage.jumpPage('uploadingStatus')
     for (const bt of btData) {
       await homePage.getCard(bt.btName).waitFor('visible')
