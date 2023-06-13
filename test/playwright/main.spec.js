@@ -153,10 +153,10 @@ test('reset torrent status', async () => {
   await homePage.clearTask()
 })
 
-test('Play while you download', async ({ page }) => {
-  await page.locator().click()
-  await page.locator().click()
-})
+// test('Play while you download', async ({ page }) => {
+//   await page.locator().click()
+//   await page.locator().click()
+// })
 
 test.describe('play video', () => {
   test.beforeEach(async () => {
@@ -173,7 +173,7 @@ test.describe('play video', () => {
     await window.waitForLoadState()
     // should video can play
     await window.waitForTimeout(5000)
-    const progressControl = await playerPage.playArrow
+    const progressControl = await playerPage.stopPlay
     await playerPage.playPage.click()
     await expect(progressControl).toBeVisible({ timeout: 30000 })
     await playerPage.stopPlay.click()
@@ -185,7 +185,7 @@ test.describe('play video', () => {
     await window.waitForLoadState()
     // should video can play
     await window.waitForTimeout(5000)
-    const progressControl = await playerPage.playArrow
+    const progressControl = await playerPage.stopPlay
     await playerPage.playPage.click()
     await expect(progressControl).toBeVisible({ timeout: 30000 })
   })
@@ -258,7 +258,7 @@ test.describe('save Language', () => {
   })
 })
 
-test.describe.only('download ', () => {
+test.describe('download ', () => {
   for (const bt of btData) {
     test((bt.testName ? bt.testName : '') + bt.btName, async () => {
       await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
@@ -377,7 +377,7 @@ test.describe.only('download ', () => {
 
       // should video can play
       await window.waitForTimeout(5000)
-      const progressControl = await playerPage.playArrow
+      const progressControl = await playerPage.stopPlay
       await playerPage.playPage.click()
       await expect(progressControl).toBeVisible({ timeout: 30000 })
       await playerPage.stopPlay.click()
@@ -485,7 +485,7 @@ test.describe('task', () => {
     expect(uTorrentFileIcon).toBe('folder')
     // 双击文件名播放文件
     await window.locator(`text=${testBt.btName}`).click({ clickCount: 2 })
-    await playerPage.controlBar.waitFor({ timeout: 10000 })
+    await playerPage.playSpeed.waitFor({ timeout: 10000 })
     await basePage.jumpPage('uploadingStatus')
     await window.waitForTimeout(1000)
     // 文件大小

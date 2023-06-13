@@ -5,6 +5,7 @@ class PlayerPage {
     this.playPage = page.locator('.video-js-player__controller')
     this.fileInput = page.locator('[data-cy="file-input"]')
     this.stopPlay = page.locator('button:has-text("stop")')
+    this.playSpeed = page.locator('button:has-text("speed")')
   }
 }
 
