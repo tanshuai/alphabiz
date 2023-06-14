@@ -111,7 +111,6 @@ test-results/
 playwright-report/
 test/download/**
 test/output/**
-test/samples/**
 .DS_Store
 build/**/node_modules
 build/electron/Alphabiz-win32-x64/**
