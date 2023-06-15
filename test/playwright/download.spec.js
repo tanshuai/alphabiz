@@ -5,7 +5,6 @@ const { test, expect } = require('@playwright/test')
 const electronMainPath = require('../../test.config.js').electronMainPath
 const { BasePage } = require('./models/basePage')
 const { HomePage } = require('./models/homePage')
-const { sleep } = require('../utils/getCode')
 const { parseCSV, get2DArray } = require('../utils/getCSV')
 // get random email
 
@@ -91,7 +90,7 @@ for (const tg of taskGroup) {
     test.beforeEach(async () => {
       await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
       await window.waitForLoadState()
-      await sleep(2000)
+      await window.waitForTimeout(2000)
     })
     test('reset task', async () => {
       await basePage.jumpPage('downloadingStatus')
@@ -117,6 +116,7 @@ for (const tg of taskGroup) {
       for (let j = 0, len = magnetArray.length; j < len; j++) {
         if ((j > tg.startNum && j <= tg.endNum) && magnetArray[j] !== '') {
           await homePage.downloadTorrent(magnetArray[j])
+          if (process.platform === 'darwin') await window.waitForTimeout(3000)
         }
       }
     })
@@ -132,7 +132,7 @@ for (const tg of taskGroup) {
     test('check task', async () => {
       await basePage.jumpPage('uploadingStatus')
       await window.waitForLoadState()
-      await sleep(3000)
+      await window.waitForTimeout(3000)
 
       const allCard = await homePage.allCard
       const uploadNum = await allCard.count()

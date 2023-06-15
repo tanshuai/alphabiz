@@ -10,7 +10,6 @@ const { HomePage } = require('./models/homePage')
 const { PlayerPage } = require('./models/playerPage')
 const { CreditsPage } = require('./models/creditsPage')
 
-const { sleep } = require('../utils/getCode')
 const { calculation } = require('../utils/calculation')
 let window, windows, electronApp, basePage, homePage, playerPage, creditsPage
 const ScreenshotsPath = 'test/output/playwright/main.spec/'
@@ -317,7 +316,7 @@ test.describe('task', () => {
       }
     }
     await window.waitForLoadState()
-    await sleep(2000)
+    await window.waitForTimeout(2000)
     console.log('task beforeEach end!')
   })
   test('card mode task list', async () => {
@@ -330,7 +329,7 @@ test.describe('task', () => {
     await homePage.getCardEle(btData[1].btName, 'stopBtn').click()
     await homePage.getCard(btData[1].btName).waitFor('hidden')
     await basePage.jumpPage('downloadedStatus')
-    await sleep(3000)
+    await window.waitForTimeout(3000)
     await homePage.getCard(btData[1].btName).waitFor('visible')
     await homePage.getCardEle(btData[1].btName, 'seedBtn').click()
     await homePage.getCard(btData[1].btName).waitFor('hidden')
@@ -347,7 +346,7 @@ test.describe('task', () => {
     // more.. 功能
     await homePage.getCardEle(btData[1].btName, 'moreBtn').click()
     await homePage.moreCard.waitFor()
-    await sleep(1000)
+    await window.waitForTimeout(1000)
     // 检查文件路径
     const filePathElement = await homePage.fileTreeBtn
     // 检查文件夹树状结构
@@ -355,7 +354,7 @@ test.describe('task', () => {
     await filePathElement.locator('text=01 - Beastie Boys - Now Get Busy.mp3').waitFor()
     await filePathElement.locator('text=insert_drive_file').waitFor()
     await filePathElement.locator('text=image').waitFor()
-    await sleep(1000)
+    await window.waitForTimeout(1000)
     // 退出卡片
     await basePage.headerTitle.click({ force: true })
     try {
@@ -381,7 +380,7 @@ test.describe('task', () => {
     // should video can play
     await playerPage.controlBar.waitFor({ timeout: 10000 })
     await basePage.jumpPage('uploadingStatus')
-    await sleep(1000)
+    await window.waitForTimeout(1000)
     // 文件大小
     const fileSize = await homePage.getListEle(btData[1].btName, 'fileSize').innerText()
     // expect(fileSize).toBe('56.07 MB')
@@ -415,7 +414,7 @@ test.describe('task', () => {
     // "更多"功能检查Download url
     await moreIcon.click()
     await homePage.moreCard.waitFor()
-    await sleep(1000)
+    await window.waitForTimeout(1000)
     await homePage.copyUrlBtn.click()
     await homePage.copySuccessAlert.waitFor('visible')
     // "更多"功能检查文件路径
@@ -425,7 +424,7 @@ test.describe('task', () => {
     await filePathElement.locator('text=01 - Beastie Boys - Now Get Busy.mp3').waitFor()
     await filePathElement.locator('text=insert_drive_file').waitFor()
     await filePathElement.locator('text=image').waitFor()
-    await sleep(1000)
+    await window.waitForTimeout(1000)
     // 退出卡片
     await basePage.headerTitle.click({ force: true })
     // downloaded状态栏
@@ -437,7 +436,7 @@ test.describe('task', () => {
     // // 检查任务图标
     const uploadIcon = await homePage.getListEle(btData[1].btName, 'seedBtn')
     await uploadIcon.waitFor()
-    await sleep(2000)
+    await window.waitForTimeout(2000)
     await uploadIcon.click()
     await theWoredCD.waitFor('hidden')
     await basePage.jumpPage('uploadingStatus')
@@ -445,26 +444,26 @@ test.describe('task', () => {
     // // // 验证magnet被复制到剪贴板
     // await basePage.jumpPage('downloadingStatus')
     // await homePage.downloadBtn.click()
-    // await sleep(1000)
+    // await window.waitForTimeout(1000)
     // const magnetText = await window.locator('//*[@aria-label="Download directory position"]/preceding::*[1]').inputValue()
     // // console.log('magnetText:' + magnetText)
     // expect(/alphabiz:\/\//.test(magnetText)).toBe(true)
     // await window.click('button:has-text("Cancel")')
-    // await sleep(5000)
+    // await window.waitForTimeout(5000)
     // await window.reload()
   })
   test('pause all', async () => {
     for (const bt of btData) {
       await homePage.getCard(bt.btName).waitFor('visible')
     }
-    await sleep(2000)
+    await window.waitForTimeout(2000)
     await homePage.upPauseAllBtn.click()
     await homePage.waitForAllHidden(await homePage.allCard, 60000)
     await basePage.jumpPage('downloadedStatus')
     for (const bt of btData) {
       await homePage.getCard(bt.btName).waitFor('visible')
     }
-    await sleep(2000)
+    await window.waitForTimeout(2000)
     await homePage.uploadAllBtn.click()
     await homePage.waitForAllHidden(await homePage.allCard, 60000)
     await basePage.jumpPage('uploadingStatus')
@@ -571,7 +570,7 @@ test.describe('account', () => {
     const payeeAfterPoint = Number(payeePoint) + transferAmount
     // 退出收款人账号
     await basePage.signOut()
-    await sleep(1000)
+    await window.waitForTimeout(1000)
     // 登录付款人账号
     await basePage.signIn(transferee, transfereePassword, 1)
     await basePage.jumpPage('creditsLink')
@@ -590,21 +589,21 @@ test.describe('account', () => {
     // 查看账单明细
     await creditsPage.checkBillDetail([payeeID, 'Transfer', '-' + transferAmount, 'finish'], 'expense')
     // 断言积分变化是否正确
-    await sleep(2000)
+    await window.waitForTimeout(2000)
     await window.waitForLoadState()
     expect(await creditsPage.creditsText.innerText()).toBe(calculation('reduce', transfereePoint, transferAmount).toString())
     // 退出付款人账号
     await basePage.signOut()
-    // await sleep(1000)
+    // await window.waitForTimeout(1000)
     // // 登录收款人账号
     // await basePage.signIn(payee, payeePassword, 1)
     // await basePage.jumpPage('creditsLink')
-    // await sleep(2000)
+    // await window.waitForTimeout(2000)
     // // 查看账单
     // await creditsPage.checkBillDetail(transfereeID, 'Transfer', '+' + transferAmount, 'finish')
     // // 断言积分变化是否正确
     // expect(await creditsPage.creditsText.innerText()).toBe(payeeAfterPoint.toString())
     // await basePage.signOut()
-    // await sleep(1000)
+    // await window.waitForTimeout(1000)
   })
 })
