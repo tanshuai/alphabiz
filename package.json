@@ -38,7 +38,7 @@
     "make:squirrel": "yarn pkg-fmt -f exe && electron-forge make --skip-package --targets @electron-forge/maker-squirrel",
     "make:appx": "yarn pkg-fmt -f appx && electron-forge make --skip-package --targets @electron-forge/maker-appx",
     "make:msi": "yarn pkg-fmt -f msi && node ./build-scripts/windows/wix/make.js",
-    "premake:dmg": "yarn pkg-fmt -f dmg && (node -e 'if (process.platform === `darwin` && !process.env.APPLE_ID) process.exit(1)') || ./build-scripts/macos/pkg/sign.sh",
+    "premake:dmg": "yarn pkg-fmt -f dmg && (node -e 'if (process.platform === `darwin` && process.env.APPLE_ID) process.exit(1)') || ./build-scripts/macos/pkg/sign.sh",
     "make:dmg": "electron-forge make --skip-package --targets @electron-forge/maker-dmg",
     "make:deb": "yarn pkg-fmt -f deb && electron-forge make --skip-package --targets @electron-forge/maker-deb",
     "make:snap": "yarn pkg-fmt -f snap && node build-scripts/linux/snapcraft && snapcraft snap --output=./out/installers/app.snap && node build-scripts/linux/snapcraft --post",
