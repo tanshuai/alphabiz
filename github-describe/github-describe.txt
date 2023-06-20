@@ -1,4 +1,4 @@
-show full-window recommend page for new users
-use table list as default resolve #948
-add optional hints for register resolve #948
-close #949
+fix download e2e test
+try fix recommend errors
+automatically close not-enough-credit hint
+pause player when logged out
