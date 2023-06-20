@@ -83,8 +83,11 @@ class HomePage {
   // home
   async downloadTorrent (magnet) {
     await this.downloadBtn.click()
+    if (process.platform === 'darwin') await this.page.waitForTimeout(2000)
     await this.magnetTarea.fill(magnet)
+    if (process.platform === 'darwin') await this.page.waitForTimeout(2000)
     await this.dirInput.fill('./test/download')
+    if (process.platform === 'darwin') await this.page.waitForTimeout(5000)
     await this.cardDownloadBtn.click()
     await this.page.waitForTimeout(2000)
     if (await this.cardCancelBtn.isVisible()) {

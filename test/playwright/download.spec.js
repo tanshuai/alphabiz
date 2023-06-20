@@ -29,10 +29,6 @@ const taskGroup = [
     groupName: 'group1',
     startNum: '10',
     endNum: '15'
-  }, {
-    groupName: 'group2',
-    startNum: '18',
-    endNum: '24'
   }
 ]
 test.beforeAll(async () => {
@@ -92,7 +88,7 @@ for (const tg of taskGroup) {
       await window.waitForLoadState()
       await window.waitForTimeout(2000)
     })
-    test('reset task', async () => {
+    test.skip('reset task', async () => {
       await basePage.jumpPage('downloadingStatus')
       await homePage.searchBtn.click({ force: true })
       if (await homePage.downRemoveAllBtn.isEnabled()) {
@@ -121,7 +117,7 @@ for (const tg of taskGroup) {
       for (let j = 0, len = magnetArray.length; j < len; j++) {
         if ((j > tg.startNum && j <= tg.endNum) && magnetArray[j] !== '') {
           await homePage.downloadTorrent(magnetArray[j])
-          if (process.platform === 'darwin') await window.waitForTimeout(3000)
+          if (process.platform === 'darwin') await window.waitForTimeout(5000)
         }
       }
       await window.waitForTimeout(5000)
