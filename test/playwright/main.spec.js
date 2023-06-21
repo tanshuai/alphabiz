@@ -294,6 +294,7 @@ test.describe('download ', () => {
 })
 test.describe('task', () => {
   test.beforeEach(async () => {
+    if (process.platform === 'darwin') test.setTimeout(60000 * 5)
     await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
     await window.waitForLoadState()
     await basePage.jumpPage('uploadingStatus')

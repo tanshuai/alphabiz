@@ -110,6 +110,7 @@ for (const tg of taskGroup) {
       }
     })
     test('add task', async () => {
+      if (process.platform === 'darwin') test.setTimeout(60000 * 10)
       await basePage.jumpPage('downloadingStatus')
       await homePage.searchBtn.click({ force: true })
       const val = await parseCSV('test/samples/Movie list.csv')
