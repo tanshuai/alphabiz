@@ -152,7 +152,6 @@ test.describe('play video', () => {
     // Upload
     await playerPage.fileInput.setInputFiles(media)
     await window.waitForLoadState()
-    await playerPage.bigPlayBtn.waitFor('hidden')
     // should video can play
     const progressControl = await playerPage.controlBar
     await expect(progressControl).toBeVisible()
@@ -162,7 +161,6 @@ test.describe('play video', () => {
     // Upload
     await playerPage.fileInput.setInputFiles(media)
     await window.waitForLoadState()
-    await playerPage.bigPlayBtn.waitFor('hidden')
     // should video can play
     const progressControl = await playerPage.controlBar
     await expect(progressControl).toBeVisible()
