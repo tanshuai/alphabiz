@@ -1,1 +1,7 @@
-try fix library login
+change default download directory
+fix i18n
+change download speed precision
+change library edit to publish
+trim search text
+do not fill channel info in quick start
+fix keychain error
