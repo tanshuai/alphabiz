@@ -39,7 +39,7 @@ describe('Credits', () => {
     cy.toCredits()
     cy.getPoint().as('transfereePoint')
     cy.getReceiptCode().as('transfereeReceiptCode')
-    
+
     cy.get('@payeeReceiptCode').then(payeeReceiptCode => {
       // 转账 start
       cy.transfer(payeeReceiptCode, transferAmount)
