@@ -97,7 +97,7 @@ class HomePage {
     await this.page.waitForLoadState()
   }
 
-  async waitForAllHidden (locator, timeout = 10000) {
+  async waitForAllHidden (locator, timeout = 10000, waitTime) {
     const start = Date.now()
     const elementsVisible = async () => (await locator.evaluateAll(elements => elements.map(element => element.hidden))).includes(false)
 
@@ -105,6 +105,7 @@ class HomePage {
       if (start + timeout < Date.now()) {
         console.log(`Timeout waiting for all elements to be hidden. Locator: ${locator}. Timeout: ${timeout}ms`)
       }
+      await this.page.waitForTimeout(waitTime)
     }
     console.log(`All elements hidden: ${locator}`)
   }
