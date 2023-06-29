@@ -1,1 +1,4 @@
-fix google analytics in production mode
+keep alive for downloader
+return delete result for taskList
+change gtag protocol
+add info for remote play
