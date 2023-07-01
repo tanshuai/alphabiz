@@ -105,7 +105,7 @@ class HomePage {
       if (start + timeout < Date.now()) {
         console.log(`Timeout waiting for all elements to be hidden. Locator: ${locator}. Timeout: ${timeout}ms`)
       }
-      await this.page.waitForTimeout(waitTime)
+      if (waitTime) await this.page.waitForTimeout(waitTime)
     }
     console.log(`All elements hidden: ${locator}`)
   }
