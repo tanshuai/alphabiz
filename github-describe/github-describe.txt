@@ -1,6 +1,5 @@
-fix syntax error
-download test add waiting time
-add Timeout for macos
-fix player test error
-fix electron player test error
-fix drop file player、fix open system default player
+fix skip test case mistakenly changes test results
+add waiting time for download test
+electron download test - reduce query frequency
+force update if match min version, resolve #285
+fix waitForAllHidden error
