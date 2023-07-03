@@ -1,5 +1,5 @@
 diff --git a/node_modules/gun/gun.js b/node_modules/gun/gun.js
-index b323e92..1ea9bb5 100644
+index b323e92..aae5c3f 100644
 --- a/node_modules/gun/gun.js
 +++ b/node_modules/gun/gun.js
 @@ -1,5 +1,53 @@
@@ -57,12 +57,12 @@ index b323e92..1ea9bb5 100644
    /* UNBUILD */
    function USE(arg, req){
      return req? require(arg) : arg.slice? USE[R(arg)] : function(mod, path){
-@@ -62,27 +110,39 @@
+@@ -62,34 +110,53 @@
  			return l;
  		}
  		;(function(){ // max ~1ms or before stack overflow 
 -			var u, sT = setTimeout, l = 0, c = 0, sI = (typeof setImmediate !== ''+u && setImmediate) || sT; // queueMicrotask faster but blocks UI
-+			var u, sT = setTimeout, l = 0, c = 0, sI = (typeof queueMicrotask !== ''+u && queueMicrotask) || sT; // queueMicrotask faster but blocks UI
++			var u, sT = setTimeout, l = 0, c = 0, sI = (typeof queueMicrotask !== ''+u && queueMicrotask) || setImmediate; // queueMicrotask faster but blocks UI
  			sT.hold = sT.hold || 9;
  			sT.poll = sT.poll || function(f){ //f(); return; // for testing
 -				if((sT.hold >= (+new Date - l)) && c++ < 3333){ f(); return }
@@ -103,11 +103,32 @@ index b323e92..1ea9bb5 100644
  		;(function(){
  			var u, sT = setTimeout, T = sT.turn;
 -			(sT.each = sT.each || function(l,f,e,S){ S = S || 9; (function t(s,L,r){
-+			(sT.each = sT.each || function(l,f,e,S){ S = 30; (function t(s,L,r){
- 			  if(L = (s = (l||[]).splice(0,S)).length){
- 			  	for(var i = 0; i < L; i++){
- 			  		if(u !== (r = f(s[i]))){ break }
-@@ -150,7 +210,7 @@
+-			  if(L = (s = (l||[]).splice(0,S)).length){
+-			  	for(var i = 0; i < L; i++){
+-			  		if(u !== (r = f(s[i]))){ break }
+-			  	}
+-			  	if(u === r){ T(t); return }
+-			  } e && e(r);
+-			}())})();
++			// (sT.each = sT.each || function(l,f,e,S){ S = 30; (function t(s,L,r){
++			//   if(L = (s = (l||[]).splice(0,S)).length){
++			//   	for(var i = 0; i < L; i++){
++			//   		if(u !== (r = f(s[i]))){ break }
++			//   	}
++			//   	if(u === r){ T(t); return }
++			//   } e && e(r);
++			// }())})();
++			sT.each = sT.each || function (l, f, e, S) {
++				// console.log('sT.each', l, typeof f, e, S)
++				for (const i of l) {
++					if (u !== (r = f(i))) break
++				}
++				e && e(r)
++			}
+ 		}());
+ 	})(USE, './shim');
+ 
+@@ -150,7 +217,7 @@
  	;USE(function(module){
  		USE('./shim');
  		function State(){
@@ -116,7 +137,7 @@ index b323e92..1ea9bb5 100644
  			if(last < t){
  				return N = 0, last = t + State.drift;
  			}
-@@ -187,19 +247,24 @@
+@@ -187,19 +254,24 @@
  			}
  			var dt = dup.track = function(id){
  				var it = s[id] || (s[id] = {});
@@ -143,13 +164,13 @@ index b323e92..1ea9bb5 100644
 +				// },0,99);
 +				for (const id in s) {
 +					var it = s[id]
-+					if (it && (age || opt.age) > (dup.now - it.was)) { return }
++					if (it && (age || opt.age) > (dup.now - it.was)) continue
 +					delete s[id]
 +				}
  			}
  			return dup;
  		}
-@@ -286,19 +351,37 @@
+@@ -286,19 +358,37 @@
  				(msg.$ && (msg.$ === (msg.$._||'').$)) || (msg.$ = gun);
  				if(msg['@'] && !msg.put){ ack(msg) }
  				if(!at.ask(msg['@'], msg)){ // is this machine listening for an ack?
@@ -192,7 +213,7 @@ index b323e92..1ea9bb5 100644
  				var ctx = msg._||'', root = ctx.root = ((ctx.$ = msg.$||'')._||'').root;
  				if(msg['@'] && ctx.faith && !ctx.miss){ // TODO: AXE may split/route based on 'put' what should we do here? Detect @ in AXE? I think we don't have to worry, as DAM will route it on @.
  					msg.out = universe;
-@@ -307,7 +390,7 @@
+@@ -307,7 +397,7 @@
  				}
  				ctx.latch = root.hatch; ctx.match = root.hatch = [];
  				var put = msg.put;
@@ -201,7 +222,7 @@ index b323e92..1ea9bb5 100644
  				if(put['#'] && put['.']){ /*root && root.on('put', msg);*/ return } // TODO: BUG! This needs to call HAM instead.
  				DBG && (DBG.p = S);
  				ctx['#'] = msg['#'];
-@@ -315,12 +398,12 @@
+@@ -315,12 +405,12 @@
  				ctx.all = 0;
  				ctx.stun = 1;
  				var nl = Object.keys(put);//.sort(); // TODO: This is unbounded operation, large graphs will be slower. Write our own CPU scheduled sort? Or somehow do it in below? Keys itself is not O(1) either, create ES5 shim over ?weak map? or custom which is constant.
@@ -216,7 +237,7 @@ index b323e92..1ea9bb5 100644
  							fire(ctx);
  							return;
  						}
-@@ -337,7 +420,8 @@
+@@ -337,7 +427,8 @@
  						return;
  					}
  					var i = 0, key; o = o || 0;
@@ -226,7 +247,7 @@ index b323e92..1ea9bb5 100644
  						if('_' === key){ continue }
  						var val = node[key], state = states[key];
  						if(u === state){ err = ERR+cut(key)+"on"+cut(soul)+"no state."; break }
-@@ -345,6 +429,10 @@
+@@ -345,6 +436,10 @@
  						//ctx.all++; //ctx.ack[soul+key] = '';
  						ham(val, key, soul, state, msg);
  						++C; // courtesy count;
@@ -237,7 +258,7 @@ index b323e92..1ea9bb5 100644
  					}
  					if((kl = kl.slice(i)).length){ turn(pop); return }
  					++ni; kl = null; pop(o);
-@@ -360,21 +448,22 @@
+@@ -360,21 +455,22 @@
  
  				var now = State(), u;
  				if(state > now){
@@ -264,7 +285,16 @@ index b323e92..1ea9bb5 100644
        	var eve = this, root = eve.as, graph = root.graph, ctx = msg._, put = msg.put, soul = put['#'], key = put['.'], val = put[':'], state = put['>'], id = msg['#'], tmp;
        	if((tmp = ctx.msg) && (tmp = tmp.put) && (tmp = tmp[soul])){ state_ify(tmp, key, state, val, soul) } // necessary! or else out messages do not get SEA transforms.
  				graph[soul] = state_ify(graph[soul], key, state, val, soul);
-@@ -417,7 +506,12 @@
+@@ -395,7 +491,7 @@
+ 				msg.out = universe;
+ 				ctx.root.on('out', msg);
+ 
+-				CF(); // courtesy check;
++				// CF(); // courtesy check;
+ 			}
+ 			function ack(msg){ // aggregate ACKs.
+ 				var id = msg['@'] || '', ctx;
+@@ -417,7 +513,12 @@
  			var ERR = "Error: Invalid graph!";
  			var cut = function(s){ return " '"+(''+s).slice(0,9)+"...' " }
  			var L = JSON.stringify, MD = 2147483647, State = Gun.state;
@@ -278,7 +308,7 @@ index b323e92..1ea9bb5 100644
  
  		}());
  
-@@ -444,7 +538,7 @@
+@@ -444,7 +545,7 @@
  					at.Q = {};
  				}*/
  				var ctx = msg._||{}, DBG = ctx.DBG = msg.DBG;
@@ -287,7 +317,7 @@ index b323e92..1ea9bb5 100644
  				//console.log("GET:", get, node, has);
  				if(!node){ return root.on('get', msg) }
  				if(has){
-@@ -459,12 +553,12 @@
+@@ -459,12 +560,12 @@
  				root.on('get', msg); // send GET to storage adapters.
  			}
  			function ack(msg, node){
@@ -303,7 +333,7 @@ index b323e92..1ea9bb5 100644
  					var i = 0, k, put = {}, tmp;
  					while(i < 9 && (k = keys[i++])){
  						state_ify(put, k, state_is(node, k), node[k], soul);
-@@ -473,10 +567,10 @@
+@@ -473,10 +574,10 @@
  					(tmp = {})[soul] = put; put = tmp;
  					var faith; if(F){ faith = function(){}; faith.ram = faith.faith = true; } // HNPERF: We're testing performance improvement by skipping going through security again, but this should be audited.
  					tmp = keys.length;
@@ -317,7 +347,7 @@ index b323e92..1ea9bb5 100644
  					if(!tmp){ return }
  					setTimeout.turn(go);
  				}());
-@@ -825,7 +919,7 @@
+@@ -825,7 +926,7 @@
  			var gun, tmp;
  			if(typeof key === 'string'){
  				if(key.length == 0) {	
@@ -326,7 +356,7 @@ index b323e92..1ea9bb5 100644
  					if(cb){ cb.call(gun, gun._.err) }
  					return gun;
  				}
-@@ -969,9 +1063,6 @@
+@@ -969,9 +1070,6 @@
  			if(tmp = (seen = this.seen || (this.seen = {}))[at]){ return true }
  			seen[at] = true;
  			return;
@@ -336,7 +366,7 @@ index b323e92..1ea9bb5 100644
  		}
  		var empty = {}, valid = Gun.valid, u;
  	})(USE, './get');
-@@ -979,6 +1070,7 @@
+@@ -979,6 +1077,7 @@
  	;USE(function(module){
  		var Gun = USE('./root');
  		Gun.chain.put = function(data, cb, as){ // I rewrote it :)
@@ -344,7 +374,7 @@ index b323e92..1ea9bb5 100644
  			var gun = this, at = gun._, root = at.root;
  			as = as || {};
  			as.root = at.root;
-@@ -1068,11 +1160,6 @@
+@@ -1068,11 +1167,6 @@
  				}
  				test.run = test.run || as.run;
  				test.stun = test.stun || as.stun; return;
@@ -356,7 +386,7 @@ index b323e92..1ea9bb5 100644
  			});
  		}
  
-@@ -1112,16 +1199,7 @@
+@@ -1112,16 +1206,7 @@
  				as.via = at.root.$.get(((as.data||'')._||'')['#'] || at.$.back('opt.uuid')())
  			}
  			as.via.put(as.data, as.ack, as);
@@ -373,7 +403,7 @@ index b323e92..1ea9bb5 100644
  		}
  		function check(d, tmp){ return ((d && (tmp = d.constructor) && tmp.name) || typeof d) }
  
-@@ -1343,8 +1421,8 @@
+@@ -1343,8 +1428,8 @@
  		USE('./shim');
  
  		var noop = function(){}
@@ -384,7 +414,7 @@ index b323e92..1ea9bb5 100644
  		json.sucks = function(d){ if(d > 99){ console.log("Warning: JSON blocking CPU detected. Add `gun/lib/yson.js` to fix."); json.sucks = noop } }
  
  		function Mesh(root){
-@@ -1359,7 +1437,7 @@
+@@ -1359,7 +1444,7 @@
  
  			var dup = root.dup, dup_check = dup.check, dup_track = dup.track;
  
@@ -393,7 +423,7 @@ index b323e92..1ea9bb5 100644
  
  			var hear = mesh.hear = function(raw, peer){
  				if(!raw){ return }
-@@ -1369,22 +1447,22 @@
+@@ -1369,22 +1454,22 @@
  						var stat = console.STAT || {};
  						//console.log('HEAR:', peer.id, (raw||'').slice(0,250), ((raw||'').length / 1024 / 1024).toFixed(4));
  						
@@ -421,7 +451,7 @@ index b323e92..1ea9bb5 100644
  							flush(peer); // force send all synchronously batched acks.
  							if(!msg.length){ return }
  							puff(go, 0);
-@@ -1406,7 +1484,7 @@
+@@ -1406,7 +1491,7 @@
  				var id, hash, tmp, ash, DBG;
  				if(msg.DBG){ msg.DBG = DBG = {DBG: msg.DBG} }
  				DBG && (DBG.h = S);
@@ -430,7 +460,7 @@ index b323e92..1ea9bb5 100644
  				if(!(id = msg['#'])){ id = msg['#'] = String.random(9) }
  				if(tmp = dup_check(id)){ return }
  				// DAM logic:
-@@ -1422,12 +1500,12 @@
+@@ -1422,12 +1507,12 @@
  					dup_track(id);
  					return;
  				}
@@ -446,7 +476,7 @@ index b323e92..1ea9bb5 100644
  				(tmp = dup_track(id)).via = peer; // don't dedup message ID till after, cause GUN has internal dedup check.
  				if(msg.get){ tmp.it = msg }
  				if(ash){ dup_track(ash) } //dup.track(tmp+hash, true).it = it(msg);
-@@ -1440,12 +1518,12 @@
+@@ -1440,12 +1525,12 @@
  				var SMIA = 0;
  				var loop;
  				mesh.hash = function(msg, peer){ var h, s, t;
@@ -461,7 +491,7 @@ index b323e92..1ea9bb5 100644
  					  msg._.$put = t;
  					  msg['##'] = h;
  					  mesh.say(msg, peer);
-@@ -1464,7 +1542,7 @@
+@@ -1464,7 +1549,7 @@
  					var id, hash, raw, ack = msg['@'];
  //if(opt.super && (!ack || !msg.put)){ return } // TODO: MANHATTAN STUB //OBVIOUSLY BUG! But squelch relay. // :( get only is 100%+ CPU usage :(
  					var meta = msg._||(msg._=function(){});
@@ -470,7 +500,7 @@ index b323e92..1ea9bb5 100644
  					if(!(id = msg['#'])){ id = msg['#'] = String.random(9) }
  					!loop && dup_track(id);//.it = it(msg); // track for 9 seconds, default. Earth<->Mars would need more! // always track, maybe move this to the 'after' logic if we split function.
  					if(msg.put && (msg.err || (dup.s[id]||'').err)){ return false } // TODO: in theory we should not be able to stun a message, but for now going to check if it can help network performance preventing invalid data to relay.
-@@ -1472,20 +1550,20 @@
+@@ -1472,20 +1557,20 @@
  					if(!peer && ack){ peer = ((tmp = dup.s[ack]) && (tmp.via || ((tmp = tmp.it) && (tmp = tmp._) && tmp.via))) || ((tmp = mesh.last) && ack === tmp['#'] && mesh.leap) } // warning! mesh.leap could be buggy! mesh last check reduces this.
  					if(!peer && ack){ // still no peer, then ack daisy chain lost.
  						if(dup.s[ack]){ return } // in dups but no peer hints that this was ack to self, ignore.
@@ -497,7 +527,7 @@ index b323e92..1ea9bb5 100644
  							//Type.obj.map(peer || opt.peers, each); // in case peer is a peer list.
  							loop = 1; var wr = meta.raw; meta.raw = raw; // quick perf hack
  							var i = 0, p; while(i < 9 && (p = (pl||'')[i++])){
-@@ -1494,7 +1572,7 @@
+@@ -1494,7 +1579,7 @@
  							}
  							meta.raw = wr; loop = 0;
  							pl = pl.slice(i); // slicing after is faster than shifting during.
@@ -506,7 +536,7 @@ index b323e92..1ea9bb5 100644
  							if(!pl.length){ return }
  							puff(go, 0);
  							ack && dup_track(ack); // keep for later
-@@ -1506,7 +1584,7 @@
+@@ -1506,7 +1591,7 @@
  					if(id === peer.last){ return } peer.last = id;  // was it just sent?
  					if(peer === meta.via){ return false } // don't send back to self.
  					if((tmp = meta.yo) && (tmp[peer.url] || tmp[peer.pid] || tmp[peer.id]) /*&& !o*/){ return false }
@@ -515,7 +545,7 @@ index b323e92..1ea9bb5 100644
  					!loop && ack && dup_track(ack); // streaming long responses needs to keep alive the ack.
  					if(peer.batch){
  						peer.tail = (tmp = peer.tail || 0) + raw.length;
-@@ -1517,13 +1595,13 @@
+@@ -1517,13 +1602,13 @@
  						flush(peer);
  					}
  					peer.batch = '['; // Prevents double JSON!
@@ -532,7 +562,7 @@ index b323e92..1ea9bb5 100644
  				}
  				mesh.say.c = mesh.say.d = 0;
  				// TODO: this caused a out-of-memory crash!
-@@ -1553,10 +1631,10 @@
+@@ -1553,10 +1638,10 @@
  						tmp.put = ':])([:';
  						json(tmp, function(err, raw){
  							if(err){ return } // TODO: Handle!!
@@ -545,7 +575,7 @@ index b323e92..1ea9bb5 100644
  						});
  						return;
  					}
-@@ -1576,13 +1654,16 @@
+@@ -1576,13 +1661,16 @@
  				if(!tmp){ return }
  				if(t? 3 > tmp.length : !tmp.length){ return } // TODO: ^
  				if(!t){try{tmp = (1 === tmp.length? tmp[0] : JSON.stringify(tmp));
@@ -563,7 +593,7 @@ index b323e92..1ea9bb5 100644
  				if(peer.say){
  					peer.say(raw);
  				} else
-@@ -1591,7 +1672,7 @@
+@@ -1591,7 +1679,7 @@
  				}
  				mesh.say.d += raw.length||0; ++mesh.say.c; // STATS!
  			}catch(e){
@@ -572,7 +602,7 @@ index b323e92..1ea9bb5 100644
  			}}
  
  			mesh.hi = function(peer){
-@@ -1689,20 +1770,63 @@
+@@ -1689,20 +1777,63 @@
  			var wire = mesh.wire || opt.wire;
  			mesh.wire = opt.wire = open;
  			function open(peer){ try{
@@ -641,7 +671,7 @@ index b323e92..1ea9bb5 100644
  					if(!msg){ return }
  					opt.mesh.hear(msg.data || msg, peer);
  				};
-@@ -1712,12 +1836,23 @@
+@@ -1712,12 +1843,23 @@
  			setTimeout(function(){ !opt.super && root.on('out', {dam:'hi'}) },1); // it can take a while to open a socket, so maybe no longer lazy load for perf reasons?
  
  			var wait = 2 * 999;
@@ -668,7 +698,7 @@ index b323e92..1ea9bb5 100644
  					if(doc && doc.hidden){ return setTimeout(to,wait) }
  					open(peer);
  				}, wait);
-@@ -1767,7 +1902,8 @@
+@@ -1767,7 +1909,8 @@
  				this.to.next(msg); // remember to call next middleware adapter
  				var put = msg.put, soul = put['#'], key = put['.'], id = msg['#'], tmp; // pull data off wire envelope
  				disk[soul] = Gun.state.ify(disk[soul], key, put['>'], put[':'], soul); // merge into disk object
@@ -678,7 +708,7 @@ index b323e92..1ea9bb5 100644
  				if(!msg['@']){ acks.push(id) } // then ack any non-ack write. // TODO: use batch id.
  				if(to){ return }
  				to = setTimeout(flush, 9+(size / 333)); // 0.1MB = 0.3s, 5MB = 15s 
-@@ -1948,7 +2084,7 @@
+@@ -1948,7 +2091,7 @@
  		}
  	}());
  	Type.time = Type.time || {};
