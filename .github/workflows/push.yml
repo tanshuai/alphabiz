@@ -6,7 +6,7 @@ name: CI/CT/CD
 
 on:
   schedule:
-    - cron: "00 12 * * *"
+    - cron: "30 11 * * *"
   pull_request:
   push:
     paths:
