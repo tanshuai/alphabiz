@@ -175,7 +175,16 @@ const app = {
     enable: true,
     url: 'https://github.com/tanshuai/alphabiz',
     icon: 'https://github.githubassets.com/favicons/favicon.svg'
-  }]
+  }],
+  /**
+   * @see https://github.com/tanshuai/alphabiz/blob/main/i18n
+   * for more details about external i18n directory structure.
+   *
+   * If you are using github to maintain your i18n files, you'll need to use
+   * `raw.githubusercontent.com` for raw contents instead of `github.com`.
+   * The default url links to `https://github.com/tanshuai/alphabiz/blob/main/i18n`
+   */
+  externalI18n: 'https://raw.githubusercontent.com/tanshuai/alphabiz/main/i18n'
 }
 
 console.log('INIT APP CONFIG')
