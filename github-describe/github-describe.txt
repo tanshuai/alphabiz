@@ -1,5 +1,3 @@
-fix $ga undefined in test env
-fix $ga undefined in test env
-Unified user login and registration phone number filling logic
-After confirming the prefix, set it to the default
-add i18n dynamic configs
+change prefix show
+Display area code
+feat: support external i18n configurations
