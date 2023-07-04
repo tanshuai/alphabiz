@@ -476,6 +476,34 @@ test.describe('task', () => {
       await homePage.getCard(bt.btName).waitFor('visible')
     }
   })
+  test('search task', async () => {
+    await basePage.headerTitle.click()
+    await homePage.searchBtn.click()
+    await homePage.searchInput.fill('sunflower')
+    await window.waitForTimeout(1000)
+    await expect(homePage.getCard('bbb_sunflower_1080p')).toBeVisible()
+    await expect(homePage.getCard('uTorrent Web')).toBeHidden()
+    await expect(homePage.getCard('The WIRED CD')).toBeHidden()
+    await homePage.searchCloseBtn.click()
+    await window.waitForTimeout(1000)
+    for (const bt of btData) {
+      await homePage.getCard(bt.btName).waitFor('visible')
+    }
+  })
+  test('delete task', async () => {
+    const btName = [
+      'uTorrent Web Tutorial Video',
+      'The WIRED CD - Rip. Sample. Mash. Share',
+      'bbb_sunflower_1080p_30fps_normal.mp4'
+    ]
+    for (const bt of btName) {
+      await homePage.getCardEle(bt, 'deleteBtn').click()
+      await homePage.deleteFileChk.click()
+      await homePage.deleteBtn.click()
+      await window.waitForTimeout(1000)
+      await expect(homePage.getCard(bt)).toBeHidden()
+    }
+  })
 })
 
 test.describe('upload', () => {
