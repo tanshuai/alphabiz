@@ -6,6 +6,7 @@ class PlayerPage {
     this.fileInput = page.locator('[data-cy="file-input"]')
     this.stopPlay = page.locator('button:has-text("stop")')
     this.playSpeed = page.locator('button:has-text("speed")')
+    this.keyboardSpace = page.keyboard.press('Space')
   }
 }
 

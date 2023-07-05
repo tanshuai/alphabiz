@@ -12,7 +12,7 @@ class BasicPage extends BasePage {
       EN: {
         languageText: page.locator('.setting-block:has-text("language") .setting-label span'),
         languageSelect: page.locator('.setting-block:has-text("language") label'),
-        languageListBtn: page.locator('[role="listbox"] >> text=english'),
+        languageListBtn: page.locator('[role="listbox"] >> text=english >> nth=0'),
         saveBtn: page.locator('button:has-text("Save & Apply")'),
         saveAlert: page.locator('[role="alert"]:has-text("Save preferences successfully!")')
       },
@@ -25,7 +25,7 @@ class BasicPage extends BasePage {
       },
       TW: {
         languageText: page.locator('.setting-block:has-text("語言") .setting-label span'),
-        languageSelect: page.locator('.setting-block:has-text("語言") label'), 
+        languageSelect: page.locator('.setting-block:has-text("語言") label'),
         languageListBtn: page.locator('[role="listbox"] >> text=繁體中文'),
         saveBtn: page.locator('button:has-text("保存並應用")'),
         saveAlert: page.locator('[role="alert"]:has-text("偏好設置成功")')
