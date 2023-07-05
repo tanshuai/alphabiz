@@ -1,4 +1,4 @@
-// const { expect } = require('@playwright/test')
+const { expect } = require('@playwright/test')
 
 class HomePage {
   constructor (page) {
@@ -106,6 +106,7 @@ class HomePage {
     while (await elementsVisible()) {
       if (start + timeout < Date.now()) {
         console.log(`Timeout waiting for all elements to be hidden. Locator: ${locator}. Timeout: ${timeout}ms`)
+        expect(1).toBe(0)
       }
       if (waitTime) await this.page.waitForTimeout(waitTime)
     }
