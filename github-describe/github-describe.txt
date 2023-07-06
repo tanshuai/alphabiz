@@ -1,5 +1,5 @@
-Fix test switch language and play-while-downloading
-fix test reset torrent status
-修复删除任务测试用例错误
-Add subtitle error link
-try fix player errors
+Fix test compatibility with different platforms and playback failure
+Fix appium's closeInternalNoticeBtn
+Asynchronous errors
+Try to fix cypress points change
+fix progress controller errors
