@@ -65,7 +65,7 @@ class HomePage extends BasePage {
     this.removeAutoUploadFilesChk = page.locator('[aria-label="Remove auto-upload files"]')
     this.notNowBtn = page.locator('button:has-text("Not now")')
     this.deleteBtn = page.locator('button:has-text("Not now") >> //following::Button[1]')
-    this.deleteConfirmd = page.locator('button:has-text("Confirm")')
+    this.deleteConfirm = page.locator('button:has-text("Confirm")')
     // downloading
     this.startAllBtn = page.locator('button:has-text("Start all")')
     this.downPauseAllBtn = page.locator('button:has-text("Pause all") >> nth=0')

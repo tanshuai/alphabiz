@@ -182,7 +182,7 @@ test.describe('play video', () => {
     await playerPage.stopPlay.click()
   })
   test('BluRay_mkv_type', async () => {
-    const media = './test/cypress/fixtures/samples/Test-Sample-Tenet.2020.IMAX.2160p.UHD.BluRay.x265.10bit.HDR.DTS-HD.MA.5.1202111171122322.mkv'
+    const media = 'test/cypress/fixtures/samples/Test-Sample-Tenet.2020.IMAX.2160p.UHD.BluRay.x265.10bit.HDR.DTS-HD.MA.5.1202111171122322.mkv'
     // Upload
     await playerPage.fileInput.setInputFiles(media, { timeout: 60000 })
     await window.waitForLoadState()
@@ -524,7 +524,10 @@ test.describe('task', () => {
     const closeIcon = await homePage.getListEle(testBt.btName, 'closeBtn')
     await closeIcon.waitFor()
     await closeIcon.click()
-    await homePage.deleteConfirmd.click()
+    const isVisible = await homePage.deleteConfirm.isVisible()
+    if (isVisible) {
+      await homePage.deleteConfirm.click()
+    }
     await homePage.deleteCard.waitFor({ timeout: 10000 })
     await homePage.notNowBtn.click()
     // 验证app协议链接
