@@ -1,0 +1,7 @@
+{
+  "min": {
+    "stable": "0.1.1",
+    "nightly": "0.1.1-nightly-202205301917",
+    "internal": "0.1.1-internal-202205301821"
+  }
+}
