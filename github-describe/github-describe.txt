@@ -1,4 +1,2 @@
-Bump semver from 7.3.8 to 7.5.3 in /src-capacitor/node
-Bump semver from 7.3.7 to 7.5.2
-fix mute in player
-fix errors with tel inputs
+try fix delete country code in signup
+fix tel input in signin
