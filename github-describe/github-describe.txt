@@ -1,5 +1,6 @@
-fix skip test case mistakenly changes test results
-add waiting time for download test
-electron download test - reduce query frequency
-force update if match min version, resolve #285
-fix waitForAllHidden error
+Add a link to the page of signing up via email
+add search task test case
+fix waitForAllHidden timeout error
+Add a repetitive task test case
+remove verification data
+get min-version info from public repo
