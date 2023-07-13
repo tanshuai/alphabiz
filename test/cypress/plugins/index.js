@@ -18,6 +18,10 @@ module.exports = (on, config) => {
   on('task', {
     calculation ({ type, time, to }) {
       return calculation(type, time, to)
+    },
+    log (message) {
+      console.log(message)
+      return null
     }
   })
   // copy any needed variables from process.env to config.env

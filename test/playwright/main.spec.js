@@ -254,7 +254,10 @@ test.describe('download ', () => {
             const progressPercentage = parseFloat(/\d{1,3}.\d{0,2}/.exec(await progressBar.innerText()))
             // console.log('progressPercentage:' + progressPercentage)
             if (oldProgress === progressPercentage) {
-              if (timestamp >= 40) break
+              if (timestamp >= 40) {
+                await window.screenshot({ path: `${ScreenshotsPath}${btDate.btName}-download-fail.png` })
+                break
+              }
               timestamp += 5
             } else if (oldProgress < progressPercentage) timestamp = 0
 
@@ -292,11 +295,13 @@ test.describe('download ', () => {
   }
 })
 test.describe('task', () => {
-  test.beforeEach(async () => {
+  test.beforeEach(async ({ }, testInfo) => {
     if (process.platform === 'darwin') test.setTimeout(60000 * 5)
     await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
     await window.waitForLoadState()
     await window.waitForTimeout(1000)
+    await basePage.jumpPage('downloadedStatus')
+    await homePage.uploadAllBtn.click()
     await basePage.jumpPage('uploadingStatus')
     await homePage.searchBtn.click({ force: true })
     // 确保切换到卡片模式
@@ -304,20 +309,13 @@ test.describe('task', () => {
     if (await cardMode.isVisible()) {
       await cardMode.click()
     }
-    try {
+    await window.waitForLoadState()
+    await window.waitForTimeout(2000)
+    if (!testInfo.title.includes('delete')) {
       for (const bt of btData) {
         await homePage.getCard(bt.btName).waitFor({ timeout: 20000 })
       }
-    } catch {
-      await basePage.jumpPage('downloadedStatus')
-      await homePage.uploadAllBtn.click()
-      await basePage.jumpPage('uploadingStatus')
-      for (const bt of btData) {
-        await homePage.getCard(bt.btName).waitFor('visible')
-      }
     }
-    await window.waitForLoadState()
-    await window.waitForTimeout(2000)
     console.log('task beforeEach end!')
   })
   test('card mode task list', async () => {
