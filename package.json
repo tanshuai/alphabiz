@@ -58,7 +58,8 @@
     "videojs-ass-es6": "0.0.4",
     "videojs-hotkeys": "^0.2.27",
     "quasar": "1.18.5",
-    "webtorrent": "1.5.8"
+    "webtorrent": "1.5.8",
+    "webpack": "4.44.2"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.16.8",
