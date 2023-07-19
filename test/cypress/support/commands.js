@@ -166,20 +166,16 @@ Cypress.Commands.add('signIn', (username, password, { cacheSession = true } = {}
   }
 })
 Cypress.Commands.add('signOut', () => {
-  cy.get('.left-drawer-header').then(($el) => {
+  cy.get('[aria-label="Menu"]').then(($el) => {
     const isVisible = Cypress.dom.isVisible($el)
-    cy.log('isVisible' + isVisible)
-    if (!isVisible) {
+    cy.log('isVisible:' + isVisible)
+    if (isVisible) {
       cy.get('[aria-label="Menu"]').click()
     } // true
   })
   cy.contains('more_horiz').click()
   cy.get("[data-cy='sign-out-btn']").click()
-  cy.contains('Sign out anyway').then(($element) => {
-    if ($element.is(':visible')) {
-      cy.contains('Sign out anyway').click()
-    }
-  })
+  cy.contains('Sign out anyway').click()
   cy.contains('Signed out', { timeout: 30000 }).should('be.visible')
 })
 
@@ -211,7 +207,7 @@ Cypress.Commands.add('transfer', (ID, amount) => {
       if ($input.val() === '') cy.get('[aria-label="Receipt Code"]').type(ID)
     })
     cy.get('[aria-label="Transfer Amount"]').type(amount)
-    cy.get('.bg-primary > .q-btn__wrapper').click()
+    cy.get('.q-form >> button').contains('Transfer').click()
   })
   // 等待 q-card 退出
   cy.get('.q-dialog__inner > .q-card', { timeout: 20000 }).should('not.exist')
