@@ -45,6 +45,7 @@ describe('Player', () => {
     cy.get("[data-cy='file-input']").then(function (el) {
       el[0].dispatchEvent(new Event('input', { bubbles: true }))
     })
+    cy.contains('The media could not be loaded', { timeout: 30000 })
     cy.get('#my-video_html5_api')
       // should be paused
       .should('have.prop', 'paused', true)
