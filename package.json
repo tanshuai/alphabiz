@@ -15,6 +15,8 @@
     "posttest:e2e:electron:main": "node copy-patch.js --post",
     "pretest:e2e:electron:wallet": "node update-version.js && node copy-patch.js --pre",
     "posttest:e2e:electron:wallet": "node copy-patch.js --post",
+    "pretest:e2e:electron:library": "node update-version.js && node copy-patch.js --pre",
+    "posttest:e2e:electron:library": "node copy-patch.js --post",
     "pretest:e2e:electron:custom": "node update-version.js && yarn test:e2e:config && node copy-patch.js --pre",
     "posttest:e2e:electron:custom": "node copy-patch.js --post",
     "pretest:e2e:electron:download": "node update-version.js && node copy-patch.js --pre",
