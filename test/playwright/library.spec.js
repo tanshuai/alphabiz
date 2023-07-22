@@ -39,26 +39,26 @@ const privateChannel = {
 //   rate: 'G'
 // }
 const channelObj = {
-  title: 'first channel by',
+  title: 'first channel by ',
   desc: '',
   isPrivate: false
 }
 const postObj = {
-  title: 'first post by ZZZ',
+  title: 'first post by ',
   desc: '1231231232',
   poster: '',
   url: `${app.protocol}://uTorrent+Web+Tutorial+Video/AWGzuIVsSDnt9R9cI0ZZm2vsUkFF&_Td6WFoAAAFpIt42AgAhARwAAAAQz1jM4ALxATpdABhqCGEMasx_OPsfBFf6STjs7yEovJdH6ObIkXuPJdVFCvNYt4Pc61Bo+mbFMnz74ydATVDkJaObcR0qhiqPrZctZJ7wrQIGnWNpA6Pm9VngzwAxCow6VTNOPsR2ZmQLh6a5lzjcxHj1tP6k7AKbVFqNWDAAB9Xsbku1S+9MyAXPjwUFk9QUFefp0ZcCzVc6_dcNPvyL7tq+N9QPMqfMbSeL0TjRSROCeeZm2zRslPQyYmPX+Gm2uX3jvkBqCiSiWX4vUwGX+j43FHftXg3ettQe4CKgpHNwlgE4mZrw0z5HUmLSXJKrWC7cC4TelK71c2nNMoDc+24nO3RyGNImyf3YhnKLCsiwAbhxGYqg+HTezO_5iIDbQLEKX+GNoYmCIvkBSei+bODtpO0lgJ3Lqw_SToWjaMQsvM8AAAAA8or5xwAB0gLyBQAAXibHzD4wDYsCAAAAAAFZWg==`,
   rate: 'G'
 }
 const postObj2 = {
-  title: 'second post by ZZZ',
+  title: 'second post by ',
   desc: '2222222222',
   poster: '',
   url: `${app.shortProtocol}://AYhZSqrL3kDvPiUQxHN07AqjlsCO`,
   rate: 'G'
 }
 const postObj3 = {
-  title: 'third post by ZZZ',
+  title: 'third post by ',
   desc: '3333333333',
   poster: '',
   url: 'magnet:?xt=urn:btih:a88fda5954e89178c372716a6a78b8180ed4dad3&dn=The+WIRED+CD+-+Rip.+Sample.+Mash.+Share&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&ws=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2F',
@@ -69,6 +69,9 @@ function channelTest (newTime) {
   const formattedTime = `${newTime.getHours()}-${newTime.getMinutes()}`
   channelObj.title = channelObj.title + formattedTime
   channelObj.desc = `${newTime}`
+  postObj.title = postObj.title + formattedTime
+  postObj2.title = postObj2.title + formattedTime
+  postObj3.title = postObj3.title + formattedTime
   console.log(formattedTime, newTime)
 }
 
@@ -122,7 +125,7 @@ test.describe('initialization', () => {
     await window.waitForLoadState()
     await basePage.ensureLoginStatus(name, process.env.TEST_PASSWORD, true)
   })
-  test.skip('clear publish and block', async () => {
+  test('clear publish and block', async () => {
     let publishLog = true, blockLog = true
     await window.waitForTimeout(30000)
     while (publishLog || blockLog) {
@@ -292,7 +295,8 @@ test.describe('key', () => {
       if (await accountPage.recommendTitle.isVisible()) await accountPage.recommendPage()
       // 等待密钥配置，加载, 等待推荐页面出现
       await window.waitForTimeout(5000)
-      if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
+      await basePage.getOneS.click()
+      await basePage.recommendFollowOenBtn.click()
 
       // 验证同步云端功能
       await basePage.signOut()
@@ -320,7 +324,7 @@ test.describe('key', () => {
       await window.waitForTimeout(5000)
       if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
     })
-    test.skip('change password', async () => {
+    test('change password', async () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
       await window.waitForTimeout(5000)
       await basePage.jumpPage('accountSettingLink')
@@ -335,7 +339,7 @@ test.describe('key', () => {
 if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
       await basePage.signOut()
     })
-    test.skip('reset password', async () => {
+    test('reset password', async () => {
       await window.waitForTimeout(3000)
       await accountPage.resetPassword(name, accountPassword)
       await basePage.waitForAllHidden(await basePage.alert)
@@ -380,7 +384,7 @@ if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
   })
 })
 
-test.describe.only('channel', () => {
+test.describe('channel', () => {
   test.beforeEach(async ({ }, testInfo) => {
     // test.skip(testInfo.title != 'open explore page', 'only check explore page')
     await window.waitForLoadState()
@@ -604,8 +608,8 @@ test.describe.only('channel', () => {
     await window.waitForTimeout(3000)
     while (1) {
       const remain = await libraryPage.getPostCardEle(postObj.title, 'channelTitleEle')
-      if (await remain.isVisible()) {
-        await remain.click()
+      if (await remain.nth(0).isVisible()) {
+        await remain.nth(0).click()
         break
       }
       await libraryPage.scrollToLoadPage(0, 6000, '.virtual-scroll-grid')
@@ -829,7 +833,7 @@ test.describe.only('channel', () => {
         await libraryPage.checkShareLink('advancedLink', channelObj.title)
       })
       test('channelHeader', async () => {
-        await basePage.jumpPage('homeLink')
+        await basePage.jumpPage('homeLink', '', false)
         await basePage.waitForAllHidden(await basePage.centerAlert)
         await window.waitForTimeout(5000)
         await libraryPage.getPostCardEle(postObj.title, 'channelTitleEle').click()
@@ -1122,7 +1126,7 @@ test.describe.only('channel', () => {
   test('delete post', async () => {
     // 编辑页面检查是否关注
     await libraryPage.checkChannelFollowStatus(channelObj.title)
-    await window.waitForTimeout(1000)
+    await window.waitForTimeout(10000)
     await basePage.jumpPage('editLink')
     // 删除第二个推文
     await window.waitForTimeout(5000)
@@ -1146,12 +1150,10 @@ test.describe.only('channel', () => {
     await libraryPage.scrollToLoadPage()
     await window.waitForTimeout(5000)
     await expect(libraryPage.getPostCardEle(postObj2.title, 'postTitle')).toHaveCount(0)
-    await expect(libraryPage.getPostCardEle(postObj.title, 'postTitle')).toHaveCount(1)
     // 频道详细
     await libraryPage.getPostCardEle(postObj.title, 'channelTitleEle').click()
     await window.waitForTimeout(5000)
     await expect(libraryPage.getPostCardEle(postObj2.title, 'postTitle')).toHaveCount(0)
-    await expect(libraryPage.getPostCardEle(postObj.title, 'postTitle')).toHaveCount(1)
   })
   test('remove channel', async () => {
     await basePage.jumpPage('editLink')

@@ -136,11 +136,10 @@ class BasePage {
    * @param {string} target - homeLink、playerLink、creditsLink、accountLink
    */
   async jumpPage (firstTarget, secondTarget, initialization = true) {
-    await this.recommendHandle()
     const menuButton = await this[secondTarget] || await this[firstTarget]
     await this.page.waitForTimeout(500)
     const isHidden = await this[firstTarget].isHidden()
-    if (isHidden && initialization) {
+    if (isHidden) {
       await this.menuIcon.click({ timeout: 60000 })
     }
     if (secondTarget) {
@@ -148,9 +147,8 @@ class BasePage {
         await this[firstTarget].click()
       }
     }
-    await this.page.waitForTimeout(10000)
-    await this.recommendHandle()
-    if (initialization) await menuButton.click()
+    if (initialization) await this.recommendHandle()
+    await menuButton.click()
   }
 
   async closeInternalNotice () {
