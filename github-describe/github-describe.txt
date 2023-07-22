@@ -1,8 +1,5 @@
-fix account email test
-add wait timeout
-try log email info
-fix match code error
-add match code regex
-delete log
-bump @zeeis/alphabiz-libdb to v0.0.94
-try improve performance
+fix oauth test
+The fifth time
+Testimonials page
+fix library
+Increase time
