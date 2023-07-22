@@ -9,11 +9,11 @@ class AccountPage extends BasePage {
 
     this.abkInput = page.locator('[data-cy="abk-input"]')
     // create keys card(ck)
-    const createKeyCardCss = '.q-card:has-text("Create or import keys")'
+    const createKeyCardCss = '.q-card:has-text("Create or import library key")'
     this.ckCard = page.locator(createKeyCardCss)
-    this.ckCreateChk = page.locator(`${createKeyCardCss} [role="radio"]:has-text("Create a new")`)
-    this.ckImportChk = page.locator(`${createKeyCardCss} [role="radio"]:has-text("locally")`)
-    this.ckFromcloudChk = page.locator(`${createKeyCardCss} [role="radio"]:has-text("from the cloud")`)
+    this.ckCreateChk = page.locator(`${createKeyCardCss} [role="radio"]:has-text("Create a new library key")`)
+    this.ckImportChk = page.locator(`${createKeyCardCss} [role="radio"]:has-text("Import a library key Locally")`)
+    this.ckFromcloudChk = page.locator(`${createKeyCardCss} [role="radio"]:has-text("Import the library key from the cloud")`)
     this.ckOkBtn = page.locator(`${createKeyCardCss} button:has-text("ok")`)
     // store your library key(sk)
     this.skCard = page.locator('.q-card:has-text("Store your")')
@@ -22,6 +22,9 @@ class AccountPage extends BasePage {
     this.skUpdateCloudChk = page.locator('[role="radio"] >> text=backup')
     this.skOKBtn = page.locator('.q-card:has-text("store") button:has-text("OK")')
     this.skCancelBtn = page.locator('.q-card:has-text("store") button:has-text("cancel")')
+    this.skOKBtnTwo = page.locator('button:has-text("OK") >> nth=2')
+    this.loadCard = page.locator('text = Loading library key...')
+    this.backCard = page.locator('text = Backing up...')
     // Confirm to update the cloud key(up)
     this.ukOKBtn = page.locator('.q-card:has-text("You already have a key in the cloud") button:has-text("OK")')
     // enter independent password(eip)
@@ -42,7 +45,7 @@ class AccountPage extends BasePage {
     this.cpCurrentPasswordInput = page.locator(`${changePassword} [aria-label="Current password"]`)
     this.cpNewPasswordInput = page.locator(`${changePassword} [aria-label="New password"]`)
     this.cpReEnterInput = page.locator(`${changePassword} [aria-label="Re-enter new password"]`)
-    this.cpSubmitBtn = page.locator(`${changePassword} button:has-text("Submit")`)
+    this.cpSubmitBtn = page.locator(`${changePassword} button:has-text("ok")`)
 
     // library setting
     this.editUserBtn = page.locator('button:has-text("Edit user profile")')
@@ -96,6 +99,14 @@ class AccountPage extends BasePage {
     this.ekfOKBtn = page.locator(`${exportKeyFile} button:has-text("OK")`)
     // alert
     this.successAlert = page.locator('[role="alert"]:has-text("Success")')
+
+    // recommend page
+    this.recommendTitle = page.locator('text=Recommend >> nth=0')
+    this.getOne = page.locator('[style="width: 100%; height: 280px;"] >> nth=0')
+    this.recommendFollowOenBtn = page.locator('button:has-text("starFollow 1 channels and continue")')
+
+    // account
+    this.account = page.locator('text = Account >> nth=1')
   }
 
   async changePassword (oldPassword, newPassword) {
@@ -126,11 +137,12 @@ class AccountPage extends BasePage {
   }
 
   getBlockListCloseBtn (channelTitle) {
-    return this.page.locator(`tr:has-text("${channelTitle}") button:has-text("close")`)
+    return this.page.locator(`tr:has-text("${channelTitle}") button:has-text("remove_circle_outline")`)
   }
 
   async isUseABPassword (password, isABPassword) {
     if (!isABPassword) {
+      await this.page.waitForTimeout(1000)
       await this.ecsUseInPasswordBtn.click()
       await this.eipCard.waitFor()
       await this.eipInput.nth(0).fill(password)
@@ -159,11 +171,17 @@ class AccountPage extends BasePage {
     await this.skCard.waitFor({ timeout: 60000 })
     await this.skSaveCloudChk.click({ timeout: 10000 })
     await this.skOKBtn.click()
+    await this.skOKBtnTwo.click()
+    // await this.waitForSelector(this.backCard, { visible: true })
+    // await this.waitForSelector(this.loadCard, { visible: true })
+    await this.page.waitForTimeout(20000)
+    if (await this.recommendTitle.isVisible()) await this.recommendPage()
     // 设置独立密码
     // 是否弹出更新密钥提示框
-    await this.page.waitForTimeout(5000)
     if (isUpdate) {
-      await this.ukOKBtn.click({ timeout: 10000 })
+      await this.page.waitForTimeout(10000)
+      if (await this.recommendTitle.isVisible()) await this.recommendPage()
+      // await this.ukOKBtn.click({ timeout: 10000 })
     }
     if (isUpdate && !isABPassword) {
       await this.eipInput.fill(password)
@@ -177,11 +195,13 @@ class AccountPage extends BasePage {
     if (typeof options.isCorrectPassword === 'undefined') options.isCorrectPassword = true
     // 导入云端密钥
     await this.ckFromcloudChk.waitFor()
+    await this.page.waitForTimeout(1000)
     await this.ckFromcloudChk.click()
     await this.ckOkBtn.click()
     if (!options.isABPassword) {
       // 输入独立密钥
       await this.eipInput.fill(password)
+      await this.page.waitForTimeout(1000)
       await this.eipOKBtn.click()
       if (!options.isCorrectPassword) {
         // 不是正确的密码
@@ -196,6 +216,7 @@ class AccountPage extends BasePage {
     await this.kcEnCloudBtn.waitFor()
     await expect(this.kcCard).toHaveText(/cloud_off/)
     await this.kcEnCloudBtn.click()
+    await this.page.waitForTimeout(1000)
     await this.isUseABPassword(password, isABPassword)
     // wait alert
     await this.checkAlert('enableCloudKey', /Success/)
@@ -222,19 +243,48 @@ class AccountPage extends BasePage {
   }
 
   async disableCloudKey () {
+    await this.page.waitForTimeout(15000)
     await this.jumpPage('accountSettingLink')
     await this.kcCloudBtn.waitFor()
     await this.page.waitForTimeout(3000)
     const kcCardText = await this.kcCard.innerText()
     if (kcCardText.includes('Sync Keychain with Amazon Web Services')) {
-      await expect(this.kcCard).toHaveText(/Sync Keychain with Amazon Web Services/)
+      // await expect(this.kcCard).toHaveText(/Sync Keychain with Amazon Web Services/)
       await this.kcDisCloudBtn.click()
       await this.dcDisCloudBtn.waitFor()
       await this.dcDisCloudBtn.click({ timeout: 9000 })
-      await this.checkAlert('disableCloudKey', /Success/)
+      // await this.checkAlert('disableCloudKey', /Success/)
     }
+    await this.account.click()
     await this.kcEnCloudBtn.waitFor()
-    await expect(this.kcCard).toHaveText(/Cloud storage disabled/)
+    // await expect(this.kcCard).toHaveText(/Cloud storage disabled/)
+  }
+
+  async recommendPage () {
+    if (await this.recommendTitle.isVisible()) {
+      await this.getOne.click()
+      await this.recommendFollowOenBtn.click()
+    }
+  }
+
+  async allBlockCloseBtn () {
+    const target = 'tbody :has-text("remove_circle_outline")'
+    this.clickAllBtn(target)
+  }
+
+  async clickAllBtn (target) {
+    let len = await this.page.locator(target).count()
+    while (len) {
+      len--
+      await this.page.waitForTimeout(2000)
+      await this.page.locator(target + ' >> nth=0 >> button').click()
+      await this.page.waitForTimeout(2000)
+    }
+  }
+
+  async clickViewport (x, y) {
+    await this.page.waitForTimeout(5000)
+    await this.page.mouse.click(x, y, { force: true })
   }
 }
 

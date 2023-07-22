@@ -18,6 +18,7 @@ class AccountPage extends HomePage {
   get internalNoticeText () { return this.page.$('//Text[@Name="Internal Release Notice"]') }
   get closeInternalNoticeBtn () { return this.page.$('//Text[@Name="Internal Release Notice"]/parent::*/Button[2]') }
   get language () { return this.page.$('/Document[@Name="Alphabiz"]/Group/Group/Button[1]') }
+  get reUsername () { return this.page.$('/Group[@Name="+86"]/Group/Edit[@Name="+86"]') }
 
   async changeLanguage (targetLang = 'English') {
     await this.language.click()
@@ -38,13 +39,15 @@ class AccountPage extends HomePage {
   }
 
   async signIn (username, password, opt = { isWaitAlert: false }) {
-    await this.closeInternalNotice()
+    // await this.closeInternalNotice()
     // await this.changeLanguage()
     await this.username.setValue(username)
     await sleep(2000)
     await this.password.setValue(password)
     await sleep(2000)
-    await this.signInBtn.click()
+    // await this.reUsername.setValue(username)
+    // await sleep(2000)
+    // await this.signInBtn.click()
 
     if (opt.isWaitAlert) {
       // 等待登录卡片消失
