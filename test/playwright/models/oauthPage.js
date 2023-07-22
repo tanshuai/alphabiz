@@ -43,7 +43,7 @@ class OauthPage extends BasePage {
 
   async signInTwitter (username, password, twitterUsername) {
     let newTime
-    await this.page.waitForURL('https://twitter.com/i/oauth2/**')
+    await this.page.waitForURL('https://twitter.com/i/**')
     await this.page.waitForTimeout(5000)
     if (await this.page.locator('[data-testid="OAuth_Consent_Log_In_Button"]').isVisible()) {
       await this.page.locator('[data-testid="OAuth_Consent_Log_In_Button"]').click()
@@ -77,6 +77,29 @@ class OauthPage extends BasePage {
       //   await this.page.locator('div[role="button"]:has-text("Next")').click()
       //   await this.page.waitForTimeout(5000)
       // }
+    } else if (await this.page.locator('div[role="button"]:has-text("Next")').isVisible()) {
+      await this.page.locator('input[autocomplete="username"]').fill(username)
+      await this.page.waitForTimeout(2000)
+      newTime = new Date()
+      await this.page.locator('div[role="button"]:has-text("Next")').click()
+      await this.page.waitForTimeout(5000)
+      try {
+        if (await this.page.locator('[data-testid="ocfEnterTextTextInput"]').isVisible()) {
+        await this.page.locator('[data-testid="ocfEnterTextTextInput"]').fill(twitterUsername)
+        await this.page.locator('[data-testid="ocfEnterTextNextButton"]').click()
+        await this.page.waitForTimeout(3000)
+      }
+      } catch (err) {
+
+      }
+
+      if (await this.page.locator('input[name="password"]').isVisible()) {
+        console.log('twitter need password!')
+        await this.page.locator('input[name="password"]').fill(password)
+        newTime = new Date()
+        await this.page.locator('[data-testid="LoginForm_Login_Button"]').click()
+      }
+      await this.page.waitForTimeout(10000)
     }
     try {
       if (await this.page.locator('[data-testid="OAuth_Consent_Button"]').isVisible()) {
