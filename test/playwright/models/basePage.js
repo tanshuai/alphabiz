@@ -108,7 +108,8 @@ class BasePage {
     this.noShowAgainBtn = page.locator('text=SHOW AGAIN')
     // recommend
     this.recommendTitle = page.locator('text=Recommend')
-    this.getOne = page.locator('[style="width: 100%; height: 280px;"] >> nth=0')
+    this.getOneS = page.locator('[style="width: 100%; height: 280px;"] >> nth=0')
+    this.getOne = page.locator('.library-view .library-recommend .recommends .channel-card')
     this.recommendFollowOenBtn = page.locator('button:has-text("starFollow 1 channels and continue")')
 
     // initialization
@@ -370,13 +371,16 @@ class BasePage {
 
   async recommendHandle () {
     if (await this.recommendTitle.nth(0).isVisible()) {
-      await this.getOne.click()
+      await this.getOneS.click()
       await this.recommendFollowOenBtn.click()
+      return true
     }
     if (await this.recommendTitle.nth(1).isVisible()) {
-      await this.getOne.click()
+      await this.getOne.nth(0).click()
       await this.recommendFollowOenBtn.click()
+      return true
     }
+    return false
   }
 
   async deletePublish () {

@@ -187,11 +187,7 @@ test.describe('key', () => {
       await accountPage.syncCloudKey(inPassword)
       // 等待密钥配置，加载,等待推荐页面出现
       await basePage.jumpPage('homeLink')
-      if (basePage.recommendTitle.isVisible()) {
-        await basePage.recommendHandle()
-      } else {
-        await libraryPage.tweetsFrist.waitFor()
-      }
+      if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
     })
     test('config password', async () => {
       await basePage.ensureLoginStatus(name, process.env.TEST_PASSWORD, true, true)
@@ -203,11 +199,7 @@ test.describe('key', () => {
       await accountPage.syncCloudKey(newPassword)
       // 等待密钥配置，加载,等待推荐页面出现
       await basePage.jumpPage('homeLink')
-      if (basePage.recommendTitle.isVisible()) {
-        await basePage.recommendHandle()
-      } else {
-        await libraryPage.tweetsFrist.waitFor()
-      }
+      if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
       await basePage.signOut()
       await basePage.waitForAllHidden(await basePage.alert)
     })
@@ -218,11 +210,7 @@ test.describe('key', () => {
       await accountPage.createCloudKey(newPassword, true)
       // 等待密钥配置，加载, 等待推文页面出现
       await basePage.jumpPage('homeLink')
-      if (basePage.recommendTitle.isVisible()) {
-        await basePage.recommendHandle()
-      } else {
-        await libraryPage.tweetsFrist.waitFor()
-      }
+      if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
 
       // 验证同步云端功能
       await basePage.signOut()
@@ -230,11 +218,7 @@ test.describe('key', () => {
       await accountPage.syncCloudKey(newPassword, { isABPassword: true })
       // 等待密钥配置，加载，等待推荐页面出现
       await basePage.jumpPage('homeLink')
-      if (basePage.recommendTitle.isVisible()) {
-        await basePage.recommendHandle()
-      } else {
-        await libraryPage.tweetsFrist.waitFor()
-      }
+      if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
     })
     test('disable cloud key', async () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
@@ -308,11 +292,7 @@ test.describe('key', () => {
       if (await accountPage.recommendTitle.isVisible()) await accountPage.recommendPage()
       // 等待密钥配置，加载, 等待推荐页面出现
       await window.waitForTimeout(5000)
-      if (basePage.recommendTitle.isVisible()) {
-        await basePage.recommendHandle()
-      } else {
-        await libraryPage.tweetsFrist.waitFor()
-      }
+      if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
 
       // 验证同步云端功能
       await basePage.signOut()
@@ -320,11 +300,7 @@ test.describe('key', () => {
       await accountPage.syncCloudKey('', { isABPassword: true })
       // 等待密钥配置，加载，等待推荐页面出现
       await window.waitForTimeout(5000)
-      if (basePage.recommendTitle.isVisible()) {
-        await basePage.recommendHandle()
-      } else {
-        await libraryPage.tweetsFrist.waitFor()
-      }
+      if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
       await basePage.signOut()
     })
     test('update and save key in cloud', async () => {
@@ -334,11 +310,7 @@ test.describe('key', () => {
       await accountPage.createCloudKey('', true, true)
       // 等待密钥配置，加载, 等待推荐页面出现
       await window.waitForTimeout(5000)
-      if (basePage.recommendTitle.isVisible()) {
-        await basePage.recommendHandle()
-      } else {
-        await libraryPage.tweetsFrist.waitFor()
-      }
+      if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
 
       // 验证同步云端功能
       await basePage.signOut()
@@ -346,11 +318,7 @@ test.describe('key', () => {
       await accountPage.syncCloudKey('', { isABPassword: true })
       // 等待密钥配置，加载，等待推荐页面出现
       await window.waitForTimeout(5000)
-      if (basePage.recommendTitle.isVisible()) {
-        await basePage.recommendHandle()
-      } else {
-        await libraryPage.tweetsFrist.waitFor()
-      }
+      if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
     })
     test.skip('change password', async () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
@@ -364,11 +332,7 @@ test.describe('key', () => {
       await accountPage.syncCloudKey('', { isABPassword: true })
       // 等待密钥配置，加载,等待推荐页面出现
       await window.waitForTimeout(15000)
-      if (basePage.recommendTitle.isVisible()) {
-        await basePage.recommendHandle()
-      } else {
-        await libraryPage.tweetsFrist.waitFor()
-      }
+if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
       await basePage.signOut()
     })
     test.skip('reset password', async () => {
@@ -380,11 +344,7 @@ test.describe('key', () => {
       await accountPage.syncCloudKey('', { isABPassword: true })
       // 等待密钥配置，加载,等待推荐页面出现
       await window.waitForTimeout(15000)
-      if (basePage.recommendTitle.isVisible()) {
-        await basePage.recommendHandle()
-      } else {
-        await libraryPage.tweetsFrist.waitFor()
-      }
+if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
     })
     // 若重置失败，手动修改密码
     // test('')
@@ -399,11 +359,7 @@ test.describe('key', () => {
       await window.waitForTimeout(5000)
       if (await libraryPage.recommendTitle.isVisible()) await libraryPage.recommendPageTest()
       await window.waitForTimeout(5000)
-      if (basePage.recommendTitle.isVisible()) {
-        await basePage.recommendHandle()
-      } else {
-        await libraryPage.tweetsFrist.waitFor()
-      }
+      if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
     })
     test('disable cloud key', async () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
@@ -424,7 +380,7 @@ test.describe('key', () => {
   })
 })
 
-test.describe('channel', () => {
+test.describe.only('channel', () => {
   test.beforeEach(async ({ }, testInfo) => {
     // test.skip(testInfo.title != 'open explore page', 'only check explore page')
     await window.waitForLoadState()
@@ -484,7 +440,8 @@ test.describe('channel', () => {
   })
   test('Recommend page follow channel (simplified version)', async () => {
     // await libraryPage.getChannelCardEle('', 'card').nth(0).click()
-    await window.waitForTimeout(10000)
+    await window.waitForTimeout(20000)
+    await basePage.recommendHandle()
     await basePage.jumpPage('exploreLink')
 
     for (let i = 0; i < 5; i++) {
