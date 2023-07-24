@@ -1,11 +1,3 @@
-add timeout 、output alert log
-wait for animation to end
-fix system default player i18n #304
-add background and icons for language/feedback options, resolve #301
-disable xxxAll buttons if no available tasks, resolve #306
-fix version checker checks every seconds in schedule
-change default saveSeed option to false, resolve #307
-add close button to diagnotic and feedback, resolve #302
-fix ping errors in aws
-sort: put loading tasks after 0kb tasks, resolve #310
-fix the deleting account test case process
+fix get transfer button error
+basic test save settings
+add test case list
