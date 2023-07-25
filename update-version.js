@@ -4,8 +4,6 @@ const { exec } = require('child_process')
 const fs = require('fs')
 
 const versionJSON = './public/version.json'
-const releaseJSON = './release.json'
-const releaseObj = require(releaseJSON)
 
 const unpackagedVersionJSON = fs.readFileSync('build/electron/UnPackaged/version.json')
 const unpackagedVersionObj = JSON.parse(unpackagedVersionJSON)
@@ -23,15 +21,15 @@ const getBuildTime = async () => {
     if (process.platform === 'win32') command = 'set TZ=UTC-8 && git log -1 --date=format-local:"%Y%m%d%H%M" --format="%cd"'
     else command = 'TZ=UTC-8 git log -1 --date=format-local:"%Y%m%d%H%M" --format="%cd"'
     exec(command, (error, stdout, stderr) => {
-    if (error) {
-      console.error(`exec error: ${error}`)
-      return
-    }
-    if (stderr) {
-      console.error(`Error from Git: ${stderr}`)
-      return
-    }
-    resolve(stdout.trim())
+      if (error) {
+        console.error(`exec error: ${error}`)
+        return
+      }
+      if (stderr) {
+        console.error(`Error from Git: ${stderr}`)
+        return
+      }
+      resolve(stdout.trim())
     })
   })
 }
@@ -46,7 +44,7 @@ const getCommit = async () => {
         console.error(`Error from Git: ${stderr}`)
         return
       }
-    resolve(stdout.trim())
+      resolve(stdout.trim())
     })
   })
 }
@@ -61,27 +59,30 @@ const getSourceCommit = async () => {
         console.error(`Error from Git: ${stderr}`)
         return
       }
-    const sha7 = /(?<=-)\w{7}(?=\s)|^\w{7}(?=\s)|^\w{7}/.exec(stdout.trim())
-    resolve(sha7[0])
+      const sha7 = /(?<=-)\w{7}(?=\s)|^\w{7}(?=\s)|^\w{7}/.exec(stdout.trim())
+      resolve(sha7[0])
     })
   })
 }
 const updateVersionJSON = async () => {
   // console.log(unpackagedVersionObj)
+  const zVersion = unpackagedVersionObj.packageVer.match(/(\d+)(?!.*\d)/gm)
+  const UnstableVersion = unpackagedVersionObj.packageVer.replace(/(\d+)(?!.*\d)/, Number(zVersion[0]) + 1)
+
   content.packageVer = unpackagedVersionObj.packageVer
   content.buildTime = await getBuildTime()
   content.channel = 'nightly'
   content.sourceCommit = await getSourceCommit()
   // 如果正式发布,则从argv传入新的tagname format: node update-version.js --newTag [newTagName] --SHA7 [newSHA7] --buildTime [buildTime]
-  const argv = require('minimist')(process.argv.slice(2), {string : ['newTag', 'SHA7', 'buildTime']})
+  const argv = require('minimist')(process.argv.slice(2), { string: ['newTag', 'SHA7', 'buildTime'] })
   console.log(argv)
-  if(process.argv.includes('--buildTime')) content.buildTime = argv.buildTime
+  if (process.argv.includes('--buildTime')) content.buildTime = argv.buildTime
   // 如果正式发布buildCommit 为触发正式发布的sha7
-  if(process.argv.includes('--SHA7')) content.buildCommit = argv.SHA7
+  if (process.argv.includes('--SHA7')) content.buildCommit = argv.SHA7
   else content.buildCommit = await getCommit()
   // get newTag
-  if(!process.argv.includes('--newTag')) {
-    content.version = content.packageVer + '-' + content.channel + '-' + content.buildTime
+  if (!process.argv.includes('--newTag')) {
+    content.version = UnstableVersion + '-' + content.channel + '-' + content.buildTime
   } else {
     if (process.argv.includes('--stable')) {
       content.channel = 'stable'
