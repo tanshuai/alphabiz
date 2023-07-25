@@ -1,3 +1,6 @@
-fix get transfer button error
-basic test save settings
-add test case list
+add push test workflow
+fix scripts error
+fix account test scripts
+use module: alphabiz-account
+upgrade alphabiz-account
+update test case list - settings test
