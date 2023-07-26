@@ -59,6 +59,8 @@ describe('upload', () => {
     console.log('initialCredit:' + initialCredit)
     // 判断是否已经上传
     await homePage.jumpPage('uploadingStatusTab')
+    await sleep(3000)
+    await homePage.setCardMode()
     if (await homePage.getTask(torrentName) === null) {
       await homePage.jumpPage('downloadedStatusTab')
       // 上传bt种子

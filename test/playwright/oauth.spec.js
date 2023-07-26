@@ -83,7 +83,7 @@ test.describe('github', () => {
     await basePage.signOut()
   })
 
-  test.only('Login - connected', async () => {
+  test('Login - connected', async () => {
     await page.goto('https://web.alpha.biz', { timeout: 40000, waitUntil: 'domcontentloaded' })
     await oauthPage.signInWithGithubBtn.click()
     await oauthPage.signInGithub(githubUsername, oauthAccountPassword)

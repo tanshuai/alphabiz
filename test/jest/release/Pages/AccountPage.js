@@ -46,8 +46,7 @@ class AccountPage extends HomePage {
     await this.password.setValue(password)
     await sleep(2000)
     // await this.reUsername.setValue(username)
-    // await sleep(2000)
-    // await this.signInBtn.click()
+    await this.signInBtn.click()
 
     if (opt.isWaitAlert) {
       // 等待登录卡片消失
