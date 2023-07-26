@@ -3,7 +3,9 @@ const { existsSync, copyFileSync, mkdirSync, unlinkSync, readFileSync, writeFile
 const { resolve } = require('path')
 const { productName, description } = require('./package.json')
 const publicVersion = require('./public/version.json').version
+const versionHeader = publicVersion.match(/\d+\.\d+\.\d+/gm)
 const pkgVersion = require('./public/version.json').packageVer
+console.log('test version', pkgVersion, publicVersion, versionHeader[0])
 const readline = require('readline')
 const { copySync } = require('fs-extra')
 
@@ -77,13 +79,13 @@ const doPostmake = () => {
     const appxDir = resolve(outDir, `appx/${arch}`)
     toMoves.push([resolve(appxDir, `${productName}.appx`), resolve(destDir, `${productName.toLowerCase()}-${version}.appx`)])
     const files = [
-      `${productName}-${pkgVersion} Setup.exe`,
-      `${productName}-${pkgVersion}-full.nupkg`,
-      `${productName}-${pkgVersion}-delta.nupkg`,
+      `${productName}-${versionHeader[0]} Setup.exe`,
+      `${productName}-${versionHeader[0]}-full.nupkg`,
+      `${productName}-${versionHeader[0]}-delta.nupkg`,
       'RELEASES'
     ]
     files.forEach(file => {
-      toMoves.push([resolve(squirrelDir, file), resolve(destDir, file.replace(' Setup', '').replace(`${productName}`, `${productName.toLowerCase()}`).replace('-full', '').replace('-delta', '').replace(pkgVersion, version))])
+      toMoves.push([resolve(squirrelDir, file), resolve(destDir, file.replace(' Setup', '').replace(`${productName}`, `${productName.toLowerCase()}`).replace('-full', '').replace('-delta', '').replace(versionHeader[0], version))])
     })
   } else if (platform === 'darwin') {
     // move darwin installers
@@ -94,7 +96,7 @@ const doPostmake = () => {
   } else if (platform === 'linux') {
     // move linux installers
     toMoves.push([
-      resolve(outDir, `deb/${arch}/${productName.toLowerCase()}_${pkgVersion}_${arch === 'x64' ? 'amd64' : arch}.deb`),
+      resolve(outDir, `deb/${arch}/${productName.toLowerCase()}_${versionHeader[0]}_${arch === 'x64' ? 'amd64' : arch}.deb`),
       resolve(destDir, `${productName.toLowerCase()}-${version}.deb`)
     ])
   }
@@ -111,7 +113,7 @@ if (process.argv.includes('--make')) {
   const packagePath = resolve(__dirname, './package.json')
   const packageObj = readFileSync(packagePath)
   const pkg = JSON.parse(packageObj)
-  pkg.version = pkgVersion
+  pkg.version = versionHeader[0]
   writeFileSync(packagePath, JSON.stringify(pkg, null, 2))
   process.on('exit', () => {
     writeFileSync(packagePath, packageObj)
@@ -121,7 +123,7 @@ if (process.argv.includes('--make')) {
   if (platform === 'win32') {
     const xmlFilePath = resolve(__dirname, 'appx/template.xml')
     const appxTemplate = readFileSync(resolve(__dirname, 'appx/template.xml'), 'utf-8')
-    writeFileSync(xmlFilePath, appxTemplate.replace('{{pkgVersion}}', pkgVersion + '.0').replace('{{description}}', description))
+    writeFileSync(xmlFilePath, appxTemplate.replace('{{pkgVersion}}', versionHeader[0] + '.0').replace('{{description}}', description))
     process.on('exit', () => {
       writeFileSync(xmlFilePath, appxTemplate)
       console.log('Restored appx/template.xml before exit')
