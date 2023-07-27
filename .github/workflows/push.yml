@@ -11,7 +11,7 @@ on:
   push:
     paths:
       - "**.js"
-      - "!**/push.yml"
+      - "**/push.yml"
       - "!patches/**"
       - "!public/**"
       - "!wix/**"
@@ -150,6 +150,13 @@ jobs:
         run: |
           echo "::set-output name=package-version::${{ fromJson(steps.unpackaged.outputs.versionJson).packageVer }}"
 
+      # stable version x.y.z+1
+      - name: Get UnstableVersion
+        id: unstable
+        run: |
+          echo "::set-output name=unstable-version::$(echo ${{ steps.versionJson.outputs.package-version }} | awk -F. -v OFS=. 'NF==1{print ++$NF}; NF>1{$NF=sprintf("%0*d", length($NF), ($NF+1)); print}')"
+        shell: bash
+
       # after git checkout
       - name: Get last commit date \ today all commit message
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
@@ -177,9 +184,9 @@ jobs:
                else echo "::set-output name=release-name::${{ steps.checkout.outputs.new-tag-name }}" ; \
                fi
                echo "::set-output name=package-name::${{ steps.checkout.outputs.new-tag-name }}" ; \
-          else echo "::set-output name=tag-name::${{ steps.versionJson.outputs.package-version }}-nightly-${{ steps.vars.outputs.date }}" ; \
-               echo "::set-output name=release-name::${{ steps.versionJson.outputs.package-version }}-nightly-${{ steps.nightly.outputs.commit-sha7 }}" ;  \
-               echo "::set-output name=package-name::${{ steps.versionJson.outputs.package-version }}-nightly-${{ steps.vars.outputs.date }}" ; \
+          else echo "::set-output name=tag-name::${{ steps.unstable.outputs.unstable-version }}-nightly-${{ steps.vars.outputs.date }}" ; \
+               echo "::set-output name=release-name::${{ steps.unstable.outputs.unstable-version }}-nightly-${{ steps.nightly.outputs.commit-sha7 }}" ;  \
+               echo "::set-output name=package-name::${{ steps.unstable.outputs.unstable-version }}-nightly-${{ steps.vars.outputs.date }}" ; \
           fi
         shell: bash
 
@@ -195,6 +202,7 @@ jobs:
           echo "run workflow date: ${{ steps.vars.outputs.date }}"
           echo "package.json version: ${{ steps.version.outputs.prop }}"
           echo "unpackage.version: ${{ steps.versionJson.outputs.package-version }}"
+          echo "unstable-version: ${{ steps.unstable.outputs.unstable-version }}"
           echo "----------------------"
           echo "MODIFIED_FILE_LIST: ${{ env.MODIFIED_FILE_LIST }}"
           if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
