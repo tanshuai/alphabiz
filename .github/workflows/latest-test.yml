@@ -1,0 +1,109 @@
+name: CT - latest releases
+on:
+  schedule:
+    - cron: "30 11 * * *"
+  push:
+    paths:
+      - "**/latest-test.yml"
+    branches: [main]
+
+jobs:
+  win_job:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            node-version: 16
+      fail-fast: false
+    environment:
+      name: CICD
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.PAT }}
+      GITHUB_PAT: ${{ secrets.PAT }}
+      EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
+      EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+      PHONE_NUMBER_ACCOUNT: ${{ secrets.PHONE_NUMBER_ACCOUNT }}
+      PHONE_NUMBER_TOKEN: ${{ secrets.PHONE_NUMBER_TOKEN }}
+      TEST_EMAIL_DOMAIN: ${{ secrets.TEST_EMAIL_DOMAIN }}
+      TEST1_EMAIL: ${{ secrets.TEST1_EMAIL }}
+      TEST2_EMAIL: ${{ secrets.TEST2_EMAIL }}
+      TEST3_EMAIL: ${{ secrets.TEST3_EMAIL }}
+      TEST1_PHONE_NUMBER: ${{ secrets.TEST1_PHONE_NUMBER }}
+      TEST2_PHONE_NUMBER: ${{ secrets.TEST2_PHONE_NUMBER }}
+      TEST3_PHONE_NUMBER: ${{ secrets.TEST3_PHONE_NUMBER }}
+      TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+      TEST_RESET_PASSWORD: ${{ secrets.TEST_RESET_PASSWORD }}
+    steps:
+      - name: Get short SHA 🔑
+        id: slug
+        run: |
+          echo "::set-output name=sha7::${GITHUB_SHA::7}"
+        shell: bash
+
+      - name: Checkout ${{ steps.slug.outputs.sha7 }} ⬇️
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js ${{ matrix.node-version }} 📮
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "yarn"
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@zeeis"
+      
+      - name: update node-gyp on windows to support Visual Studio 2019
+        shell: powershell
+        run: |
+          npm install --global node-gyp@8.4.1
+          npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
+
+      - name: Get message
+        run: |
+          git fetch --prune --unshallow
+        shell: bash
+
+      - name: Install dependencies 👨🏻‍💻
+        uses: nick-fields/retry@v2
+        with:
+          timeout_seconds: 600
+          max_attempts: 2
+          shell: bash
+          retry_on: error
+          command: yarn
+
+      - name: download the latest releases of all platforms 🧪
+        run: yarn test:e2e:download-stable
+
+      - name: Install alphabiz.msi
+        run: |
+          Start-Process msiexec -ArgumentList "/quiet","/i","C:\alphabiz.msi"
+          Start-Sleep -s 20
+        shell: powershell
+
+      - name: Install winappdriver.msi
+        run: |
+          Invoke-WebRequest "https://github.com/microsoft/WinAppDriver/releases/download/v1.2.1/WindowsApplicationDriver_1.2.1.msi" -OutFIle "C:\WindowsApplicationDriver_1.2.1.msi"
+          Start-Process msiexec -ArgumentList "/quiet","/x","{087BBF93-D9E3-4D27-BDBE-9C702E0066FC}" -Verb runAs -Wait
+          Start-Process msiexec -ArgumentList "/quiet","/i","C:\WindowsApplicationDriver_1.2.1.msi" -Verb runAs -Wait
+          Start-Sleep -s 5
+        shell: powershell
+
+      - name: Run appium
+        run: |
+          Start-Process PowerShell -ArgumentList "yarn test:appium"
+          Start-Sleep -s 10
+
+      - name: E2E appium test for msi 🧪
+        uses: nick-fields/retry@v2
+        with:
+          timeout_seconds: 1200
+          max_attempts: 2
+          shell: bash
+          retry_on: error
+          command: |
+            taskkill //F //IM Alphabiz.exe || (echo "app is ready")
+            sleep 10s
+            export APP_TYPE=msi
+            yarn test:release
+            unset APP_TYPE
