@@ -186,11 +186,12 @@ test.describe('key', () => {
       await window.waitForTimeout(100000)
     })
 
-    test('save cloud key', async () => {
+    test.only('save cloud key', async () => {
       // await basePage.clearLocalstorage()
       await window.waitForLoadState()
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
       await basePage.waitForAllHidden(await basePage.alert)
+      basePage.updateCardCloseBtn.click()
       await accountPage.disableCloudKey()
 
       await accountPage.enableCloudKey(inPassword, false)
