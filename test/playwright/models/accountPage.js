@@ -102,7 +102,7 @@ class AccountPage extends BasePage {
 
     // recommend page
     this.recommendTitle = page.locator('text=Recommend >> nth=0')
-    this.getOne = page.locator('[style="width: 100%; height: 280px;"] >> nth=0')
+    this.getOne1 = page.locator('.library-view .library-recommend .recommends .channel-card')
     this.recommendFollowOenBtn = page.locator('button:has-text("starFollow 1 channels and continue")')
 
     // account
@@ -262,7 +262,7 @@ class AccountPage extends BasePage {
 
   async recommendPage () {
     if (await this.recommendTitle.isVisible()) {
-      await this.getOne.click()
+      await this.getOne1.nth(0).click()
       await this.recommendFollowOenBtn.click()
     }
   }
