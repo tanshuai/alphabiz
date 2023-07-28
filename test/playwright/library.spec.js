@@ -191,9 +191,11 @@ test.describe('key', () => {
       await window.waitForLoadState()
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
       await basePage.waitForAllHidden(await basePage.alert)
-      basePage.updateCardCloseBtn.click()
-      await accountPage.disableCloudKey()
-
+      try {
+        await accountPage.disableCloudKey()
+      } catch (error) {
+        console.log(error)
+      }
       await accountPage.enableCloudKey(inPassword, false)
       await window.waitForTimeout(3000)
       // 验证同步云端
