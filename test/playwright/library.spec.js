@@ -186,7 +186,7 @@ test.describe('key', () => {
       await window.waitForTimeout(100000)
     })
 
-    test.only('save cloud key', async () => {
+    test('save cloud key', async () => {
       // await basePage.clearLocalstorage()
       await window.waitForLoadState()
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
@@ -221,7 +221,7 @@ test.describe('key', () => {
       await basePage.waitForAllHidden(await basePage.alert)
     })
     test('update and save key in cloud', async () => {
-      test.setTimeout(5 * 60000)
+      test.setTimeout(3 * 60000)
       await basePage.ensureLoginStatus(name, process.env.TEST_PASSWORD, true, false)
       // 创建新的密钥
       await accountPage.createCloudKey(newPassword, true)
@@ -235,7 +235,7 @@ test.describe('key', () => {
       await accountPage.syncCloudKey(newPassword, { isABPassword: true })
       // 等待密钥配置，加载，等待推荐页面出现
       await basePage.jumpPage('homeLink')
-      // if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
+      if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
     })
     test('disable cloud key', async () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
@@ -291,7 +291,8 @@ test.describe('key', () => {
       await window.waitForTimeout(3000)
     })
   })
-  test.skip('aws password', () => {
+  test.describe('aws password', () => {
+    test.skip()
     test('create and save key in cloud', async () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, false)
       await window.waitForTimeout(30000)
