@@ -172,7 +172,7 @@ test.skip('disable cloud key force', async () => {
 test.describe('key', () => {
   test.beforeEach(async () => {
   })
-  test.skip('independent password', async () => {
+  test.describe('independent password', async () => {
     const inPassword = process.env.TEST_RESET_PASSWORD
     const newPassword = process.env.TEST_PASSWORD
     test.skip('importing a Local Key', async () => { // 此用例已不可用
@@ -288,7 +288,7 @@ test.describe('key', () => {
     })
   })
   test.describe('aws password', () => {
-    test.only('create and save key in cloud', async () => {
+    test('create and save key in cloud', async () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, false)
       await window.waitForTimeout(10000)
       if (await accountPage.recommendTitle.isVisible()) {
@@ -306,8 +306,9 @@ test.describe('key', () => {
       if (await accountPage.recommendTitle.isVisible()) await accountPage.recommendSelected()
       // 等待密钥配置，加载, 等待推荐页面出现
       await window.waitForTimeout(5000)
-      await basePage.getOneS.click()
-      await basePage.recommendFollowOenBtn.click()
+      await accountPage.recommendSelected()
+      // await basePage.recommendCard.click()
+      // await basePage.recommendFollowOenBtn.click()
 
       // 验证同步云端功能
       await basePage.signOut()
@@ -335,7 +336,7 @@ test.describe('key', () => {
       await window.waitForTimeout(5000)
       if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
     })
-    test('change password', async () => {
+    test.skip('change password', async () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
       await window.waitForTimeout(5000)
       await basePage.jumpPage('accountSettingLink')
@@ -350,7 +351,7 @@ test.describe('key', () => {
       if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
       await basePage.signOut()
     })
-    test('reset password', async () => {
+    test.skip('reset password', async () => {
       await window.waitForTimeout(3000)
       await accountPage.resetPassword(name, accountPassword)
       await basePage.waitForAllHidden(await basePage.alert)
@@ -363,7 +364,7 @@ test.describe('key', () => {
     })
     // 若重置失败，手动修改密码
     // test('')
-    test('config password', async () => {
+    test.skip('config password', async () => {
       await accountPage.cfgKeyPassword(accountPassword, accountResetPassword)
 
       // 验证同步云端

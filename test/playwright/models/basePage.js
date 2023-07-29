@@ -108,8 +108,10 @@ class BasePage {
     this.noShowAgainBtn = page.locator('text=SHOW AGAIN')
     // recommend
     this.recommendTitle = page.locator('text=Recommend')
-    this.getOneS = page.locator('[style="width: 100%; height: 280px;"] >> nth=0')
+    // this.recommendCard = page.locator('[style="width: 100%; height: 280px;"] >> nth=0')
     this.getOne = page.locator('.library-view .library-recommend .recommends .channel-card')
+    this.recommendCard = page.locator('.channel-card >> nth=0')
+    this.recommendCardSelected = page.locator('.channel-card.selected')
     this.recommendFollowOenBtn = page.locator('button:has-text("starFollow 1 channels and continue")')
 
     // initialization
@@ -369,9 +371,15 @@ class BasePage {
 
   async recommendHandle () {
     if (await this.recommendTitle.nth(0).isVisible()) {
-      await this.getOneS.click()
-      await this.recommendFollowOenBtn.click()
-      return true
+      // 如果已经选了第一个，就不用再点击了直接点击关注
+      if (await this.recommendCardSelected.isVisible()) {
+        await this.recommendFollowOenBtn.click()
+        return true
+      } else {
+        await this.recommendCard.click()
+        await this.recommendFollowOenBtn.click()
+        return true
+      }
     }
     if (await this.recommendTitle.nth(1).isVisible()) {
       await this.getOne.nth(0).click()
