@@ -191,11 +191,7 @@ test.describe('key', () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
       await window.waitForTimeout(2000)
       await basePage.waitForAllHidden(await basePage.alert)
-      try {
-        await accountPage.disableCloudKey()
-      } catch (error) {
-        console.log(error)
-      }
+      await accountPage.disableCloudKey()
       await accountPage.enableCloudKey(inPassword, false)
       await window.waitForTimeout(3000)
       // 验证同步云端
