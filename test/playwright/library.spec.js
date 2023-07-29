@@ -178,7 +178,7 @@ test.describe('key', () => {
     test.skip('importing a Local Key', async () => { // 此用例已不可用
       await basePage.signIn(name, process.env.TEST_PASSWORD, true, false)
       await window.waitForTimeout(20000)
-      if (await accountPage.recommendTitle.isVisible()) await accountPage.recommendPage()
+      if (await accountPage.recommendTitle.isVisible()) await accountPage.recommendSelected()
       await accountPage.ckImportChk.waitFor()
       const taskAbk = './test/cypress/fixtures/samples/test.abk'
       await window.locator('[name="input-file"][accept=".abk"]').setInputFiles(taskAbk, { timeout: 60000 })
@@ -287,12 +287,12 @@ test.describe('key', () => {
       await window.waitForTimeout(3000)
     })
   })
-  test.skip('aws password', () => {
+  test.describe('aws password', () => {
     test('create and save key in cloud', async () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, false)
       await window.waitForTimeout(30000)
       if (await accountPage.recommendTitle.isVisible()) {
-        await accountPage.recommendPage()
+        await accountPage.recommendSelected()
       } else {
         await libraryPage.tweetsFrist.waitFor()
       }
@@ -302,7 +302,7 @@ test.describe('key', () => {
       // 创建新的密钥
       // await accountPage.createCloudKey('', false, true)
       await window.waitForTimeout(5000)
-      if (await accountPage.recommendTitle.isVisible()) await accountPage.recommendPage()
+      if (await accountPage.recommendTitle.isVisible()) await accountPage.recommendSelected()
       // 等待密钥配置，加载, 等待推荐页面出现
       await window.waitForTimeout(5000)
       await basePage.getOneS.click()
@@ -371,7 +371,7 @@ test.describe('key', () => {
       await accountPage.syncCloudKey(accountResetPassword)
       // 等待密钥配置，加载,等待推荐页面出现
       await window.waitForTimeout(5000)
-      if (await libraryPage.recommendTitle.isVisible()) await libraryPage.recommendPageTest()
+      if (await libraryPage.recommendTitle.isVisible()) await libraryPage.recommendSelectedTest()
       await window.waitForTimeout(5000)
       if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
     })
@@ -385,7 +385,7 @@ test.describe('key', () => {
       await basePage.signIn(name, accountPassword, true, false)
       // await accountPage.ckCard.waitFor()
       await window.waitForTimeout(10000)
-      if (await accountPage.recommendTitle.isVisible()) await libraryPage.recommendPageTest()
+      if (await accountPage.recommendTitle.isVisible()) await libraryPage.recommendSelectedTest()
       // await basePage.jumpPage('accountSettingLink')
       // await expect(accountPage.ckFromcloudChk).toHaveText(/Disable cloud storage/)
       // await basePage.clearLocalstorage()
