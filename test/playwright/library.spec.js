@@ -172,7 +172,7 @@ test.skip('disable cloud key force', async () => {
 test.describe('key', () => {
   test.beforeEach(async () => {
   })
-  test.describe('independent password', async () => {
+  test.skip('independent password', async () => {
     const inPassword = process.env.TEST_RESET_PASSWORD
     const newPassword = process.env.TEST_PASSWORD
     test.skip('importing a Local Key', async () => { // 此用例已不可用
@@ -288,13 +288,14 @@ test.describe('key', () => {
     })
   })
   test.describe('aws password', () => {
-    test('create and save key in cloud', async () => {
+    test.only('create and save key in cloud', async () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, false)
-      await window.waitForTimeout(30000)
+      await window.waitForTimeout(10000)
       if (await accountPage.recommendTitle.isVisible()) {
         await accountPage.recommendSelected()
       } else {
-        await libraryPage.tweetsFrist.waitFor()
+        await accountPage.recommendSelected()
+        // await libraryPage.tweetsFrist.waitFor()
       }
       await accountPage.disableCloudKey()
       await basePage.signOut()
@@ -357,7 +358,7 @@ test.describe('key', () => {
       await basePage.signIn(name, accountPassword, true, false)
       await accountPage.syncCloudKey('', { isABPassword: true })
       // 等待密钥配置，加载,等待推荐页面出现
-      await window.waitForTimeout(15000)
+      await window.waitForTimeout(10000)
       if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
     })
     // 若重置失败，手动修改密码

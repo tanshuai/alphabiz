@@ -269,6 +269,7 @@ class AccountPage extends BasePage {
     //   await this.recommendFollowOenBtn.click()
     // }
     if (await this.recommendTitle.isVisible()) {
+      // 如果已经选了第一个，就不用再点击了直接点击关注
       if (await this.recommendCardSelected.isVisible()) {
         await this.recommendFollowOenBtn.click()
       } else {
