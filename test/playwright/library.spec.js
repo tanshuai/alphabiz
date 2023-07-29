@@ -220,7 +220,7 @@ test.describe('key', () => {
       await basePage.signOut()
       await basePage.waitForAllHidden(await basePage.alert)
     })
-    test.skip('update and save key in cloud', async () => {
+    test('update and save key in cloud', async () => {
       test.setTimeout(5 * 60000)
       await basePage.ensureLoginStatus(name, process.env.TEST_PASSWORD, true, false)
       // 创建新的密钥
