@@ -2,15 +2,19 @@
 const { test, expect } = require('@playwright/test');
 const { chromium } = require('playwright')
 const path = require('path')
-
+const ScreenshotsPath = 'test/output/playwright/downloadLatest/'
 let browser, page
 test.beforeAll(async () => {
   browser = await chromium.launch({
     headless: false,
   })
-  page = await browser.newPage({
-    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36'
-  })
+  page = await browser.newPage()
+})
+test.afterEach(async ({ }, testInfo) => {
+  if (testInfo.status !== testInfo.expectedStatus) {
+    console.log(`Timeout! Screenshots => ${ScreenshotsPath}${testInfo.title}-retry-${testInfo.retry}-fail.png`)
+    await page.screenshot({ path: `${ScreenshotsPath}${testInfo.title}-retry-${testInfo.retry}-fail.png` })
+  }
 })
 
 test.describe('download stable version alphabiz', () => {
