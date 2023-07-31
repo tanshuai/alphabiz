@@ -104,13 +104,18 @@ dist
 .tern-port
 
 public/version.json
+ 
+# test file
 
-# build/
-*.torrent
+test/samples/IMDB250-item-list.xls
+test/samples/douban250-item-list.xls
 test-results/
 playwright-report/
 test/download/**
 test/output/**
+
+# build/
+*.torrent
 .DS_Store
 build/**/node_modules
 build/electron/Alphabiz-win32-x64/**
