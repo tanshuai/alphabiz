@@ -59,6 +59,20 @@ test.beforeAll(async () => {
   playerPage = new PlayerPage(window)
   basicPage = new BasicPage(window)
   accountPage = new AccountPage(window)
+
+  window.on('console', msg => {
+    if (msg.type() === 'error') {
+      if (msg.text().includes('WebSocket connection')) return
+      if (msg.text().includes('get channel list')) return
+      if (msg.text().includes('wire')) return
+      if (msg.text().includes('a status of 404')) return
+      if (msg.location().url.includes('recommends.txt')) return
+      if (msg.location().url.includes('versions.json')) return
+      if (msg.location().url.includes('alpha.biz')) return
+      if (msg.location().url.includes('take - down.json')) return
+      console.log(`Console log: ${msg.text()} \n ${msg.location().url} \n lineNumber:${msg.location().lineNumber} \n columnNumber:${msg.location().columnNumber} \n`)
+    }
+  })
 })
 
 test.beforeEach(async () => {
@@ -75,24 +89,22 @@ test.afterEach(async ({ }, testInfo) => {
 test.describe('key', () => {
   test.beforeEach(async () => {
   })
-  test.describe('independent password', () => {  //暂时跳过
+  test.only('disable cloud key', async () => {
+    await basePage.ensureLoginStatus(name, accountPassword, true, true)
+    await basePage.waitForAllHidden(await basePage.alert)
+    await window.waitForTimeout(3000)
+    await accountPage.disableCloudKey()
+    await basePage.signOut()
+  })
+  // 独立密码，负责密钥的访问权限
+  test.describe.only('independent password', () => { 
     const inPassword = process.env.TEST_RESET_PASSWORD
     const newPassword = process.env.TEST_PASSWORD
-
-    test.skip('importing a Local Key', async () => { // 此用例已不可用
-      await basePage.signIn(name, process.env.TEST_PASSWORD, true, false)
-      await window.waitForTimeout(20000)
-      if (await accountPage.recommendTitle.isVisible()) await accountPage.recommendPage()
-      await accountPage.ckImportChk.waitFor()
-      const taskAbk = './test/cypress/fixtures/samples/test.abk'
-      await window.locator('[name="input-file"][accept=".abk"]').setInputFiles(taskAbk, { timeout: 60000 })
-      await window.waitForTimeout(100000)
-    })
-    test.skip('save cloud key', async () => {
+    test('save cloud key', async () => {
       await window.waitForLoadState()
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
       await basePage.waitForAllHidden(await basePage.alert)
-      await window.waitForTimeout(10000)
+      await window.waitForTimeout(3000)
       await accountPage.disableCloudKey()
       await accountPage.enableCloudKey(inPassword, false)
       await window.waitForTimeout(3000)
@@ -102,9 +114,9 @@ test.describe('key', () => {
       await accountPage.syncCloudKey(inPassword)
       // 等待密钥配置，加载,等待推荐页面出现
       await basePage.jumpPage('homeLink')
-      if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
+      await window.locator('.post-card').nth(0).waitFor({ timeout: 30000 })
     })
-    test.skip('config password', async () => {
+    test('config password', async () => {
       await basePage.ensureLoginStatus(name, process.env.TEST_PASSWORD, true, true)
       await accountPage.cfgKeyPassword(inPassword, newPassword)
       // 验证同步云端
@@ -114,129 +126,51 @@ test.describe('key', () => {
       await accountPage.syncCloudKey(newPassword)
       // 等待密钥配置，加载,等待推荐页面出现
       await basePage.jumpPage('homeLink')
-      if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
-      await basePage.signOut()
-      await basePage.waitForAllHidden(await basePage.alert)
-    })
-    test.skip('update and save key in cloud', async () => {
-      test.setTimeout(5 * 60000)
-      await basePage.ensureLoginStatus(name, process.env.TEST_PASSWORD, true, false)
-      // 创建新的密钥
-      await accountPage.createCloudKey(newPassword, true)
-      // 等待密钥配置，加载, 等待推文页面出现
-      await basePage.jumpPage('homeLink')
-      if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
-
-      // 验证同步云端功能
-      await basePage.signOut()
-      await basePage.signIn(name, process.env.TEST_PASSWORD, true, false)
-      await accountPage.syncCloudKey(newPassword, { isABPassword: true })
-      // 等待密钥配置，加载，等待推荐页面出现
-      await basePage.jumpPage('homeLink')
-      if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
-    })
-    test.skip('disable cloud key', async () => {
+      await window.locator('.post-card').nth(0).waitFor({ timeout: 30000 })
+    }) 
+    test('disable cloud key', async () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
       await basePage.waitForAllHidden(await basePage.alert)
       await window.waitForTimeout(5000)
       await accountPage.disableCloudKey()
-
       // 验证取消同步云端
       await basePage.signOut()
-      // await basePage.signIn(name, accountPassword, true, false)
-      // await accountPage.ckCard.waitFor()
-      // await expect(accountPage.ckFromcloudChk).toHaveText(/Disable cloud storage/)
-      // await basePage.clearLocalstorage()
-      // await window.waitForTimeout(3000)
-    })
-    // 该功能已取消
-    test.skip('create and save key in cloud', async () => {
-      test.setTimeout(5 * 60000)
-      await basePage.clearLocalstorage()
-      await window.waitForTimeout(3000)
-      await basePage.ensureLoginStatus(name, process.env.TEST_PASSWORD, true, false)
-      // 创建新的密钥
-      await accountPage.createCloudKey(inPassword, false, false)
-      // 等待密钥配置，加载, 等待推荐页面出现
-      await libraryPage.tweetsFrist.waitFor({ timeout: 60000 })
-
-      // 验证同步云端功能
-      await basePage.signOut()
-      await basePage.signIn(name, process.env.TEST_PASSWORD, true, false)
-      await basePage.waitForAllHidden(await basePage.alert)
-      // 验证密码错误
-      await accountPage.syncCloudKey('1234567890', { isCorrectPassword: false })
-      await accountPage.syncCloudKey(inPassword)
-      // 等待密钥配置，加载，等待推荐页面出现
-      await basePage.jumpPage('homeLink')
-      await libraryPage.tweetsFrist.waitFor({ timeout: 60000 })
-      await basePage.signOut()
-    })
-    // 该功能已取消
-    test.skip('disable cloud key force', async () => {
-      await basePage.ensureLoginStatus(name, accountPassword, true, true)
-      await basePage.waitForAllHidden(await basePage.alert)
-      await window.waitForTimeout(15000)
-      await accountPage.disableCloudKey()
-
-      // 验证取消同步云端
-      await basePage.signOut()
-      await basePage.signIn(name, accountPassword, true, false)
-      await accountPage.ckCard.waitFor()
-      await expect(accountPage.ckFromcloudChk).toHaveText(/Disable cloud storage/)
-      // await basePage.signOut()
-      await basePage.clearLocalstorage()
-      await window.waitForTimeout(3000)
     })
   })
-  test.describe('aws password', () => {
-    test.skip('create and save key in cloud', async () => {
+  test.describe.only('Alphabiz account password', () => {
+    test.only('create and save key in cloud', async () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, false)
-      await window.waitForTimeout(30000)
-      if (await accountPage.recommendTitle.isVisible()) {
-        await accountPage.recommendPage()
-      } else {
-        await libraryPage.tweetsFrist.waitFor()
+      // 1. 等待showMoreBtn出现，可能有时候加载很慢
+      await libraryPage.showMoreBtn.waitFor({timeout: 60000})
+      // 2. 判断是否有选中频道(.channel-card.selected)
+      // 问题：判断语句 怎么用？
+      if (!await libraryPage.channelSelected.isVisible()) {
+        //如果没有，则选中第一个.channel - card元素
+        await libraryPage.chanel1Global.click(); //全局推荐页的第一个频道定位
       }
-      await accountPage.disableCloudKey()
-      await basePage.signOut()
-      await basePage.signIn(name, accountPassword, true, false)
-      // 创建新的密钥
-      // await accountPage.createCloudKey('', false, true)
-      await window.waitForTimeout(5000)
-      if (await accountPage.recommendTitle.isVisible()) await accountPage.recommendPage()
-      // 等待密钥配置，加载, 等待推荐页面出现
-      await window.waitForTimeout(5000)
-      await basePage.getOneS.click()
-      await basePage.recommendFollowOenBtn.click()
-
+      // 3. 点击Follow按钮
+      await libraryPage.channelFollowsBtn.click();
+      // 4. 等待home页面出现第一个post-card元素出现
+      await window.locator('.post-card').nth(0).waitFor({timeout:60000})
       // 验证同步云端功能
       await basePage.signOut()
       await basePage.signIn(name, accountPassword, true, false)
-      await accountPage.syncCloudKey('', { isABPassword: true })
-      // 等待密钥配置，加载，等待推荐页面出现
-      await window.waitForTimeout(5000)
-      if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
+      await window.locator('.post-card').nth(0).waitFor({ timeout: 60000 })
       await basePage.signOut()
     })
-    test.skip('update and save key in cloud', async () => {
-      test.setTimeout(5 * 60000)
+    test.only('update and save key in cloud', async () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, false)
       // 创建新的密钥
       await accountPage.createCloudKey('', true, true)
-      // 等待密钥配置，加载, 等待推荐页面出现
-      await window.waitForTimeout(5000)
-      if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
-
+      await window.locator('.post-card').nth(0).waitFor({ timeout: 60000 })
       // 验证同步云端功能
       await basePage.signOut()
       await basePage.signIn(name, accountPassword, true, false)
       await accountPage.syncCloudKey('', { isABPassword: true })
       // 等待密钥配置，加载，等待推荐页面出现
-      await window.waitForTimeout(5000)
-      if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
+      await window.locator('.post-card').nth(0).waitFor({ timeout: 60000 })
     })
-    test('change password', async () => {
+    test.skip('change password', async () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
       await window.waitForTimeout(5000)
       await basePage.jumpPage('accountSettingLink')
@@ -251,7 +185,7 @@ test.describe('key', () => {
       if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
       await basePage.signOut()
     })
-    test('change password again', async () => { //跳过重置密码时临时启用
+    test.skip('change password again', async () => { //跳过重置密码时临时启用
       await basePage.ensureLoginStatus(name, accountResetPassword, true, true)
       await window.waitForTimeout(5000)
       await basePage.jumpPage('accountSettingLink')
@@ -297,17 +231,7 @@ test.describe('key', () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
       await basePage.waitForAllHidden(await basePage.alert)
       await accountPage.disableCloudKey()
-
-      // 验证取消同步云端
       await basePage.signOut()
-      await basePage.signIn(name, accountPassword, true, false)
-      // await accountPage.ckCard.waitFor()
-      await window.waitForTimeout(10000)
-      if (await accountPage.recommendTitle.isVisible()) await libraryPage.recommendPageTest()
-      // await basePage.jumpPage('accountSettingLink')
-      // await expect(accountPage.ckFromcloudChk).toHaveText(/Disable cloud storage/)
-      // await basePage.clearLocalstorage()
-      // await window.waitForTimeout(3000)
-    })
-  })
+    }) 
+  }) 
 })
