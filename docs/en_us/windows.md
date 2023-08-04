@@ -19,6 +19,14 @@ yarn global add @quasar/cli
 
 For building MSI installers, you should also install [WiX Toolset](https://wixtoolset.org) and add the install path to your PATH. The default install path should be something like `C:\Program Files (x86)\WiX Toolset v3.11\bin`.
 
+### MSI for Arm64
+
+Normaly you will get `3.11` from Wix's website, but this version does not support `arm64`.
+
+The `arm64` support was added since `3.14`, which is not released to github.
+
+You can download above version from [here](https://wixtoolset.org/docs/v3/releases/v3-14-0-6526/).
+
 ## About `appx` target
 
 The `appx` installer is a wrapper for Universal Windows Platform apps (aka Microsoft Store apps). To build this target you need generate a `pfx` certificate.
