@@ -122,13 +122,15 @@ class AccountPage extends BasePage {
   }
 
   async resetPassword (account, newPassword) {
-    const newTime = new Date()
     await this.page.click('text=Reset password')
     await this.page.click('text=Find your account')
     await this.page.fill('[aria-label="Phone number or email"]', account)
     await this.page.click('.q-card >> button:has-text("Search")')
     // 验证信息
+    const newTime = new Date()
+    newTime.setMinutes(newTime.getMinutes() - 1); // 将时间往前挪一分钟
     const verificationCode = await getMailCode({ type: 1, time: newTime, to: account })
+    console.log(verificationCode)
     await this.page.fill('[aria-label="Verification code"]', verificationCode.toString())
     await this.page.fill('[aria-label="Password"]', newPassword)
     await this.page.fill('[aria-label="Re-enter password"]', newPassword)
@@ -178,17 +180,6 @@ class AccountPage extends BasePage {
     // await this.waitForSelector(this.loadCard, { visible: true })
     await this.page.waitForTimeout(20000)
     if (await this.recommendTitle.isVisible()) await this.recommendSelected()
-    // 设置独立密码
-    // 是否弹出更新密钥提示框
-    if (isUpdate) {
-      await this.page.waitForTimeout(10000)
-      if (await this.recommendTitle.isVisible()) await this.recommendSelected()
-      // await this.ukOKBtn.click({ timeout: 10000 })
-    }
-    if (isUpdate && !isABPassword) {
-      await this.eipInput.fill(password)
-      await this.eipOKBtn.click()
-    }
   }
 
   // 登录后同步云端密钥

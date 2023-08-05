@@ -89,22 +89,24 @@ test.afterEach(async ({ }, testInfo) => {
 test.describe('key', () => {
   test.beforeEach(async () => {
   })
-  test.only('disable cloud key', async () => {
+  // 清除密钥
+  test('disable cloud key', async () => { 
     await basePage.ensureLoginStatus(name, accountPassword, true, true)
     await basePage.waitForAllHidden(await basePage.alert)
     await window.waitForTimeout(3000)
     await accountPage.disableCloudKey()
     await basePage.signOut()
   })
-  // 独立密码，负责密钥的访问权限
-  test.describe.only('independent password', () => { 
+  test.describe('independent password', () => { 
     const inPassword = process.env.TEST_RESET_PASSWORD
     const newPassword = process.env.TEST_PASSWORD
-    test('save cloud key', async () => {
+    //由独立密码访问密钥
+    test('access cloud key by independ password', async () => {
       await window.waitForLoadState()
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
       await basePage.waitForAllHidden(await basePage.alert)
       await window.waitForTimeout(3000)
+      // isABPassword = false, 不使用账户密码
       await accountPage.disableCloudKey()
       await accountPage.enableCloudKey(inPassword, false)
       await window.waitForTimeout(3000)
@@ -116,13 +118,14 @@ test.describe('key', () => {
       await basePage.jumpPage('homeLink')
       await window.locator('.post-card').nth(0).waitFor({ timeout: 30000 })
     })
-    test('config password', async () => {
-      await basePage.ensureLoginStatus(name, process.env.TEST_PASSWORD, true, true)
+    test('change independ password', async () => {
+      //修改独立密码
+      await basePage.ensureLoginStatus(name, accountPassword, true, true)
       await accountPage.cfgKeyPassword(inPassword, newPassword)
       // 验证同步云端
       await basePage.signOut()
       await basePage.waitForAllHidden(await basePage.alert)
-      await basePage.signIn(name, process.env.TEST_PASSWORD, true, false)
+      await basePage.signIn(name, accountPassword, true, false)
       await accountPage.syncCloudKey(newPassword)
       // 等待密钥配置，加载,等待推荐页面出现
       await basePage.jumpPage('homeLink')
@@ -137,8 +140,8 @@ test.describe('key', () => {
       await basePage.signOut()
     })
   })
-  test.describe.only('Alphabiz account password', () => {
-    test.only('create and save key in cloud', async () => {
+  test.describe('Alphabiz account password', () => {
+    test('create and save key in cloud', async () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, false)
       // 1. 等待showMoreBtn出现，可能有时候加载很慢
       await libraryPage.showMoreBtn.waitFor({timeout: 60000})
@@ -158,7 +161,8 @@ test.describe('key', () => {
       await window.locator('.post-card').nth(0).waitFor({ timeout: 60000 })
       await basePage.signOut()
     })
-    test.only('update and save key in cloud', async () => {
+    // 密钥的更新
+    test('create new library key', async () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, false)
       // 创建新的密钥
       await accountPage.createCloudKey('', true, true)
@@ -170,7 +174,8 @@ test.describe('key', () => {
       // 等待密钥配置，加载，等待推荐页面出现
       await window.locator('.post-card').nth(0).waitFor({ timeout: 60000 })
     })
-    test.skip('change password', async () => {
+    // 更新账户密码
+    test('change account password', async () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
       await window.waitForTimeout(5000)
       await basePage.jumpPage('accountSettingLink')
@@ -185,21 +190,8 @@ test.describe('key', () => {
       if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
       await basePage.signOut()
     })
-    test.skip('change password again', async () => { //跳过重置密码时临时启用
-      await basePage.ensureLoginStatus(name, accountResetPassword, true, true)
-      await window.waitForTimeout(5000)
-      await basePage.jumpPage('accountSettingLink')
-      await accountPage.changePassword(accountResetPassword, accountPassword)
-      // 验证同步云端
-      await basePage.signOut()
-      await basePage.signIn(name, accountPassword, true, false)
-      await accountPage.syncCloudKey('', { isABPassword: true })
-      // 等待密钥配置，加载,等待推荐页面出现
-      await window.waitForTimeout(15000)
-      // if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
-      await basePage.signOut()
-    })
-    test.skip('reset password', async () => { //邮件监听器 待测试
+    // 测试忘记密码 -> 重置密码
+    test('reset password', async () => {
       await window.waitForTimeout(3000)
       await accountPage.resetPassword(name, accountPassword)
       await basePage.waitForAllHidden(await basePage.alert)
@@ -211,26 +203,13 @@ test.describe('key', () => {
       if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
       await basePage.signOut()
     })
-    // 若重置失败，手动修改密码
-    // test('')
-    test('config password', async () => {
-      await basePage.ensureLoginStatus(name, accountResetPassword, true, true)
-      await window.waitForTimeout(5000)
-      await accountPage.cfgKeyPassword(accountPassword, accountResetPassword)
-      // 验证同步云端
-      await basePage.signOut()
-      await basePage.signIn(name, accountPassword, true, false)
-      await accountPage.syncCloudKey(accountResetPassword)
-      // 等待密钥配置，加载,等待推荐页面出现
-      await window.waitForTimeout(5000)
-      if (await libraryPage.recommendTitle.isVisible()) await libraryPage.recommendPageTest()
-      await window.waitForTimeout(5000)
-      if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
-    })
-    test('disable cloud key', async () => {
+    // 清除密钥缓存
+    test('reset cloud key', async () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
       await basePage.waitForAllHidden(await basePage.alert)
+      // 重置，isABPassword = true
       await accountPage.disableCloudKey()
+      await accountPage.enableCloudKey(accountPassword, true)
       await basePage.signOut()
     }) 
   }) 
