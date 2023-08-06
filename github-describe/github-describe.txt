@@ -1,6 +1,4 @@
-add push test workflow
-fix scripts error
-fix account test scripts
-use module: alphabiz-account
-upgrade alphabiz-account
-update test case list - settings test
+fix #767
+fix #768
+test conditional push
+Update push.yml
