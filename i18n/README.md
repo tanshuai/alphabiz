@@ -1,5 +1,7 @@
 # Guide for external i18n
 
+> Use `node ./check.js` to check your i18n files for updates, and use `node ./check.js -O` to modified your files with missing keys.
+
 The example [en-GB](en-GB) directory contains configurations for en-GB.
 
 You can add your custom language in a directory named by locale codes. The locale codes are recommended to be [BCP-47 language tags](https://gist.github.com/typpo/b2b828a35e683b9bf8db91b5404f1bd1).
