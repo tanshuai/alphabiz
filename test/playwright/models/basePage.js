@@ -160,6 +160,7 @@ class BasePage {
       this.page.locator(internalNoticeCss).waitFor({ state:'hidden', timeout: 30000 }),
       this.page.locator(`${internalNoticeCss} button:has-text("close")`).click()
     ]
+    await this.page.waitForTimeout(2000)
   }
 
   async newReload () {
