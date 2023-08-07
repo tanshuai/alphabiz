@@ -110,8 +110,8 @@ test.describe('key', () => {
     await basePage.signOut()
   })
   test.describe('independent password', () => { 
-    const inPassword = process.env.TEST_RESET_PASSWORD
-    const newPassword = process.env.TEST_PASSWORD
+    const inPassword = accountResetPassword
+    const newPassword = accountPassword
     //由独立密码访问密钥
     test('access cloud key by independ password', async () => {
       await window.waitForLoadState()
