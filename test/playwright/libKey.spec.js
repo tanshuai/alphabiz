@@ -108,6 +108,10 @@ test.describe('librayKey:媒体库密钥测试', () => {
     }
     await basePage.waitForAllHidden(await basePage.alert)
     await window.waitForTimeout(3000)
+    if (process.platform === 'darwin') {
+      await basePage.newReload()
+      await window.screenshot({ path: `${ScreenshotsPath}macos-disableCloudKey-screen.png` })
+    }
     await accountPage.disableCloudKey()
     await basePage.signOut()
   })
