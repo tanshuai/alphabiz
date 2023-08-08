@@ -148,7 +148,7 @@ test('close set default', async () => {
   }
 })
 
-test('reset torrent status', async () => {
+test('清除磁力列表', async () => {
   test.setTimeout(60000 * 4)
   await window.waitForLoadState()
   await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
@@ -160,7 +160,7 @@ test('reset torrent status', async () => {
 //   await page.locator().click()
 // })
 
-test.describe('play video', () => {
+test.describe('播放视频', () => {
   test.beforeEach(async () => {
     if (process.platform === 'darwin') test.setTimeout(60000 * 5)
     else test.setTimeout(60000 * 3)
@@ -168,7 +168,7 @@ test.describe('play video', () => {
     await window.waitForTimeout(1000)
     await basePage.jumpPage('playerLink')
   })
-  test('avi_type', async () => {
+  test('avi类型', async () => {
     const media = 'test/cypress/fixtures/samples/GoneNutty.avi'
     // Upload
     await window.waitForTimeout(5000)
@@ -181,7 +181,7 @@ test.describe('play video', () => {
     await expect(progressControl).toBeVisible({ timeout: 30000 })
     await playerPage.stopPlay.click()
   })
-  test('BluRay_mkv_type', async () => {
+  test('BluRay_mkv蓝光视频', async () => {
     const media = 'test/cypress/fixtures/samples/Test-Sample-Tenet.2020.IMAX.2160p.UHD.BluRay.x265.10bit.HDR.DTS-HD.MA.5.1202111171122322.mkv'
     // Upload
     await playerPage.fileInput.setInputFiles(media, { timeout: 60000 })
@@ -194,8 +194,8 @@ test.describe('play video', () => {
   })
 })
 
-test.describe('save Language', () => {
-  test.describe('signInPage', () => {
+test.describe('切换语言设置', () => {
+  test.describe('在登录页切换语言', () => {
     test.beforeEach(async () => {
       if (process.platform === 'darwin') {
         test.skip()
@@ -203,7 +203,7 @@ test.describe('save Language', () => {
       await basePage.clearLocalstorage()
       await window.waitForTimeout(3000)
     })
-    test('CN', async () => {
+    test('CN简体中文', async () => {
       await basePage.quickSaveLanguage('CN')
       const signIncardCss = '.q-card:has-text("登录账户")'
       await window.locator(signIncardCss).waitFor()
@@ -211,7 +211,7 @@ test.describe('save Language', () => {
       await window.waitForLoadState()
       await window.locator(signIncardCss).waitFor()
     })
-    test('TW', async () => {
+    test('TW繁体中文', async () => {
       await basePage.quickSaveLanguage('TW')
       const signIncardCss = '.q-card:has-text("登錄賬戶")'
       await window.locator(signIncardCss).waitFor()
@@ -219,7 +219,7 @@ test.describe('save Language', () => {
       await window.waitForLoadState()
       await window.locator(signIncardCss).waitFor()
     })
-    test('EN', async () => {
+    test('EN英文', async () => {
       await basePage.quickSaveLanguage('EN')
       const signIncardCss = '.q-card:has-text("sign in")'
       await window.locator(signIncardCss).waitFor()
@@ -237,7 +237,7 @@ test.describe('save Language', () => {
       }
     })
   })
-  test.describe('basicPage', () => {
+  test.describe('主页', () => {
     test.beforeEach(async () => {
       if (process.platform === 'darwin') {
         test.skip()
@@ -250,19 +250,22 @@ test.describe('save Language', () => {
       await window.waitForLoadState()
     })
     // EN -> CN -> TW -> EN
-    test('Language', async () => {
+    test('语言重复切换: EN->CN->TW->EN', async () => {
+      console.log('EN->CN')
       await basicPage.saveLanguage('EN', 'CN')
       await expect(await basicPage.headerTitle).toHaveText(/基础设置/, { timeout: 20000 })
+      console.log('CN->TW')
       await basicPage.saveLanguage('CN', 'TW')
       await expect(await basicPage.headerTitle).toHaveText(/基礎設置/, { timeout: 20000 })
+      console.log('TW->EN')
       await basicPage.saveLanguage('TW', 'EN')
       await expect(await basicPage.headerTitle).toHaveText(/Basic/, { timeout: 20000 })
     })
   })
 })
 
-test.describe('account', () => {
-  test('transfer - check bill details', async () => {
+test.describe('账户设置', () => {
+  test('transfer - check bill details 转账-检查账单详细', async () => {
     test.setTimeout(60000 * 5)
     // 转账人账号、密码
     const transferee = from
@@ -333,7 +336,7 @@ test.describe('account', () => {
   })
 })
 
-test.describe('download ', () => {
+test.describe('download 视频下载', () => {
   for (const bt of btData) {
     test((bt.testName ? bt.testName : '') + bt.btName, async () => {
       await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
@@ -472,10 +475,11 @@ test.describe('download ', () => {
     })
   }
 })
-test.describe('task', () => {
+test.describe('task下载任务', () => {
   test.beforeEach(async ({ }, testInfo) => {
     if (process.platform === 'darwin') test.setTimeout(60000 * 8)
     else test.setTimeout(60000 * 5)
+    await window.waitForTimeout(5000)
     await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
     await window.waitForLoadState()
     await window.waitForTimeout(1000)
@@ -540,6 +544,10 @@ test.describe('task', () => {
     }
     await window.waitForTimeout(1000)
     // 退出卡片
+    if (await homePage.moreCardCloseBtn.isVisible()){
+      // 在小界面下卡片占据整个页面，卡片会有关闭按钮
+      await homePage.moreCardCloseBtn.click()
+    }
     await basePage.headerTitle.click({ force: true })
     try {
       await homePage.moreCard.waitFor('hidden')

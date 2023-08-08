@@ -55,7 +55,8 @@ class HomePage extends BasePage {
     this.ucUploadBtn = page.locator(`${uploadCardCss} button:has-text("upload")`)
     this.ucCancelBtn = page.locator(`${uploadCardCss} button:has-text("Cancel")`)
     // more card
-    this.moreCard = page.locator('.q-card:has-text("Download U")')
+    this.moreCard = page.locator('.q-card:has-text("Download URL")')
+    this.moreCardCloseBtn = page.locator('.q-card [data-cy="moreCard-closeBtn"]')
     this.copyUrlBtn = page.locator('[role="presentation"]:has-text("content_copy")')
     this.copyShareUrlBtn = page.locator('[role="presentation"]:has-text("share")')
     this.fileTreeBtn = page.locator('.file-tree')

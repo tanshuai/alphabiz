@@ -155,7 +155,7 @@ class BasePage {
     if(await menuButton.isVisible()){
       const buttonBoundingBox = await menuButton.boundingBox()
       const {x,y,width,height} = buttonBoundingBox;
-      const clickX = x + width + 10 //假设相对于按钮的右侧有10px的空白区域
+      const clickX = x + width + 20 //假设相对于按钮的右侧有20px的空白区域
       const clickY = y + height/2 //点击位置垂直居中
       await this.page.mouse.click(clickX,clickY)
     }
@@ -290,7 +290,9 @@ class BasePage {
     } else {
       await this.page.waitForTimeout(4000)
       const leftBar = await this.downloadingStatus.isVisible()
-      if (!leftBar) await this.menuIcon.click()
+      if (!leftBar) {
+        await this.menuIcon.click({noWaitAfter: true})
+      }
       if (await this.accountSignIn.isVisible()) {
         message = await this.signIn(username, password, isWaitAlert, isSetToken)
       }
