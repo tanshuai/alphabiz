@@ -222,7 +222,7 @@ class LibraryPage extends BasePage {
 
   getPostCardEle (title, target) {
     const postCard = `.post-card:has(.post-title:has-text("${title}"))`
-    return this.page.locator(postCard + ' ' + this.postCardEleObj[target])
+    return this.page.locator(postCard + ' ' + this.postCardEleObj[target] + ' >> nth = 0' )
   }
 
   async postArrFaitFor (title, target, len) {
@@ -372,19 +372,25 @@ class LibraryPage extends BasePage {
     await this.searchChannelBtn.click()
     const channelID = channelObj.channelID
     // 验证不完整的频道id
+    console.log('输入缺少最后一个字符的ID')
     await this.sciInput.fill(channelID.slice(0, channelID.length - 1))
     await this.sciSearchBtn.click()
+    console.log('搜索')
     await this.page.waitForTimeout(3000)
     if (isCompleteId) {
+      console.log('私有频道需要完整ID, 提示找不到')
       await this.page.locator('.q-card:has-text("cannot find channel")').waitFor()
+      console.log('关闭提示')
       await this.page.locator('.q-card:has-text("cannot find channel") button:has-text("ok")').click()
     } else {
+      console.log('公共频道不需要完整ID也能搜到')
       await this.getChannelCardEle(channelObj.title, 'card', 'sci').waitFor()
     }
-
     // expect(await this.getChannelCardEle(channelObj.title, 'card', 'sci')).toHaveCount(isCompleteId ? 0 : 1)
     // 验证完整频道id
+    console.log('重新输入一个完整的ID')
     await this.sciInput.fill(channelObj.channelID)
+    console.log('搜索')
     await this.sciSearchBtn.click()
     await this.getChannelCardEle(channelObj.title, 'card', 'sci').waitFor()
   }
