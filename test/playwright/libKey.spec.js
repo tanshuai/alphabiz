@@ -93,6 +93,7 @@ test.describe('librayKey:媒体库密钥测试', () => {
   })
   // 清除密钥
   test('清除密钥', async () => { 
+    console.log('准备登录')
     let loggingMsg = await basePage.ensureLoginStatus(name, accountPassword, true, true)
     if (loggingMsg === "trylater") {
       console.log("try after 1 minutes later")
@@ -106,9 +107,11 @@ test.describe('librayKey:媒体库密钥测试', () => {
       accountResetPassword = tmp
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
     }
+    console.log('已经登录')
     await basePage.waitForAllHidden(await basePage.alert)
     await window.waitForTimeout(3000)
     if (process.platform === 'darwin') {
+      console.log("macos环境，刷新页面")
       await basePage.newReload()
       await window.screenshot({ path: `${ScreenshotsPath}macos-disableCloudKey-screen.png` })
     }
@@ -124,8 +127,10 @@ test.describe('librayKey:媒体库密钥测试', () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
       await basePage.waitForAllHidden(await basePage.alert)
       await window.waitForTimeout(3000)
+      console.log('清除密钥')
       // isABPassword = false, 不使用账户密码
       await accountPage.disableCloudKey()
+      console.log('使用独立密码新建密钥')
       await accountPage.enableCloudKey(inPassword, false)
       await window.waitForTimeout(3000)
       // 验证同步云端
@@ -139,11 +144,14 @@ test.describe('librayKey:媒体库密钥测试', () => {
     test('修改独立密码', async () => {
       //修改独立密码
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
+      console.log('修改访问密钥的独立密码')
       await accountPage.cfgKeyPassword(inPassword, newPassword)
       // 验证同步云端
       await basePage.signOut()
       await basePage.waitForAllHidden(await basePage.alert)
+      console.log('重新登录')
       await basePage.signIn(name, accountPassword, true, false)
+      console.log('输入新的独立密码来导入密钥')
       await accountPage.syncCloudKey(newPassword)
       // 等待密钥配置，加载,等待推荐页面出现
       await basePage.jumpPage('homeLink')
@@ -162,28 +170,41 @@ test.describe('librayKey:媒体库密钥测试', () => {
     test('登陆后自动创建媒体库密钥并备份到云', async () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, false)
       // 1. 等待showMoreBtn出现，可能有时候加载很慢
+      console.log('等待showMore按钮出现')
       await libraryPage.showMoreBtn.waitFor({timeout: 60000})
       // 2. 判断是否有选中频道(.channel-card.selected)
       // 问题：判断语句 怎么用？
+      console.log('是否已经有选中的频道')
       if (!await libraryPage.channelSelected.isVisible()) {
+        console.log('没有，现在选上第一个频道卡片')
         //如果没有，则选中第一个.channel - card元素
         await libraryPage.chanel1Global.click(); //全局推荐页的第一个频道定位
+      } else {
+        console.log('有')
       }
+      console.log('点击Follow')
       // 3. 点击Follow按钮
       await libraryPage.channelFollowsBtn.click();
       // 4. 等待home页面出现第一个post-card元素出现
+      console.log('等待首页第一个卡片出现')
       await window.locator('.post-card').nth(0).waitFor({timeout:60000})
       // 验证同步云端功能
+      console.log('退出')
       await basePage.signOut()
+      console.log('重新登录')
       await basePage.signIn(name, accountPassword, true, false)
+      console.log('等待出现第一张卡片，证明保存了上次Follow的频道')
       await window.locator('.post-card').nth(0).waitFor({ timeout: 60000 })
+      console.log('退出')
       await basePage.signOut()
     })
     // 密钥的更新
     test('登陆后更新密钥', async () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, false)
       // 创建新的密钥
+      console.log('登陆后选择创建新密钥')
       await accountPage.createCloudKey('', true, true)
+      console.log('新密钥自动备份并导入客户端，等待第一张卡片出现')
       await window.locator('.post-card').nth(0).waitFor({ timeout: 60000 })
       // 验证同步云端功能
       await basePage.signOut()
@@ -219,7 +240,7 @@ test.describe('librayKey:媒体库密钥测试', () => {
     // 测试忘记密码 -> 重置密码
     test('通过邮件重置账户密码', async () => {
       if (process.env.excludePasswordTest) {
-        console.log('由push触发的工作流, 选择跳过密码更改的测试')
+        console.log('由push触发的工作流, 选择跳过密码重置的测试')
         return
       }
       await window.waitForTimeout(3000)
@@ -237,7 +258,6 @@ test.describe('librayKey:媒体库密钥测试', () => {
         await basePage.jumpPage('accountSettingLink')
         console.log("重新修改账户密码")
         await accountPage.changePassword(accountResetPassword, accountPassword)
-        return
       }
       await basePage.waitForAllHidden(await basePage.alert)
       // 验证同步云端
@@ -252,9 +272,8 @@ test.describe('librayKey:媒体库密钥测试', () => {
     test('清除密钥', async () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
       await basePage.waitForAllHidden(await basePage.alert)
-      // 重置，isABPassword = true
+      await window.waitForTimeout(5000)
       await accountPage.disableCloudKey()
-      await accountPage.enableCloudKey(accountPassword, true)
       await basePage.signOut()
     }) 
   }) 
