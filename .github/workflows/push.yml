@@ -300,6 +300,10 @@ jobs:
             alphabiz-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }}.7z
             ./out/installers/${{ steps.unify.outputs.build-version }}/**
 
+      - name: public describe to Twitter
+        if: contains(steps.vars.outputs.event-name, 'schedule')
+        run: yarn node publicTwitter.js
+
   appium_test_job:
     needs: nightly_job
     if: |
