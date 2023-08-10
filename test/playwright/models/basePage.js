@@ -177,7 +177,7 @@ class BasePage {
     if (app.displayName === 'Alphabiz') {
       const version = await this.versionBtn.innerText()
       if (version.includes('internal') || version.includes('nightly')) {
-        await this.closeInternalNotice()
+        // await this.closeInternalNotice()
       }
     }
   }
@@ -284,7 +284,7 @@ class BasePage {
   async ensureLoginStatus (username, password, isWaitAlert, isSetToken = true) {
     await this.page.waitForTimeout(500)
     const count = await this.page.locator('.q-card:has-text("INTERNAL DEMO ONLY")').count()
-    if (count) await this.closeInternalNotice()
+    // if (count) await this.closeInternalNotice()
     // if not logged in
     let message ;
     if (await this.accountInput.isVisible()) {
