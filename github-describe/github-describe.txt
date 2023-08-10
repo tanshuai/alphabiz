@@ -1,13 +1,14 @@
-test library key: more detail
+library-test: change cron
+test library channel
 test library key
-test library key
-test library key
-test library key
+libChannel-pretest: update-version
 test library key
 test library channel
+test复用checkForPopup
+test library key
 test library channel
 test library channel
+test library channel : download
 test library channel
 test library channel
-test library channel
-fix i18n on electron
+fix arch
