@@ -1,17 +1,16 @@
-OAuth
-OAuth
-OAuth UI
-OAuth
+fix bug
+fix: #722
+fix: #772
+fix oauth bug
+fix Router
 Update index.js
-fix：blockUsers undefined
+Update index.js
+Update index.js
+oauth router
 OAuth
-OAuth
-OAuth: disconnect providers when delete account
-#757
-fix: #763
-hide oauth on web
-fix #771
-bump @zeeis/alphabiz-libdb to v0.0.86, try fix texts decoded error
-Update team-provider-info.json
-Update twitter.js
+fix #775
+OAuth for website
 Update OAuthManager.vue
+Update index.js
+fix #735
+OAuth
