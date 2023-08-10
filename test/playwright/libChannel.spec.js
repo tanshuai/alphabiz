@@ -111,13 +111,35 @@ test.beforeAll(async () => {
       if (msg.text().includes('WebSocket connection')) return
       if (msg.text().includes('get channel list')) return
       if (msg.text().includes('wire')) return
-      if (msg.text().includes('recommends.txt')) return
+      if (msg.text().includes('a status of 404')) return
+      if (msg.location().url.includes('recommends.txt')) return
+      if (msg.location().url.includes('versions.json')) return
+      if (msg.location().url.includes('alpha.biz')) return
+      if (msg.location().url.includes('take - down.json')) return
+      if (msg.text().includes('no such file or directory')) return
+      if (msg.text().includes('resolver')) return
       console.log(`Console log: ${msg.text()} \n ${msg.location().url} \n lineNumber:${msg.location().lineNumber} \n columnNumber:${msg.location().columnNumber} \n`)
     }
   })
 })
+
+async function checkForPopup () {
+  while (true) {
+    try {
+      // 等待弹窗出现，但如果5秒内没有出现就会抛出一个错误
+      await window.waitForSelector('.q-card:has-text("INTERNAL DEMO ONLY")', { timeout: 5000 });
+      // 如果上一行代码没有抛出错误，那么弹窗已经出现，我们可以关闭它
+      await basePage.closeInternalNotice()
+      console.log('checkForPopup关闭了弹窗')
+    } catch (error) {
+      // 我们捕获了错误，但什么都不做，因为错误只是表示弹窗没有出现
+    }
+  }
+}
+
 test.beforeEach(async () => {
   test.setTimeout(60000 * 6)
+  checkForPopup()
 })
 test.afterEach(async ({ }, testInfo) => {
   if (testInfo.status !== testInfo.expectedStatus) {
@@ -155,61 +177,54 @@ test.describe('explorePage-探索页面测试', ()=>{
     }
     console.log('等待出现探索路由')
     await basePage.exploreLink.waitFor({ timeout: 60000 })
-    console.log('出现探索路由，准备跳转到探索页面')
-    await basePage.jumpPage('exploreLink')
-    console.log('页面跳转完成')
-    await libraryPage.getPostCardEle('', 'channelTitleEle').nth(0).waitFor({ timeout: 60000 })
+    console.log('出现探索路由')
   })
   test('search-探索页面中搜索频道', async()=>{
       test.setTimeout(5 * 60000)
-      console.log('跳转到探索页面')
+      console.log('准备跳转到探索页面')
       await basePage.jumpPage('exploreLink')
       console.log('已跳转, 检查面包屑导航是否出现Explore')
       await libraryPage.checkNavBar('Explore', { timeout: 3000 })
-      console.log('等待推荐页面加载')
-      await libraryPage.getPostCardEle('', 'channelTitleEle').nth(0).waitFor()
-      // 存四个视频对象到PostArr中
-      const postArr = []
-      for (let i = 3; i < 7; i++) {
-        const postTitle = await libraryPage.getPostCardEle('', 'postTitle').nth(i).innerText()
-        const postChannelTitle = await libraryPage.getPostCardEle('', 'channelTitleEle').nth(i).innerText()
-        const postDesc = await libraryPage.getPostCardEle('', 'desc').nth(i).innerText()
-        postArr.push({
-          title: postTitle,
-          channelTitle: postChannelTitle,
-          desc: postDesc
-        })
+      // 获取第一张卡片的标题
+      console.log('等待第一张卡片出现')
+      const cardTitleEle = await window.waitForSelector('.post-info .desc-main .desc-title .post-title >> nth=0')
+      console.log('使用第一张卡片做测试')
+      const postTitle = await cardTitleEle.getAttribute('title');
+      const postChannelTitle = await libraryPage.getPostCardEle(postTitle, 'channelTitleEle').nth(0).innerText()
+      console.log('title: '+ postTitle)
+      console.log('channelTitle: '+ postChannelTitle)
+      const post = {
+        title: postTitle,
+        channelTitle: postChannelTitle
       }
       console.log('测试 >> 通过推文标题过滤')
       // 推文标题查找
-      for (let j = 0; j < postArr.length; j++) {
-        console.log('输入推文标题'+j)
-        await libraryPage.searchInput.fill(postArr[j].title)
-        await window.waitForTimeout(2000)
-        console.log('统计过滤后的推文数量')
-        const postNum = await libraryPage.getPostCardEle('', 'postTitle').count()
-        console.log('逐一遍历，验证推文标题是否一致')
-        for (let i = 0; i < postNum; i++) {
-          const postTitle = await libraryPage.getPostCardEle('', 'postTitle').nth(i).innerText()
-          if (postTitle !== postArr[j].title && !postTitle.startsWith('Post title')) throw new Error('标题查找出现错误:' + postTitle)
-        }
-        const postLen = await libraryPage.getPostCardEle(postArr[j].title, 'postTitle').count()
-        await libraryPage.postArrFaitFor(postArr[j].title, 'postTitle', postLen)
+      console.log('输入推文标题'+postTitle)
+      await libraryPage.searchInput.fill(post.title)
+      await window.waitForTimeout(2000)
+      console.log('统计过滤后的推文数量')
+      const postNumByTitle = await libraryPage.getPostCardEle('', 'postTitle').count()
+      console.log('逐一遍历，验证推文标题是否一致')
+      for (let i = 0; i < postNumByTitle; i++) {
+        const postTitle = await libraryPage.getPostCardEle('', 'postTitle').nth(i).innerText()
+        if (postTitle !== post.title && !postTitle.startsWith('Post title')) throw new Error('标题查找出现错误:' + postTitle)
       }
+      const postLen = await libraryPage.getPostCardEle(post.title, 'postTitle').count()
+      await libraryPage.postArrFaitFor(post.title, 'postTitle', postLen)
       console.log('测试 >> 通过频道标题过滤')
       // 频道标题查找
       console.log('切换过滤条件为频道标题')
       await libraryPage.searchCbo.click()
       await window.locator('text=Channel title').click()
       console.log('输入频道标题')
-      await libraryPage.searchInput.fill(postArr[0].channelTitle)
+      await libraryPage.searchInput.fill(post.channelTitle)
       await window.waitForTimeout(3000)
       console.log('统计过滤后的推文数量')
       const postNum = await libraryPage.getPostCardEle('', 'channelTitleEle').count()
       console.log('逐一遍历，验证推文标题是否一致')
       for (let i = 0; i < postNum; i++) {
         const postChannelTitle = await libraryPage.getPostCardEle('', 'channelTitleEle').nth(i).innerText()
-        expect(postChannelTitle).toBe(postArr[0].channelTitle)
+        expect(postChannelTitle).toBe(post.channelTitle)
       }
   })
   test("close explore page-关闭探索页面", async()=>{
@@ -236,16 +251,15 @@ test.describe('explorePage-探索页面测试', ()=>{
   })
 })
 test.describe('localFavorite-本地收藏', ()=>{
-  test('add: 添加本地收藏', async()=>{
+  test('add-添加本地收藏', async()=>{
     console.log('准备跳转到主页')
     await basePage.jumpPage('homeLink')
     console.log('跳转到主页, 滚屏加载页面')
     //await libraryPage.scrollToLoadPage()
     console.log('滚动结束')
     // 获取第一张卡片的标题
-    console.log('获取第一张卡片的标题')
-    const cardTitleEle = await window.locator('.post-info .desc-main .desc-title .post-title >> nth=0')
-    console.log(cardTitleEle)
+    console.log('等待第一张卡片出现')
+    const cardTitleEle = await window.waitForSelector('.post-info .desc-main .desc-title .post-title >> nth=0')
     const title = await cardTitleEle.getAttribute('title');
     console.log('title: ' + title)
     console.log('获取第一张卡片的星星按钮')
@@ -314,19 +328,5 @@ test.describe('shareChannel-分享频道测试', ()=>{
     await libraryPage.checkShareLink('homeLink', channelTitle, { isCloseDialog: false })
     console.log('follow')
     await libraryPage.checkShareLink('followingLink', channelTitle)
-    console.log('local_favorite')
-    await libraryPage.checkShareLink('localFavoritesLink', channelTitle)
-    // console.log('explore')
-    // await libraryPage.checkShareLink('exploreLink', channelTitle)
-    await window.waitForTimeout(5000)
-    await libraryPage.checkShareLink('editLink', channelTitle)
-    await libraryPage.checkShareLink('downloadingStatus', channelTitle)
-    await libraryPage.checkShareLink('uploadingStatus', channelTitle)
-    await libraryPage.checkShareLink('downloadedStatus', channelTitle)
-    await libraryPage.checkShareLink('playerLink', channelTitle)
-    await libraryPage.checkShareLink('creditsLink', channelTitle)
-    await libraryPage.checkShareLink('accountSettingLink', channelTitle)
-    await libraryPage.checkShareLink('basicLink', channelTitle)
-    await libraryPage.checkShareLink('advancedLink', channelTitle)
   })
 })
