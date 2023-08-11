@@ -188,6 +188,8 @@ test.describe('explorePage-探索页面测试', ()=>{
         await window.waitForSelector('.post-info .desc-main .desc-title .post-title >> nth=0', {timeout: 10*60000} )
       } catch(error){
         console.log('等待十分钟，没有结果，网络有问题，退出测试')
+        await window.screenshot({ path: `${ScreenshotsPath}search-探索页面中搜索频道-没结果-fail.png` })
+        console.log('截屏')
         return
       }
       const cardTitleEle = window.locator('.post-info .desc-main .desc-title .post-title >> nth=0')
