@@ -40,6 +40,7 @@ test.beforeAll(async () => {
   // new Pege Object Model
   basePage = new BasePage(page)
   oauthPage = new OauthPage(page)
+  basePage.checkForPopup()
 })
 
 // test.afterEach(async ({}, testInfo) => {
@@ -51,7 +52,6 @@ test.beforeAll(async () => {
 test.describe('github', () => {
   test.beforeEach(async () => {
     test.setTimeout(60000 * 5)
-    basePage.checkForPopup()
   })
   test('Ensure disconnected', async () => {
     await page.goto('https://web.alpha.biz', { timeout: 40000, waitUntil: 'domcontentloaded' })

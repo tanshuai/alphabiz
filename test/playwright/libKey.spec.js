@@ -75,6 +75,8 @@ test.beforeAll(async () => {
       console.log(`Console log: ${msg.text()} \n ${msg.location().url} \n lineNumber:${msg.location().lineNumber} \n columnNumber:${msg.location().columnNumber} \n`)
     }
   })
+
+  basePage.checkForPopup()
 })
 
 test.beforeEach(async () => {
@@ -90,7 +92,6 @@ test.afterEach(async ({ }, testInfo) => {
 
 test.describe('librayKey:媒体库密钥测试', () => {
   test.beforeEach(async () => {
-    basePage.checkForPopup()
   })
   // 清除密钥
   test('清除密钥', async () => { 

@@ -44,9 +44,9 @@ test.beforeAll(async () => {
   basePage = new BasePage(window)
   homePage = new HomePage(window)
   libraryPage = new LibraryPage(window)
+  basePage.checkForPopup()
 })
 test.beforeEach(async () => {
-  basePage.checkForPopup()
 })
 test.afterEach(async ({ }, testInfo) => {
   if (testInfo.status !== testInfo.expectedStatus) {
