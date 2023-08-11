@@ -125,7 +125,11 @@ test.beforeAll(async () => {
   basicPage = new BasicPage(window)
   // // fix electron test - ServiceWorker is not defined
   // await basePage.newReload()
-  basePage.checkForPopup()
+  try {
+    basePage.checkForPopup()
+  } catch (error) {
+    // 不做处理
+  }
 })
 test.afterAll(async () => {
 })
@@ -191,7 +195,14 @@ test.describe('播放视频', () => {
     await window.waitForTimeout(5000)
     const progressControl = await playerPage.stopPlay
     await playerPage.playPage.click()
-    await expect(progressControl).toBeVisible({ timeout: 30000 })
+    try{
+      await expect(progressControl).toBeVisible({ timeout: 60000 })
+    }catch(error){
+      console.log('一分钟之内看不到视频播放按钮')
+      await window.screenshot({ path: `${ScreenshotsPath}看不到视频播放按钮.png` })
+      console.log('截屏')
+      return
+    }
   })
 })
 

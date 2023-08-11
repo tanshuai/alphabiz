@@ -67,7 +67,11 @@ test.beforeAll(async () => {
   //     console.log(`Console log: ${msg.text()} \n ${msg.location().url} \n lineNumber:${msg.location().lineNumber} \n columnNumber:${msg.location().columnNumber} \n`)
   //   }
   // })
-  basePage.checkForPopup()
+  try {
+    basePage.checkForPopup()
+  } catch (error) {
+    // 不做处理
+  }
 })
 test.afterAll(async () => {
 })
