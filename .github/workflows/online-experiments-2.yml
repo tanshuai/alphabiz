@@ -96,6 +96,14 @@ jobs:
           yarn test:e2e:electron:library
           unset REPO
         shell: bash
+      
+      - name: oauth E2E Test 🧪( library channel )
+        if: github.event_name == 'push'
+        run: |
+          export REPO=alphabiz
+          yarn test:e2e:electron:libChannel
+          unset REPO
+        shell: bash  
 
       - name: Upload Test Results 🗃
         if: always()
