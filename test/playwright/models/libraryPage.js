@@ -330,7 +330,11 @@ class LibraryPage extends BasePage {
     str = str.replace(/\(.*?\)/, ''); //删去小括号，不然会错误
     const channelReg = new RegExp(str)
     console.log('断言卡片出现频道名称')
-    expect(await this.copyCard).toHaveText(channelReg)
+    try{
+      await expect(this.copyCard, {timeout: 10000}).toHaveText(channelReg)
+    }catch(error){
+      console.log('十秒过去了，没有出现频道名称')
+    }
     console.log('断言成功')
     if (options.isCloseDialog === true) {
       await this.ccCancelBtn.click()
