@@ -335,6 +335,8 @@ class LibraryPage extends BasePage {
       console.log('断言成功')
     }catch(error){
       console.log('断言失败')
+      await this.ccCancelBtn.click()
+      expect(await this.copyCard).toHaveCount(0)
       return
     }
     if (options.isCloseDialog === true) {
