@@ -325,15 +325,9 @@ test.describe('librayKey:媒体库密钥测试', () => {
       await accountPage.syncCloudKey('', { isABPassword: true })
       // 等待密钥配置，加载,等待推荐页面出现
       await window.waitForTimeout(15000)
-      await basePage.signOut()
-    })
-    // 清除密钥缓存
-    test('清除密钥', async () => {
-      await basePage.ensureLoginStatus(name, accountPassword, true, true)
-      await basePage.waitForAllHidden(await basePage.alert)
-      await window.waitForTimeout(5000)
+      console.log('清除密钥')
       await accountPage.disableCloudKey()
       await basePage.signOut()
-    }) 
+    })
   }) 
 })
