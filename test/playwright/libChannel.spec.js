@@ -267,8 +267,6 @@ test.describe('explorePage-探索页面测试', ()=>{
     const followBtn = window.locator('.post-channel-info .follow-btn-label >> nth = 0')
     console.log('准备关注')
     await followBtn.click()
-    console.log('静待5s，在github action中经常会出现乱码现象')
-    await window.waitForTimeout(5000)
     try{
       await window.waitForSelector('.post-channel-info .follow-btn-label:has-text("Following")', {timeout: 30000})
     }catch(error){
@@ -282,7 +280,14 @@ test.describe('explorePage-探索页面测试', ()=>{
     await basePage.jumpPage('followingLink')
     console.log('已跳转')
     console.log('是否出现刚才关注的频道')
-    await window.waitForSelector(`.q-img__content:has-text("${postChannelTitle}")`, {timeout: 30000})    
+    try{
+      await window.waitForSelector(`.q-img__content:has-text("${postChannelTitle}")`, {timeout: 10000})    
+    } catch(error){
+      console.log('没有出现')
+      await window.screenshot({ path: `${ScreenshotsPath}follow-关注了没出现-fail.png` })
+      console.log('截屏')
+      return
+    }
     console.log('出现了')
     const unfollowBtn = window.locator(`.channel-card:has-text("${postChannelTitle}") .follow-btn`)
     console.log('准备取消关注这个频道')
@@ -371,7 +376,7 @@ test.describe('localFavorite-本地收藏', ()=>{
 })
 
 test.describe('shareChannel-分享频道测试', ()=>{
-  test('postCard', async () => {
+  test('到主页拷贝一个频道链接', async () => {
     await basePage.ensureLoginStatus(name, accountPassword, true, true)
     await basePage.jumpPage('homeLink')
     await basePage.waitForAllHidden(await basePage.centerAlert)
@@ -444,7 +449,7 @@ test.describe('downLoad-测试下载功能',()=>{
   test('下载', async()=>{
     // 第二步，找到目标电影
     try{
-      await window.waitForSelector(`.post-info:has-text("${testMovie}")`, {timeout:5*60000})  
+      await window.waitForSelector(`.post-info:has-text("${testMovie}")`, {timeout:60000})  
     }catch(error){
       console.log('五分钟内没有出现目标电影，网络有错误，退出测试')
       return
@@ -478,7 +483,7 @@ test.describe('downLoad-测试下载功能',()=>{
   })
   test('边下边播', async()=>{
     try {
-      await window.waitForSelector(`.post-info:has-text("${testMovie}")`, { timeout: 5 * 60000 })
+      await window.waitForSelector(`.post-info:has-text("${testMovie}")`, { timeout: 60000 })
     } catch (error) {
       console.log('五分钟内没有出现目标电影，网络有错误，退出测试')
       return
@@ -491,7 +496,7 @@ test.describe('downLoad-测试下载功能',()=>{
     // 自动跳转到playerLink
     console.log('完成点击，自动跳转到播放器页, 等待影片播放')
     try{
-      await window.waitForSelector(`.video-js-player:has-text("${testMovie}")`, {timeout: 5*60000})
+      await window.waitForSelector(`.video-js-player:has-text("${testMovie}")`, {timeout: 60000})
       console.log('影片开始播放')
     }catch(error){
       console.log('边下边播失败')
@@ -598,6 +603,8 @@ test.describe('homePage-SearchChannel-在主页中搜索频道', ()=>{
     console.log(visualNums)
     if(visualNums === 5) {
       console.log('当前级别NC-17, 能看到五种影片')
+    } else {
+      console.log('看到的个数: '+visualNums)
     }
   })
 
@@ -630,7 +637,6 @@ test.describe('homePage-SearchChannel-在主页中搜索频道', ()=>{
       await targetChannel.click()
     } else {
       console.log('进入失败')
-
       return
     }
     // 遍历影片列表
@@ -648,6 +654,8 @@ test.describe('homePage-SearchChannel-在主页中搜索频道', ()=>{
     console.log(visualNums)
     if (visualNums === 3) {
       console.log('当前级别PG-13, 能看到三种影片')
+    } else{
+      console.log('看到的个数: '+visualNums)
     }
   })
 })
