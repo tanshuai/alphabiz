@@ -1,14 +1,16 @@
-library-test: change cron
-test library channel
+test library
+test library
+test library
+test library
 test library key
-libChannel-pretest: update-version
-test library key
-test library channel
-test复用checkForPopup
-test library key
-test library channel
-test library channel
-test library channel : download
-test library channel
-test library channel
-fix arch
+test library
+test library
+test library
+test library
+test library
+test library
+test library
+test library
+test library
+test library
+update linux arm build scripts
