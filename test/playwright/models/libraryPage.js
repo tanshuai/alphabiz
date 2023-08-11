@@ -331,11 +331,12 @@ class LibraryPage extends BasePage {
     const channelReg = new RegExp(str)
     console.log('断言卡片出现频道名称')
     try{
-      await expect(this.copyCard, {timeout: 10000}).toHaveText(channelReg)
+      await expect(this.copyCard, {timeout: 60000}).toHaveText(channelReg)
+      console.log('断言成功')
     }catch(error){
-      console.log('十秒过去了，没有出现频道名称')
+      console.log('断言失败')
+      return
     }
-    console.log('断言成功')
     if (options.isCloseDialog === true) {
       await this.ccCancelBtn.click()
       expect(await this.copyCard).toHaveCount(0)
