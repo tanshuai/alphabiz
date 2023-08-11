@@ -325,15 +325,23 @@ class LibraryPage extends BasePage {
     await this.page.waitForTimeout(1000)
     await this.page.keyboard.press(`${this.modifier}+KeyV`)
     await this.copyCard.waitFor()
-    const channelReg = new RegExp(targetChannel)
+    console.log('粘贴频道ID')
+    let str = targetChannel
+    str = str.replace(/\(.*?\)/, ''); //删去小括号，不然会错误
+    const channelReg = new RegExp(str)
+    console.log('断言卡片出现频道名称')
     expect(await this.copyCard).toHaveText(channelReg)
+    console.log('断言成功')
     if (options.isCloseDialog === true) {
       await this.ccCancelBtn.click()
       expect(await this.copyCard).toHaveCount(0)
     } else {
       await this.ccOKBtn.click()
+      console.log('定位到频道')
       await this.checkNavBar(targetChannel)
+      console.log('断言cd标题有频道名称')
       expect(await this.cdTitle).toHaveText(channelReg)
+      console.log('断言成功')
     }
   }
 
