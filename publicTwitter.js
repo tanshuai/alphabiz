@@ -2,7 +2,7 @@ const Twitter = require('twitter')
 const fs = require('fs')
 require('dotenv').config()
 const describe = fs.readFileSync('./github-describe/github-describe.txt', 'utf-8')
-console.log(describe)
+// console.log(describe)
 const publicTwitter = (describe) => {
   const client = new Twitter({
     consumer_key: process.env.TWITTER_CONSUMER_KEY,
@@ -15,7 +15,7 @@ const publicTwitter = (describe) => {
     { status: describe },
     function (error, tweet, response) {
       if (error) {
-        if (error && error[0].message && error[0].message.includes('duplicate.')) {
+        if (error && Array.isArray(error) && error[0].message && error[0].message.includes('duplicate.')) {
           console.log('error:', error[0].message)
           return
         } else {
@@ -27,4 +27,4 @@ const publicTwitter = (describe) => {
     }
   )
 }
-// publicTwitter(describe)
+publicTwitter(describe)

@@ -40,6 +40,10 @@ jobs:
       TEST3_PHONE_NUMBER: ${{ secrets.TEST3_PHONE_NUMBER }}
       TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
       TEST_RESET_PASSWORD: ${{ secrets.TEST_RESET_PASSWORD }}
+      TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
+      TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
+      TWITTER_ACCESS_TOKEN_KEY: ${{ secrets.TWITTER_ACCESS_TOKEN_KEY }}
+      TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
     steps:
       - name: Get short SHA 🔑
         id: slug
@@ -81,6 +85,28 @@ jobs:
           echo "${{ steps.vars.outputs.tag-name }}"
           echo "isRunAppium: ${{ steps.vars.outputs.isRunAppium }}"
         shell: bash
+
+      - name: Setup Node.js ${{ matrix.node-version }} 📮
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "yarn"
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@zeeis"
+
+      - name: Install dependencies 👨🏻‍💻
+        uses: nick-fields/retry@v2
+        with:
+          timeout_seconds: 600
+          max_attempts: 2
+          shell: bash
+          retry_on: error
+          command: yarn
+          on_retry_command: rm -rf C:/Users/runneradmin/AppData/Local/node-gyp/
+
+      - name: public describe to Twitter
+        if: contains(steps.vars.outputs.event-name, 'schedule')
+        run: yarn node publicTwitter.js
 
   appium-test:
     needs: build-1
