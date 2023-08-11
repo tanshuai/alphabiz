@@ -6,6 +6,10 @@ description: {{description}}
 grade: stable
 confinement: strict
 base: core18
+# This tells snapcraft to cross-compile for target arch
+architectures:
+  - build-on: {{arch}}
+    run-on: {{arch}}
 
 apps:
   {{snapName}}:
