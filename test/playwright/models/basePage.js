@@ -206,10 +206,10 @@ class BasePage {
   while (true) {
     // 循环时间，监督弹窗的出现
     try {
-      const element = await this.page.waitForSelector('.q-card:has-text("INTERNAL DEMO ONLY")', { timeout: 60000 });
+      await this.page.waitForSelector('.q-card:has-text("INTERNAL DEMO ONLY")', { timeout: 60000 });
       await this.page.waitForTimeout(2000)
-      element = await this.page.waitForSelector('.q-card:has-text("INTERNAL DEMO ONLY")', { timeout: 60000 });// 二次确认
-      if(element){
+      const confirm = await this.page.waitForSelector('.q-card:has-text("INTERNAL DEMO ONLY")', { timeout: 60000 });
+      if(confirm){
         console.log('checkForPopup发现了弹窗')
         await this.closeInternalNotice() 
         console.log('checkForPopup关闭了弹窗')
