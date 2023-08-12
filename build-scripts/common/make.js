@@ -259,7 +259,7 @@ if (process.argv.includes('--make')) {
       : existsSync(publicLocales)
         ? readFileSync(publicLocales, 'utf-8').split('\n').map(line => {
           const [lang] = line.replace(/#.*$/, '').trim().split(' ')
-          if (!lang) return undefined
+          if (!lang || lang.includes('#')) return undefined
           return lang.toLowerCase()
         }).filter(line => line)
         : ['en-us']
