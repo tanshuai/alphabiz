@@ -59,11 +59,7 @@ test.beforeAll(async () => {
   // new Pege Object Model
   basePage = new BasePage(window)
   homePage = new HomePage(window)
-  try {
-    basePage.checkForPopup()
-  } catch (error) {
-    // 不做处理
-  }
+  basePage.checkForPopup()
 })
 test.beforeEach(async () => {
   await window.evaluate(() => localStorage.clear())

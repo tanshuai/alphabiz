@@ -40,11 +40,7 @@ test.beforeAll(async () => {
   // new Pege Object Model
   basePage = new BasePage(page)
   oauthPage = new OauthPage(page)
-  try {
-    basePage.checkForPopup()
-  } catch (error) {
-    // 不做处理
-  }
+  basePage.checkForPopup()
 })
 
 // test.afterEach(async ({}, testInfo) => {
