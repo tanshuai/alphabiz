@@ -183,8 +183,12 @@ class BasePage {
 
   async closeInternalNotice () {
     const internalNoticeCss = '.q-card:has-text("INTERNAL DEMO ONLY")'
-    await this.page.locator(internalNoticeCss).waitFor({timeout:10000})
-    await his.page.locator(`${internalNoticeCss} button:has-text("close")`).click()
+    await this.page.locator(internalNoticeCss).waitFor()
+    await Promise.all[
+      this.page.locator(internalNoticeCss).waitFor({ state: 'hidden', timeout: 30000 }),
+      this.page.locator(`${internalNoticeCss} button:has-text("close")`).click()
+    ]
+    await this.page.waitForTimeout(2000)
   }
 
   async newReload () {
@@ -213,6 +217,7 @@ class BasePage {
         return null;
       } else {
         console.log(error.message)
+        await this.page.waitForTimeout(5000)
       }
     }
   }
