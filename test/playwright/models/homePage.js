@@ -116,17 +116,27 @@ class HomePage extends BasePage {
   }
 
   async clearTask () {
+    console.log('准备跳转到下载列表')
     await this.jumpPage('downloadingStatus')
+    console.log('跳转成功')
     await this.page.waitForTimeout(7000)
     try {
+      console.log('等待出现删除按钮')
       await this.downRemoveAllBtn.waitFor({ timeout: 5000 })
+      console.log('已经出现')
     } catch (e) {
+      console.log('没有出现，怀疑是不是来错地方了')
       await this.jumpPage('downloadingStatus')
+      console.log('再次跳转')
     }
+    console.log('点击查找按钮')
     await this.searchBtn.click({ force: true })
     await this.page.waitForTimeout(1000)
+    console.log('删除全部的按钮是否可用')
     if (await this.downRemoveAllBtn.isEnabled()) {
+      console.log('可用，点击')
       await this.downRemoveAllBtn.click()
+      console.log('已经点击')
       const isDeleteFile = await this.deleteFileChk.getAttribute('aria-checked')
       if (isDeleteFile !== 'true') {
         await this.deleteFileChk.click()

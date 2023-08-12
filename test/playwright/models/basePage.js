@@ -207,6 +207,8 @@ class BasePage {
     // 循环时间，监督弹窗的出现
     try {
       const element = await this.page.waitForSelector('.q-card:has-text("INTERNAL DEMO ONLY")', { timeout: 60000 });
+      await this.page.waitForTimeout(2000)
+      element = await this.page.waitForSelector('.q-card:has-text("INTERNAL DEMO ONLY")', { timeout: 60000 });// 二次确认
       if(element){
         console.log('checkForPopup发现了弹窗')
         await this.closeInternalNotice() 
@@ -261,7 +263,13 @@ class BasePage {
     }
     await this.page.waitForLoadState()
     if (process.platform === 'darwin') await this.page.waitForTimeout(2000)
-    if (!await this.accountInput.isVisible()) this.jumpPage('accountSignIn')
+    if (!await this.accountInput.isVisible()) {
+      console.log('看不到accountInput')
+      this.jumpPage('accountSignIn')
+    } else{
+      console.log('看见了accountInput')
+      this.page.waitForTimeout(1000)
+    }
     await this.accountInput.click()
     await this.page.keyboard.type(username, { delay: 100 })
     await this.passwordInput.click()
