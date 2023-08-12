@@ -184,7 +184,7 @@ const app = {
    * `raw.githubusercontent.com` for raw contents instead of `github.com`.
    * The default url links to `https://github.com/tanshuai/alphabiz/blob/main/i18n`
    */
-  externalI18n: 'https://raw.githubusercontent.com/fengpxu/6to/main/i18n'
+  externalI18n: 'https://raw.githubusercontent.com/tanshuai/alphabiz/main/i18n'
 }
 
 console.log('INIT APP CONFIG')
