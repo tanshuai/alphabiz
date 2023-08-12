@@ -119,13 +119,13 @@ test.describe('librayKey:媒体库密钥测试', () => {
       console.log('等待主页中的频道出现，否则稍等片刻会强制跳转回主页')
       await window.waitForSelector('.post-channel-info', { timeout: 60000 })
       console.log('已出现，页面加载完毕')
-      // isABPassword = false, 不使用账户密码
       try{
         await accountPage.disableCloudKey()
       } catch(error) {
         console.log('云端存储原本就已经关闭')
       }
       await console.log('使用独立密码新建密钥')
+      // isABPassword = false, 不使用账户密码, 使用独立密码
       await accountPage.enableCloudKey(inPassword, false)
       await console.log('新建完毕')
       await window.waitForTimeout(3000)
