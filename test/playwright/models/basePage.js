@@ -183,12 +183,8 @@ class BasePage {
 
   async closeInternalNotice () {
     const internalNoticeCss = '.q-card:has-text("INTERNAL DEMO ONLY")'
-    await this.page.locator(internalNoticeCss).waitFor()
-    await Promise.all[
-      this.page.locator(internalNoticeCss).waitFor({ state:'hidden', timeout: 30000 }),
-      this.page.locator(`${internalNoticeCss} button:has-text("close")`).click()
-    ]
-    await this.page.waitForTimeout(2000)
+    await this.page.locator(internalNoticeCss).waitFor({timeout:10000})
+    await his.page.locator(`${internalNoticeCss} button:has-text("close")`).click()
   }
 
   async newReload () {
@@ -203,13 +199,22 @@ class BasePage {
 
   async checkForPopup () {
   while (true) {
-      // 循环时间，监督弹窗的出现
-    const element = await this.waitForSelectorOptional('.q-card:has-text("INTERNAL DEMO ONLY")', { timeout: 2147483647})
+    // 循环时间，监督弹窗的出现
+    try {
+      const element = await this.page.waitForSelector('.q-card:has-text("INTERNAL DEMO ONLY")', { timeout: 2147483647 });
       if(element){
         console.log('checkForPopup发现了弹窗')
-        await this.closeInternalNotice()
+        await this.closeInternalNotice() 
         console.log('checkForPopup关闭了弹窗')
       }
+    } catch (error) {
+      if (error.message.includes('Timeout')) {
+        if (msg) console.log(msg)
+        return null;
+      } else {
+        console.log(error.message)
+      }
+    }
   }
 }
 
