@@ -192,6 +192,7 @@ class BasePage {
   }
 
   async newReload () {
+    console.log('调用一次newReload')
     await this.page.reload()
     if (app.displayName === 'Alphabiz') {
       const version = await this.versionBtn.innerText()
@@ -205,7 +206,7 @@ class BasePage {
   while (true) {
     // 循环时间，监督弹窗的出现
     try {
-      const element = await this.page.waitForSelector('.q-card:has-text("INTERNAL DEMO ONLY")', { timeout: 2147483647 });
+      const element = await this.page.waitForSelector('.q-card:has-text("INTERNAL DEMO ONLY")', { timeout: 60000 });
       if(element){
         console.log('checkForPopup发现了弹窗')
         await this.closeInternalNotice() 
@@ -213,7 +214,6 @@ class BasePage {
       }
     } catch (error) {
       if (error.message.includes('Timeout')) {
-        if (msg) console.log(msg)
         return null;
       } else {
         console.log(error.message)
