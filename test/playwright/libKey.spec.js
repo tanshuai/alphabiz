@@ -14,7 +14,7 @@ const app = require('../../developer/app.js')
 let window, windows, electronApp, basePage, homePage, libraryPage, playerPage, basicPage, accountPage
 const ScreenshotsPath = 'test/output/playwright/library_key.spec/'
 
-let name, checkName
+let name
 if (process.platform === 'win32') {
   name = 'test7'
 } else if (process.platform === 'linux') {
