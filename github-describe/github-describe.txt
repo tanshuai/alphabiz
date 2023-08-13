@@ -1,13 +1,3 @@
-Update index.js
-fix: #777
-Update index.js
-OAuth: improve RestoreOAuthFlow
-OAuth: add delay for RestoreOAuthFlow
-OAuth: fix: missing `flow` when calling updateStage
-ui adjustment: MnemonicCode
-OAuth: enable Github Entry
-AlphabizAccount: add views SignUpConfirmCard, ResetPasswordCard
-OAuth: disable legacy backend interfaces of Github
-OAuth: disable legacy frontend interfaces of Github
-try get token in actions
-fix e2e test delete account error、add waiting time
+backend: GithubSubscription Task
+fix bug of `createBindingTasks`
+add TaskPanel
