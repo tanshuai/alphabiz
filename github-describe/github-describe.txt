@@ -1,16 +1,13 @@
-fix bug
-fix: #722
-fix: #772
-fix oauth bug
-fix Router
 Update index.js
+fix: #777
 Update index.js
-Update index.js
-oauth router
-OAuth
-fix #775
-OAuth for website
-Update OAuthManager.vue
-Update index.js
-fix #735
-OAuth
+OAuth: improve RestoreOAuthFlow
+OAuth: add delay for RestoreOAuthFlow
+OAuth: fix: missing `flow` when calling updateStage
+ui adjustment: MnemonicCode
+OAuth: enable Github Entry
+AlphabizAccount: add views SignUpConfirmCard, ResetPasswordCard
+OAuth: disable legacy backend interfaces of Github
+OAuth: disable legacy frontend interfaces of Github
+try get token in actions
+fix e2e test delete account error、add waiting time
