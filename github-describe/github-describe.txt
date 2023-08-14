@@ -1,18 +1,13 @@
 test library
 test library
-add various i18n files and fix win build scripts
-test library
-test library
-test library key
 test library
 test library
 test library
+fix language codes
 test library
 test library
+test main
+test main
 test library
 test library
-test library
-fix script for public repo
-test library
-test library
-fix error
+add init script for linux and mac
