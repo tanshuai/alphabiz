@@ -260,6 +260,33 @@ test.describe('切换语言设置', () => {
     })
     // EN -> CN -> TW -> EN
     test('语言重复切换-EN->CN->TW->EN', async () => {
+      const inHome = await window.locator('.left-drawer-menu .q-item:has-text("home").active-item').isVisible()
+      if (inHome) {
+        console.log('是否有Follow菜单项')
+        try {
+          await window.waitForSelector('.left-drawer-menu >> text=following', { timeout: 10000 })
+          console.log('有')
+        } catch (error) {
+          console.log('没有')
+          console.log('等待出现局部推荐页面的第一个频道')
+          await window.waitForSelector('.channel-card >> nth=5', { timeout: 60000 })
+          if (!await libraryPage.channelSelected.isVisible()) {
+            console.log('选中第一个频道')
+            await libraryPage.chanel1Local.click(); //局部推荐页的第一个频道定位
+            console.log('成功选中')
+          }
+          console.log('点击Follow')
+          // 3. 点击Follow按钮
+          await libraryPage.channelFollowsBtn.click();
+          console.log('成功Follow了一个频道')
+          if (await basePage.followingLink.isVisible()) {
+            console.log('菜单中出现了Follow选项')
+          }
+        }
+        console.log('等待主页中的频道出现，否则稍等片刻会强制跳转回主页')
+        await window.waitForSelector('.post-channel-info', { timeout: 60000 })
+        console.log('已出现，页面加载完毕')
+      }
       console.log('EN->CN')
       await basicPage.saveLanguage('EN', 'CN')
       await expect(await basicPage.headerTitle).toHaveText(/基础设置/, { timeout: 20000 })
@@ -270,7 +297,7 @@ test.describe('切换语言设置', () => {
       await basicPage.saveLanguage('TW', 'EN')
       await expect(await basicPage.headerTitle).toHaveText(/Basic/, { timeout: 20000 })
     })
-    test.only('确保最后的语言是EN', async () => {
+    test('确保最后的语言是EN', async () => {
       try{
         console.log('先跳转到基础设置页')
         await window.locator('.q-item:has-text("assignment")').click()
