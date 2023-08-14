@@ -262,7 +262,13 @@ if (process.argv.includes('--make')) {
           if (!lang || lang.includes('#')) return undefined
           return lang.toLowerCase()
         }).filter(line => line)
-        : ['en-us']
+        : ['en-us', 'zh-cn', 'zh-tw']
+    // Internal languages
+    for (const lang of ['zh-tw', 'zh-cn', 'en-us']) {
+      if (!languages.includes(lang)) {
+        languages.unshift(lang)
+      }
+    }
     appxTemplate = appxTemplate
       .replace('{{description}}', description)
       .replace('{{appxPackageIdentityName}}', appConfig.appxPackageIdentityName)
