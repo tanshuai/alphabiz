@@ -160,16 +160,16 @@ test('checkNetwork-检查节点连接是否正常', async ()=>{
     await window.locator('button:has-text("close")').click()
     console.log('点击关闭按钮')
   }else{
-    console.log('当前大界面，关闭按钮隐藏')
-    const outsideEle = await window.locator('.q-dialog >>.peer-dialog-card') 
-    const box = await outsideEle.boundingBox()
-    if(box){
-      const { x, y, width, height } = box
-      const clickX = x - width / 10
-      const clickY = y + height / 2
-      console.log('准备点击弹窗外的有效区域')
-      await window.mouse.click(clickX, clickY, {delay:500})
-      console.log('点击')
+    const dialogSelector = await window.locator('.q-table:has-text("status") tr>>nth=1')
+    await dialogSelector.click()
+    console.log('点击对话框中的内容，以确保它获得焦点')
+    await window.waitForTimeout(1000)
+    await window.keyboard.press('Escape');
+    await window.keyboard.press('Escape');
+    console.log('按下Esc键以关闭对话框')
+    await window.waitForTimeout(1000)
+    if (await window.locator('.q-dialog >>.peer-dialog-card').isVisible()) {
+      console.log('没有关闭')
     }
   }
   console.log('已经关闭弹窗')
