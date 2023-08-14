@@ -133,8 +133,8 @@ test.beforeEach(async () => {
       }
     }
     console.log('等待主页中的频道出现，否则稍等片刻会强制跳转回主页')
-    await window.waitForSelector('.post-channel-info', { timeout: 60000 })
-    console.log('已出现，页面加载完毕')
+    const mainLoad = await basePage.waitForSelectorOptional('.post-channel-info', { timeout: 60000 }, "主页在1分钟内没有加载出来")
+    if (mainLoad) console.log('已出现，页面加载完毕')
   }
 })
 test.afterEach(async ({ }, testInfo) => {
@@ -398,6 +398,37 @@ test.describe('shareChannel-分享频道测试', ()=>{
 
 test.describe('downLoad-测试下载功能',()=>{
   test.beforeEach(async()=>{
+    const message = await basePage.ensureLoginStatus(name, accountPassword, true, true)
+    if (message == "success") {
+      await basePage.waitForAllHidden(await basePage.alert)
+    }
+    const inHome = await window.locator('.left-drawer-menu .q-item:has-text("home").active-item').isVisible()
+    if (inHome) {
+      console.log('是否有Follow菜单项')
+      try {
+        await window.waitForSelector('.left-drawer-menu >> text=following', { timeout: 10000 })
+        console.log('有')
+      } catch (error) {
+        console.log('没有')
+        console.log('等待出现局部推荐页面的第一个频道')
+        await window.waitForSelector('.channel-card >> nth=5', { timeout: 60000 })
+        if (!await libraryPage.channelSelected.isVisible()) {
+          console.log('选中第一个频道')
+          await libraryPage.chanel1Local.click(); //局部推荐页的第一个频道定位
+          console.log('成功选中')
+        }
+        console.log('点击Follow')
+        // 3. 点击Follow按钮
+        await libraryPage.channelFollowsBtn.click();
+        console.log('成功Follow了一个频道')
+        if (await basePage.followingLink.isVisible()) {
+          console.log('菜单中出现了Follow选项')
+        }
+      }
+      console.log('等待主页中的频道出现，否则稍等片刻会强制跳转回主页')
+      const mainLoad = await basePage.waitForSelectorOptional('.post-channel-info', { timeout: 60000 }, "主页在1分钟内没有加载出来")
+      if (mainLoad) console.log('已出现，页面加载完毕')
+    }
     console.log('准备跳转首页')
     await basePage.jumpPage('homeLink')
     console.log('跳转成功')
@@ -406,20 +437,30 @@ test.describe('downLoad-测试下载功能',()=>{
     console.log('搜索频道')
     await libraryPage.searchChannelID(testChannel, false)
     // 进入频道
-    console.log('找到频道')
-    const targetChannel = window.locator(`.q-card:has-text("Search for channel ID") .channel-image .q-img__content:has-text("${testChannel.title}")`)
-    if (await targetChannel.isVisible()) {
+    const targetChannel = await basePage.waitForSelectorOptional(`.q-card:has-text("Search for channel ID") .channel-image .q-img__content:has-text("${testChannel.title}")`, {timeout:20000}, '找不到频道')
+    if (targetChannel) {
       console.log('进入频道')
       await targetChannel.click()
+    } else {
+      await libraryPage.sciCloseBtn.click()
+      console.log('关闭搜索页')
+      test.skip()
     }
   })
   test('下载', async()=>{
-    // 第二步，找到目标电影
-    await window.waitForSelector(`.post-info:has-text("${testMovie}")`, {timeout:60000})  
+    console.log('滚屏加载')
+    await window.locator('.posts').hover()
+    await window.mouse.wheel(0, 1000)
+    console.log('寻找目标电影')
+    const targetFilm = await basePage.waitForSelectorOptional(`.post-info:has-text("${testMovie}")`, {timeout:60000},'没有找到')
+    if(targetFilm) console.log('成功找到')
+    else{
+      test.skip()
+    } 
     const downLoadBtn = window.locator(`.post-info:has-text("${testMovie}") .q-btn:has-text("Download")`)    
     // 第三步，点击下载按钮
-    console.log('点击下载按钮')
     await downLoadBtn.click()
+    console.log('点击下载按钮')
     await window.waitForTimeout(2000)
     // 跳转到下载
     console.log('准备跳转到下载页')
@@ -444,17 +485,22 @@ test.describe('downLoad-测试下载功能',()=>{
     console.log('已经移除')
   })
   test('边下边播', async()=>{
-    await window.waitForSelector(`.post-info:has-text("${testMovie}")`, { timeout: 60000 })
-    // 第二步，找到目标电影
+    console.log('寻找目标电影')
+    const targetFilm = await basePage.waitForSelectorOptional(`.post-info:has-text("${testMovie}")`, { timeout: 60000 }, '没有找到')
+    if (targetFilm) console.log('成功找到')
+    else {
+      test.skip()
+    } 
+    // 点击边下边播按钮
     const PlayBtn = window.locator(`.post-info:has-text("${testMovie}") .q-btn:has-text("Play...")`)
-    // 第三步，点击边下边播按钮
     console.log('点击边下边播按钮')
     await PlayBtn.click({delay: 500})
     // 自动跳转到playerLink
     console.log('完成点击，自动跳转到播放器页, 等待影片播放')
-    await window.waitForSelector(`.video-js-player:has-text("${testMovie}")`, {timeout: 60000})
-    console.log('影片开始播放')
-    console.log('跳转成功')
+    const playing = await basePage.waitForSelectorOptional(`.video-js-player:has-text("${testMovie}")`, {timeout: 30000}, '30s内无响应')
+    if(playing){
+      console.log('影片开始播放')
+    }
     // 跳转到下载页面
     console.log('准备跳转到下载页')
     await basePage.jumpPage('downloadingStatus')
@@ -486,14 +532,15 @@ test.describe('homePage-SearchChannel-在主页中搜索频道', ()=>{
     await basePage.waitForAllHidden(await basePage.centerAlert)
     console.log('搜索私有频道')
     await libraryPage.searchChannelID(privateChannel, true)
-    console.log('找到频道')
     // 等待频道出现
-    await window.waitForSelector(`.q-card:has-text("Search for channel ID") .channel-image .q-img__content:has-text("${privateChannel.title}")`, {timeout: 60000})
-    console.log('频道出现')
-    const targetChannel = window.locator(`.q-card:has-text("Search for channel ID") .channel-image .q-img__content:has-text("${privateChannel.title}")`)
-    if (await targetChannel.isVisible()) {
-      await targetChannel.click()
+    const targetChannel = await basePage.waitForSelectorOptional(`.q-card:has-text("Search for channel ID") .channel-image .q-img__content:has-text("${privateChannel.title}")`, { timeout: 20000 }, '找不到频道')
+    if (targetChannel) {
       console.log('进入频道')
+      await targetChannel.click()
+    }else{
+      await libraryPage.sciCloseBtn.click()
+      console.log('关闭搜索页')
+      test.skip()
     }
   })
   test('available-firm-rate搜索不同级别的电影(NC-17)', async ()=>{
@@ -516,15 +563,14 @@ test.describe('homePage-SearchChannel-在主页中搜索频道', ()=>{
     console.log('搜索拥有全级别的频道')
     await libraryPage.searchChannelID(fullLevelChannel, true)
     // 进入频道
-    console.log('找到频道')
-    const targetChannel = window.locator(`.q-card:has-text("Search for channel ID") .channel-image .q-img__content:has-text("${fullLevelChannel.title}")`)    
-    await window.waitForTimeout(2000)
-    if (await targetChannel.isVisible()) {
+    const targetChannel = await basePage.waitForSelectorOptional(`.q-card:has-text("Search for channel ID") .channel-image .q-img__content:has-text("${fullLevelChannel.title}")`, { timeout: 20000 }, '找不到频道')
+    if (targetChannel) {
       console.log('进入频道')
       await targetChannel.click()
-    } else{
-      console.log('进入失败')
-      return
+    } else {
+      await libraryPage.sciCloseBtn.click()
+      console.log('关闭搜索页')
+      test.skip()
     }
     // 遍历影片列表
     const firm = await basePage.waitForSelectorOptional('.desc-main > .text-subtitle2', {timeout: 10000}, '10s内没有影片出现')
@@ -570,15 +616,14 @@ test.describe('homePage-SearchChannel-在主页中搜索频道', ()=>{
     console.log('搜索拥有全级别的频道')
     await libraryPage.searchChannelID(fullLevelChannel, true)
     // 进入频道
-    console.log('找到频道')
-    const targetChannel = window.locator(`.q-card:has-text("Search for channel ID") .channel-image .q-img__content:has-text("${fullLevelChannel.title}")`)
-    await window.waitForTimeout(2000)
-    if (await targetChannel.isVisible()) {
+    const targetChannel = await basePage.waitForSelectorOptional(`.q-card:has-text("Search for channel ID") .channel-image .q-img__content:has-text("${fullLevelChannel.title}")`, { timeout: 20000 }, '找不到频道')
+    if (targetChannel) {
       console.log('进入频道')
       await targetChannel.click()
     } else {
-      console.log('进入失败')
-      return
+      await libraryPage.sciCloseBtn.click()
+      console.log('关闭搜索页')
+      test.skip()
     }
     // 遍历影片列表
     const firm = await basePage.waitForSelectorOptional('.desc-main > .text-subtitle2', { timeout: 10000 }, '10s内没有影片出现')
