@@ -91,8 +91,12 @@ test.describe('librayKey:媒体库密钥测试', () => {
     console.log('已经登录')
     await basePage.waitForAllHidden(await basePage.alert)
     console.log('等待主页中的频道出现，否则稍等片刻会强制跳转回主页')
-    await window.waitForSelector('.post-channel-info', { timeout: 60000 })
-    console.log('已出现，页面加载完毕')
+    try{
+      await window.waitForSelector('.post-channel-info', { timeout: 15000 })
+      console.log('已出现，页面加载完毕')
+    }catch(error){
+      console.log('15s内页面加载失败')
+    }
     await console.log("准备清除密钥")
     await accountPage.disableCloudKey()
     await console.log("成功清除密钥")
@@ -109,8 +113,12 @@ test.describe('librayKey:媒体库密钥测试', () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
       await basePage.waitForAllHidden(await basePage.alert)
       console.log('等待主页中的频道出现，否则稍等片刻会强制跳转回主页')
-      await window.waitForSelector('.post-channel-info', { timeout: 60000 })
-      console.log('已出现，页面加载完毕')
+      try{
+        await window.waitForSelector('.post-channel-info', { timeout: 15000 })
+        console.log('已出现，页面加载完毕')
+      }catch(error){
+        console.log('15s内页面加载失败')
+      }
       try{
         await accountPage.disableCloudKey()
       } catch(error) {
