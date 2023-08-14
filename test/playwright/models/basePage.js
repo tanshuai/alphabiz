@@ -167,7 +167,9 @@ class BasePage {
       }
     }catch(error){
       console.log('isHidden failed')
-      this.page.screenshot({ path: `test/output/playwright/basePage/jumpPage-fail.png` })
+      await this.page.screenshot({ path: `test/output/playwright/basePage/jumpPage-fail.png` })
+      console.log('截屏，刷新页面')
+      await this.page.reload()
     }
     if (secondTarget) {
       if (await menuButton.isHidden()) {
