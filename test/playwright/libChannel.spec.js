@@ -96,6 +96,10 @@ test.beforeAll(async () => {
   basePage.checkForPopup()
 })
 
+test.afterAll(async()=>{
+  await basePage.signOut()
+})
+
 
 
 test.beforeEach(async () => {

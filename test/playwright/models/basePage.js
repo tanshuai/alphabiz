@@ -160,9 +160,14 @@ class BasePage {
   async jumpPage (firstTarget, secondTarget) {
     const menuButton = await this[secondTarget] || await this[firstTarget]
     await this.page.waitForTimeout(500)
-    const isHidden = await this[firstTarget].isHidden()
-    if (isHidden) {
-      await this.menuIcon.click({ timeout: 60000 })
+    try{
+      const isHidden = await this[firstTarget].isHidden()
+      if (isHidden) {
+        await this.menuIcon.click({ timeout: 60000 })
+      }
+    }catch(error){
+      console.log('isHidden failed')
+      this.page.screenshot({ path: `test/output/playwright/basePage/jumpPage-fail.png` })
     }
     if (secondTarget) {
       if (await menuButton.isHidden()) {
