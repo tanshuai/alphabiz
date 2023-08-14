@@ -139,6 +139,7 @@ test.afterEach(async ({}, testInfo) => {
   }
 })
 test('close set default', async () => {
+  console.log('刷新')
   await basePage.newReload()
   try {
     await basePage.defaultAppAlert.waitFor({ timeout: 3000 })
@@ -254,7 +255,7 @@ test.describe('切换语言设置', () => {
       await basePage.clearLocalstorage()
       await window.waitForTimeout(3000)
       await basePage.quickSaveLanguage('EN')
-      await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
+      await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1) //登陆
       await window.waitForLoadState()
     })
     // EN -> CN -> TW -> EN
@@ -268,6 +269,26 @@ test.describe('切换语言设置', () => {
       console.log('TW->EN')
       await basicPage.saveLanguage('TW', 'EN')
       await expect(await basicPage.headerTitle).toHaveText(/Basic/, { timeout: 20000 })
+    })
+    test.only('确保最后的语言是EN', async () => {
+      try{
+        console.log('先跳转到基础设置页')
+        await window.locator('.q-item:has-text("assignment")').click()
+        console.log('跳转到基础设置页, 断言标题是Basic')
+        await expect(await basicPage.headerTitle).toHaveText(/Basic/, { timeout: 5000 })
+        console.log('√断言成功')
+      }catch(error){
+        console.log('×断言失败')
+        console.log('点击语言下拉框')
+        await window.locator('.q-field__append >> nth=0').click()
+        console.log('点击第一项就是英语')
+        await window.locator('.q-menu .q-item >> nth = 0').click()
+        console.log('保存设置')
+        await basicPage.saveSetting()
+        console.log('成功保存')
+        await expect(await basicPage.headerTitle).toHaveText(/Basic/, { timeout: 5000 })
+        console.log('√')
+      }
     })
   })
 })

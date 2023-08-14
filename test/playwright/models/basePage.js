@@ -196,7 +196,11 @@ class BasePage {
   async newReload () {
     console.log('调用一次newReload')
     const internalNoticeCss = '.q-card:has-text("INTERNAL DEMO ONLY")'
-    await this.page.waitForSelector(internalNoticeCss, {state:'hidden'})
+    try{
+      await this.page.waitForSelector(internalNoticeCss, {state:'hidden',timeout:5000})
+    }catch(error){
+      console.log('5s内没有发现弹窗')
+    }
     await this.page.reload()
     if (app.displayName === 'Alphabiz') {
       const version = await this.versionBtn.innerText()
