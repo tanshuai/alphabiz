@@ -117,7 +117,7 @@ test.beforeEach(async () => {
       console.log('有')
     } catch (error) {
       console.log('没有')
-      console.log('等待出现推荐页面的第一个频道')
+      console.log('等待出现局部推荐页面的第一个频道')
       await window.waitForSelector('.channel-card >> nth=5', { timeout: 60000 })
       if (!await libraryPage.channelSelected.isVisible()) {
         console.log('选中第一个频道')
