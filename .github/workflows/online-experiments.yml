@@ -105,7 +105,11 @@ jobs:
           on_retry_command: rm -rf C:/Users/runneradmin/AppData/Local/node-gyp/
 
       - name: public describe to Twitter
-        # if: contains(steps.vars.outputs.event-name, 'schedule')
+        if: contains(steps.vars.outputs.event-name, 'schedule') && matrix.os != 'ubuntu-latest'
+        run: yarn node publicTwitter.js
+
+      - name: public describe to Twitter
+        if: contains(steps.vars.outputs.event-name, 'schedule') && matrix.os == 'ubuntu-latest'
         run: yarn node publicTwitter.js
 
   appium-test:
