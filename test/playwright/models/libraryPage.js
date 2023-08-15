@@ -332,14 +332,13 @@ class LibraryPage extends BasePage {
     await this.page.waitForTimeout(1000)
     await this.page.keyboard.press(`${this.modifier}+KeyV`)
     await this.page.keyboard.press(`${this.modifier}+KeyV`)
-    await this.copyCard.waitFor()
     console.log('粘贴频道ID')
     let str = targetChannel
     str = str.replace(/\(.*?\)/, ''); //删去小括号，不然会错误
     const channelReg = new RegExp(str)
     try{
       console.log('等待出现对话框')
-      await this.page.waitForSelector('.q-card:has-text("Go to library")', {timeout: 60000})
+      await this.copyCard.waitFor()
     }catch(error){
       console.log(error)
       console.log('没有出现')
