@@ -157,34 +157,42 @@ class BasePage {
    *
    * @param {string} firstTarget - homeLink、playerLink、creditsLink、accountLink
    * @param {string} secondTarget - 
-   * return {boolean} true or false
+   * @return {boolean} true or false
    */
   async jumpPage (firstTarget, secondTarget) {
     const menuButton = await this[secondTarget] || await this[firstTarget]
     await this.page.waitForTimeout(1000)
-    try{
-      const isHidden = await this[firstTarget].isHidden()
-      if (isHidden) {
-        await this.menuIcon.click({ timeout: 60000 })
+    let menuShrink = false;
+    if (await this[firstTarget].isVisible()){
+      console.log('当前大窗口，左侧菜单栏可见')
+    }else{
+      menuShrink = true;
+      console.log('当前小窗口，左侧菜单栏不可见')
+      if(this.menuIcon.isVisible()) {
+        await this.menuIcon.click()
+        console.log('点击菜单图标（三条杠）')
       }
-    }catch(error){
-      console.log(error)
-      return false;
     }
     if (secondTarget) {
       if (await menuButton.isHidden()) {
         await this[firstTarget].click()
       }
     }
-    await menuButton.click()
-    if (firstTarget === 'accountMore') return
-    await this.page.waitForTimeout(1500)
-    if(await menuButton.isVisible()){
+    if (await menuButton.isVisible()) {
+      await menuButton.click()
+    }
+    console.log('点击目标菜单')
+    if (firstTarget === 'accountMore'){
+      console.log('是账号管理（负责登录和退出）')
+      return true
+    } 
+    if (menuShrink && await menuButton.isVisible()){
       const buttonBoundingBox = await menuButton.boundingBox()
       const {x,y,width,height} = buttonBoundingBox;
       const clickX = x + width + 20 //假设相对于按钮的右侧有20px的空白区域
       const clickY = y + height/2 //点击位置垂直居中
       await this.page.mouse.click(clickX,clickY)
+      console.log('小窗口点击右侧旁白，收回左侧菜单栏')
     }
     return true;
   }
