@@ -295,8 +295,8 @@ test.describe('切换语言设置', () => {
         await basePage.waitForAllHidden(await basePage.alert)
       }
       await window.waitForLoadState()
-      const inHome = await window.locator('.left-drawer-menu .q-item:has-text("home").active-item').isVisible()
-      if (inHome) {
+      const inHome = await window.locator('.left-drawer-menu .q-item:has-text("home").active-item').count()
+      if (inHome > 0) {
         console.log('是否有Follow菜单项')
         try {
           await window.waitForSelector('.left-drawer-menu >> text=following', { timeout: 10000 })
@@ -318,9 +318,9 @@ test.describe('切换语言设置', () => {
             console.log('菜单中出现了Follow选项')
           }
         }
-        const mainLoad = await basePage.waitForSelectorOptional('.post-channel-info', { timeout: 60000 }, "主页在1分钟内没有加载出来")
-        if (mainLoad) console.log('已出现，页面加载完毕')
       }
+      const mainLoad = await basePage.waitForSelectorOptional('.post-channel-info', { timeout: 60000 }, "主页在1分钟内没有加载出来")
+      if (mainLoad) console.log('已出现，页面加载完毕')
       console.log('EN->CN')
       await basicPage.saveLanguage('EN', 'CN')
       await expect(await basicPage.headerTitle).toHaveText(/基础设置/, { timeout: 20000 })

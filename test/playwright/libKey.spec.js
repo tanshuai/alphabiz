@@ -92,8 +92,8 @@ test.describe('librayKey:媒体库密钥测试', () => {
     if (message == "success") {
       await basePage.waitForAllHidden(await basePage.alert)
     }
-    const inHome = await window.locator('.left-drawer-menu .q-item:has-text("home").active-item').isVisible()
-    if (inHome) {
+    const inHome = await window.locator('.left-drawer-menu .q-item:has-text("home").active-item').count()
+    if (inHome > 0) {
       console.log('是否有Follow菜单项')
       try {
         await window.waitForSelector('.left-drawer-menu >> text=following', { timeout: 10000 })
@@ -119,11 +119,11 @@ test.describe('librayKey:媒体库密钥测试', () => {
           }
         }
       }
-      console.log('等待主页中的频道出现，否则稍等片刻会强制跳转回主页')
-      const mainLoad = await basePage.waitForSelectorOptional('.post-channel-info', { timeout: 60000 }, "主页在1分钟内没有加载出来")
-      if(mainLoad) console.log('已出现，页面加载完毕')
-      else console.log('没有加载')
     }
+    console.log('等待主页中的频道出现，否则稍等片刻会强制跳转回主页')
+    const mainLoad = await basePage.waitForSelectorOptional('.post-channel-info', { timeout: 60000 }, "主页在1分钟内没有加载出来")
+    if(mainLoad) console.log('已出现，页面加载完毕')
+    else console.log('没有加载')
     await console.log("准备清除密钥")
     await accountPage.disableCloudKey()
     await console.log("成功清除密钥")

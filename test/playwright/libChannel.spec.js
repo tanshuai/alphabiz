@@ -133,10 +133,10 @@ test.beforeEach(async () => {
         console.log('菜单中出现了Follow选项')
       }
     }
-    console.log('等待主页中的频道出现，否则稍等片刻会强制跳转回主页')
-    const mainLoad = await basePage.waitForSelectorOptional('.post-channel-info', { timeout: 60000 }, "主页在1分钟内没有加载出来")
-    if (mainLoad) console.log('已出现，页面加载完毕')
   }
+  console.log('等待主页中的频道出现，否则稍等片刻会强制跳转回主页')
+  const mainLoad = await basePage.waitForSelectorOptional('.post-channel-info', { timeout: 60000 }, "主页在1分钟内没有加载出来")
+  if (mainLoad) console.log('已出现，页面加载完毕')
 })
 test.afterEach(async ({ }, testInfo) => {
   if (testInfo.status !== testInfo.expectedStatus) {
@@ -436,8 +436,8 @@ test.describe('downLoad-测试下载功能',()=>{
     if (message == "success") {
       await basePage.waitForAllHidden(await basePage.alert)
     }
-    const inHome = await window.locator('.left-drawer-menu .q-item:has-text("home").active-item').isVisible()
-    if (inHome) {
+    const inHome = await window.locator('.left-drawer-menu .q-item:has-text("home").active-item').count()
+    if (inHome > 0) {
       console.log('是否有Follow菜单项')
       try {
         await window.waitForSelector('.left-drawer-menu >> text=following', { timeout: 10000 })
@@ -459,10 +459,10 @@ test.describe('downLoad-测试下载功能',()=>{
           console.log('菜单中出现了Follow选项')
         }
       }
-      console.log('等待主页中的频道出现，否则稍等片刻会强制跳转回主页')
-      const mainLoad = await basePage.waitForSelectorOptional('.post-channel-info', { timeout: 60000 }, "主页在1分钟内没有加载出来")
-      if (mainLoad) console.log('已出现，页面加载完毕')
     }
+    console.log('等待主页中的频道出现，否则稍等片刻会强制跳转回主页')
+    const mainLoad = await basePage.waitForSelectorOptional('.post-channel-info', { timeout: 60000 }, "主页在1分钟内没有加载出来")
+    if (mainLoad) console.log('已出现，页面加载完毕')
     console.log('准备跳转首页')
     if (!await basePage.jumpPage('homeLink')) {
       console.log('跳转失败')
