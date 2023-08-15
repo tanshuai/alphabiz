@@ -323,12 +323,13 @@ class LibraryPage extends BasePage {
     await this.jumpPage(targetPage)
     await this.page.waitForTimeout(1000)
     await this.page.keyboard.press(`${this.modifier}+KeyV`)
+    await this.page.keyboard.press(`${this.modifier}+KeyV`)
     await this.copyCard.waitFor()
     console.log('粘贴频道ID')
     let str = targetChannel
     str = str.replace(/\(.*?\)/, ''); //删去小括号，不然会错误
     const channelReg = new RegExp(str)
-    const card = await this.page.waitForSelector('.q-card:has-text("Go to library")', {timeout: 60000})
+    await this.page.waitForSelector('.q-card:has-text("Go to library")', {timeout: 60000})
     console.log('出现对话框')
     console.log('断言对话框中出现频道名称')
     const content = await this.copyCard.innerText()

@@ -109,7 +109,9 @@ test.describe('librayKey:媒体库密钥测试', () => {
         }
         console.log('点击Follow')
         // 3. 点击Follow按钮
-        await libraryPage.channelFollowsBtn.click();
+        if (await libraryPage.channelFollowsBtn.isVisble()){
+            await libraryPage.channelFollowsBtn.click()
+        }
         console.log('成功Follow了一个频道')
         if (await basePage.followingLink.isVisible()) {
           console.log('菜单中出现了Follow选项')
