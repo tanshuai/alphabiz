@@ -163,7 +163,9 @@ class BasePage {
     const menuButton = await this[secondTarget] || await this[firstTarget]
     await this.page.waitForTimeout(1000)
     let menuShrink = false;
-    if (await this[firstTarget].isVisible()){
+    const leftMenu = await this[firstTarget].count()
+    if (leftMenu > 0){
+      await this[firstTarget].isVisible()
       console.log('当前大窗口，左侧菜单栏可见')
     }else{
       menuShrink = true;
@@ -312,23 +314,25 @@ class BasePage {
   }
 
   async signOut () {
-      await this.jumpPage('accountMore')
-      if(await this.signOutItem.isVisible()){
-        console.log('捕获到退出选项')
-        const box = await this.signOutItem.boundingBox()
-        const {x,y,width,height} = box
-        const clickX = x + width/2
-        const clickY = y + height/2
-        await this.page.mouse.click(clickX,clickY)
-        console.log('点击到退出选项')
-      }else{
-        console.log('没有捕获到退出选项')
+      if(await this.jumpPage('accountMore'))
+      {
+        if(await this.signOutItem.isVisible()){
+          console.log('捕获到退出选项')
+          const box = await this.signOutItem.boundingBox()
+          const {x,y,width,height} = box
+          const clickX = x + width/2
+          const clickY = y + height/2
+          await this.page.mouse.click(clickX,clickY)
+          console.log('点击到退出选项')
+        }else{
+          console.log('没有捕获到退出选项')
+        }
+        await this.page.waitForTimeout(1000)
+        if (await this.signOutAnywayBtn.isVisible()) { await this.signOutAnywayBtn.click() }
+        await this.signOutAlert.waitFor()
+        await this.page.waitForTimeout(3000)
+        await this.waitForAllHidden(await this.alert)
       }
-      await this.page.waitForTimeout(1000)
-      if (await this.signOutAnywayBtn.isVisible()) { await this.signOutAnywayBtn.click() }
-      await this.signOutAlert.waitFor()
-      await this.page.waitForTimeout(3000)
-      await this.waitForAllHidden(await this.alert)
   }
 
   /**
