@@ -318,9 +318,17 @@ class LibraryPage extends BasePage {
     // await this.mmFollowBtn.click()
   }
 
+  /**
+   * 
+   * @param {*} targetPage 
+   * @param {*} targetChannel 
+   * @param {*} options
+   * return {boolean} true or false 
+   */
   async checkShareLink (targetPage, targetChannel, options = {}) {
     if (typeof options.isCloseDialog === 'undefined') options.isCloseDialog = true
     await this.jumpPage(targetPage)
+    // 等1s是不够的，不能解决问题
     await this.page.waitForTimeout(1000)
     await this.page.keyboard.press(`${this.modifier}+KeyV`)
     await this.page.keyboard.press(`${this.modifier}+KeyV`)
@@ -329,11 +337,23 @@ class LibraryPage extends BasePage {
     let str = targetChannel
     str = str.replace(/\(.*?\)/, ''); //删去小括号，不然会错误
     const channelReg = new RegExp(str)
-    await this.page.waitForSelector('.q-card:has-text("Go to library")', {timeout: 60000})
+    try{
+      console.log('等待出现对话框')
+      await this.page.waitForSelector('.q-card:has-text("Go to library")', {timeout: 60000})
+    }catch(error){
+      console.log(error)
+      console.log('没有出现')
+      return false;
+    }
     console.log('出现对话框')
     console.log('断言对话框中出现频道名称')
     const content = await this.copyCard.innerText()
-    expect(content).toMatch(channelReg)
+    try{
+      expect(content).toMatch(channelReg)
+    }catch(error){
+      console.log('断言失败')
+      return false;
+    }
     console.log('断言成功')
     if (options.isCloseDialog === true) {
       await this.ccCancelBtn.click()
@@ -346,6 +366,7 @@ class LibraryPage extends BasePage {
       expect(await this.cdTitle).toHaveText(channelReg)
       console.log('断言成功')
     }
+    return true;
   }
 
   async ensureChannelHeader (channelObj, options = { followStatus: 'FOLLOWING' }) {
