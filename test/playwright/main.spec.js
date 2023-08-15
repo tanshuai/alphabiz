@@ -168,35 +168,48 @@ test.describe('播放视频', () => {
     else test.setTimeout(60000 * 3)
     await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
     await window.waitForTimeout(1000)
+    console.log('准备跳转到播放器页')
     await basePage.jumpPage('playerLink')
+    console.log('跳转成功')
   })
   test('avi类型', async () => {
     const media = 'test/cypress/fixtures/samples/GoneNutty.avi'
     // Upload
     await window.waitForTimeout(5000)
+    console.log('准备上传一个avi类型视频--GoneNutty.avi')
     await playerPage.fileInput.setInputFiles(media, { timeout: 60000 })
+    console.log('开始上传')
     await window.waitForLoadState()
     // should video can play
+    console.log('等待视频播放')
     await window.waitForTimeout(5000)
     const progressControl = await playerPage.stopPlay
     await playerPage.playPage.click()
+    console.log('点击playPage，断言可以看到视频暂停按钮')
     await expect(progressControl).toBeVisible({ timeout: 30000 })
+    console.log('断言成功')
     await playerPage.stopPlay.click()
+    console.log('点击停止播放')
   })
-  test('BluRay_mkv蓝光视频', async () => {
+  test('BlueRay_mkv蓝光视频', async () => {
     const media = 'test/cypress/fixtures/samples/Test-Sample-Tenet.2020.IMAX.2160p.UHD.BluRay.x265.10bit.HDR.DTS-HD.MA.5.1202111171122322.mkv'
     // Upload
+    console.log('准备上传一个BlueRay_mkv蓝光视频--Test-Sample-Tenet.mkv')
     await playerPage.fileInput.setInputFiles(media, { timeout: 60000 })
+    console.log('上传成功')
     await window.waitForLoadState()
     // should video can play
     await window.waitForTimeout(5000)
     const progressControl = await playerPage.stopPlay
     await playerPage.playPage.click()
+    console.log('点击playPage')
     try{
+      console.log('断言出现视频暂停按钮')
       await expect(progressControl).toBeVisible({ timeout: 60000 })
+      console.log('断言成功')
     }catch(error){
-      console.log('一分钟之内看不到视频播放按钮')
-      await window.screenshot({ path: `${ScreenshotsPath}看不到视频播放按钮.png` })
+      console.log('断言失败')
+      await window.screenshot({ path: `${ScreenshotsPath}看不到按钮.png` })
       console.log('截屏')
       return
     }
@@ -210,31 +223,50 @@ test.describe('切换语言设置', () => {
         test.skip()
       }
       await basePage.clearLocalstorage()
+      console.log('回到登陆页')
       await window.waitForTimeout(3000)
     })
     test('CN简体中文', async () => {
+      console.log('设置中文')
       await basePage.quickSaveLanguage('CN')
+      console.log('设置完毕')
       const signIncardCss = '.q-card:has-text("登录账户")'
+      console.log('等待“登录账户”')
       await window.locator(signIncardCss).waitFor()
+      console.log('出现')
       await basePage.newReload()
+      console.log('刷新界面, 再次验证')
       await window.waitForLoadState()
+      console.log('等待“登录账户”')
       await window.locator(signIncardCss).waitFor()
+      console.log('出现')
+      
     })
     test('TW繁体中文', async () => {
       await basePage.quickSaveLanguage('TW')
       const signIncardCss = '.q-card:has-text("登錄賬戶")'
+      console.log('等待"登錄賬戶"')
       await window.locator(signIncardCss).waitFor()
+      console.log('出现')
       await basePage.newReload()
+      console.log('刷新界面，再次验证')
       await window.waitForLoadState()
+      console.log('等待"登錄賬戶"')
       await window.locator(signIncardCss).waitFor()
+      console.log('出现')
     })
     test('EN英文', async () => {
       await basePage.quickSaveLanguage('EN')
       const signIncardCss = '.q-card:has-text("sign in")'
+      console.log('等待“sign in”')
       await window.locator(signIncardCss).waitFor()
+      console.log('出现')
       await basePage.newReload()
+      console.log('刷新界面，再次验证')
       await window.waitForLoadState()
+      console.log('等待“sign in”')
       await window.locator(signIncardCss).waitFor()
+      console.log('出现')
       if (process.platform === 'darwin') {
         await basePage.clearLocalstorage()
         await window.waitForTimeout(3000)
