@@ -160,45 +160,50 @@ class BasePage {
    * @return {boolean} true or false
    */
   async jumpPage (firstTarget, secondTarget) {
-    const menuButton = await this[secondTarget] || await this[firstTarget]
-    await this.page.waitForTimeout(1000)
-    let menuShrink = false;
-    const leftMenu = await this[firstTarget].count()
-    if (leftMenu > 0){
-      await this[firstTarget].isVisible()
-      console.log('当前大窗口，左侧菜单栏可见')
-    }else{
-      menuShrink = true;
-      console.log('当前小窗口，左侧菜单栏不可见')
-      if(this.menuIcon.isVisible()) {
-        await this.menuIcon.click()
-        console.log('点击菜单图标（三条杠）')
+    try{
+      const menuButton = await this[secondTarget] || await this[firstTarget]
+      await this.page.waitForTimeout(1000)
+      let menuShrink = false;
+      const leftMenu = await this[firstTarget].count()
+      if (leftMenu > 0) {
+        await this[firstTarget].isVisible()
+        console.log('当前大窗口，左侧菜单栏可见')
+      } else {
+        menuShrink = true;
+        console.log('当前小窗口，左侧菜单栏不可见')
+        if (this.menuIcon.isVisible()) {
+          await this.menuIcon.click()
+          console.log('点击菜单图标（三条杠）')
+        }
       }
-    }
-    if (secondTarget) {
-      if (await menuButton.isHidden()) {
-        await this[firstTarget].click()
+      if (secondTarget) {
+        if (await menuButton.isHidden()) {
+          await this[firstTarget].click()
+        }
       }
+      if (await menuButton.isVisible()) {
+        await menuButton.click()
+        console.log('点击目标菜单')
+      } else {
+        console.log('目标菜单不可见')
+      }
+      if (firstTarget === 'accountMore') {
+        console.log('是账号管理（负责登录和退出）')
+        return true
+      }
+      if (menuShrink && await menuButton.isVisible()) {
+        const buttonBoundingBox = await menuButton.boundingBox()
+        const { x, y, width, height } = buttonBoundingBox;
+        const clickX = x + width + 20 //假设相对于按钮的右侧有20px的空白区域
+        const clickY = y + height / 2 //点击位置垂直居中
+        await this.page.mouse.click(clickX, clickY)
+        console.log('小窗口点击右侧旁白，收回左侧菜单栏')
+      }
+      return true;
+    }catch(error){
+      console.log('jumpPage有错误', error)
+      return false;
     }
-    if (await menuButton.isVisible()) {
-      await menuButton.click()
-      console.log('点击目标菜单')
-    } else{
-      console.log('目标菜单不可见')
-    }
-    if (firstTarget === 'accountMore'){
-      console.log('是账号管理（负责登录和退出）')
-      return true
-    } 
-    if (menuShrink && await menuButton.isVisible()){
-      const buttonBoundingBox = await menuButton.boundingBox()
-      const {x,y,width,height} = buttonBoundingBox;
-      const clickX = x + width + 20 //假设相对于按钮的右侧有20px的空白区域
-      const clickY = y + height/2 //点击位置垂直居中
-      await this.page.mouse.click(clickX,clickY)
-      console.log('小窗口点击右侧旁白，收回左侧菜单栏')
-    }
-    return true;
   }
 
   async closeInternalNotice () {
