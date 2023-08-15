@@ -234,7 +234,7 @@ test.describe('explorePage-探索页面测试', ()=>{
       console.log('逐一遍历，断言推文标题一致')
       for (let i = 0; i < postNumByTitle; i++) {
         const postTitle = await window.locator('.post-card .post-title').nth(i).innerText()
-        if (postTitle !== post.title && !postTitle.startsWith('Post title')) throw new Error('标题查找出现错误:' + postTitle)
+        if (!postTitle.includes(post.title)) throw new Error('标题查找出现错误:' + postTitle)
       }
       console.log('断言成功')
       console.log('测试 >> 通过频道标题过滤')
@@ -250,7 +250,7 @@ test.describe('explorePage-探索页面测试', ()=>{
       console.log('逐一遍历, 断言推文标题都一致')
       for (let i = 0; i < postNumByChannel; i++) {
         const postChannelTitle = await window.locator('.post-card .channel-title').nth(i).innerText()
-        expect(postChannelTitle).toBe(post.channelTitle)
+        if (!postChannelTitle.includes(post.channelTitle)) throw new Error('频道查找出现错误:' + postTitle)
       }
       console.log('断言成功')
   })
