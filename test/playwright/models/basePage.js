@@ -351,24 +351,26 @@ class BasePage {
     // if (count) await this.closeInternalNotice()
     // if not logged in
     let message = "alreadyIn";
+    console.log('当前是否位于登陆页')
     if (await this.accountInput.isVisible()) {
+      console.log('是的，立即登录')
       message = await this.signIn(username, password, isWaitAlert, isSetToken)
     } else {
-      console.log('左边栏是否可见')
+      console.log('不是，左侧菜单栏是否可见')
       const leftMenu = await this[firstTarget].isVisible() //试过count(), 始终大于0
       if (leftMenu) {
-        console.log('左侧菜单栏可见')
+        console.log('可见')
       } else {
-        console.log('左侧菜单栏不可见')
+        console.log('不可见')
         await this.menuIcon.click({noWaitAfter: true})
         console.log('点击菜单按钮，弹出左边栏')
       }
-      console.log('是否存在登录的选项')
+      console.log('是否未登录')
       if (await this.accountSignIn.isVisible()) {
-        console.log('存在，现在登录')
+        console.log('是的，现在登录')
         message = await this.signIn(username, password, isWaitAlert, isSetToken)
       } else {
-        console.log('不存在，现在已经是登录状态')
+        console.log('状态是已登录')
       }
       try {
         await this.accountMore.waitFor({ timeout: 10000 })
