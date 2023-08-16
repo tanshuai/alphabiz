@@ -211,7 +211,7 @@ class BasePage {
             const clickY = y + height / 2 //点击位置垂直居中
             await this.page.mouse.click(clickX, clickY)
             console.log('点击右侧旁白，收回左侧菜单栏')
-            return
+            return true
           } else {
             console.log('不在')
           }
