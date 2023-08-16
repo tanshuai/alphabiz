@@ -357,7 +357,7 @@ class BasePage {
       message = await this.signIn(username, password, isWaitAlert, isSetToken)
     } else {
       console.log('不是，左侧菜单栏是否可见')
-      const leftMenu = await this[firstTarget].isVisible() //试过count(), 始终大于0
+      const leftMenu = await this.downloadingStatus.isVisible()
       if (leftMenu) {
         console.log('可见')
       } else {
