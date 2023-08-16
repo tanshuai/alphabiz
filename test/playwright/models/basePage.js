@@ -171,8 +171,7 @@ class BasePage {
       }
       const menuButton = await this[secondTarget] || await this[firstTarget]
       await this.page.waitForTimeout(1000)
-      const menuButtonIsVisible = await this.waitForSelectorOptional(this[firstTarget],{timeout:5000},'菜单项不可见')
-      if (menuButtonIsVisible) {
+      if (await this[firstTarget].isVisible()) {
         console.log('当前大窗口，左侧菜单栏可见')
       } else {
         console.log('当前小窗口，侧边栏收缩')
