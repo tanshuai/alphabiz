@@ -297,8 +297,10 @@ test.describe('切换语言设置', () => {
       await window.waitForLoadState()
       const inHome = await window.locator('.left-drawer-menu .q-item:has-text("home").active-item').count()
       if (inHome > 0) {
-        console.log('检查是否有Follow菜单项')
-        const followExist = await window.locator('.left-drawer-menu >> text=following').count()
+        console.log('检查是否存在Follow菜单项')
+        //等待
+        await basePage.waitForSelectorOptional('.left-drawer-menu >> text=following', { timeout: 10000 }, '不可见')
+        const followExist = await window.locator('.left-drawer-menu >> text=following').count() //小屏（不可见但存在）
         if (followExist > 0) {
           console.log('有')
         } else {
