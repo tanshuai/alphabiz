@@ -493,17 +493,17 @@ test.describe('downLoad-测试下载功能',()=>{
           console.log('菜单中出现了Follow选项')
         }
       }
+      console.log('等待主页中的频道出现，否则稍等片刻会强制跳转回主页')
+      const mainLoad = await basePage.waitForSelectorOptional('.post-channel-info', { timeout: 60000 }, "主页在1分钟内没有加载出来")
+      if (mainLoad) console.log('已出现，页面加载完毕')
+    }else{
+      console.log('准备跳转首页')
+      if (!await basePage.jumpPage('homeLink')) {
+        console.log('跳转失败')
+        test.skip()
+      }
+      console.log('跳转成功')
     }
-    console.log('等待主页中的频道出现，否则稍等片刻会强制跳转回主页')
-    const mainLoad = await basePage.waitForSelectorOptional('.post-channel-info', { timeout: 60000 }, "主页在1分钟内没有加载出来")
-    if (mainLoad) console.log('已出现，页面加载完毕')
-    console.log('准备跳转首页')
-    if (!await basePage.jumpPage('homeLink')) {
-      console.log('跳转失败')
-      test.skip()
-    }
-    console.log('跳转成功')
-    await basePage.waitForAllHidden(await basePage.centerAlert)
     // 第一步，找到频道fxpebrsi9ij5pzinwdky
     console.log('搜索频道')
     await libraryPage.searchChannelID(testChannel, false)
