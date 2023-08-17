@@ -40,14 +40,28 @@ class BasicPage extends BasePage {
 
   async saveLanguage (startLanguage, targetLanguage) {
     let basicPage
-    if (startLanguage === 'EN') basicPage = 'basicLink'
-    else basicPage = 'basicLink_' + startLanguage
+    if (startLanguage === 'EN') {
+      console.log('原语言是EN')
+      basicPage = 'basicLink'
+    }else{
+      console.log('原语言不是EN')
+      basicPage = 'basicLink_' + startLanguage
+    }
+    console.log('跳转到基础设置页')
     await this.jumpPage(basicPage)
+    console.log('跳转成功')
     await this.i18n[startLanguage].languageText.click({ force: true })
+    console.log('点击语言框')
     await this.i18n[startLanguage].languageSelect.click()
+    console.log('点击下拉框')
     await this.i18n[targetLanguage].languageListBtn.click()
+    console.log('点击目标语言')
     await this.i18n[targetLanguage].saveBtn.click()
+    console.log('点击保存，等待提示出现')
     await this.i18n[targetLanguage].saveAlert.waitFor()
+    console.log('提示出现，等待提示消失')
+    await this.i18n[targetLanguage].saveAlert.waitFor({state:'detached'})
+    console.log('提示消失')
   }
 
   async setChannel (targetChannel) {
