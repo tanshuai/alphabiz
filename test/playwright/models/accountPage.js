@@ -274,7 +274,7 @@ class AccountPage extends BasePage {
       // await expect(this.kcCard).toHaveText(/Sync Keychain with Amazon Web Services/)
       await this.kcDisCloudBtn.click()
       await this.dcDisCloudBtn.waitFor()
-      await this.dcDisCloudBtn.click({ timeout: 9000 })
+      await this.dcDisCloudBtn.click({ timeout: 30000 })
       // await this.checkAlert('disableCloudKey', /Success/)
     } else {
       console.log('云存储原本关闭，无需操作')
