@@ -296,9 +296,13 @@ class BasePage {
   async quickSaveLanguage (targetLanguage) {
     let language
     if (targetLanguage === 'EN') {
+      console.log('设置EN')
       language = 'English'
       await this.languageBtn.click()
+      console.log('点击语言设置按钮')
       await this.page.locator('label .q-item__section >> nth=0').click()
+      console.log('点击第一项')
+      return
     } else if (targetLanguage === 'CN') language = '简体中文'
     else if (targetLanguage === 'TW') language = '繁體中文'
     await this.languageBtn.click()
