@@ -94,35 +94,50 @@ test.describe('wallet', () => {
     if (testInfo.title === 'copy') test.skip()
     test.setTimeout(60000 * 15)
     await developmentPage.openWalletPage()
+    console.log('开启钱包页面')
     const headerTitle = await basePage.headerTitle.innerText()
     console.log('headerTitle: [ ', headerTitle, ' ]')
-    if (!/Wallet/.test(headerTitle)) await walletPage.jumpPage('walletLink')
+    if (!/Wallet/.test(headerTitle)) {
+      console.log('准备跳转到钱包页面')
+      await walletPage.jumpPage('walletLink')
+      console.log('跳转成功')
+    }
     await window.waitForTimeout(5000)
     const afterHeaderTitle = await basePage.headerTitle.innerText()
     if (!/Wallet/.test(afterHeaderTitle)) {
       console.log('afterHeaderTitle: [ ', afterHeaderTitle, ' ]')
+      console.log('准备跳转到钱包页面')
       await walletPage.jumpPage('walletLink')
+      console.log('跳转成功')
     }
+    console.log('断言连接状态为：online')
     await expect(walletPage.connectionStatus).toHaveText(/online/, { timeout: 60000 })
+    console.log('断言成功')
     await window.waitForTimeout(7000)
     await walletPage.ensureClearKey()
-
+    console.log('确保清除密钥')
     if (typeof firstKey === 'undefined' && typeof secondKey === 'undefined') {
       firstKey = await walletPage.createKey()
+      console.log('创建密钥')
       await window.waitForTimeout(3000)
       firstKey.coin = await walletPage.getCoin()
+      console.log('获得硬币')
 
       await walletPage.ensureClearKey()
+      console.log('确保清除密钥')
 
       secondKey = await walletPage.createKey()
+      console.log('创建密钥')
       await window.waitForTimeout(3000)
       secondKey.coin = await walletPage.getCoin()
+      console.log('获得硬币')
 
       await walletPage.ensureClearKey()
+      console.log('确保清除密钥')
     }
   })
 
-  test('copy', async () => {
+  test('copy-在各个页面复制私钥', async () => {
     await walletPage.recoveryKey(firstKey.privateKey)
     await walletPage.checkCollectionLink('homeLink', firstKey.address)
     await walletPage.checkCollectionLink('downloadingStatus', firstKey.address)
@@ -131,47 +146,60 @@ test.describe('wallet', () => {
     await walletPage.checkCollectionLink('accountSettingLink', firstKey.address)
     // await walletPage.checkCollectionLink('basicLink', firstKey.address)
     await walletPage.checkCollectionLink('walletLink', firstKey.address, { isCloseDialog: false })
-    // 验证转账功能
+    console.log('验证转账功能')
     const amount = 100
     await walletPage.dwcAmountInput.fill(amount.toString())
+    console.log('输入转账金额')
     await walletPage.dwcTransferBtn.click()
+    console.log('点击传输按钮')
     await walletPage.checkWalletAlert('dwcAlertText')
+    console.log('出现提示')
 
     await window.waitForTimeout(10000)
     await walletPage.walletPageHeader.click({ force: true })
+    console.log('点击页头')
+    console.log('断言0张钱包卡片')
     expect(walletPage.dialogWalletCard).toHaveCount(0)
+    console.log('断言成功')
 
     await window.waitForTimeout(5000)
-    // 检查账单信息
+    // 检查账单信息 （自己给自己转账）
     await walletPage.checkTransferItem({
-      senderAddress: firstKey.address,
-      recipientAddress: firstKey.address,
-      amount: amount
+      senderAddress: firstKey.address, //发送者地址
+      recipientAddress: firstKey.address, //接收者地址
+      amount: amount // 金额
     })
     // .toBeLessThan toBeGreatedThen
     expect(await walletPage.getCoin()).toBeLessThan(firstKey.coin - amount)
     firstKey.coin = await walletPage.getCoin()
   })
 
-  test('transfer', async () => {
+  test('transfer-转账功能', async () => {
     const amount = 150
     // 转账用户
     await walletPage.recoveryKey(firstKey.privateKey)
+    console.log('复制密钥')
     await walletPage.transfer(secondKey.address, amount)
-    await window.waitForTimeout(10000)
+    console.log('转账')
+    await window.waitForTimeout(10000) 
     // 检查账单信息
     await walletPage.checkTransferItem({
       senderAddress: firstKey.address,
       recipientAddress: secondKey.address,
       amount: amount
     })
+    console.log('断言')
     expect(await walletPage.getCoin()).toBeLessThanOrEqual(firstKey.coin - amount)
+    console.log('断言成功')
     firstKey.coin = await walletPage.getCoin()
+    console.log('计算硬币数量')
     // 退出账号
     await walletPage.ensureClearKey()
+    console.log('清除密钥')
 
     // 收款用户
     await walletPage.recoveryKey(secondKey.privateKey)
+    console.log('复制密钥')
     await window.waitForTimeout(5000)
     // 检查账单信息
     await walletPage.checkTransferItem({

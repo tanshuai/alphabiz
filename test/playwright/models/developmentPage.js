@@ -14,19 +14,21 @@ class DevelopmentPage extends BasePage {
   }
 
   async openTools () {
+    console.log('开启开发者选项')
     const isVisibleDevelopment = await this.developmentLink.isVisible()
-    if (isVisibleDevelopment) return
-    try {
-      await this.versionBtn.click({ timeout: 5000 })
-    } catch (e) {
-      await this.versionBtn.click({ force: true })
-      await this.versionBtn.click()
-    }
-
+    if (isVisibleDevelopment) {
+      console.log('原本已经开启')
+      return
+    } 
+    await this.versionBtn.click({ timeout: 5000 , force:true})
     await this.aboutDialog.waitFor()
+    console.log('出现about页面')
     await this.alphabizLogo.click({ clickCount: 5 })
+    console.log('点击五下Logo')
     await this.checkAlert('Tools', /is enabled/, { position: 'center' })
+    console.log('出现提示')
     await this.AboutDialogCloseBtn.click()
+    console.log('关闭about页')
   }
 
   async openWalletPage () {
