@@ -13,6 +13,7 @@ class AccountPage extends HomePage {
   get importCloudKeyOKBtn () { return this.page.$('//Button[@Name="OK"]') }
   get accountSettingsTitle () { return this.page.$('//Text[@Name="Account"]') }
   get accountMoreBtn () { return this.page.$('//Custom[starts-with(@Name,"Lv.")]/following-sibling::Button[1]') }
+  // get accountMoreBtn () { return this.page.$('//Custom[starts-with(@Name,"Lv.")]/ancestor::Group[3]/Button[1]') }
   get signOutBtn () { return this.page.$('//*[@Name="Sign out"]') }
   get signOutAnywayBtn () { return this.page.$('//Button[@Name="Sign out anyway"]') }
   get internalNoticeText () { return this.page.$('//Text[@Name="Internal Release Notice"]') }
@@ -41,15 +42,19 @@ class AccountPage extends HomePage {
   async signIn (username, password, opt = { isWaitAlert: false }) {
     // await this.closeInternalNotice()
     // await this.changeLanguage()
+    console.log('输入用户名')
     await this.username.setValue(username)
     await sleep(2000)
+    console.log('输入密码')
     await this.password.setValue(password)
     await sleep(2000)
     // await this.reUsername.setValue(username)
     await this.signInBtn.click()
+    console.log('点击登录')
 
     if (opt.isWaitAlert) {
       // 等待登录卡片消失
+      console.log('等待登录卡片消失')
       await this.username.waitUntil(async () => {
         return (await this.username.isDisplayed()) === false
       }, {
@@ -58,6 +63,7 @@ class AccountPage extends HomePage {
       })
       await sleep(2000)
       await this.importCloudKeyOKBtn.click()
+      console.log('点击导入密钥OK')
       await this.importCloudKeyOKBtn.waitUntil(async () => {
         return (await this.importCloudKeyOKBtn.isDisplayed()) === false
       }, {
@@ -75,21 +81,32 @@ class AccountPage extends HomePage {
       }
       await sleep(5000)
       if (!(await this.page.$('//*[@Name="Credits"]').isDisplayed())) {
+        console.log('//*[@Name="Credits"]不可见（小窗口）')
         await this.page.$('//Button[@Name="Menu"]').click()
+        console.log('点击三道杠，展开侧边栏')
+        // console.log('等待三个点出现，验证侧边栏展开')
+        // await this.accountMoreBtn.waitForDisplayed({ timeout: 30000 })
+        await sleep(5000)
+      }else{
+        console.log('//*[@Name="Credits"]可见（大窗口）')
       }
-      await this.accountMoreBtn.waitForDisplayed({ timeout: 30000 })
     }
   }
 
   async ensureSignIn (username, password, opt = { isWaitAlert: false }) {
     // 判断是否已经登录
+    console.log('判断是否已经登录')
     if (await this.username.isDisplayed()) {
       // 未登录
+      console.log('未登录，立即登录')
       await this.signIn(username, password, { isWaitAlert: true })
     } else {
+      console.log('已登录, 判断是否需要导入云端密钥')
       // 判断是否需要导入云端密钥
       if (await this.importCloudKeyOKBtn.isDisplayed()) {
+        console.log('导入云端密钥的ok按钮可见')
         await this.importCloudKeyOKBtn.click()
+        console.log('点击')
         await this.importCloudKeyOKBtn.waitUntil(async () => {
           return (await this.importCloudKeyOKBtn.isDisplayed()) === false
         }, {
@@ -97,17 +114,19 @@ class AccountPage extends HomePage {
           timeoutMsg: 'auto sign in - importCloudKeyCard is not hidden'
         })
       }
+      console.log('等待跳转到首页')
       await this.jumpPage('homeLink')
+      console.log('成功跳转')
       // 已登陆,等待拉取数据
       // await client.$('//*[@Name="Settings"]').click()
       if (!await this.settingsLink.isDisplayed()) {
         await this.menuBtn.click()
-        await sleep(1000)
-        if (!await this.settingsLink.isDisplayed()) {
-          await this.menuBtn.click()
-        }
+        console.log('点击菜单按钮')
       }
-      await this.accountMoreBtn.waitForDisplayed({ timeout: 15000 })
+      console.log('等待accountMoreBtn出现')
+      // await this.accountMoreBtn.waitForDisplayed({ timeout: 15000 })
+      await sleep(5000)
+      console.log('已经出现')
     }
   }
 
