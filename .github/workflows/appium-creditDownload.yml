@@ -106,6 +106,7 @@ jobs:
           max_attempts: 3
           shell: bash
           retry_on: error
+          config: viewportHeight=1200, viewportWidth=1800
           command: |
             taskkill //F //IM "Alphabiz.exe" || (echo "app is ready")
             sleep 10s
@@ -119,6 +120,7 @@ jobs:
           max_attempts: 3
           shell: bash
           retry_on: error
+          config: viewportHeight=1200, viewportWidth=1800
           command: |
             taskkill //F //IM "Alphabiz.exe" || (echo "app is ready")
             sleep 10s
