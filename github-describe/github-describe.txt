@@ -1,4 +1,28 @@
-fix: #793
-fix: #790
-bump @zeeis/alphabiz-libdb to v0.0.87
-add settings for gun peers in advanced settings, close #773
+skip e2e
+fix type errors
+fix type errors
+fix #783
+skip e2e
+close #758
+skip e2e
+Remove unused content & test GitHub  Dev VSC web edit feature
+add contrastColor
+push code to test repo
+drawer color adjustment
+restore updater color
+push main code to test repo
+library color adjustment
+fix errors in web mode
+fix: clickable of TaskItemStage
+fix require errors in electron
+add contrastColor for theme
+restore app icons
+fix: #757
+fix: #795
+add no-wrap for buttons of about dialog
+fix: #795
+fix: handle specific app protocol url
+fix error in take-down voting
+allow setting corner logo
+close #791
+modify theme coler  config for e2e test, skip e2e
