@@ -29,14 +29,20 @@ describe('Credits', () => {
     }
     // 转账金额
     const transferAmount = 1
-
+    cy.log('准备登录payee账号')
     cy.signIn(payee.account, payee.password)
+    cy.log('成功登录')
+    cy.log('跳转到信用卡页')
     cy.toCredits()
+    cy.log('成功跳转')
     cy.getPoint().as('payeePoint')
     cy.getReceiptCode().as('payeeReceiptCode')
-
+    cy.log('准备登录transferee账号')
     cy.signIn(transferee.account, transferee.password)
+    cy.log('成功登录')
+    cy.log('跳转到信用卡页')
     cy.toCredits()
+    cy.log('成功跳转')
     cy.getPoint().as('transfereePoint')
     cy.getReceiptCode().as('transfereeReceiptCode')
 
@@ -57,9 +63,12 @@ describe('Credits', () => {
         cy.getPoint().should('eq', number.toString())
       })
     })
-
+    cy.log('准备登录payee账号')
     cy.signIn(payee.account, payee.password)
+    cy.log('成功登录')
+    cy.log('跳转到信用卡页')
     cy.toCredits()
+    cy.log('成功跳转')
     cy.get('@payeePoint').then(payeePoint => {
       // 断言 收款人 积分变化
       cy.task('calculation', { type: 'add', from: payeePoint, to: transferAmount }).then((number) => {
