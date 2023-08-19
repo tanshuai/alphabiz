@@ -67,6 +67,12 @@ describe('main', () => {
     await accountPage.ensureSignIn(process.env.TEST1_EMAIL, process.env.TEST_PASSWORD, { isWaitAlert: true })
     console.log('已经登录')
     isSuccess = true
+    console.log('判断左侧栏是否可见')
+    while (!(await accountPage.libraryGroup.isDisplayed())) {
+      console.log('locate full-screen button')
+      await accountPage.fullScreenBtn.click()
+      console.log('full screen!')
+    }
   })
   it('version number', async () => {
     const version = await homePage.getAppVersion()
