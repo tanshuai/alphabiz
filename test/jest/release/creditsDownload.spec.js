@@ -72,7 +72,7 @@ describe('download', () => {
     expect(await homePage.getTask(torrentName)).toBe(null)
     // expect(1).toBe(1)
   })
-  it.only('test', async() => {
+  it('test', async() => {
     await sleep(10000)
     console.log('ensure Log In')
     await accountPage.ensureSignIn(downloadUser, process.env.TEST_PASSWORD, { isWaitAlert: true })
@@ -81,7 +81,7 @@ describe('download', () => {
     await accountPage.signOut()
     console.log('sign out')
   })
-  it('download seeding', async () => {
+  it.skip('download seeding', async () => {
     const DownloadFilePath = path.resolve(__dirname, '../../download')
     await sleep(10000)
     console.log('ensure Log In')
