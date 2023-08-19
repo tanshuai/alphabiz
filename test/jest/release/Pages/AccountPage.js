@@ -110,30 +110,26 @@ class AccountPage extends HomePage {
           timeoutMsg: 'auto sign in - importCloudKeyCard is not hidden'
         })
       }
-      console.log('等待跳转到首页')
-      await this.jumpPage('homeLink')
-      console.log('成功跳转')
-      // 已登陆,等待拉取数据
-      // await client.$('//*[@Name="Settings"]').click()
-      if (!await this.settingsLink.isDisplayed()) {
-        await this.menuBtn.click()
-        console.log('点击菜单按钮')
-      }
-      console.log('wait 5s')
-      await sleep(5000)
     }
   }
 
   async signOut () {
     console.log('判断左侧栏是否可见')
-    if (!(await this.libraryGroup.isDisplayed())) {
-      console.log('libraryGroup不可见 左侧栏 is hidden')
-      await this.menuBtn.click()
-      console.log('点击三道杠，展开侧边栏')
-      await sleep(5000)
-    } else {
-      console.log('libraryGroup可见 左侧栏 can see')
+    let limit = 4
+    while (limit > 0 && !(await accountPage.libraryGroup.isDisplayed())) {
+      limit = limit - 1
+      console.log('locate full-screen button')
+      await accountPage.fullScreenBtn.click()
+      console.log('full screen!')
     }
+    // if (!(await this.libraryGroup.isDisplayed())) {
+    //   console.log('libraryGroup不可见 左侧栏 is hidden')
+    //   await this.menuBtn.click()
+    //   console.log('点击三道杠，展开侧边栏')
+    //   await sleep(5000)
+    // } else {
+    //   console.log('libraryGroup可见 左侧栏 can see')
+    // }
     console.log('locate the button')
     await this.accountMoreBtn.click()
     console.log('show the options')
