@@ -42,14 +42,18 @@ describe('main', () => {
   })
   it('title', async () => {
     const windowTitle = await client.getTitle()
-    console.log(windowTitle)
+    console.log("windowTitle: ",windowTitle)
+    console.log(`断言windowTitle=${homePage.appConfig.displayName}`)
     expect(windowTitle).toBe(homePage.appConfig.displayName)
+    console.log('断言成功')
+
     // const appTitle = await homePage.getAppTitle()
     // expect(appTitle).toBe('Alphabiz')
     console.log('outputPath:' + outputPath)
     // 判断该路径是否存在，若不存在，则创建
 
     if (!fs.existsSync(outputPath)) {
+      console.log('不存在该路径，mkdir创建')
       fs.mkdirSync(outputPath, { recursive: true })
     }
     await sleep(2000)
@@ -59,7 +63,9 @@ describe('main', () => {
   it('ensure sign in', async () => {
     // 判断是否已经登录
     await sleep(10000)
+    console.log('确保登录')
     await accountPage.ensureSignIn(process.env.TEST1_EMAIL, process.env.TEST_PASSWORD, { isWaitAlert: true })
+    console.log('已经登录')
     isSuccess = true
   })
   it('version number', async () => {
