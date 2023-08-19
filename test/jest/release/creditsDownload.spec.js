@@ -95,7 +95,11 @@ describe('download', () => {
     await accountPage.ensureSignIn(downloadUser, process.env.TEST_PASSWORD, { isWaitAlert: true })
     console.log('Login')
     console.log('判断左侧栏是否可见')
-    while (!(await accountPage.libraryGroup.isDisplayed())) {
+    // click 4 times at most
+    let limit = 4
+    while (limit > 0 && !(await accountPage.libraryGroup.isDisplayed())) {
+      limit = limit - 1
+      await client.saveScreenshot(outputPath + `/click-full-screen-limit${limit}.png`)
       console.log('locate full-screen button')
       await accountPage.fullScreenBtn.click()
       console.log('full screen!')
