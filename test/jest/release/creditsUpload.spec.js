@@ -13,7 +13,7 @@ const { calculation } = require('../../utils/calculation')
 const appConfig = require('../../../developer/app')
 
 let client, homePage, accountPage, creditsPage, developmentPage
-const uploadUser = (appConfig.name === 'Alphabiz' ? 'down2' : 'down4') + process.env.TEST_EMAIL_DOMAIN
+const uploadUser = (appConfig.name === 'Alphabiz' ? 'down2' : 'down4') +  process.env.TEST_EMAIL_DOMAIN
 const outputFile = process.env.APP_TYPE === 'exe' ? '/exe' : process.env.APP_TYPE === 'msi' ? '/msi' : '/7z'
 const outputPath = path.resolve(__dirname, '../../output/release' + outputFile)
 let isSuccess = false
