@@ -44,50 +44,50 @@ describe('download', () => {
       client && await client.saveScreenshot(outputPath + `/${expect.getState().currentTestName}.png`)
     }
   })
-  it.skip('delete task', async () => {
-    let isDelete = false
-    let isJump = true
-    await homePage.jumpPage('downloadingStatusTab')
-    if (await homePage.getTask(torrentName) !== null) {
-      isDelete = true
-      isJump = false
-    }
-    if (isJump && !isDelete) {
-      await homePage.jumpPage('uploadingStatusTab')
-      if (await homePage.getTask(torrentName) !== null) {
-        isDelete = true
-        isJump = false
-      }
-    }
-    if (isJump && !isDelete) {
-      await homePage.jumpPage('downloadedStatusTab')
-      if (await homePage.getTask(torrentName) !== null) {
-        isDelete = true
-      }
-    }
-    if (isDelete) {
-      console.log('delete')
-      await homePage.deleteTask(torrentName)
-    }
-    expect(await homePage.getTask(torrentName)).toBe(null)
-    // expect(1).toBe(1)
-  })
-  it.skip('test', async() => {
-    await sleep(10000)
-    console.log('ensure Log In')
-    await accountPage.ensureSignIn(downloadUser, process.env.TEST_PASSWORD, { isWaitAlert: true })
-    console.log('Login')
-    console.log('判断左侧栏是否可见')
-    while (!(await accountPage.libraryGroup.isDisplayed())) {
-      console.log('locate full-screen button')
-      await accountPage.fullScreenBtn.click()
-      console.log('full screen!')
-    }
-    console.log('ready sign out')
-    await accountPage.signOut()
-    console.log('sign out')
-    await sleep(10000)
-  })
+  // it.skip('delete task', async () => {
+  //   let isDelete = false
+  //   let isJump = true
+  //   await homePage.jumpPage('downloadingStatusTab')
+  //   if (await homePage.getTask(torrentName) !== null) {
+  //     isDelete = true
+  //     isJump = false
+  //   }
+  //   if (isJump && !isDelete) {
+  //     await homePage.jumpPage('uploadingStatusTab')
+  //     if (await homePage.getTask(torrentName) !== null) {
+  //       isDelete = true
+  //       isJump = false
+  //     }
+  //   }
+  //   if (isJump && !isDelete) {
+  //     await homePage.jumpPage('downloadedStatusTab')
+  //     if (await homePage.getTask(torrentName) !== null) {
+  //       isDelete = true
+  //     }
+  //   }
+  //   if (isDelete) {
+  //     console.log('delete')
+  //     await homePage.deleteTask(torrentName)
+  //   }
+  //   expect(await homePage.getTask(torrentName)).toBe(null)
+  //   // expect(1).toBe(1)
+  // })
+  // it.skip('test', async() => {
+  //   await sleep(10000)
+  //   console.log('ensure Log In')
+  //   await accountPage.ensureSignIn(downloadUser, process.env.TEST_PASSWORD, { isWaitAlert: true })
+  //   console.log('Login')
+  //   console.log('判断左侧栏是否可见')
+  //   while (!(await accountPage.libraryGroup.isDisplayed())) {
+  //     console.log('locate full-screen button')
+  //     await accountPage.fullScreenBtn.click()
+  //     console.log('full screen!')
+  //   }
+  //   console.log('ready sign out')
+  //   await accountPage.signOut()
+  //   console.log('sign out')
+  //   await sleep(10000)
+  // })
   it('download seeding', async () => {
     const DownloadFilePath = path.resolve(__dirname, '../../download')
     await sleep(10000)
