@@ -3,7 +3,7 @@ const fs = require('fs')
 require('dotenv').config()
 const describe = fs.readFileSync('./github-describe/github-describe.txt', 'utf-8')
 
-// describe length cannot exceed 200
+// describe length cannot exceed 280
 const getDescribe = (describe) => {
   let desc = describe.replace(/(,\s|)skip e2e/gm, '').replace(/^\s*\n/gm, '')
   // delete duplicate lines
@@ -12,7 +12,7 @@ const getDescribe = (describe) => {
       return i === allItems.indexOf(item)
     })
     .join("\n")
-  desc = desc.substring(0, 200)
+  desc = desc.substring(0, 280)
   desc = desc.replace(/\r?\n?[^\r\n]*$/, "")
   return desc
 }
