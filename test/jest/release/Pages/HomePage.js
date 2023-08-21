@@ -109,7 +109,9 @@ class HomePage {
   }
 
   async uploadTorrent (directory) {
+    console.log('准备上传磁力')
     await this.uploadTorrentBtn.click()
+    console.log('点击上传磁力的按钮')
     await this.torrentFileBtn.click()
     var dir = '../../output/release'
     if (!fs.existsSync(dir)) {
@@ -118,7 +120,9 @@ class HomePage {
     await sleep(2000)
     await this.page.saveScreenshot('test/output/release/upload-file-selector.png')
     await this.fileNameEdit.setValue([directory, '\uE007'])
+    console.log('选择文件')
     await this.confirmUploadBtn.click()
+    console.log('确定传输')
   }
 
   async waitSeedFound (torrentName, time) {
