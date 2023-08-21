@@ -1,10 +1,9 @@
 test appium
-test library key
-test appium
-test e2e
-test e2e
 test appium
 test appium
 test appium
+test wallet
 test appium
+test main
 test appium
+test main
