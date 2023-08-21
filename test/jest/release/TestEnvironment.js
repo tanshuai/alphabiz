@@ -21,13 +21,9 @@ export const opts = {
     appWaitDuration: 60000,
     createSessionTimeout: 60000,
     app: AlphabizAppPath,
-    waitForAppLaunch: 25
+    ms: {
+      waitForAppLaunch: 25
+    }
   },
   logLevel: 'error'
-  // afterTest: function (test) {
-  // if (test.error !== undefined) {
-  //   const name = 'ERROR-' + Date.now()
-  //   browser.saveScreenshot('./errorShots/' + name + '.png')
-  // }
-  // }
 }
