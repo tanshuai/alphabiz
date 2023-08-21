@@ -300,6 +300,11 @@ jobs:
           command: yarn unpackaged
           on_retry_command: rm -rf C:/Users/runneradmin/AppData/Local/node-gyp/
 
+      - name: setDisplay for windows
+        if: contains(steps.vars.outputs.system, 'windows')
+        run: Set-DisplayResolution -Width 1920 -Height 1080 -Force
+        shell: powershell
+
       - name: main E2E Test for Electron 🧪
         if: "!contains(github.event.head_commit.message, 'skip e2e')"
         run: |
