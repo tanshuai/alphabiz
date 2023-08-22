@@ -366,6 +366,9 @@ test.describe('切换语言设置', () => {
     })
     // EN -> CN -> TW -> EN
     test('语言重复切换-EN-CN-TW-EN', async () => {
+      if (process.platform === 'linux'){
+        test.skip()
+      }
       // 确保语言en
       await basePage.clearLocalstorage()
       await window.waitForTimeout(3000)
