@@ -365,7 +365,7 @@ test.describe('切换语言设置', () => {
       }
     })
     // EN -> CN -> TW -> EN
-    test('语言重复切换-EN-CN-TW-EN', async () => {
+    test.only('语言重复切换-EN-CN-TW-EN', async () => {
       // 确保语言en
       await basePage.clearLocalstorage()
       await window.waitForTimeout(3000)
@@ -446,9 +446,11 @@ test.describe('切换语言设置', () => {
         console.log('√断言成功')
       }catch(error){
         console.log('×断言失败')
-        console.log('点击语言下拉框')
-        await window.locator('.q-field__append >> nth=0').click()
-        console.log('点击第一项就是英语')
+        do{
+          console.log('点击语言下拉框, 等待出现选择列表')
+          await window.locator('.q-field__append >> nth=0').click()
+        } while (!await window.locator('.q-menu .q-item >> nth = 0').isVisible())
+        console.log('出现选择列表, 点击第一项就是英语')
         await window.locator('.q-menu .q-item >> nth = 0').click()
         console.log('保存设置')
         await basicPage.saveSetting()
