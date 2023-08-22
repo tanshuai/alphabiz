@@ -298,9 +298,17 @@ class BasePage {
     if (targetLanguage === 'EN') {
       console.log('设置EN')
       language = 'English'
-      await this.languageBtn.click()
+      for(let i = 0 ; i < 5; i ++){
+        await this.languageBtn.click()
+        enOption = await this.waitForSelectorOptional('label .q-item__section >> nth=0',{timeout: 5000}, 'click has no effect')
+        if(enOption){
+          await this.page.locator('label .q-item__section >> nth=0').click()
+          break;
+        }else{
+          console.log(`第${i+1}次重试`)
+        }
+      }
       console.log('点击语言设置按钮')
-      await this.page.locator('label .q-item__section >> nth=0').click()
       console.log('点击第一项')
       return
     } else if (targetLanguage === 'CN') language = '简体中文'
