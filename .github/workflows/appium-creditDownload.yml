@@ -1,4 +1,4 @@
-name: appium-credit-download
+name: appium-credit-test
 
 on:
   push:
@@ -26,7 +26,7 @@ env:
       TWITTER_ACCESS_TOKEN_KEY: ${{ secrets.TWITTER_ACCESS_TOKEN_KEY }}
       TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
 jobs:
-  appium_upload_job:
+  appium_download_job:
     timeout-minutes: 120
     runs-on: ${{ matrix.os }}
     strategy:
@@ -110,10 +110,10 @@ jobs:
           cancelled() || failure()
         uses: actions/upload-artifact@v3
         with:
-          name: "appium-upload-output"
+          name: "appium-download-output"
           path: test/output/**
 
-  appium_download_job:
+  appium_upload_job:
     timeout-minutes: 120
     runs-on: ${{ matrix.os }}
     strategy:
@@ -196,6 +196,6 @@ jobs:
           cancelled() || failure()
         uses: actions/upload-artifact@v3
         with:
-          name: "appium-download-output"
+          name: "appium-upload-output"
           path: test/output/**
        
