@@ -302,7 +302,12 @@ class BasePage {
         await this.languageBtn.click()
         const enOption = await this.waitForSelectorOptional('label .q-item__section >> nth=0',{timeout: 5000}, 'click has no effect')
         if(enOption){
-          await this.page.locator('label .q-item__section >> nth=0').click()
+          try{
+            await this.page.locator('label .q-item__section >> nth=0').click()
+          }catch(error){
+            console.log('cannot click , try again')
+            continue;
+          }
           break;
         }else{
           console.log(`第${i+1}次重试`)
