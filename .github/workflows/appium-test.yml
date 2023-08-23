@@ -112,3 +112,88 @@ jobs:
         with:
           name: "appium-download-output"
           path: test/output/**    
+  appium_upload_job:
+    timeout-minutes: 120
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node-version: [16]
+        os: [windows-latest]
+    environment:
+      name: CICD
+    steps:
+      - name: appium_test_job Get short SHA 🔑
+        run: |
+          echo "sha7=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+          echo "nightly_job"
+          echo "isRunAppium: 0"
+          echo "repository: tanshuai/alphabiz"
+        shell: bash
+
+      - name: Checkout ⬇️
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js ${{ matrix.node-version }} 📮
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "yarn"
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@zeeis"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PAT }}
+
+      - name: Get message
+        run: |
+          git fetch --prune --unshallow
+        shell: bash
+
+      - name: Install dependencies 👨🏻‍💻
+        uses: nick-fields/retry@v2
+        with:
+          timeout_seconds: 600
+          max_attempts: 2
+          shell: bash
+          retry_on: error
+          command: yarn
+
+      - name: Install alphabiz.7z
+        run: |
+          curl -L https://github.com/tanshuai/alphabiz/releases/download/0.2.5-nightly-202308171841/alphabiz-0.2.5-nightly-202308171841-windows.7z > appPackage.7z
+          7z x appPackage.7z
+        shell: bash
+
+      - name: Install winappdriver.msi
+        run: |
+          Set-DisplayResolution -Width 1920 -Height 1080 -Force
+          Invoke-WebRequest "https://github.com/microsoft/WinAppDriver/releases/download/v1.2.1/WindowsApplicationDriver_1.2.1.msi" -OutFIle "C:\WindowsApplicationDriver_1.2.1.msi"
+          Start-Process msiexec -ArgumentList "/quiet","/x","{087BBF93-D9E3-4D27-BDBE-9C702E0066FC}" -Verb runAs -Wait
+          Start-Process msiexec -ArgumentList "/quiet","/i","C:\WindowsApplicationDriver_1.2.1.msi" -Verb runAs -Wait
+          Start-Sleep -s 5
+        shell: powershell
+
+      - name: Run appium
+        run: |
+          $env:JEST_TEST = 'true'
+          Start-Process PowerShell -ArgumentList "yarn test:appium"
+          Start-Sleep -s 10
+
+      - name: E2E appium creditUpload test for 7z 🧪
+        uses: nick-fields/retry@v2
+        with:
+          timeout_seconds: 6000
+          max_attempts: 3
+          shell: bash
+          retry_on: error
+          command: |
+            taskkill //F //IM "Alphabiz.exe" || (echo "app is ready")
+            sleep 10s
+            yarn test:release:creditsUpload
+
+      - name: Upload Test Results 🗃
+        if: |
+          cancelled() || failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: "appium-upload-output"
+          path: test/output/**
