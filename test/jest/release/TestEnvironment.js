@@ -17,11 +17,6 @@ export const opts = {
   capabilities: {
     browserName: '',
     platformName: 'Windows',
-    // "appium:options" : {
-    //   deviceName: 'WindowsPC',
-    //   createSessionTimeout: 60000,
-    //   app: AlphabizAppPath
-    // }
     "ms:waitForAppLaunch": 50,
     "appium:deviceName": 'WindowsPC',
     "appium:createSessionTimeout": 60000,
