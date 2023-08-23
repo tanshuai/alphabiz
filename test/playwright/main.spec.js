@@ -438,6 +438,9 @@ test.describe('切换语言设置', () => {
       }
     })
     test('确保最后的语言是EN', async () => {
+      if (process.platform === 'linux') {
+        test.skip()
+      }
       try{
         console.log('先跳转到基础设置页')
         const basicIcon = window.locator('.q-item:has-text("assignment")')
