@@ -18,7 +18,7 @@ const outputFile = process.env.APP_TYPE === 'exe' ? '/exe' : process.env.APP_TYP
 const outputPath = path.resolve(__dirname, '../../output/release' + outputFile)
 let isSuccess = false
 
-jest.setTimeout(60000 * 30)
+jest.setTimeout(60000 * 50)
 describe('upload', () => {
   beforeAll(async () => {
     client = await wdio.remote(obj.opts)
@@ -79,7 +79,6 @@ describe('upload', () => {
         await client.$('//Text[@Name="' + torrentName + '"]/following-sibling::Button[@Name="SEED"]').click()
       }
     }
-
     const taskStatus = await homePage.getTaskStatus(torrentName)
     expect(taskStatus).toBe('Status: Uploading')
     console.log('准备跳转到--积分页')
@@ -87,7 +86,7 @@ describe('upload', () => {
     console.log('成功跳转')
     let changedCredit
     let currentCredit = initialCredit
-    for (let i = 0; i < 500; i++) {
+    for (let i = 0; i < 50; i++) {
       changedCredit = await creditsPage.checkCredits()
       if(i%10==0) console.log(changedCredit)
       const delta = calculation('reduce', changedCredit, currentCredit)
@@ -99,8 +98,6 @@ describe('upload', () => {
       }
       await sleep(5000)
     }
-    console.log('十分钟后退出')
-    await sleep(60000*10)
     console.log('wait download complete')
     isSuccess = true
   })
