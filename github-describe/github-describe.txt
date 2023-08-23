@@ -1,12 +1,9 @@
-test appium
-test key
-test main
 test main
 test main
 test appium
 test appium
 test appium
 test main
-test main
-test main
-test main
+test appium
+test appium
+test appium
