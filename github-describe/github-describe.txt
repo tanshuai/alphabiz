@@ -1,2 +1,3 @@
-AlphabizAccount: Auth SignInPage
-#779
+account: improve `addOnAuthStateChangedListener`
+AlphabizAccount: improve Auth page
+AlphabizAccount: Auth add new SignInCard
