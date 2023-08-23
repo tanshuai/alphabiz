@@ -17,10 +17,10 @@ export const opts = {
   capabilities: {
     browserName: '',
     platformName: 'Windows',
-    deviceName: 'WindowsPC',
-    appWaitDuration: 60000,
-    createSessionTimeout: 60000,
-    app: AlphabizAppPath
+    "appium:deviceName": 'WindowsPC',
+    "appium:appWaitDuration": 60000,
+    "appium:createSessionTimeout": 60000,
+    "appium:app": AlphabizAppPath
   },
   logLevel: 'error'
 }
