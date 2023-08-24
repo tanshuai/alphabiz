@@ -157,7 +157,7 @@ describe('download', () => {
         console.log('成功跳转')
         await homePage.downloadTorrent(`${homePage.appConfig.protocol}://GoneNutty.avi/AaJKFjiFIyvGNE0Fur1wE36EC+Dl&_Td6WFoAAAFpIt42AgAhARwAAAAQz1jM4AC3AEZdABhqCGEMasx_OPsfBFf13OOYW5xF7e0HINkIZP9Ep1rbI74+n0R63w2OQgpQX9OpSJvNChXnpMoaSfWgK44ljmeAgDPktAAAAACE1btxAAFeuAEAAADqmdptPjANiwIAAAAAAVla`, DownloadFilePath)
         // await homePage.downloadTorrent('alphabiz://ChinaCup.1080p.H264.AAC.mp4/AZLwy9+LB7G1y0HGGJis+f4UZlze&MDAyNzAwMjgwMDI5MDAyYTAwMmIwMDJjMDAyZCZ0cj0=', DownloadFilePath)
-        await homePage.waitSeedFound(torrentName, 60000 * 20, isCard=true)
+        await homePage.waitSeedFound(torrentName, 60000 * 20,true)
         // 等待种子开始下载
         await homePage.downloadTorrentBtn.waitUntil(async () => {
           console.log('等待5s')
