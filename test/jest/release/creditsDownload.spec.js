@@ -110,16 +110,12 @@ describe('download', () => {
     console.log('准备跳转到下载中')
     await homePage.jumpPage('downloadingStatusTab')
     console.log('成功跳转')
+    await homePage.setCardMode()
+    console.log('设置卡片模式')
     if (await homePage.getTask(torrentName) !== null) {
       console.log('找到对应的磁力名')
       console.log('任务下载中')
       try {
-        // 查看种子任务卡片状态
-        console.log('check task status')
-        console.log('查看种子任务卡片状态')
-        const taskTitle = await homePage.getTask(torrentName)
-        taskTitle.click()
-        console.log('点击taskTitle')
         // 等待种子开始下载
         console.log('等待种子下载完成（每隔5s检查列表）')
         await homePage.downloadTorrentBtn.waitUntil(async () => {
@@ -161,13 +157,7 @@ describe('download', () => {
         console.log('成功跳转')
         await homePage.downloadTorrent(`${homePage.appConfig.protocol}://GoneNutty.avi/AaJKFjiFIyvGNE0Fur1wE36EC+Dl&_Td6WFoAAAFpIt42AgAhARwAAAAQz1jM4AC3AEZdABhqCGEMasx_OPsfBFf13OOYW5xF7e0HINkIZP9Ep1rbI74+n0R63w2OQgpQX9OpSJvNChXnpMoaSfWgK44ljmeAgDPktAAAAACE1btxAAFeuAEAAADqmdptPjANiwIAAAAAAVla`, DownloadFilePath)
         // await homePage.downloadTorrent('alphabiz://ChinaCup.1080p.H264.AAC.mp4/AZLwy9+LB7G1y0HGGJis+f4UZlze&MDAyNzAwMjgwMDI5MDAyYTAwMmIwMDJjMDAyZCZ0cj0=', DownloadFilePath)
-        await homePage.waitSeedFound(torrentName, 60000 * 20)
-        // 查看种子任务卡片状态
-        // console.log('check task status')
-        // console.log('检查种子任务卡片状态')
-        // const taskTitle = await homePage.getTask(torrentName)
-        // taskTitle.click()
-        // console.log('点击')
+        await homePage.waitSeedFound(torrentName, 60000 * 20, isCard=true)
         // 等待种子开始下载
         await homePage.downloadTorrentBtn.waitUntil(async () => {
           console.log('等待5s')
@@ -198,7 +188,7 @@ describe('download', () => {
     }
     // // 等待种子下载完成
     await homePage.jumpPage('uploadingStatusTab')
-    await client.$('//DataItem[@Name="' + torrentName + ' -"]').waitForDisplayed({ timeout: 60000 * 4 })
+    await client.$(`//Text[@Name="${torrentName}"]`).waitForDisplayed({ timeout: 60000 * 4 })
     const isUp = await homePage.isTaskUploading(torrentName)
     if(isUp){
       console.log('seed download complete!')
