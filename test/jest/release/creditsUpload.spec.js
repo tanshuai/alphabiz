@@ -28,7 +28,11 @@ describe('upload', () => {
     developmentPage = new DevelopmentPage(client)
   }, 120000)
   afterAll(async () => {
-    client && await client.deleteSession()
+    try{
+      client && await client.deleteSession()
+    }catch(error){
+      console.log(error)
+    }
   })
   beforeEach(async () => {
     isSuccess = false
@@ -41,9 +45,6 @@ describe('upload', () => {
       }
       client && await client.saveScreenshot(outputPath + `/${expect.getState().currentTestName}.png`)
     }
-  })
-  it.skip('test1', async () => {
-    expect(1).toBe(1)
   })
   it('upload seeding', async () => {
     const uploadFilePath = path.resolve(__dirname, '../../cypress/fixtures/samples/GoneNutty.avi')
@@ -98,24 +99,7 @@ describe('upload', () => {
       }
       await sleep(5000)
     }
-    console.log('再运行10分钟')
-    await sleep(60000*10)
     console.log('wait download complete')
     isSuccess = true
-  })
-  it.skip('test', async () => {
-    await sleep(10000)
-    console.log('ensure Log In')
-    await accountPage.ensureSignIn(uploadUser, process.env.TEST_PASSWORD, { isWaitAlert: true })
-    console.log('Login')
-    console.log('判断左侧栏是否可见')
-    while (!(await accountPage.libraryGroup.isDisplayed())) {
-      console.log('locate full-screen button')
-      await accountPage.fullScreenBtn.click()
-      console.log('full screen!')
-    }
-    console.log('ready sign out')
-    await accountPage.signOut()
-    console.log('sign out')
   })
 })
