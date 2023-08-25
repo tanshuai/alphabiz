@@ -10,7 +10,7 @@
 
 ![image](https://user-images.githubusercontent.com/3947852/163349980-b8354c86-fb7f-4106-9458-86708af96dbc.png)
 
-Alphabiz is an open source Electron-based desktop app. It is written in JavaScript and uses Vue, Quasar...
+Alphabiz is an open source desktop & mobile framework & sdk to build web 3 apps.
 
 ## Supported operating systems
 
@@ -20,7 +20,7 @@ Alphabiz is an open source Electron-based desktop app. It is written in JavaScri
 
 ## Installation
 
-Download the official installer for your operating system: https://alpha.biz/download/
+Download the official demo installer for your operating system: https://alpha.biz/download/
 
 ## Nightly Releases
 
