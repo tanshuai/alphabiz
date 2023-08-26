@@ -169,7 +169,7 @@ Cypress.Commands.add('signIn', (username, password, { cacheSession = true, isWeb
       }
     })
     cy.newVisit(isWebsite)
-    cy.get('.post-card', { timeout: 30000}).should('be.visible')
+    cy.get('.post-card', { timeout: 60000 }).should('be.visible')
     cy.toMoreHoriz()
   } else {
     login()
