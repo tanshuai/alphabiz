@@ -1,3 +1,7 @@
-fix make rename step
-add reset template method
-push code to test repo
+fix 7z file name, delete schedule event
+release name use lower display name
+debug $q.screen
+Update app.scss
+run release web workflow
+Update BasicPanel.vue
+fix fullscreen on ios (#779)
