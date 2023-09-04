@@ -1,7 +1,7 @@
-fix 7z file name, delete schedule event
-release name use lower display name
-debug $q.screen
-Update app.scss
-run release web workflow
-Update BasicPanel.vue
-fix fullscreen on ios (#779)
+fix: handle `Failed to fetch`
+improve `ConnectionStatus` (#779)
+improve `QuickStart` (#779)
+improve `ChannelEdit` (#779)
+#779 `BlockList`
+#779 `EditProfile`
+retry download subtitle when failed
