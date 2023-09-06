@@ -1,2 +1,3 @@
-fix github describe
-skip e2e
+fix: #819
+fix #817
+record current subtitles #822
