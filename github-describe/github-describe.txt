@@ -1,3 +1,8 @@
-fix: #819
-fix #817
-record current subtitles #822
+restore subtitles when the player refresh #822
+separate requestRecommends
+pause player when delete account #824
+#821
+#779
+fix #821
+fix nupkg file name invalid
+#779
