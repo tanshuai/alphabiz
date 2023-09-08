@@ -1,9 +1,1 @@
-fix file path contains spaces
-improve torrent table list
-ui adjustment
-skip e2e
-remove `lorem`
-Update MnemonicCode.vue
-install package name use fileName, skip e2e
-fix syntax error, skip e2e
-output player log #822
+save subtitle list use store, fix #822
