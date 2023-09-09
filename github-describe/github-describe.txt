@@ -1,1 +1,2 @@
-save subtitle list use store, fix #822
+fix #823
+fix eslint errors
