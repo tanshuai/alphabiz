@@ -1,2 +1,7 @@
-fix #823
-fix eslint errors
+Update PostCard.vue
+#779
+fix drag empty file prompt
+improve performance
+update displayName fengpxu/6to-app#5
+try force quit for updater resolve #810
+fix #827
