@@ -1,4 +1,7 @@
-add appx package identity name
-fix: add backgroundColor for `TableList`
-try to fix: fullscreen on ios safari
-show subtitleList in more card
+support horizontal #779
+adjustment padding
+disable `getCodes`
+insert TaskCard to CreditPage
+fix subtitle list
+add `SafariPolyfill`
+fix #808
