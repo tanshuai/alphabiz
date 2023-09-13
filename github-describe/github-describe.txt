@@ -1,8 +1,8 @@
-#779
-#779
-#830 #829
-fix table list e2e test
-move `TaskItem` files
-fix credits e2e test
-add TaskStageCard
-try fix crashes
+add config isShowInternalNotice
+improve Task #830
+add log
+fix oauth error
+fix recommends
+improve recommends for web
+fix library e2e test
+fix OOM crashes, close #800
