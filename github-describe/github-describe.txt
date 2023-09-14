@@ -1,13 +1,1 @@
-add appx zh resource
-fix: #828
-add e2e test timeout
-add beforeAll hook timeout, fix reload error
-improve Task Panel
-skip e2e
-run library e2e test
-rerun library e2e test
-improve Task_GithubSubscription
-skip useless test case
-improve Task
-fix Recommends
-keep the new version info when abort update
+fix oauth detach error
