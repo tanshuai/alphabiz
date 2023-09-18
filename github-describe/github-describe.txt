@@ -1,8 +1,10 @@
-#835
-add api `ignore_notify` for invitation
-delete e2e test only annotation
-hide and disable auto-update in windows-store build
-fix save language error
-exit pip when force load player
-fix web e2e test save language error
-add ignore link for email
+fix: #840
+fix get latest commit date
+fix: #842
+increase the wait time #841
+get package name dynamically in s3
+fix e2e test save language error
+#844
+#843
+#847
+#847
