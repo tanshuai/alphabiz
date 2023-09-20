@@ -1,6 +1,4 @@
-#847
-#845
-#846
-close useless log
-fix #838
-update not-found message
+fix latest commit date error
+fix default video player name
+push code to test repo
+save play state when entering pip
