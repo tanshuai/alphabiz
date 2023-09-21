@@ -1,0 +1,29 @@
+diff --git a/node_modules/create-torrent/get-files.js b/node_modules/create-torrent/get-files.js
+index 0e67d79..e4f2f53 100644
+--- a/node_modules/create-torrent/get-files.js
++++ b/node_modules/create-torrent/get-files.js
+@@ -38,7 +38,7 @@ function getFiles (path, keepRoot, cb) {
+   traversePath(path, getFileInfo, (err, files) => {
+     if (err) return cb(err)
+ 
+-    if (Array.isArray(files)) files = files.flat()
++    if (Array.isArray(files)) files = files.flat(Infinity)
+     else files = [files]
+ 
+     path = corePath.normalize(path)
+diff --git a/node_modules/create-torrent/index.js b/node_modules/create-torrent/index.js
+index 4d70755..7f45838 100644
+--- a/node_modules/create-torrent/index.js
++++ b/node_modules/create-torrent/index.js
+@@ -229,6 +229,11 @@ function getPieceList (files, pieceLength, estimatedTorrentLength, opts, cb) {
+ 
+   function onData (chunk) {
+     length += chunk.length
++    if (opts.onProgress && opts.onProgress._destroyed) {
++      multistream._destroy('Torrent destroyed', () => { })
++      // return console.log('onData: destroyed')
++      return
++    }
+ 
+     const i = pieceNum
+     sha1(chunk, hash => {

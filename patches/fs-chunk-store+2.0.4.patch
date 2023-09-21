@@ -1,0 +1,87 @@
+diff --git a/node_modules/fs-chunk-store/index.js b/node_modules/fs-chunk-store/index.js
+index 10d782b..c14fece 100644
+--- a/node_modules/fs-chunk-store/index.js
++++ b/node_modules/fs-chunk-store/index.js
+@@ -11,6 +11,44 @@ const randombytes = require('randombytes')
+ const rimraf = require('rimraf')
+ const thunky = require('thunky')
+ 
++const invalidChars = [
++  '?', '|', '*', '!', ':',
++  '"', ':',
++  '<', '>'
++]
++const preservedWords = [
++  'CON', 'PRN', 'AUX', 'NUL',
++  'COM1', 'COM2', 'COM3', 'COM4', 'COM5', 'COM6', 'COM7', 'COM8', 'COM9',
++  'LPT1', 'LPT2', 'LPT3', 'LPT4', 'LPT5', 'LPT6', 'LPT7', 'LPT8', 'LPT9'
++]
++const escapePath = (str = '') => {
++  let result = str
++    // Linux/MacOS path
++    .replace(/\//g, '_')
++    // Windows path
++    .replace(/\\/g, '_')
++    // Windows does not allow filepath ends with space or dot
++    .replace(/(\s|\.)+$/, '')
++  // These words are preserved in Windows and cannot be filename
++  // See https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file#naming-conventions
++  for (const word of preservedWords) {
++    while (result.startsWith(word)) {
++      result = result.replace(word, '')
++    }
++  }
++  const arr = result.split('')
++  for (let i = 0; i < arr.length; i++) {
++    if (invalidChars.includes(arr[i])) {
++      // Invalid characters (mainly in windows)
++      arr[i] = '-'
++    } else if (arr[i].charCodeAt(0) < 32 || arr[i].charCodeAt(0) === 127) {
++      // non-printable ASCII characters
++      arr[i] = '-'
++    }
++  }
++  return arr.join('')
++}
++
+ let TMP
+ try {
+   TMP = fs.statSync('/tmp') && '/tmp'
+@@ -30,9 +68,16 @@ function Storage (chunkLength, opts) {
+ 
+   if (opts.files) {
+     self.path = opts.path
++    console.log('new store', opts)
+     if (!Array.isArray(opts.files)) {
+       throw new Error('`files` option must be an array')
+     }
++    let extName = ''
++    if (opts.files.length === 1) {
++      const file0 = opts.files[0]
++      const matched = file0.name.match(/\.[^\.]{1,}$/)
++      if (matched && matched[0]) extName = matched[0]
++    }
+     self.files = opts.files.slice(0).map(function (file, i, files) {
+       if (file.path == null) throw new Error('File is missing `path` property')
+       if (file.length == null) throw new Error('File is missing `length` property')
+@@ -47,6 +92,10 @@ function Storage (chunkLength, opts) {
+       if (self.path) {
+         file.path = self.addUID ? path.resolve(path.join(self.path, self.name, file.path)) : path.resolve(path.join(self.path, file.path))
+       }
++      if (opts.postTitle && opts.torrent && opts.torrent.name) {
++        file.path = file.path.replace(opts.torrent.name, escapePath(opts.postTitle)) + extName
++        console.log('change file path to', file.path, opts.torrent.name, opts.postTitle)
++      }
+       return file
+     })
+     self.length = self.files.reduce(function (sum, file) { return sum + file.length }, 0)
+@@ -69,6 +118,9 @@ function Storage (chunkLength, opts) {
+   self.files.forEach(function (file) {
+     file.open = thunky(function (cb) {
+       if (self.closed) return cb(new Error('Storage is closed'))
++      if (fs.existsSync(path.dirname(file.path))) {
++        return cb(null, raf(file.path))
++      }
+       fs.mkdir(path.dirname(file.path), { recursive: true }, function (err) {
+         if (err) return cb(err)
+         if (self.closed) return cb(new Error('Storage is closed'))

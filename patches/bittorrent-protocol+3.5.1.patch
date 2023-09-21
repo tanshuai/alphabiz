@@ -1,5 +1,5 @@
 diff --git a/node_modules/bittorrent-protocol/index.js b/node_modules/bittorrent-protocol/index.js
-index 722878a..af271bf 100644
+index 722878a..76c5610 100644
 --- a/node_modules/bittorrent-protocol/index.js
 +++ b/node_modules/bittorrent-protocol/index.js
 @@ -39,6 +39,8 @@ function xor (a, b) {
@@ -11,7 +11,7 @@ index 722878a..af271bf 100644
  class Request {
    constructor (piece, offset, length, callback) {
      this.piece = piece
-@@ -126,8 +128,17 @@ class Wire extends stream.Duplex {
+@@ -126,8 +128,21 @@ class Wire extends stream.Duplex {
  
      this._peEnabled = peEnabled
      if (peEnabled) {
@@ -21,7 +21,11 @@ index 722878a..af271bf 100644
 +        this._dh = _bittorrent_pe_._dh
 +        this._myPubKey = _bittorrent_pe_._myPubKey
 +      } else {
-+        this._dh = crypto.createDiffieHellman(DH_PRIME, 'hex', DH_GENERATOR) // crypto object used to generate keys/secret
++        try {
++          this._dh = crypto.createDiffieHellman(DH_PRIME, 'hex', DH_GENERATOR) // crypto object used to generate keys/secret
++        } catch (e) {
++          this._dh = crypto.createDiffieHellman(DH_PRIME, 'hex', DH_GENERATOR.toString())
++        }
 +        this._myPubKey = this._dh.generateKeys('hex') // my DH public key
 +        _bittorrent_pe_ = {
 +          _dh: this._dh,
@@ -31,7 +35,7 @@ index 722878a..af271bf 100644
      } else {
        this._myPubKey = null
      }
-@@ -148,6 +159,7 @@ class Wire extends stream.Duplex {
+@@ -148,6 +163,7 @@ class Wire extends stream.Duplex {
      this.on('finish', this._onFinish)
      this._debug('type:', this.type)
  
@@ -39,7 +43,7 @@ index 722878a..af271bf 100644
      if (this.type === 'tcpIncoming' && this._peEnabled) {
        // If we are not the initiator, we should wait to see if the client begins
        // with PE/MSE handshake or the standard bittorrent handshake.
-@@ -246,6 +258,7 @@ class Wire extends stream.Duplex {
+@@ -246,6 +262,7 @@ class Wire extends stream.Duplex {
    }
  
    sendPe1 () {
@@ -47,7 +51,7 @@ index 722878a..af271bf 100644
      if (this._peEnabled) {
        const padALen = Math.floor(Math.random() * 513)
        const padA = randombytes(padALen)
-@@ -254,12 +267,14 @@ class Wire extends stream.Duplex {
+@@ -254,12 +271,14 @@ class Wire extends stream.Duplex {
    }
  
    sendPe2 () {
@@ -58,11 +62,11 @@ index 722878a..af271bf 100644
    }
  
    sendPe3 (infoHash) {
-+    console.log('sendPe3')
++    // console.log('sendPe3')
      this.setEncrypt(this._sharedSecret, infoHash)
  
      const hash1Buffer = Buffer.from(sha1.sync(Buffer.from(this._utfToHex('req1') + this._sharedSecret, 'hex')), 'hex')
-@@ -284,6 +299,7 @@ class Wire extends stream.Duplex {
+@@ -284,6 +303,7 @@ class Wire extends stream.Duplex {
    }
  
    sendPe4 (infoHash) {
@@ -70,7 +74,17 @@ index 722878a..af271bf 100644
      this.setEncrypt(this._sharedSecret, infoHash)
  
      const padDLen = randombytes(2).readUInt16BE(0) % 512
-@@ -692,24 +708,29 @@ class Wire extends stream.Duplex {
+@@ -391,7 +411,8 @@ class Wire extends stream.Duplex {
+       // BEP6: If a peer sends a choke, it MUST reject all requests from the peer to whom the choke
+       // was sent except it SHOULD NOT reject requests for pieces that are in the allowed fast set.
+       while (this.peerRequests.length) {
+-        const request = this.peerRequests[0]
++        // Is this safety?
++        const request = this.peerRequests.pop()
+         if (!this.allowedFastSet.includes(request.piece)) {
+           this.reject(request.piece, request.offset, request.length)
+         }
+@@ -692,24 +713,29 @@ class Wire extends stream.Duplex {
    }
  
    _onPe1 (pubKeyBuffer) {
@@ -88,7 +102,7 @@ index 722878a..af271bf 100644
    }
  
    _onPe3 (hashesXorBuffer) {
-+    // console.log('onPe3')
++    // console.log('bittorrent-protocol: onPe3')
      const hash3 = sha1.sync(Buffer.from(this._utfToHex('req3') + this._sharedSecret, 'hex'))
      const sKeyHash = xor(Buffer.from(hash3, 'hex'), hashesXorBuffer).toString('hex')
      this.emit('pe3', sKeyHash)
@@ -100,7 +114,7 @@ index 722878a..af271bf 100644
      if (!vcBuffer.equals(VC)) {
        this._debug('Error: verification constant did not match')
        this.destroy()
-@@ -730,6 +751,7 @@ class Wire extends stream.Duplex {
+@@ -730,6 +756,7 @@ class Wire extends stream.Duplex {
    }
  
    _onPe4 (peerSelectBuffer) {
@@ -108,7 +122,7 @@ index 722878a..af271bf 100644
      this._encryptionMethod = peerSelectBuffer.readUInt8(3)
      if (!CRYPTO_PROVIDE.includes(this._encryptionMethod)) {
        this._debug('Error: peer selected invalid crypto method')
-@@ -1156,10 +1178,11 @@ class Wire extends stream.Duplex {
+@@ -1156,10 +1183,11 @@ class Wire extends stream.Duplex {
    }
  
    _parsePe2 () {
@@ -121,7 +135,7 @@ index 722878a..af271bf 100644
        }
        this._parsePe4()
      })
-@@ -1170,10 +1193,11 @@ class Wire extends stream.Duplex {
+@@ -1170,10 +1198,11 @@ class Wire extends stream.Duplex {
      const hash1Buffer = Buffer.from(sha1.sync(Buffer.from(this._utfToHex('req1') + this._sharedSecret, 'hex')), 'hex')
      // synchronize on HASH('req1', S)
      this._parseUntil(hash1Buffer, 512)
