@@ -11,7 +11,6 @@ const {
 const readline = require('readline')
 const { spawn } = require('child_process')
 const uuid = require('uuid')
-const productCode = uuid.v4().toUpperCase()
 const Wix = require('electron-wix-msi/lib/creator')
 
 const appDirectoryRootPath = require('../test.config.js').appDirectoryRootPath
@@ -50,7 +49,14 @@ const exitWith = code => {
   process.exit(code)
 }
 
-const { name, version, description, author, productName } = require('../package.json')
+const appConfig = require('../developer/app');
+const productName = appConfig.displayName;
+const displayName = appConfig.displayName;
+const developerName = appConfig.developer;
+const upgradeCode = appConfig.upgradeCode;
+
+const { version, description } = require('../package.json')
+
 const WiSubStg = resolve(__dirname, 'WiSubStg.vbs')
 const WiLangId = resolve(__dirname, 'WiLangId.vbs')
 const appDirectory = resolve(__dirname, `../${appDirectoryRootPath}/electron/${productName}-win32-x64`)
@@ -72,12 +78,13 @@ const ensureDirectory = async () => {
   mkdirSync(outputDirectory, { recursive: true })
 }
 
-const icoPath = resolve(__dirname, '../public/platform-assets/windows/icon.ico')
+const icoPath = resolve(__dirname, '../developer/platform-assets/windows/icon.ico')
 const iconTemplate = `<Icon Id="icon.ico" SourceFile="${icoPath}"/>
     <Property Id="ARPPRODUCTICON" Value="icon.ico" />`
 const wixTemplate = readFileSync(resolve(__dirname, 'template.xml'))
   .toString()
   .replace('<!-- {{IconTemplate}} -->', iconTemplate)
+  // .replace(/{{displayName}}/g, displayName)
 
 /**
  * @typedef CultureOption
@@ -124,17 +131,19 @@ const makeCulture = async (culture, asBase = false) => {
   //   console.warn('Not exist', localizationFile)
   // }
   const maker = new Wix.MSICreator({
-    name: productName,
-    shortName: productName,
+    name: displayName,
+    shortName: displayName,
+    // name: productName,
+    // shortName: productName,
     arch: process.arch,
     description,
     version,
-    manufacturer: 'Alphabiz Team',
+    manufacturer: developerName,
     exe: productName,
     shortcutFolderName: '',
     programFilesFolderName: productName,
     appIconPath: icoPath,
-    upgradeCode: '4d8a65aa-fc5b-421c-94ab-cb722ef737e2',
+    upgradeCode,
     cultures: cultureStr,
     appDirectory,
     outputDirectory,
@@ -144,12 +153,12 @@ const makeCulture = async (culture, asBase = false) => {
     ui: {
       chooseDirectory: true,
       images: {
-        background: resolve(__dirname, '../public/platform-assets/windows/splash/background_493x312.png'),
-        banner: resolve(__dirname, '../public/platform-assets/windows/splash/banner_493x58.png'),
-        exclamationIcon: resolve(__dirname, '../public/icons/favicon-32x32.png'),
-        infoIcon: resolve(__dirname, '../public/icons/favicon-32x32.png'),
-        newIcon: resolve(__dirname, '../public/icons/favicon-16x16.png'),
-        upIcon: resolve(__dirname, '../public/icons/favicon-16x16.png')
+        background: resolve(__dirname, '../developer/platform-assets/windows/splash/background_493x312.png'),
+        banner: resolve(__dirname, '../developer/platform-assets/windows/splash/banner_493x58.png'),
+        exclamationIcon: resolve(__dirname, '../developer/icons/favicon-32x32.png'),
+        infoIcon: resolve(__dirname, '../developer/icons/favicon-32x32.png'),
+        newIcon: resolve(__dirname, '../developer/icons/favicon-16x16.png'),
+        upIcon: resolve(__dirname, '../developer/icons/favicon-16x16.png')
       },
       localizations: [localizationFile]
     }
@@ -165,7 +174,7 @@ const makeCulture = async (culture, asBase = false) => {
   maker.getRegistryKeys = (function getRegistryKeys (...args) {
     const registry = _getRegistryKeys.bind(maker)(...args)
     const icon = registry.find(i => i.id === 'UninstallDisplayIcon')
-    if (icon) icon.value = '[APPLICATIONROOTDIRECTORY]Alphabiz.exe'
+    if (icon) icon.value = `[APPLICATIONROOTDIRECTORY]${productName}.exe`
     // console.log(icon, registry.find)
     return registry
   }).bind(maker)
