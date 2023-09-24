@@ -1,0 +1,15 @@
+{
+  "users": [{
+    "_comment": "You should use pubkey as id here. See take-down.js for more info.",
+    "id": "a_pubkey_of_user",
+    "reason": "Serious Violation"
+  }],
+  "channels": [{
+    "id": "an_id_of_channel",
+    "reason": "Copyright Disputes"
+  }],
+  "posts": [{
+    "id": "an_id_of_post",
+    "reason": "Adults Only"
+  }]
+}

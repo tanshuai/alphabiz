@@ -1,0 +1,1 @@
+module.exports={mode:"committee",admins:["FQi3UfsB5zY7SSfLMPdl9Fdh7_EeM4og0ZGivp4tfJU.yXhvCAmmUz1Pw9-Iwhf9hpo9-H4WDHwezzRAGE5Oipk","an_id_of_admin","an_id_of_other_admin"]};
