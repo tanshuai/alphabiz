@@ -11,13 +11,14 @@ class HomePage {
   // 菜单
   get menuBtn () { return this.page.$('//Button[@Name="Menu"]') }
   get pageTitle () { return this.page.$('//Button[@Name="Menu"]/following::Text[1]') }
+  get libraryLink () { return this.page.$('//*[@Name="Library"]') }
   get homeLink () { return this.page.$('//*[@Name="Home"]') }
   get playerLink () { return this.page.$('//*[@Name="Player"]') }
   get creditsLink () { return this.page.$('//*[@Name="Credits"]') }
   get settingsLink () { return this.page.$('//*[@Name="Settings"]') }
   get basicLink () { return this.page.$('//*[@Name="Basic"]') }
   get accountLink () { return this.page.$('//*[@Name="Advanced"]') }
-  get developmentLink () { return this.page.$('//*[@Name="Development Developer Mode for Internal Use"]') }
+  get developmentLink () { return this.page.$('//*[@Name="Development"]') }
   // 种子状态tab
   get downloadingStatusTab () { return this.page.$('//*[@AutomationId="downloading"]') }
   get uploadingStatusTab () { return this.page.$('//*[@AutomationId="uploading"]') }
@@ -41,15 +42,17 @@ class HomePage {
 
   // 跳转菜单页面-支持跳转二级目录
   async jumpPage (firstTarget, secondTarget) {
-    await sleep(1000)
+    await sleep(2000)
     const menuLink = await this[secondTarget] || await this[firstTarget]
     if (!(await this[firstTarget].isDisplayed())) {
-      // await this.page.$('/Button[@Name="Menu"]').click()
       await this.menuBtn.click()
+      await sleep(1000)
+      if (!(await this[firstTarget].isDisplayed())) {
+        await this.menuBtn.click()
+      }
     }
     if (secondTarget) {
       if (!(await menuLink.isDisplayed())) {
-      // await this.page.$('/Button[@Name="Menu"]').click()
         await this[firstTarget].click()
       }
     }
@@ -77,9 +80,9 @@ class HomePage {
       // setValue功能的自动清除内容不稳定，手动清除输入框内容
       const text = await this.page.$('//Edit[@Name="Download directory position"]').getText()
       const backSpaces = new Array(text.length).fill('\uE003')
-      await sleep(1000)
+      await sleep(2000)
       await this.downloadDirectoryEdit.setValue(backSpaces)
-      await sleep(1000)
+      await sleep(2000)
       await this.downloadDirectoryEdit.setValue(directory)
     }
     await this.confirmDownloadBtn.click()
@@ -172,10 +175,10 @@ class HomePage {
     })
   }
 
-  async getTaskStatus (torrentName) {
-    await this.page.$('//Text[@Name="' + torrentName + '"]').click()
+  async getTaskStatus (torrentName, opt = { isLog: true }) {
+    await this.page.$('//Text[@Name="' + torrentName + '"]')
     const taskStatus = await this.page.$('//Text[@Name="' + torrentName + '"]/following-sibling::Text[starts-with(@Name,"Status:")]')
-    console.log(await taskStatus.getText())
+    if (opt.isLog) console.log(await taskStatus.getText())
     return await taskStatus.getText()
   }
 

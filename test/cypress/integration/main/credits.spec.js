@@ -1,33 +1,7 @@
 /// <reference path="cypress" />
 /// <reference path="../../support/index.d.ts" />
-///
-let isSkip = false
+
 describe('Credits', () => {
-  beforeEach(function onBeforeEach () {
-    if (!(/delete/.test(this.currentTest.title))) {
-      if (isSkip) {
-        this.skip()
-      }
-    }
-  })
-  afterEach(function onAfterEach () {
-    // 如果注册未成功，跳过所有登录测试
-    if (/sign\sup/.test(this.currentTest.title)) {
-      if (this.currentTest._currentRetry === 2 && this.currentTest.state === 'failed') {
-        isSkip = true
-        // Cypress.runner.stop()
-        // this will skip tests only for current spec
-      }
-    }
-  })
-  // it('test', () => {
-  //   const num1 = 1.011
-  //   const num2 = 2.022
-  //   cy.log((parseInt(num1) * 1000 + parseInt(num2) * 1000))
-  //   cy.task('calculation', { type: 'addd', time: num1, to: num2 }).then((number) => {
-  //     cy.log('111:' + number.toFixed(3))
-  //   })
-  // })
   it('test1 to test2 transfer - check bill details', () => {
     let from
     let to
@@ -41,81 +15,62 @@ describe('Credits', () => {
       from = 'test6'
       to = 'test5'
     }
-    cy.log('Cypress.platform: ' + Cypress.platform)
     // 转账人账号 转账人密码
-    const transferee = from + Cypress.env('testEmailDomain')
-    const transfereePassword = 'password'
+    const transferee = {
+      account: from + Cypress.env('testEmailDomain'),
+      password: 'password'
+    }
     // 收款人账号 收款人密码
-    const payee = to + Cypress.env('testEmailDomain')
-    const payeePassword = 'password'
+    const payee = {
+      account: to + Cypress.env('testEmailDomain'),
+      password: 'password'
+    }
     // 转账金额
     const transferAmount = 1
-    cy.signIn(payee, payeePassword)
+
+    cy.signIn(payee.account, payee.password)
     cy.toCredits()
-    cy.get('.q-card:nth-child(2) > .q-card__section:nth-child(1) > :nth-child(2)').click()
-    cy.get('body').then($el => {
-      // 获取 收款人 初始积分
-      const payeePoint = $el.find('.text-right > div').text()
-      cy.log('payeePoint:' + payeePoint)
-      // 获取 收款人 ID
-      // old way : find(element).text() new: find(input).val()
-      let payeeID = $el.find('input[type=text]').val()
-      // 去除文本两边的空格
-      payeeID = payeeID.replace(/(^\s*)|(\s*$)/g, '')
-      cy.log('payeeID:' + payeeID)
-      cy.signIn(transferee, transfereePassword)
-      cy.toCredits()
-      cy.sleep(3000)
-      cy.get('.text-right > div').then($element => {
-        const point = parseInt($element.text())
-        cy.log('point:' + point)
-        // cy.contains('Bonus >> 99').click()
-        // cy.get('.text-right > div').contains((point + 99).toString(), { timeout: 15000 })
+    cy.getPoint().as('payeePoint')
+    cy.getReceiptCode().as('payeeReceiptCode')
+
+    cy.signIn(transferee.account, transferee.password)
+    cy.toCredits()
+    cy.getPoint().as('transfereePoint')
+    cy.getReceiptCode().as('transfereeReceiptCode')
+    
+    cy.get('@payeeReceiptCode').then(payeeReceiptCode => {
+      // 转账 start
+      cy.transfer(payeeReceiptCode, transferAmount)
+      // 检查 转账人 订单
+      cy.checkBillDetail({
+        user: 'transferee',
+        id: payeeReceiptCode,
+        type: 'Transfer',
+        amount: '-' + transferAmount
       })
-      // cy.get('.q-table__grid-content > :nth-child(1) > .q-item', { timeout: 15000 }).should('be.visible').contains('BONUS', { timeout: 15000 })
-      // cy.get('.q-table__grid-content > :nth-child(1) > .q-item').contains('FINISH', { timeout: 15000 })
+    })
+    cy.get('@transfereePoint').then(transfereePoint => {
+      // 断言 转账人 积分变化
+      cy.task('calculation', { type: 'reduce', from: transfereePoint, to: transferAmount }).then((number) => {
+        cy.getPoint().should('eq', number.toString())
+      })
+    })
 
-      cy.get('.q-card:nth-child(2) > .q-card__section:nth-child(1) > :nth-child(2)').click()
-      cy.get('body').then($el => {
-        // 获取 转账人 初始积分
-        const transfereePoint = $el.find('.text-right > div').text()
-        cy.log('transfereePoint:' + transfereePoint)
-        // 获取 转账人 ID
-        let transfereeID = $el.find('input[type=text]').val()
-        // 去除文本两边的空格
-        transfereeID = transfereeID.replace(/(^\s*)|(\s*$)/g, '')
-        cy.log('transfereeID:' + transfereeID)
-        cy.get('.q-card').contains('Cancel').click()
-        // 转账 start
-        cy.transfer(payeeID, transferAmount)
-        // 转账 end
-        // 断言 转账人 转单明细
-        cy.get('.q-table__grid-content > :nth-child(1)').eq(1).click()
-        cy.get('.q-dialog__inner > .q-card', { timeout: 5000 }).should('be.visible').then($card => {
-          cy.get('.rounded-borders > :nth-child(2)').contains(payeeID)
-          cy.get('.rounded-borders > :nth-child(3)').contains('Transfer')
-          cy.get('.rounded-borders > :nth-child(4)').contains('-' + transferAmount)
-          cy.get('.rounded-borders > :nth-child(5)').contains('finish')
-        })
-        // 断言 转账人 积分变化
-        cy.task('calculation', { type: 'reduce', time: transfereePoint, to: transferAmount }).then((number) => {
-          cy.get('.text-right > div').invoke('text').should('eq', number.toString())
-        })
-
-        cy.signIn(payee, payeePassword)
-        cy.toCredits()
-        // 断言 收款人 积分变化
-        cy.task('calculation', { type: 'add', time: payeePoint, to: transferAmount }).then((number) => {
-          cy.get('.text-right > div').invoke('text').should('eq', number.toString())
-        })
-        // 断言 收款人 转单明细
-        cy.get('.q-table__grid-content > :nth-child(1)').eq(0).click()
-        cy.get('.q-dialog__inner > .q-card', { timeout: 5000 }).should('be.visible').then($card => {
-          cy.get('.rounded-borders > :nth-child(2)').contains(transfereeID)
-          cy.get('.rounded-borders > :nth-child(3)').contains('Transfer')
-          cy.get('.rounded-borders > :nth-child(4)').contains(transferAmount)
-          cy.get('.rounded-borders > :nth-child(5)').contains('finish')
-        })
+    cy.signIn(payee.account, payee.password)
+    cy.toCredits()
+    cy.get('@payeePoint').then(payeePoint => {
+      // 断言 收款人 积分变化
+      cy.task('calculation', { type: 'add', from: payeePoint, to: transferAmount }).then((number) => {
+        cy.getPoint().should('eq', number.toString())
+      })
+    })
+    cy.get('@transfereeReceiptCode').then(transfereeReceiptCode => {
+      // 检查 收款人 订单
+      cy.checkBillDetail({
+        user: 'payee',
+        id: transfereeReceiptCode,
+        type: 'Transfer',
+        amount: transferAmount
       })
     })
   })

@@ -21,9 +21,23 @@ function calculation (type, num1, num2) {
 
   // 计算的方式是先将所有的小数乘为整数，待加减运算执行完之后再除去对应的 a 的值，将其变为小数输出
   // 先判断执行的方式是否是加法，不是的话则执行减法运算
-  return type === 'add' ? (num1 * a + num2 * a) / a : (num1 * a - num2 * a) / a
+  const number = type === 'add' ? (num1 * a + num2 * a) / a : (num1 * a - num2 * a) / a
+  return parseFloat(number.toFixed(3))
+}
+
+//生成从minNum到maxNum的随机数
+function randomNum (minNum, maxNum) {
+  switch (arguments.length) {
+    case 1:
+      return parseInt(Math.random() * minNum + 1, 10);
+    case 2:
+      return parseInt(Math.random() * (maxNum - minNum + 1) + minNum, 10);
+    default:
+      return 0;
+  }
 }
 
 module.exports = {
-  calculation
+  calculation,
+  randomNum
 }

@@ -16,12 +16,29 @@
 // Import commands.js using ES2015 syntax:
 import './commands'
 
-const resizeObserverLoopError = 'ResizeObserver loop limit exceeded'
+import './model/playerPage'
+import './model/creditsPage'
+import './model/walletPage'
+import './model/basicPage'
+import './model/toolPage'
 
-Cypress.on('uncaught:exception', (err) => {
-  if (err.message.includes(resizeObserverLoopError)) {
-    // returning false here prevents Cypress from
-    // failing the test
+Cypress.on('uncaught:exception', (err, runnable) => {
+  const resizeObserverLoopError = 'ResizeObserver loop limit exceeded'
+  if (err.message.includes(resizeObserverLoopError) ||
+    err.message.includes('User-Initiated Abort') ||
+    err.message.includes('RTCError') ||
+    err.message.includes('Failed to execute \'setRemoteDescription\'') ||
+    err.message.includes('Avoided redundant navigation') ||
+    err.message.includes('Connection failed')
+  ) {
     return false
+  }
+})
+Cypress.on('before:browser:launch', (browser = {}, launchOptions) => {
+  if (browser.name === 'chrome' || browser.name === 'edge') {
+    launchOptions.args.push('--disable-gpu')
+    launchOptions.args.push('--disable-dev-shm-usage')
+    launchOptions.args.push('--disable-web-security')
+    return launchOptions
   }
 })

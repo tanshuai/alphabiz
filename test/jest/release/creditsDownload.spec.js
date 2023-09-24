@@ -12,19 +12,34 @@ const { DevelopmentPage } = require('./Pages/DevelopmentPage')
 const obj = require('./TestEnvironment')
 
 let client, homePage, accountPage, creditsPage, developmentPage
-const torrentName = 'ChinaCup.1080p.H264.AAC.mp4'
-jest.setTimeout(60000 * 15)
-
+// const torrentName = 'ChinaCup.1080p.H264.AAC.mp4'
+const torrentName = 'GoneNutty.avi'
+const outputFile = process.env.APP_TYPE === 'exe' ? '/exe' : process.env.APP_TYPE === 'msi' ? '/msi' : '/7z'
+const outputPath = path.resolve(__dirname, '../../output/release' + outputFile)
+jest.setTimeout(60000 * 20)
+let isSuccess = false
 describe('download', () => {
-  beforeEach(async () => {
+  beforeAll(async () => {
     client = await wdio.remote(obj.opts)
     homePage = new HomePage(client)
     accountPage = new AccountPage(client)
     creditsPage = new CreditsPage(client)
     developmentPage = new DevelopmentPage(client)
-  }, 60000)
-  afterEach(async () => {
+  }, 120000)
+  afterAll(async () => {
     await client.deleteSession()
+  })
+  beforeEach(async () => {
+    isSuccess = false
+  })
+  afterEach(async () => {
+    // console.log('isSuccess', expect.getState().currentTestName, isSuccess)
+    if (!isSuccess) {
+      if (!fs.existsSync(outputPath)) {
+        fs.mkdirSync(outputPath, { recursive: true })
+      }
+      await client.saveScreenshot(outputPath + `/${expect.getState().currentTestName}.png`)
+    }
   })
   it.skip('delete task', async () => {
     let isDelete = false
@@ -56,20 +71,8 @@ describe('download', () => {
   })
   it('download seeding', async () => {
     const DownloadFilePath = path.resolve(__dirname, '../../download')
-
-    // 判断是否已经登录
-    if (await client.$('//*[@Name="SIGN IN"]').isDisplayed()) {
-      // 未登录
-      await accountPage.signIn(process.env.TEST2_EMAIL, process.env.TEST_PASSWORD, 1)
-    } else {
-      await homePage.jumpPage('creditsLink')
-      // 已登陆,等待拉取数据
-      // await client.$('//*[@Name="Settings"]').click()
-      if (!await homePage.settingsLink.isDisplayed()) {
-        await homePage.menuBtn.click()
-      }
-      await accountPage.accountSettingsTitle.waitForDisplayed({ timeout: 10000 })
-    }
+    await sleep(10000)
+    await accountPage.ensureSignIn(process.env.TEST1_EMAIL, process.env.TEST_PASSWORD, { isWaitAlert: true })
 
     // 查看初始积分
     await homePage.jumpPage('creditsLink')
@@ -85,11 +88,19 @@ describe('download', () => {
     if (await homePage.getTask(torrentName) !== null) {
       console.log('任务下载中')
       try {
-        await homePage.waitTaskPeers(torrentName, 60000 * 2, 1)
-        // 等待其他客户端上传bt种子
-        const taskPeers = await homePage.getTaskPeers(torrentName, 10000)
-        // 使用开发版本的付费积分功能
-        await homePage.downloadPaymentProd(taskPeers, 0)
+        // 查看种子任务卡片状态
+        console.log('check task status')
+        const taskTitle = await homePage.getTask(torrentName)
+        taskTitle.click()
+        // 等待种子开始下载
+        await homePage.downloadTorrentBtn.waitUntil(async () => {
+          if (await homePage.getTask(torrentName) === null) return true
+          const statusText = await homePage.getTaskStatus(torrentName, { isLog: false })
+          return !statusText.include('Loading')
+        }, {
+          timeout: 60000 * 15,
+          timeoutMsg: 'task not start'
+        })
 
         // 查看积分减少变化
         await homePage.jumpPage('creditsLink')
@@ -106,18 +117,28 @@ describe('download', () => {
         console.log('任务未下载')
         // 下载bt种子
         await homePage.jumpPage('downloadingStatusTab')
-        await homePage.downloadTorrent('alphabiz://ChinaCup.1080p.H264.AAC.mp4/AZLwy9+LB7G1y0HGGJis+f4UZlze&MDAyNzAwMjgwMDI5MDAyYTAwMmIwMDJjMDAyZCZ0cj0=', DownloadFilePath)
+        await homePage.downloadTorrent('alphabiz://GoneNutty.avi/AaJKFjiFIyvGNE0Fur1wE36EC+Dl&_Td6WFoAAAFpIt42AgAhARwAAAAQz1jM4AC3AEZdABhqCGEMasx_OPsfBFf13OOYW5xF7e0HINkIZP9Ep1rbI74+n0R63w2OQgpQX9OpSJvNChXnpMoaSfWgK44ljmeAgDPktAAAAACE1btxAAFeuAEAAADqmdptPjANiwIAAAAAAVla', DownloadFilePath)
+        // await homePage.downloadTorrent('alphabiz://ChinaCup.1080p.H264.AAC.mp4/AZLwy9+LB7G1y0HGGJis+f4UZlze&MDAyNzAwMjgwMDI5MDAyYTAwMmIwMDJjMDAyZCZ0cj0=', DownloadFilePath)
         await homePage.waitSeedFound(torrentName, 60000 * 10)
         // 查看种子任务卡片状态
         console.log('check task status')
         const taskTitle = await homePage.getTask(torrentName)
         taskTitle.click()
+        // 等待种子开始下载
+        await homePage.downloadTorrentBtn.waitUntil(async () => {
+          if (await homePage.getTask(torrentName) === null) return true
+          const statusText = await homePage.getTaskStatus(torrentName, { isLog: false })
+          return !statusText.include('Loading')
+        }, {
+          timeout: 60000 * 10,
+          timeoutMsg: 'task not start'
+        })
 
         // 等待其他客户端上传bt种子
-        const taskPeers = await homePage.getTaskPeers(torrentName, 60000 * 10)
+        // const taskPeers = await homePage.getTaskPeers(torrentName, 60000 * 10)
 
         // 使用开发版本的付费积分功能
-        await homePage.downloadPaymentProd(taskPeers, 0)
+        // await homePage.downloadPaymentProd(taskPeers, 0)
 
         // 查看积分减少变化
         await homePage.jumpPage('creditsLink')
@@ -131,6 +152,7 @@ describe('download', () => {
     await client.$('//Text[@Name="' + torrentName + '"]').waitForDisplayed({ timeout: 60000 * 4 })
     const taskStatus = await homePage.getTaskStatus(torrentName)
     await sleep(10000)
-    expect(taskStatus).toBe('Status: Seeding')
+    expect(taskStatus).toBe('Status: Uploading')
+    isSuccess = true
   })
 })

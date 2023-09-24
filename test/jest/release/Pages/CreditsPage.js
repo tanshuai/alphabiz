@@ -3,12 +3,13 @@ class CreditsPage {
     this.page = page
   }
 
-  get CreditsText () { return this.page.$('//*[starts-with(@Name, "Your credits:")]') }
+  get CreditsText () { return this.page.$('//*[@Name="Your credits"]/following-sibling::*[1]') }
 
   async checkCredits () {
     await this.CreditsText.waitForDisplayed({ timeout: 20000 })
-    const credit = new RegExp('(?<=[:]\\s)\\d+.\\d+').exec(await this.CreditsText.getText())
-    return credit[0]
+    const creditsText = await this.CreditsText.getText()
+    console.log('creditsText', creditsText)
+    return Number(creditsText)
   }
 }
 
