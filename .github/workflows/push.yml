@@ -15,6 +15,7 @@ on:
       - "!patches/**"
       - "!public/**"
       - "!wix/**"
+      - "!developer/**"
       - "!test/**"
       - "build/**"
       - "release.json"
@@ -266,6 +267,13 @@ jobs:
           path: test/output/**
 
       #后面的step晚上运行 或 正式发布
+      - name: Get recommends from github
+        if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
+        run: |
+          curl -H 'Authorization: token ${{ secrets.PAT }}' \
+          -L https://raw.githubusercontent.com/tanshuai/alphabiz-app/main/test-secret/recommends.txt \
+          > public/recommends.txt
+        shell: bash
 
       - name: Run electron-packager
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
