@@ -3,8 +3,20 @@ const fs = require('fs')
 const { resolve } = require('path')
 const { default: rebuild } = require('electron-rebuild')
 
-const { name, version, description, author, productName } = package
-const icoPath = resolve(__dirname, 'public/platform-assets/windows/icon.ico')
+const { version } = package
+const appConfig = require('./developer/app');
+const productName = appConfig.displayName;
+const author = appConfig.author;
+const protocol = appConfig.protocol;
+const homepage = appConfig.homepage;
+const publisher = appConfig.publisher;
+const description = appConfig.description;
+
+const defaultPfxPath = resolve(__dirname, 'appx/default.pfx')
+const appxPfxPath = resolve(__dirname, 'developer/appx.pfx')
+const appxPfx = fs.existsSync(appxPfxPath) ? appxPfxPath : defaultPfxPath
+
+const icoPath = resolve(__dirname, 'developer/platform-assets/windows/icon.ico')
 const wixLangPath = resolve(__dirname, 'wix/localizations')
 // Add localization files here
 const wixLocalizationFiles = [
@@ -117,7 +129,7 @@ module.exports = {
       /@zeeis\/velectron/
     ],
     protocols: [{
-      name: 'alphabiz', schemes: ['alphabiz://']
+      name: protocol, schemes: [`${protocol}://`]
     }, {
       name: 'magnet', schemes: ['magnet://']
     }, {
@@ -133,28 +145,30 @@ module.exports = {
     {
       name: "@electron-forge/maker-squirrel",
       config: {
-        name: productName,
+        name: appConfig.name,
+        title: productName,
+        setupExe: `${productName}-${version} Setup.exe`,
         productName,
         author,
         description,
         version,
-        iconUrl: resolve(__dirname, 'public/favicon.ico'),
-        setupIcon: resolve(__dirname, 'public/favicon.ico'),
-        loadingGif: resolve(__dirname, 'public/platform-assets/windows/splash/InstallSplash.gif'),
+        iconUrl: resolve(__dirname, 'developer/favicon.ico'),
+        setupIcon: resolve(__dirname, 'developer/favicon.ico'),
+        loadingGif: resolve(__dirname, 'developer/platform-assets/windows/splash/InstallSplash.gif'),
       }
     },
     {
       name: '@electron-forge/maker-dmg',
       config: {
         name: productName,
-        title: `${productName}-${version} Setup`,
-        icon: resolve(__dirname, 'public/platform-assets/mac/volume-icon.icns'),
+        title: `${appConfig.fileName}-${version} Setup`,
+        icon: resolve(__dirname, 'developer/platform-assets/mac/volume-icon.icns'),
         iconSize: 96,
         overwrite: true,
-        background: resolve(__dirname, 'public/platform-assets/mac/background.png'),
+        background: resolve(__dirname, 'developer/platform-assets/mac/background.png'),
         contents: [
           { x: 460, y: 256, type: 'link', path: '/Applications' },
-          { x: 200, y: 256, type: 'file', path: resolve(__dirname, 'out/Alphabiz-darwin-x64/Alphabiz.app') }
+          { x: 200, y: 256, type: 'file', path: resolve(__dirname, `out/${productName}-darwin-x64/${productName}.app`) }
         ]
       }
     },
@@ -174,8 +188,8 @@ module.exports = {
         description,
         productDescription: description,
         version,
-        homepage: 'https://alpha.biz',
-        icon: resolve(__dirname, 'public/platform-assets/linux/512x512.png'),
+        homepage,
+        icon: resolve(__dirname, 'developer/platform-assets/linux/512x512.png'),
         mantainer: author,
         // TODO: add file associations here
         mimeType: ['audio/*', 'video/mp4', 'video/*', 'application/x-bittorrent'],
@@ -185,12 +199,18 @@ module.exports = {
     {
       name: '@electron-forge/maker-appx',
       config: {
-        publisher: 'CN=zeeis',
-        assets: resolve(__dirname, 'public/platform-assets/windows/icon'),
-        devCert: resolve(__dirname, 'appx/default.pfx'),
+        publisher,
+        publisherName: publisher,
+        publisherDisplayName: appConfig.developer,
+        assets: resolve(__dirname, 'developer/platform-assets/windows/icon'),
+        devCert: appxPfx,
         deploy: false,
         makePri: true,
-        packageName: productName,
+        packageName: appConfig.name,
+        packageDisplayName: appConfig.displayName,
+        packageDescription: description,
+        packageVersion: version + '.0', // appx uses a version like 1.2.3.4
+        packageExecutable: `app\\${productName}.exe`,
         manifest: 'appx/template.xml'
       }
     }
