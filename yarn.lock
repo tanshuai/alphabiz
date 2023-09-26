@@ -6780,10 +6780,10 @@ grapheme-splitter@^1.0.2:
   resolved "https://registry.yarnpkg.com/grapheme-splitter/-/grapheme-splitter-1.0.4.tgz#9cf3a665c6247479896834af35cf1dbb4400767e"
   integrity sha512-bzh50DW9kTPM00T8y4o8vQg89Di9oLJVLW/KaOGIXJWP/iqCN6WKYkbNOF04vFLJhwcpYUh9ydh/+5vpOqV4YQ==
 
-gun@^0.2020.1236:
-  version "0.2020.1236"
-  resolved "https://registry.yarnpkg.com/gun/-/gun-0.2020.1236.tgz#50a8a7b0277911cba28857627214c846c6aeb321"
-  integrity sha512-kTVisg8ipKvkrrcYNkH5zQXrDdMQsCeDVnYQse8loOlSsbLEAgUcD+o8XZIbsq0geY6F/3KFm64dADchInFLtg==
+gun@^0.2020.1237:
+  version "0.2020.1237"
+  resolved "https://registry.yarnpkg.com/gun/-/gun-0.2020.1237.tgz#e798917f66a7195a9d620a7c4de3bdc331d32c83"
+  integrity sha512-5WiAMqbLzKfYy/45AVGNrI0OiU7hG5z2hdMeRBMDYXGHzkOUDvbrOnO6qaEqmvCwlwzHJaIilKS51KvMyxhDTQ==
   dependencies:
     ws "^7.2.1"
   optionalDependencies:
