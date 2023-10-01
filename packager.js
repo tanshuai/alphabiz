@@ -10,6 +10,7 @@ const buildVersion = publicVersion || version
 
 const app = require('./developer/app')
 const appName = app.name
+const displayName = app.displayName
 
 const { getPackageDetailsFromPatchFilename } = require('patch-package/dist/PackageDetails')
 const patches = fs.readdirSync(path.resolve(__dirname, 'patches'))
@@ -29,7 +30,7 @@ packageJson.productName = appName
 
 const beforeBuild = async () => {
   const { platform, arch } = process
-  const destDir = path.resolve(__dirname, `build/electron/${appName}-${platform}-${arch}`)
+  const destDir = path.resolve(__dirname, `build/electron/${displayName}-${platform}-${arch}`)
   console.log('beforeBuild', destDir)
   if (fs.existsSync(destDir)) {
     fs.rmSync(destDir, { recursive: true })

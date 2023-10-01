@@ -116,7 +116,8 @@ test/output/**
 *.torrent
 .DS_Store
 build/**/node_modules
-build/electron/Alphabiz-win32-x64/**
+build/electron/*-*-*/**
 build/electron/**/yarn.lock
 out/
 patches/@quasar+app+2.2.11.patch
+build/electron/UnPackaged/developer
