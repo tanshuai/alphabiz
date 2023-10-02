@@ -724,12 +724,7 @@ test.describe('account', () => {
     const transferAmount = 1
     await window.evaluate(() => localStorage.clear())
     await window.reload()
-    // 如果应用已经登陆则退出登录状态
-    const isHasAlert = await basePage.signOutAlert.isVisible()
-    if (isHasAlert) {
-      await window.reload()
-    }
-    await window.waitForLoadState()
+
     // 登录收款人账号
     await basePage.signIn(payee, payeePassword, 1)
     await basePage.jumpPage('creditsLink')

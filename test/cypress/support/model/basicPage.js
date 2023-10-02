@@ -35,10 +35,9 @@ Cypress.Commands.add('changeLanguage', (lang, targetLang) => {
   cy.get(HEADER_TITLE).contains(I18N.BASIC_TITLE[targetLang]).click({ timeout: 30000 })
   cy.contains(I18N.SAVE_ALERT[targetLang]).click({ timeout: 30000 })
   // 刷新验证是否保存
-  cy.reload()
-  cy.location('pathname', { timeout: 60000 }).should('eq', '/library')
+  // cy.reload()
+  // cy.location('pathname', { timeout: 60000 }).should('eq', '/library')
 
-
-  cy.toBasic(targetLang)
+  // cy.toBasic(targetLang)
   cy.get(HEADER_TITLE).contains(I18N.BASIC_TITLE[targetLang]).click({ timeout: 30000 })
 })

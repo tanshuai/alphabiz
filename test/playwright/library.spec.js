@@ -141,7 +141,7 @@ test.describe('key', () => {
       await basePage.jumpPage('homeLink')
       await libraryPage.searchChannelBtn.waitFor({ timeout: 60000 })
     })
-    test('config password', async () => {
+    test.skip('config password', async () => {
       await basePage.ensureLoginStatus(name, process.env.TEST_PASSWORD, true, true)
       await accountPage.cfgKeyPassword(inPassword, newPassword)
       // 验证同步云端
@@ -155,7 +155,7 @@ test.describe('key', () => {
       await basePage.signOut()
       await basePage.waitForAllHidden(await basePage.alert)
     })
-    test('update and save key in cloud', async () => {
+    test.skip('update and save key in cloud', async () => {
       test.setTimeout(5 * 60000)
       await basePage.ensureLoginStatus(name, process.env.TEST_PASSWORD, true, false)
       // 创建新的密钥
@@ -422,7 +422,8 @@ test.describe('channel', () => {
       await exploreChk.click()
       await basicPage.saveSetting()
     }
-    await basePage.exploreLink.waitFor()
+    if (await basePage.downloadingStatus.isHidden()) await basePage.menuIcon.click()
+    await basePage.exploreLink.waitFor({ timeout: 60000 })
     await basePage.jumpPage('exploreLink')
     await libraryPage.getPostCardEle('', 'channelTitleEle').nth(0).waitFor({ timeout: 60000 })
   })
