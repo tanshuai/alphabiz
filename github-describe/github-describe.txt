@@ -1,4 +1,4 @@
-add player log #857
-use temp folder to sync public resources
-try sync code to public repo
-set workflow timezone
+unified versions url
+fix language test in windows
+fix push code workflow
+reduce e2e test refresh times
