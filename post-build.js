@@ -13,7 +13,7 @@ const videoExt = [
 const srcIconPath = resolve(__dirname, 'public/favicon.ico')
 const iconPath = 'favicon.ico'
 
-const appConfig = require('../developer/app');
+const appConfig = require('./developer/app');
 const appName = appConfig.name;
 
 const buildDarwin = () => {
