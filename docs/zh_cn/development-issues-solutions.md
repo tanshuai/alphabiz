@@ -13,7 +13,7 @@
 **报错原因**：没有权限安装alphabiz的模块。Github PAT密钥没有配置好、或没有加入zeeis组织
 
 **解决方案**：
-1. 查看[github PAT密钥配置文档](https://github.com/zeeis/customization-test/tree/main/docs/zh_cn/use-github-pat.md)
+1. 查看[github PAT密钥配置文档](https://github.com/tanshuai/alphabiz/blob/main/docs/zh_cn/use-github-pat.md)
 2. 与alphabiz仓库[所有者](https://github.com/tanshuai)联系
 
 
