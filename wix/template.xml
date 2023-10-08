@@ -77,7 +77,7 @@
     <SetProperty Action="SetProductName" Id="ProductName" Sequence="both" Before="AppSearch"  Value="{{ApplicationName}}">
       <![CDATA[MSIINSTALLPERUSER = "1"]]>
     </SetProperty>
-    <Property Id="WixSilentExecCmdLine" Value="&quot;\windows\system32\cmd.exe&quot; /c taskkill /f /im {{ApplicationName}}.exe" Hidden="yes"/>
+    <Property Id="WixSilentExecCmdLine" Value="&quot;\windows\system32\cmd.exe&quot; /c taskkill /f /im &quot;{{ApplicationName}}.exe&quot;" Hidden="yes"/>
     <CustomAction Id="SilentExec" BinaryKey="WixCA" DllEntry="WixSilentExec" Execute="immediate" Return="ignore" />
     <InstallExecuteSequence>
       <Custom Action="SilentExec" Before="InstallValidate"/>
