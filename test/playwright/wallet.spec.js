@@ -69,7 +69,6 @@ test.beforeAll(async () => {
   // })
 })
 test.afterAll(async () => {
-  await electronApp.close()
 })
 test.beforeEach(async () => {
   await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
