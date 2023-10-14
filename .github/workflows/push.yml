@@ -321,7 +321,7 @@ jobs:
 
       - name: Package for ${{ steps.vars.outputs.system }}-${{ steps.unify.outputs.tag-name }} Release 🗜️
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
-        run: 7z a -t7z -mx=9 "./out/installers/${{ steps.unify.outputs.tag-name }}/${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }}.7z" "./dist/electron/${{ steps.vars.outputs.package }}"
+        run: 7z a -t7z -mx=9 "./out/installers/${{ steps.unify.outputs.tag-name }}/${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }}.7z" "./build/electron/${{ steps.vars.outputs.package }}"
 
       - name: Pack app 📦
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
