@@ -97,7 +97,6 @@ const app = {
   },
   update: require('./update'),
   takedown: require('./take-down'),
-
   /**
    * App Theme Config
    */
@@ -123,7 +122,8 @@ const app = {
       top: '-92px',
       height: '245px'
     }
-  }
+  },
+  dynamicConfig: require('./dynamicConfig')
 }
 
 console.log('INIT APP CONFIG')
