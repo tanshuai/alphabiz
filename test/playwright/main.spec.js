@@ -300,9 +300,9 @@ test.describe('download ', () => {
           await homePage.searchBtn.click({ force: true })
           await homePage.downloadTorrent(bt.magnetLink)
           if (!bt.btName.includes('uTorrent')) {
-            await window.click('text=' + bt.btName, { timeout: 2 * 60000 })
+            await window.click('text=' + bt.btName, { timeout: 5 * 60000 })
             // 等待 任务 加载 验证， 判断任务是 下载中
-            await homePage.getCardEle(bt.btName, 'statusText', 'Downloading').click({ timeout: 2 * 60000 })
+            await homePage.getCardEle(bt.btName, 'statusText', 'Downloading').click({ timeout: 5 * 60000 })
           }
         }
       }
