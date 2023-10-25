@@ -13,6 +13,9 @@ module.exports = {
         'Github',
         'Twitter'
       ]
+    },
+    update: {
+      enable: false
     }
   }
 }
