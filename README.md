@@ -8,7 +8,7 @@
 - **Streaming Media** with P2P technologies
 - **Media Player** supports mainstream formats & subtitles
 
-![image](https://user-images.githubusercontent.com/3947852/163349980-b8354c86-fb7f-4106-9458-86708af96dbc.png)
+![app_img_dark](https://user-images.githubusercontent.com/92558550/211519797-4e766719-f6cf-420e-9e04-0057150c5c3a.jpg)
 
 Alphabiz is an open source desktop & mobile framework & sdk to build web 3 apps.
 
