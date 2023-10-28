@@ -1,3 +1,5 @@
-update amplify
-update amplify
-add send email method in pre sign up #849
+#851
+bump @zeeis/alphabiz-libdb to v0.0.88 with custom gun server
+#849
+#851
+fix sha7 error in windows
