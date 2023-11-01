@@ -94,7 +94,7 @@
 #### (3). <span id="build-c++">在 Windows 系统下，需要安装`Visual Studio 2015 及以上版本的桌面开发工具和 C++ 组件`以及`Python`。</span>详细请参考 [这篇文档](https://github.com/Microsoft/nodejs-guidelines/blob/master/windows-environment.md#environment-setup-and-configuration)。
 此步骤用于windows系统下，编译仓库中的C++模块
 
-安装 Python 时，需要安装版本大于等于 **3.6**，并且需要勾选 **Add Python to PATH** 选项，以便操作系统可以快速找到 Python 解释器。
+安装 Python 时，需要安装版本大于等于 **3.6** 且 小于 **3.12**，并且需要勾选 **Add Python to PATH** 选项，以便操作系统可以快速找到 Python 解释器。
 
 注意：
 - 确保安装Visual Studio 2019或2017
