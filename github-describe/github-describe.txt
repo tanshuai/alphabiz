@@ -1,5 +1,3 @@
-#851
-bump @zeeis/alphabiz-libdb to v0.0.88 with custom gun server
-#849
-#851
-fix sha7 error in windows
+send an email when oauth is associated #849
+#853
+fix release e2e test
