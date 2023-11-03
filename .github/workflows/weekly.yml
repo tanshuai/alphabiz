@@ -15,7 +15,7 @@ jobs:
     steps:
       - name: Get Date 📅
         id: slug
-        run: echo "::set-output name=date::$(date +'%Y/%m/%d')"
+        run: echo "date=$(date +'%Y/%m/%d')" >> $GITHUB_OUTPUT
 
       - uses: actions/checkout@v2
       - name: Create Branch for Backup ⬆️

@@ -113,13 +113,13 @@ jobs:
           echo "event-name=${{ github.event_name }}" >> $GITHUB_OUTPUT
           echo "download-tag=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
           if [[ ${{ matrix.os }} = "ubuntu-latest" ]] ; \
-          then echo "name=ubuntu" >> $GITHUB_OUTPUT ; \
+          then echo "system=ubuntu" >> $GITHUB_OUTPUT ; \
             echo "package=${{ steps.slug.outputs.display-name }}-linux-x64" >> $GITHUB_OUTPUT ; \
           elif [[ ${{ matrix.os }} = "macos-latest" ]] ; \
-          then echo "name=macos" >> $GITHUB_OUTPUT ; \
+          then echo "system=macos" >> $GITHUB_OUTPUT ; \
             echo "package=${{ steps.slug.outputs.display-name }}-darwin-x64" >> $GITHUB_OUTPUT ; \
           elif [[ ${{ matrix.os }} = "windows-latest" ]] ; \
-          then echo "name=windows" >> $GITHUB_OUTPUT ; \
+          then echo "system=windows" >> $GITHUB_OUTPUT ; \
             echo "package=${{ steps.slug.outputs.display-name }}-win32-x64" >> $GITHUB_OUTPUT ; \
           fi
           export COMMIT_HEAD=$(git log -1 --pretty=%B | perl -wnE'say for /^\w+/gm')
@@ -182,7 +182,7 @@ jobs:
       - name: Checkout unpackaged/version.json
         id: versionJson
         run: |
-          echo "package-version=${{ fromJson(steps.unpackaged.outputs.versionJson).packageVer }}" >> $GITHUB_ENV
+          echo "package-version=$(${{ fromJson(steps.unpackaged.outputs.versionJson).packageVer }})" >> $GITHUB_ENV
 
       # stable version x.y.z+1
       - name: Get UnstableVersion
