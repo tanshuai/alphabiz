@@ -34,6 +34,7 @@ Cypress.on('uncaught:exception', (err, runnable) => {
   ) {
     return false
   }
+  cy.task('log', 'uncaught:exception error:' + err.message)
 })
 Cypress.on('before:browser:launch', (browser = {}, launchOptions) => {
   if (browser.name === 'chrome' || browser.name === 'edge') {
