@@ -139,14 +139,7 @@ jobs:
         # if: contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
           content=`cat ./release.json`
-          content="${content//'%'/'%25'}"
-          if [[ ${{ matrix.os }} = "macos-latest" ]] ; \
-          then content="${content//$'\n'/%0A}" ; \
-          else content="${content//$'\n'/'%0A'}" ; \
-          fi
-          content="${content//$'\r'/'%0D'}"
-          echo "$content"
-          echo "releaseJson=$(echo "$content")"  >> $GITHUB_ENV
+          echo "releaseJson=$(echo "${content//[$'\t\r\n ']}")"  >> $GITHUB_ENV
         shell: bash
 
       - name: Get package.json version
@@ -171,13 +164,7 @@ jobs:
         id: unpackaged
         run: |
           content=`cat ./build/electron/UnPackaged/version.json`
-          content="${content//'%'/'%25'}"
-          if [[ ${{ matrix.os }} = "macos-latest" ]] ; \
-          then content="${content//$'\n'/%0A}" ; \
-          else content="${content//$'\n'/'%0A'}" ; \
-          fi
-          content="${content//$'\r'/'%0D'}"
-          echo "versionJson=$(echo "$content")" >> $GITHUB_ENV
+          echo "versionJson=$(echo "${content//[$'\t\r\n ']}")" >> $GITHUB_ENV
         shell: bash
 
       - name: Checkout unpackaged/version.json
