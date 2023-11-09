@@ -138,9 +138,14 @@ jobs:
         id: release
         # if: contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
-          content=`cat ./release.json`
-          echo "releaseJson=$(echo "${content//[$'\t\r\n ']}")"  >> $GITHUB_ENV
+          content=$(cat ./release.json)
+          content=${content//[$'\t\r\n ']}
+          content="${content/"/\"}"
+          echo "$content"
+          JSON=$(cat ./release.json)
+          echo "releaseJson=${JSON//'%'/'%25'}" >> $GITHUB_ENV
         shell: bash
+      # echo "releaseJson=$(echo "${content//[$'\t\r\n ']}")" >> $GITHUB_ENV
 
       - name: Get package.json version
         id: version
@@ -151,7 +156,7 @@ jobs:
 
       - name: Checkout release.json target tag
         id: checkout
-        if: contains(env.MODIFIED_FILE_LIST, 'release.json')
+        # if: contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
           git checkout ${{ fromJson(steps.release.outputs.releaseJson).targetTagName }}
           git show --name-only
@@ -163,14 +168,16 @@ jobs:
       - name: Get unpackaged/version.json property
         id: unpackaged
         run: |
-          content=`cat ./build/electron/UnPackaged/version.json`
-          echo "versionJson=$(echo "${content//[$'\t\r\n ']}")" >> $GITHUB_ENV
+          JSON=$(cat ./build/electron/UnPackaged/version.json)
+          echo "releaseJson=${JSON//'%'/'%25'}" >> $GITHUB_ENV
         shell: bash
+          # content=`cat ./build/electron/UnPackaged/version.json`
+          # echo "versionJson=$(echo "${content//[$'\t\r\n ']}")" >> $GITHUB_ENV
 
       - name: Checkout unpackaged/version.json
         id: versionJson
         run: |
-          echo "package-version=$(${{ fromJson(steps.unpackaged.outputs.versionJson).packageVer }})" >> $GITHUB_ENV
+          echo "package-version=${{ fromJson(steps.unpackaged.outputs.versionJson).packageVer }}" >> $GITHUB_ENV
 
       # stable version x.y.z+1
       - name: Get UnstableVersion
