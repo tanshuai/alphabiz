@@ -138,9 +138,10 @@ jobs:
         id: release
         # if: contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
-          echo 'releaseJson<<EOF' >> $GITHUB_ENV
-          cat ./release.json >> $GITHUB_ENV
-          echo 'EOF' >> $GITHUB_ENV
+          export CONTENT=$(cat ./release.json)
+          echo "versionJson<<EOF" >> $GITHUB_ENV
+          echo "$CONTENT" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
         shell: bash
       # echo "releaseJson=$(echo "${content//[$'\t\r\n ']}")" >> $GITHUB_ENV
 
@@ -155,19 +156,20 @@ jobs:
         id: checkout
         # if: contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
-          git checkout ${{ fromJson(steps.release.outputs.releaseJson).targetTagName }}
+          git checkout ${{ fromJson(env.releaseJson).targetTagName }}
           git show --name-only
           echo "--------------------------"
-          echo "target-tag-name=${{ fromJson(steps.release.outputs.releaseJson).targetTagName }}" >> $GITHUB_ENV
-          echo "new-tag-name=${{ fromJson(steps.release.outputs.releaseJson).newTagName }}" >> $GITHUB_ENV
+          echo "target-tag-name=${{ fromJson(env.releaseJson).targetTagName }}" >> $GITHUB_ENV
+          echo "new-tag-name=${{ fromJson(env.releaseJson).newTagName }}" >> $GITHUB_ENV
         shell: bash
 
       - name: Get unpackaged/version.json property
         id: unpackaged
         run: |
-          echo 'versionJson<<EOF' >> $GITHUB_ENV
-          cat ./build/electron/UnPackaged/version.json >> $GITHUB_ENV
-          echo 'EOF' >> $GITHUB_ENV
+          export CONTENT=$(cat ./build/electron/UnPackaged/version.json)
+          echo "versionJson<<EOF" >> $GITHUB_ENV
+          echo "$CONTENT" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
         shell: bash
           # content=`cat ./build/electron/UnPackaged/version.json`
           # echo "versionJson=$(echo "${content//[$'\t\r\n ']}")" >> $GITHUB_ENV
@@ -175,7 +177,7 @@ jobs:
       - name: Checkout unpackaged/version.json
         id: versionJson
         run: |
-          echo "package-version=${{ fromJson(steps.unpackaged.outputs.versionJson).packageVer }}" >> $GITHUB_ENV
+          echo "package-version=${{ fromJson(env.versionJson).packageVer }}" >> $GITHUB_ENV
 
       # stable version x.y.z+1
       - name: Get UnstableVersion
