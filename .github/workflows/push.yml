@@ -11,7 +11,7 @@ on:
   push:
     paths:
       - "**.js"
-      - "**/push.yml"
+      - "!**/push.yml"
       - "!patches/**"
       - "!public/**"
       - "!wix/**"
@@ -134,7 +134,7 @@ jobs:
 
       - name: Get release.json property
         id: release
-        # if: contains(env.MODIFIED_FILE_LIST, 'release.json')
+        if: contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
           CONTENT=$(cat ./release.json)
           TARGET_TAG_NAME=$(echo "$CONTENT" | perl -wnE"say for /(?<=targetTagName\"\:\s\").*(?=\",)/gm")
@@ -154,7 +154,7 @@ jobs:
 
       - name: Checkout release.json target tag
         id: checkout
-        # if: contains(env.MODIFIED_FILE_LIST, 'release.json')
+        if: contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
           git checkout ${{ steps.release.outputs.target-tag-name }}
           git show --name-only
@@ -193,7 +193,7 @@ jobs:
       # nightly-release use tag_name: $packageJsonVersion-internal/nightly-$dateTime-$commitId
       # official-release use tag_name: ./release.json property newTagName
       - name: Unified Tag format
-        # if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
+        if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         id: unify
         run: |
           if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
@@ -248,9 +248,6 @@ jobs:
           echo "package-name: ${{ steps.unify.outputs.package-name }}"
           echo "nightly----------------------"
           echo "commit-sha7: ${{ steps.nightly.outputs.commit-sha7 }}"
-          echo "checkout----------------------"
-          echo "target-tag-name: ${{ steps.release.outputs.target-tag-name }}"
-          echo "new-tag-name: ${{ steps.release.outputs.new-tag-name }}"
         shell: bash
       
       - name: Install dependencies 👨🏻‍💻
