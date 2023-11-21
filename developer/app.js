@@ -24,6 +24,11 @@ const app = {
    */
   fileName: APP,
   /**
+   * The bin name for snapcraft, which can be used to launch your app
+   * via terminal. Default: `alphabiz`
+   */
+  snapName: APP.toLowerCase(),
+  /**
    * Author name
    */
   author: `${APP} Team <dev@alpha.biz>`,
