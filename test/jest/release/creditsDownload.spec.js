@@ -16,7 +16,7 @@ let client, homePage, accountPage, creditsPage, developmentPage
 const torrentName = 'GoneNutty.avi'
 const outputFile = process.env.APP_TYPE === 'exe' ? '/exe' : process.env.APP_TYPE === 'msi' ? '/msi' : '/7z'
 const outputPath = path.resolve(__dirname, '../../output/release' + outputFile)
-jest.setTimeout(60000 * 20)
+jest.setTimeout(60000 * 30)
 let isSuccess = false
 describe('download', () => {
   beforeAll(async () => {

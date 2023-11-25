@@ -12,7 +12,7 @@ const { sleep } = require('../../utils/getCode')
 const { calculation } = require('../../utils/calculation')
 
 let client, homePage, accountPage, creditsPage, developmentPage
-jest.setTimeout(60000 * 20)
+jest.setTimeout(60000 * 30)
 const outputFile = process.env.APP_TYPE === 'exe' ? '/exe' : process.env.APP_TYPE === 'msi' ? '/msi' : '/7z'
 const outputPath = path.resolve(__dirname, '../../output/release' + outputFile)
 let isSuccess = false
