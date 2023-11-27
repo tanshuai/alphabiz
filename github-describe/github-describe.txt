@@ -1,6 +1,7 @@
-#853
-#835
-#862
-fix: #863
-bump @zeeis/alphabiz-libdb to v0.0.89
-add snapcraft target
+#859
+#859
+#859 add log
+add release e2e test timeout
+add Event: clear_unconfirmed_users
+improve updater
+fix #867
