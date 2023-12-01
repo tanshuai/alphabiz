@@ -45,8 +45,10 @@ class CreditsPage {
     await this.transferBtn.click()
     await this.receiveCodeInput.fill(ID)
     await this.amountInput.fill(amount)
+    await this.page.waitForTimeout(1000)
     await this.confirmBtn.click()
-    await this.transferCard.waitFor('hidden')
+    await this.page.waitForTimeout(1000)
+    expect(await this.transferCard).toHaveCount(0)
   }
 
   async checkBillDetail (detail, type) {
