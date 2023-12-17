@@ -93,7 +93,7 @@ packager({
         const src = path.resolve(__dirname, 'developer', assetDir)
         const dest = path.resolve(buildPath, assetDir === '.' ? 'node_modules/developer' : 'developer/' + assetDir)
         if (!fs.existsSync(src)) return console.error('not found', src)
-        console.log('--- COPY ---\n', src, '\n', dest, '\n--- COPY END ---')
+        // console.log('--- COPY ---\n', src, '\n', dest, '\n--- COPY END ---')
         // fs.rmSync not support low version
         const removeDir = (dir) => {
           const files = fs.readdirSync(dir) // 一个数组

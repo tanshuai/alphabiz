@@ -80,7 +80,7 @@ const deleteVersionJSON = async () => {
 // any one can register when run e2e test
 const resetRegisterMode = (folder) => {
   const appConfigPath = path.resolve(folder, './app.js')
-  console.log(appConfigPath)
+  // console.log(appConfigPath)
   const appConfigContent = fs.readFileSync(appConfigPath, 'utf-8')
   const registerMode = appConfigContent.substring(appConfigContent.indexOf('register: {'), appConfigContent.indexOf('Country code list'))
 
