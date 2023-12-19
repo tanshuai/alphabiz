@@ -1,3 +1,4 @@
-add install Timeout
-try log app config env
-try fix webpack require error
+Bump luxon from 1.28.0 to 1.28.1
+Bump ua-parser-js from 0.7.31 to 0.7.33
+fix isElectron error #879
+add component: `VirtualScrollGrid`
