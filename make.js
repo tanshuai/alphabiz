@@ -109,6 +109,7 @@ const doPostmake = () => {
       resolve(outDir, `deb/${arch}/${productName.toLowerCase().replace(/\s/gm, '-')}_${versionHeader[0]}_${arch === 'x64' ? 'amd64' : arch}.deb`),
       resolve(destDir, `${appConfig.fileName.toLowerCase()}-${version}.deb`)
     ])
+    console.log('NOTE: To build snapcraft target, you need to run `yarn make:snap` manually.')
   }
   for (const [src, tar] of toMoves) {
     if (existsSync(src)) {
