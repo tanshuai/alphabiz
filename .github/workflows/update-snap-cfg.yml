@@ -168,8 +168,8 @@ jobs:
       - name: prepare Snap
         run: |
           sudo apt install snapd
-          sudo snap install snapcraft
-          sudo snap install multipass
+          sudo snap install snapcraft --classic
+          sudo snap install multipass --classic
 
       - name: generate snapcraft.yaml
         run: yarn node snapcraft
