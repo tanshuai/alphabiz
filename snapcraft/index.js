@@ -5,6 +5,7 @@ const { resolve } = require('path')
 const appConfig = require('../developer/app')
 const publicVersion = require('../public/version.json').version
 // console.log(publicVersion)
+const appDirectoryRootPath = require('../test.config.js').appDirectoryRootPath
 
 const checkCommand = (cmd, options = {}) => {
   return new Promise((resolve) => {
@@ -32,7 +33,7 @@ const prepareSnap = async () => {
   const snapAppPath = resolve(__dirname, '../out/make/snapcraft', appConfig.name)
   if (existsSync(snapAppPath)) rmSync(snapAppPath, { recursive: true })
   mkdirSync(snapAppPath, { recursive: true })
-  const buildDist = resolve(__dirname, `../dist/electron/${appConfig.displayName}-linux-x64`)
+  const buildDist = resolve(__dirname, `../${appDirectoryRootPath}/electron/${appConfig.displayName}-linux-x64`)
   console.log(buildDist)
 
   cpSync(buildDist, snapAppPath, { recursive: true })
