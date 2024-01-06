@@ -171,23 +171,16 @@ jobs:
           sudo snap install snapcraft --classic
           sudo snap install multipass --classic
 
-      - name: generate snapcraft.yaml
+      - name: modify snap config
         run: yarn node snapcraft
 
       - name: log snapcraft.yaml 📰
         run: cat snap/snapcraft.yaml
       
-      - name: push snapcraft.yaml to publiv repo 📰
-        uses: cpina/github-action-push-to-another-repository@main
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.PAT }}
-          NODE_AUTH_TOKEN: ${{ secrets.PAT }}
-          GITHUB_PAT: ${{ secrets.PAT }}
-        with:
-          source-directory: snap
-          destination-github-username: "tanshuai"
-          destination-repository-name: "alphabiz"
-          user-name: Alphabiz-Team
-          user-email: git@alpha.biz
-          target-directory: snap
-          commit-message: "${{ steps.slug.outputs.sha7 }} update snap config"
+      - name: update snap config to public repo 📰
+        - run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "${{ steps.sha.outputs.sha7 }} auto update snap config"
+          git push
