@@ -178,7 +178,7 @@ jobs:
         run: cat snap/snapcraft.yaml
       
       - name: update snap config to public repo 📰
-        - run: |
+        run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add .
