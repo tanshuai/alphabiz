@@ -124,6 +124,6 @@ build/electron/UnPackaged/developer
 # out/
 # Ignore out/ except for out/make/snapcraft/
 out/*
-!out/make
-out/make/*
-!out/make/snapcraft/
+# !out/make
+# out/make/*
+# !out/make/snapcraft/
