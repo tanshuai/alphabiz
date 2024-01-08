@@ -14,7 +14,7 @@ on:
       - "**/update-snap-cfg.yml"
       - "release.json"
     branches: [main]
-
+#
 jobs:
   nightly_job:
     runs-on: ${{ matrix.os }}
