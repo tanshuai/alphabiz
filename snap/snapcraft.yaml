@@ -41,13 +41,22 @@ parts:
       mkdir -pv $SNAPCRAFT_PART_INSTALL/gnome-platform
 
   alphabiz:
-    plugin: dump
+    plugin: nodejs
     source: https://nodejs.org/dist/v16.19.0/node-v16.19.0-linux-x64.tar.xz
+    nodejs-version: 16.19.0
+    nodejs-package-manager: yarn
+    nodejs-yarn-version: v1.22.19
     override-build: |
-      ls
+      find ~ -type d -name "*build/alphabiz*" -print
+      echo "---------------------------"
+      echo "$SNAP"
+
+      sudo apt update
+      sudo apt install curl
       curl -sL https://deb.nodesource.com/setup_16.x | sudo bash -
       sudo apt -y install nodejs
       node -v
+      npm -v
 
       sudo npm install --global yarn
       yarn --version
