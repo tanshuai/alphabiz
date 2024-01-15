@@ -52,6 +52,7 @@ const app = {
    * Website for your app. Used in linux debian package.
    */
   homepage: 'https://alpha.biz',
+  webEditionUrl: 'https://web.alpha.biz',
   /**
    * Upgrade code for windows.
    * If two app have a same code, windows will remove old one when installing.
