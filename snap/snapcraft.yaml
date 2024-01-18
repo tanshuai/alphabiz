@@ -25,6 +25,32 @@ apps:
     command: bin/desktop-launch $SNAP/alphabiz/Alphabiz --no-sandbox
 
 parts:
+  prepare-alphabiz:
+    plugin: dump
+    source: https://nodejs.org/dist/v16.19.0/node-v16.19.0-linux-x64.tar.xz
+    override-build: |
+      find ~ -type d -name "*alphabiz*" -print
+      echo "---------------------------"
+      echo "$SNAP"
+      pwd
+
+      set -ex
+
+      apt-get install -y curl
+      curl -sL https://deb.nodesource.com/setup_16.x | sudo bash -
+      apt-get update
+      apt-get install -y nodejs
+      node -v
+      npm -v
+
+      sudo npm install --global yarn
+      yarn --version
+
+      yarn
+      yarn unpackaged
+      yarn packager
+      yarn node snapcraft
+
   desktop-gnome-platform:
     source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
     source-type: git
@@ -39,29 +65,6 @@ parts:
     override-build: |
       snapcraftctl build
       mkdir -pv $SNAPCRAFT_PART_INSTALL/gnome-platform
-
-  prepare-alphabiz:
-    plugin: dump
-    source: https://nodejs.org/dist/v16.19.0/node-v16.19.0-linux-x64.tar.xz
-    override-build: |
-      find ~ -type d -name "*build/alphabiz*" -print
-      echo "---------------------------"
-      echo "$SNAP"
-
-      sudo apt update
-      sudo apt install curl
-      curl -sL https://deb.nodesource.com/setup_16.x | sudo bash -
-      sudo apt -y install nodejs
-      node -v
-      npm -v
-
-      sudo npm install --global yarn
-      yarn --version
-
-      yarn
-      yarn unpackaged
-      yarn packager
-      yarn node snapcraft
 
   alphabiz:
     source: out/make/snapcraft
