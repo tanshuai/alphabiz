@@ -36,6 +36,7 @@
     "make:msi": "node ./wix/make.js",
     "make:dmg": "electron-forge make --skip-package --targets @electron-forge/maker-dmg",
     "make:deb": "electron-forge make --skip-package --targets @electron-forge/maker-deb",
+    "make:snap": "node snapcraft && snapcraft snap --output=./out/installers/app.snap && node snapcraft --post",
     "postmake": "node make.js --postmake"
   },
   "dependencies": {

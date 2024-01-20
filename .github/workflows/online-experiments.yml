@@ -21,8 +21,8 @@ jobs:
     strategy:
       matrix:
         # os: [ubuntu-latest, windows-latest, macos-latest]
-        os: [windows-2022]
-        node-version: [14]
+        os: [ubuntu-latest]
+        node-version: [16]
     environment:
       name: CICD
     env:
@@ -46,17 +46,68 @@ jobs:
       TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
     steps:
       - name: Get short SHA 🔑
-        id: slug
+        id: sha
         run: |
-          echo "::set-output name=sha7::${GITHUB_SHA::7}"
+          echo "sha7=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
         shell: bash
 
-      - name: Checkout ${{ steps.slug.outputs.sha7 }} ⬇️
-        uses: actions/checkout@v2
+      - name: Checkout ${{ steps.sha.outputs.sha7 }} ⬇️
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: main
 
-      - name: Get all Commit
+      - name: Get app name
+        id: slug
         run: |
-          git fetch --prune --unshallow
+          DISPLAYNAME=$(cat developer/app.js | perl -wnE"say for /(?<=displayName\:\s)\'?.*\'?(?=,)/gm")
+          APPNAME=$(cat developer/app.js | perl -wnE"say for /(?<=const\sAPP\s=\s\')[a-zA-Z]+/gm")
+          FILENAME=$(cat developer/app.js | perl -wnE"say for /(?<=fileName\:\s)\'?.*\'?(?=,)/gm")
+          echo ${APPNAME}
+          echo ${DISPLAYNAME}
+          echo ${FILENAME}
+          echo "app-name=${APPNAME}" >> $GITHUB_OUTPUT
+          echo "app-name-lower=$(echo ${APPNAME} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+          if [[ ${DISPLAYNAME} = "APP" ]] ; \
+          then  echo "display-name=${APPNAME}" >> $GITHUB_OUTPUT ; \
+            echo "display-name-lower=$(echo ${APPNAME} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT ; \
+          else  DISPLAYNAME=$(echo ${DISPLAYNAME} | sed "s/'//g") ; \
+            echo "display-name=${DISPLAYNAME}" >> $GITHUB_OUTPUT ; \
+            echo "display-name-lower=$(echo ${DISPLAYNAME} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT ; \
+          fi
+          if [[ ${FILENAME} = "APP" ]] ; \
+          then  echo "file-name=${APPNAME}" >> $GITHUB_OUTPUT ; \
+            echo "file-name-lower=$(echo ${APPNAME} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT ; \
+          else  FILENAME=$(echo ${FILENAME} | sed "s/'//g") ; \
+            echo "file-name=${FILENAME}" >> $GITHUB_OUTPUT ; \
+            echo "file-name-lower=$(echo ${FILENAME} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT ; \
+          fi
+        shell: bash
+
+      - name: Setup Node.js ${{ matrix.node-version }} 📮
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "yarn"
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@zeeis"
+
+      - name: Get message
+        id: vars
+        run: |
+          echo "date=$(TZ=UTC-8 git log -1 --date=format-local:"%Y%m%d%H%M" --format="%cd")" >> $GITHUB_OUTPUT
+          echo "event-name=${{ github.event_name }}" >> $GITHUB_OUTPUT
+          echo "download-tag=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
+          if [[ ${{ matrix.os }} = "ubuntu-latest" ]] ; \
+          then echo "system=ubuntu" >> $GITHUB_OUTPUT ; \
+            echo "package=${{ steps.slug.outputs.display-name }}-linux-x64" >> $GITHUB_OUTPUT ; \
+          elif [[ ${{ matrix.os }} = "macos-latest" ]] ; \
+          then echo "system=macos" >> $GITHUB_OUTPUT ; \
+            echo "package=${{ steps.slug.outputs.display-name }}-darwin-x64" >> $GITHUB_OUTPUT ; \
+          elif [[ ${{ matrix.os }} = "windows-latest" ]] ; \
+          then echo "system=windows" >> $GITHUB_OUTPUT ; \
+            echo "package=${{ steps.slug.outputs.display-name }}-win32-x64" >> $GITHUB_OUTPUT ; \
+          fi
           export COMMIT_HEAD=$(git log -1 --pretty=%B | perl -wnE'say for /^\w+/gm')
           if [[ "$COMMIT_HEAD" = "Merge" ]] ; \
           then export MODIFIED_FILE_LIST=$(git show --pretty="format:" --name-only -2) ; \
@@ -67,32 +118,125 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
         shell: bash
 
-      - name: Check commit date
-        id: vars
+      - name: Get release.json property
+        id: release
+        if: contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
-          TZ=UTC-8 git log -10 --date=format-local:"%Y%m%d%H%M" --format="%cd"
-          echo "--------------------------"
-          echo "::set-output name=tag-name::0.1.0-nightly-202204151014"
+          CONTENT=$(cat ./release.json)
+          TARGET_TAG_NAME=$(echo "$CONTENT" | perl -wnE"say for /(?<=targetTagName\"\:\s\").*(?=\",)/gm")
+          NEW_TAG_NAME=$(echo "$CONTENT" | perl -wnE"say for /(?<=newTagName\"\:\s\").*(?=\")/gm")
+          echo "target-tag-name=${TARGET_TAG_NAME}"
+          echo "new-tag-name=${NEW_TAG_NAME}"
+          echo "target-tag-name=${TARGET_TAG_NAME}" >> $GITHUB_OUTPUT
+          echo "new-tag-name=${NEW_TAG_NAME}" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Get package.json version
+        id: version
+        uses: notiz-dev/github-action-json-property@release
+        with:
+          path: "package.json"
+          prop_path: "version"
+
+      - name: Checkout release.json target tag
+        id: checkout
+        if: contains(env.MODIFIED_FILE_LIST, 'release.json')
+        run: |
+          git checkout ${{ steps.release.outputs.target-tag-name }}
+          git show --name-only
+        shell: bash
+
+      - name: Get unpackaged/version.json property
+        id: unpackaged
+        run: |
+          CONTENT=$(cat ./build/electron/UnPackaged/version.json)
+          PACKAGE_VERSION=$(echo "$CONTENT" | perl -wnE"say for /(?<=packageVer\"\:\s\").*(?=\")/gm")
+          echo "package-version=${PACKAGE_VERSION}"
+          echo "package-version=${PACKAGE_VERSION}" >> $GITHUB_OUTPUT
+        shell: bash
+
+      # stable version x.y.z+1
+      - name: Get UnstableVersion
+        id: unstable
+        run: |
+          echo "unstable-version=$(echo ${{ steps.unpackaged.outputs.package-version }} | awk -F. -v OFS=. 'NF==1{print ++$NF}; NF>1{$NF=sprintf("%0*d", length($NF), ($NF+1)); print}')" >> $GITHUB_OUTPUT
+        shell: bash
+
+      # after git checkout
+      - name: Get last commit date \ today all commit message
+        if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
+        id: nightly
+        run: |
+          echo "commit-sha7=$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /(?<=-)\w{7}(?=\s)|^\w{7}(?=\s)/g')" >> $GITHUB_OUTPUT
+          export DESCRIBE=$(cat github-describe/github-describe.txt)
+          echo "$DESCRIBE"
+          echo "DESCRIBE<<EOF" >> $GITHUB_ENV
+          echo "$DESCRIBE" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+        shell: bash
+
+      # This step for unify the tag name
+      # nightly-release use tag_name: $packageJsonVersion-internal/nightly-$dateTime-$commitId
+      # official-release use tag_name: ./release.json property newTagName
+      - name: Unified Tag format
+        if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
+        id: unify
+        run: |
           if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
-          then echo "::set-output name=isRunAppium::1" ; \
-          else echo "::set-output name=isRunAppium::0" ; \
+          then echo "tag-name=${{ steps.release.outputs.new-tag-name }}" >> $GITHUB_OUTPUT ; \
+            if ${{ contains(steps.release.outputs.new-tag-name, 'nightly') }} ; \
+            then echo "release-name=$(echo '${{ steps.release.outputs.new-tag-name }}' | perl -wnE'say for /^\d+\.\d+\.\d+\-?\w*/g' )-${{ steps.nightly.outputs.commit-sha7 }}" >> $GITHUB_OUTPUT ; \
+            else echo "release-name=${{ steps.release.outputs.new-tag-name }}" >> $GITHUB_OUTPUT ; \
+            fi
+            echo "package-name=${{ steps.release.outputs.new-tag-name }}" >> $GITHUB_OUTPUT ; \
+          else echo "tag-name=${{ steps.unstable.outputs.unstable-version }}-nightly-${{ steps.vars.outputs.date }}" >> $GITHUB_OUTPUT ; \
+            echo "release-name=${{ steps.unstable.outputs.unstable-version }}-nightly-${{ steps.nightly.outputs.commit-sha7 }}" >> $GITHUB_OUTPUT ;  \
+            echo "package-name=${{ steps.unstable.outputs.unstable-version }}-nightly-${{ steps.vars.outputs.date }}" >> $GITHUB_OUTPUT ; \
           fi
         shell: bash
 
-      - name: Check ${{ steps.vars.outputs.tag-name }}
+      # this step checkout all output
+      - name: Checkout vars-date ${{ steps.vars.outputs.date }} ⬇️
         id: check
         run: |
-          echo "${{ steps.vars.outputs.tag-name }}"
-          echo "isRunAppium: ${{ steps.vars.outputs.isRunAppium }}"
+          echo "repo-name: ${{ github.repository }}"
+          echo "repository=${{ github.repository }}" >> $GITHUB_OUTPUT
+          echo "slug----------------------"
+          echo "app-name: ${{ steps.slug.outputs.app-name }}"
+          echo "app-name-lower: ${{ steps.slug.outputs.app-name-lower }}"
+          echo "display-name: ${{ steps.slug.outputs.display-name }}"
+          echo "display-name-lower: ${{ steps.slug.outputs.display-name-lower }}"
+          echo "file-name: ${{ steps.slug.outputs.file-name }}"
+          echo "file-name-lower: ${{ steps.slug.outputs.file-name-lower }}"
+          echo "vars----------------------"
+          echo "run workflow date: ${{ steps.vars.outputs.date }}"
+          echo "event_name: ${{ steps.vars.outputs.event-name }}"
+          echo "download-tag: ${{ steps.vars.outputs.download-tag }}"
+          echo "event.head_commit.message: ${{ github.event.head_commit.message }}"
+          echo "system: ${{ steps.vars.outputs.system }}"
+          echo "package: ${{ steps.vars.outputs.package }}"
+          echo "release----------------------"
+          echo "target-tag-name: ${{ steps.release.outputs.target-tag-name }}"
+          echo "new-tag-name: ${{ steps.release.outputs.new-tag-name }}"
+          echo "version----------------------"
+          echo "package.json version: ${{ steps.version.outputs.prop }}"
+          echo "unpackaged----------------------"
+          echo "unpackage.version: ${{ steps.unpackaged.outputs.package-version }}"
+          echo "unstable----------------------"
+          echo "unstable-version: ${{ steps.unstable.outputs.unstable-version }}"
+          echo "----------------------"
+          echo "MODIFIED_FILE_LIST: ${{ env.MODIFIED_FILE_LIST }}"
+          if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
+          then echo "isRunAppium=1" >> $GITHUB_OUTPUT ; \
+          else echo "isRunAppium=0" >> $GITHUB_OUTPUT ; \
+          fi
+          echo "unify----------------------"
+          echo "tag-name: ${{ steps.unify.outputs.tag-name }}"
+          echo "release-name: ${{ steps.unify.outputs.release-name }}"
+          echo "package-name: ${{ steps.unify.outputs.package-name }}"
+          echo "nightly----------------------"
+          echo "commit-sha7: ${{ steps.nightly.outputs.commit-sha7 }}"
         shell: bash
-
-      - name: Setup Node.js ${{ matrix.node-version }} 📮
-        uses: actions/setup-node@v2
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: "yarn"
-          registry-url: "https://npm.pkg.github.com"
-          scope: "@zeeis"
 
       - name: Install dependencies 👨🏻‍💻
         uses: nick-fields/retry@v2
@@ -104,13 +248,55 @@ jobs:
           command: yarn
           on_retry_command: rm -rf C:/Users/runneradmin/AppData/Local/node-gyp/
 
-      - name: public describe to Twitter
-        if: contains(steps.vars.outputs.event-name, 'schedule') && matrix.os != 'ubuntu-latest'
-        run: yarn node publicTwitter.js
+      - name: Install UnPackaged 👨🏻‍💻
+        uses: nick-fields/retry@v2
+        with:
+          timeout_seconds: 600
+          max_attempts: 2
+          shell: bash
+          retry_on: error
+          command: yarn unpackaged
+          on_retry_command: rm -rf C:/Users/runneradmin/AppData/Local/node-gyp/
 
-      - name: public describe to Twitter
-        if: contains(steps.vars.outputs.event-name, 'schedule') && matrix.os == 'ubuntu-latest'
-        run: yarn node publicTwitter.js
+      - name: Run electron-packager
+        if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
+        run: |
+          if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
+          then if ${{ contains(steps.release.outputs.new-tag-name, 'nightly') }} ; \
+            then yarn node update-version.js --newTag ${{ steps.unify.outputs.tag-name }} --SHA7 ${{ steps.sha.outputs.sha7 }} --buildTime ${{ steps.vars.outputs.date }} ; \
+            else yarn node update-version.js --newTag ${{ steps.unify.outputs.tag-name }} --SHA7 ${{ steps.sha.outputs.sha7 }} --buildTime ${{ steps.vars.outputs.date }} --stable; \
+            fi
+          else yarn node update-version.js --buildTime ${{ steps.vars.outputs.date }} ; \
+          fi
+          yarn packager
+        shell: bash
+
+      - name: Pack app 📦
+        if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
+        run: |
+          export PATH=$PATH:/c/Program\ Files\ \(x86\)/WiX\ Toolset\ v3.11/bin
+          yarn make
+        shell: bash
+
+      - name: Install Snapcraft env
+        run: |
+          sudo apt install snapd
+          sudo snap install snapcraft
+          sudo snap install multipass
+
+      - name: Pack snap 📦
+        run: yarn make:snap
+
+      - name: Release ${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }} to GitHub 📰
+        if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
+        uses: softprops/action-gh-release@v1
+        with:
+          prerelease: true
+          name: ${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.release-name }}
+          tag_name: ${{ steps.unify.outputs.tag-name }}
+          body: ${{ env.DESCRIBE }}
+          files: |
+            ./out/installers/${{ steps.unify.outputs.tag-name }}/**
 
   appium-test:
     needs: build-1
