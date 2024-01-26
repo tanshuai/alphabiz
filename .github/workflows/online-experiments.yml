@@ -21,7 +21,7 @@ jobs:
     strategy:
       matrix:
         # os: [ubuntu-latest, windows-latest, macos-latest]
-        os: [ubuntu-18.04]
+        os: [ubuntu-20.04]
         node-version: [16]
     environment:
       name: CICD
@@ -279,10 +279,6 @@ jobs:
       - name: Install Snapcraft env
         run: |
           sudo snap install multipass --classic
-
-      - name: check env
-        run: |
-          snap info multipass
 
       - name: Build snap 📦
         run: yarn make:snap:ci
