@@ -28,7 +28,10 @@ jobs:
     if: "!contains(github.event.head_commit.message , 'skip workflow')"
     outputs:
       tag-name: ${{ steps.unify.outputs.tag-name }}
+      release-name: ${{ steps.unify.outputs.release-name }}
+      package-name: ${{ steps.unify.outputs.package-name }}
       isRunAppium: ${{ steps.check.outputs.isRunAppium }}
+      isModifyReleaseJson: ${{ steps.unify.outputs.isModifyReleaseJson }}
       repository: ${{ steps.check.outputs.repository }}
       display-name: ${{ steps.slug.outputs.display-name }}
       file-name-lower: ${{ steps.slug.outputs.file-name-lower }}
@@ -202,6 +205,7 @@ jobs:
         run: |
           if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
           then echo "tag-name=${{ steps.release.outputs.new-tag-name }}" >> $GITHUB_OUTPUT ; \
+            echo "isModifyReleaseJson=1" >> $GITHUB_OUTPUT ; \
             if ${{ contains(steps.release.outputs.new-tag-name, 'nightly') }} ; \
             then echo "release-name=$(echo '${{ steps.release.outputs.new-tag-name }}' | perl -wnE'say for /^\d+\.\d+\.\d+\-?\w*/g' )-${{ steps.nightly.outputs.commit-sha7 }}" >> $GITHUB_OUTPUT ; \
             else echo "release-name=${{ steps.release.outputs.new-tag-name }}" >> $GITHUB_OUTPUT ; \
@@ -210,6 +214,7 @@ jobs:
           else echo "tag-name=${{ steps.unstable.outputs.unstable-version }}-nightly-${{ steps.vars.outputs.date }}" >> $GITHUB_OUTPUT ; \
             echo "release-name=${{ steps.unstable.outputs.unstable-version }}-nightly-${{ steps.nightly.outputs.commit-sha7 }}" >> $GITHUB_OUTPUT ;  \
             echo "package-name=${{ steps.unstable.outputs.unstable-version }}-nightly-${{ steps.vars.outputs.date }}" >> $GITHUB_OUTPUT ; \
+            echo "isModifyReleaseJson=0" >> $GITHUB_OUTPUT ; \
           fi
         shell: bash
 
@@ -331,28 +336,6 @@ jobs:
           export PATH=$PATH:/c/Program\ Files\ \(x86\)/WiX\ Toolset\ v3.11/bin
           yarn make
         shell: bash
-      
-      # build snapcraft
-      - name: Install Snapcraft
-        if: |
-          (contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json'))
-          && contains(steps.vars.outputs.system, 'ubuntu')
-        uses: samuelmeuli/action-snapcraft@v1
-        with:
-          use_lxd: true
-
-      - name: Install Snapcraft env
-        if: |
-          (contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json'))
-          && contains(steps.vars.outputs.system, 'ubuntu')
-        run: |
-          sudo snap install multipass --classic
-
-      - name: Build snap 📦
-        if: |
-          (contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json'))
-          && contains(steps.vars.outputs.system, 'ubuntu')
-        run: yarn make:snap:ci
 
       - name: Release ${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }} to GitHub 📰
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
@@ -371,8 +354,136 @@ jobs:
           && steps.slug.outputs.app-name == 'Alphabiz'
         run: yarn node publicTwitter.js
 
-  appium_test_job:
+  release_job:
     needs: nightly_job
+    runs-on: ${{ matrix.os }}
+    if: contains(github.event_name, 'schedule') || contains(needs.nightly_job.outputs.isModifyReleaseJson, '1')
+    strategy:
+      matrix:
+        os: [ubuntu-20.04]
+        node-version: [16]
+      fail-fast: false
+    environment:
+      name: CICD
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.PAT }}
+      GITHUB_PAT: ${{ secrets.PAT }}
+    steps:
+      - name: Get short SHA 🔑
+        id: sha
+        run: |
+          echo "sha7=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Checkout ${{ steps.sha.outputs.sha7 }} ⬇️
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: main
+      
+      - name: Setup Node.js ${{ matrix.node-version }} 📮
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "yarn"
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@zeeis"
+
+      - name: Get message
+        id: vars
+        run: |
+          echo "date=$(TZ=UTC-8 git log -1 --date=format-local:"%Y%m%d%H%M" --format="%cd")" >> $GITHUB_OUTPUT
+          if [[ ${{ matrix.os }} = "ubuntu-latest" ]] ; \
+          then echo "system=ubuntu" >> $GITHUB_OUTPUT ; \
+            echo "package=${{ steps.slug.outputs.display-name }}-linux-x64" >> $GITHUB_OUTPUT ; \
+          elif [[ ${{ matrix.os }} = "macos-latest" ]] ; \
+          then echo "system=macos" >> $GITHUB_OUTPUT ; \
+            echo "package=${{ steps.slug.outputs.display-name }}-darwin-x64" >> $GITHUB_OUTPUT ; \
+          elif [[ ${{ matrix.os }} = "windows-latest" ]] ; \
+          then echo "system=windows" >> $GITHUB_OUTPUT ; \
+            echo "package=${{ steps.slug.outputs.display-name }}-win32-x64" >> $GITHUB_OUTPUT ; \
+          fi
+        shell: bash
+
+      - name: Get release.json property
+        id: release
+        if: contains(needs.nightly_job.outputs.isModifyReleaseJson, '1')
+        run: |
+          CONTENT=$(cat ./release.json)
+          TARGET_TAG_NAME=$(echo "$CONTENT" | perl -wnE"say for /(?<=targetTagName\"\:\s\").*(?=\",)/gm")
+          NEW_TAG_NAME=$(echo "$CONTENT" | perl -wnE"say for /(?<=newTagName\"\:\s\").*(?=\")/gm")
+          echo "target-tag-name=${TARGET_TAG_NAME}"
+          echo "new-tag-name=${NEW_TAG_NAME}"
+          echo "target-tag-name=${TARGET_TAG_NAME}" >> $GITHUB_OUTPUT
+          echo "new-tag-name=${NEW_TAG_NAME}" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Checkout release.json target tag
+        id: checkout
+        if: contains(needs.nightly_job.outputs.isModifyReleaseJson, '1')
+        run: |
+          git checkout ${{ steps.release.outputs.target-tag-name }}
+          git show --name-only
+        shell: bash
+
+      - name: Install dependencies 👨🏻‍💻
+        uses: nick-fields/retry@v2
+        with:
+          timeout_seconds: 600
+          max_attempts: 2
+          shell: bash
+          retry_on: error
+          command: yarn
+          on_retry_command: rm -rf C:/Users/runneradmin/AppData/Local/node-gyp/
+
+      - name: Install UnPackaged 👨🏻‍💻
+        uses: nick-fields/retry@v2
+        with:
+          timeout_seconds: 600
+          max_attempts: 2
+          shell: bash
+          retry_on: error
+          command: yarn unpackaged
+          on_retry_command: rm -rf C:/Users/runneradmin/AppData/Local/node-gyp/
+
+      - name: Run electron-packager
+        run: |
+          if ${{ contains(needs.nightly_job.outputs.isModifyReleaseJson, '1') }} ; \
+          then if ${{ contains(steps.release.outputs.new-tag-name, 'nightly') }} ; \
+            then yarn node update-version.js --newTag ${{needs.nightly_job.outputs.tag-name}} --SHA7 ${{ steps.sha.outputs.sha7 }} --buildTime ${{ steps.vars.outputs.date }} ; \
+            else yarn node update-version.js --newTag ${{needs.nightly_job.outputs.tag-name}} --SHA7 ${{ steps.sha.outputs.sha7 }} --buildTime ${{ steps.vars.outputs.date }} --stable; \
+            fi
+          else yarn node update-version.js --buildTime ${{ steps.vars.outputs.date }} ; \
+          fi
+          yarn packager
+        shell: bash
+
+      # fix lxd dir error in ubuntu20.04
+      - name: fix lxd dir error
+        run: |
+          sudo ln -s /var/snap/lxd/common/lxd /var/lib/lxd
+          sudo snap install multipass --classic
+
+      - name: Install Snapcraft
+        uses: samuelmeuli/action-snapcraft@v1
+        with:
+          use_lxd: true
+
+      - name: Build snap 📦
+        run: yarn make:snap:ci
+
+      - name: Release ${{ needs.nightly_job.outputs.file-name-lower }}-${{ needs.nightly_job.outputs.package-name }}-${{ steps.vars.outputs.system }} to GitHub 📰
+        uses: softprops/action-gh-release@v1
+        with:
+          prerelease: true
+          name: ${{ needs.nightly_job.outputs.file-name-lower }}-${{ needs.nightly_job.outputs.release-name }}
+          tag_name: ${{needs.nightly_job.outputs.tag-name}}
+          body: ${{ env.DESCRIBE }}
+          files: |
+            ./out/installers/${{ needs.nightly_job.outputs.tag-name }}/**
+
+  appium_test_job:
+    needs: [nightly_job, release_job]
     if: |
       (contains(github.event_name, 'schedule') || contains(needs.nightly_job.outputs.isRunAppium, '1'))
         && !contains(github.event.head_commit.message, 'skip e2e')
