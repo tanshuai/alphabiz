@@ -1,0 +1,20 @@
+diff --git a/node_modules/utf-8-validate/binding.gyp b/node_modules/utf-8-validate/binding.gyp
+index 30edf27..4c6c813 100644
+--- a/node_modules/utf-8-validate/binding.gyp
++++ b/node_modules/utf-8-validate/binding.gyp
+@@ -3,13 +3,11 @@
+     {
+       'target_name': 'validation',
+       'sources': ['src/validation.c'],
+-      'cflags': ['-std=c99'],
++      'cflags': ['-std=c++11'],
+       'conditions': [
+         ["OS=='mac'", {
+           'xcode_settings': {
+-            'MACOSX_DEPLOYMENT_TARGET': '10.7',
+-            'OTHER_CFLAGS': ['-arch x86_64', '-arch arm64'],
+-            'OTHER_LDFLAGS': ['-arch x86_64', '-arch arm64']
++            'MACOSX_DEPLOYMENT_TARGET': '10.7'
+           }
+         }]
+       ]
