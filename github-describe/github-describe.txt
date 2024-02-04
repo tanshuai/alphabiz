@@ -1,1 +1,7 @@
+redirect build logs to local file
+Support building macOS universal app
+add waiting time #841
+bump @zeeis/alphabiz-libdb to v0.0.90 fix #892
 #886
+fix quit errors, close #877, close #882
+fix #892
