@@ -1,4 +1,7 @@
-#890
-#889
-#888
-add custom param for mac app store identifier, check and resolve spaces in `displayName` when building, fix #894
+upgrade node 16
+Update team-provider-info.json
+Update index.js
+#871
+email context add os info when sign up #896
+try fix file keeping too much space error #887
+save md5 file
