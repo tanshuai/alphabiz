@@ -1,0 +1,43 @@
+diff --git a/node_modules/random-access-file/index.js b/node_modules/random-access-file/index.js
+index 2d1742a..c083081 100644
+--- a/node_modules/random-access-file/index.js
++++ b/node_modules/random-access-file/index.js
+@@ -4,6 +4,7 @@ var fs = require('fs')
+ var mkdirp = require('mkdirp-classic')
+ var path = require('path')
+ var constants = fs.constants || require('constants') // eslint-disable-line
++var fswin = require('fswin')
+ 
+ var READONLY = constants.O_RDONLY
+ var READWRITE = constants.O_RDWR | constants.O_CREAT
+@@ -28,7 +29,20 @@ function RandomAccessFile (filename, opts) {
+   this._truncate = !!opts.truncate || this._size > 0
+   this._rmdir = !!opts.rmdir
+   this._lock = opts.lock || noLock
++
++  /**
++   * @see https://en.wikipedia.org/wiki/Sparse_file
++   * The sparse files will be written to disk as its "real size" (without empty blocks).
++   * This will help us save disk spaces for pre-cache and normak tasks.
++   */
+   this._sparse = opts.sparse || noLock
++  // It seems this module use _sparse as a function...
++  if (typeof this._sparse !== 'function') {
++    var realSparse = Boolean(this._sparse)
++    this._sparse = function () {
++      return realSparse
++    }
++  }
+   this._alloc = opts.alloc || Buffer.allocUnsafe
+ }
+ 
+@@ -41,6 +55,9 @@ RandomAccessFile.prototype._open = function (req) {
+ 
+   function ondir (err) {
+     if (err) return req.callback(err)
++    if (fswin) {
++      fswin.ntfs.setSparseSync(self.filename, this._sparse ? this._sparse() : true)
++    }
+     open(self, READWRITE, req)
+   }
+ }

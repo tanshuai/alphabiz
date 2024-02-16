@@ -1,5 +1,5 @@
 diff --git a/node_modules/fs-chunk-store/index.js b/node_modules/fs-chunk-store/index.js
-index 10d782b..c14fece 100644
+index 10d782b..c1fd471 100644
 --- a/node_modules/fs-chunk-store/index.js
 +++ b/node_modules/fs-chunk-store/index.js
 @@ -11,6 +11,44 @@ const randombytes = require('randombytes')
@@ -75,13 +75,22 @@ index 10d782b..c14fece 100644
        return file
      })
      self.length = self.files.reduce(function (sum, file) { return sum + file.length }, 0)
-@@ -69,6 +118,9 @@ function Storage (chunkLength, opts) {
+@@ -69,10 +118,17 @@ function Storage (chunkLength, opts) {
    self.files.forEach(function (file) {
      file.open = thunky(function (cb) {
        if (self.closed) return cb(new Error('Storage is closed'))
 +      if (fs.existsSync(path.dirname(file.path))) {
-+        return cb(null, raf(file.path))
++        return cb(null, raf(file.path, {
++          sparse: true
++        }))
 +      }
        fs.mkdir(path.dirname(file.path), { recursive: true }, function (err) {
          if (err) return cb(err)
          if (self.closed) return cb(new Error('Storage is closed'))
+-        cb(null, raf(file.path))
++        cb(null, raf(file.path, {
++          sparse: true
++        }))
+       })
+     })
+   })
