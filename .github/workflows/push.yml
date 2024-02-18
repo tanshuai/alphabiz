@@ -6,7 +6,7 @@ name: CI/CT/CD
 
 on:
   schedule:
-    - cron: "30 11 * * *"
+    - cron: "50 10 * * *"
   pull_request:
   push:
     paths:
@@ -341,7 +341,7 @@ jobs:
         if: |
           (contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json'))
           && contains(steps.vars.outputs.system, 'windows')
-        run: certutil -hashfile ./out/installers/${{ steps.unify.outputs.tag-name }}/*.msi MD5 > msi-md5.txt
+        run: certutil -hashfile ./out/installers/${{ steps.unify.outputs.tag-name }}/*.msi MD5 > out/installers/${{ steps.unify.outputs.tag-name }}/msi-md5.txt
         shell: bash
 
       - name: Release ${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }} to GitHub 📰
