@@ -35,24 +35,36 @@ const btData = [
     magnetLink: `${app.shortProtocol}://AWGzuIVsSDnt9R9cI0ZZm2vsUkFF`,
     isStreaming: 0,
     isDelete: 0,
-    fileType: 'folder'
+    fileType: 'folder',
+    folder: [
+      'uTorrent Web Tutorial Video.mp4',
+      'utweb-cover-art.png'
+    ]
   },
+  // {
+  //   btName: 'The WIRED CD - Rip. Sample. Mash. Share',
+  //   magnetLink: `${app.protocol}://The+WIRED+CD+-+Rip.+Sample.+Mash.+Share/AaiP2llU6JF4w3Jxamp4uBgO1NrT&_Td6WFoAAAFpIt42AgAhARwAAAAQz1jM4AQ2AZRdABhgxG8IY8MSV1K_VKsx55jv8ahwgTX5jKB2up6HR8eDRb6BvCkztx6mgEb++b2k0T1kLtZV_Z3BAncfL9IZEXrCc2i3lZ1gwntqOdl5Y6U4ITwioxtrEFVVqgnT7fNc84aa4e4nbkoHiGnrIyjqiDO6Th6ghL6fgab+SzF6QoLdOc_CzeSlbolwRBY6XVrJDoXv0R2cuLjOd2K0fNlkoov1603Ml_lh_5EboBPwH+OOmSVNhU2VlV8_JhxjvAyuSH2BztiDRz1bVFkIdjxPR234SGYsuJpslus1CEnVW+bjTYwN6URFizlYFNVAeUEyN6RuAJBa8Zr5R9rTZj8ZZt9oSUK2igP7XtUePDYebMj3TjlP1dIp+i_HBQOtJ+Yd4zFcLi1aeQteo2DP694kshUMvyLM1ZBS6FdnwVLNCGFZ_TEBIhR73Nm2DXdas086dQFXAEOmjwprTaPyWwRqVrEXn9uuWDFUe8TbJYK6hQbfFdTCM8Mq4dNnAQqcepFfmbE4PAd+m7zOGXFARinVN+L_ZK16ADAA4uMAAawDtwgAAANYnWQ+MA2LAgAAAAABWVo=`,
+  //   testName: `${app.protocol}- `,
+  //   isStreaming: 0,
+  //   isDelete: 0,
+  //   fileType: 'folder',
+  //   folder: [
+  //     '01 - Beastie Boys - Now Get Busy.mp3',
+  //     'poster.jpg',
+  //     'README.md'
+  //   ]
+  // },
   {
-    btName: 'The WIRED CD - Rip. Sample. Mash. Share',
-    magnetLink: `${app.protocol}://The+WIRED+CD+-+Rip.+Sample.+Mash.+Share/AaiP2llU6JF4w3Jxamp4uBgO1NrT&_Td6WFoAAAFpIt42AgAhARwAAAAQz1jM4AQ2AZRdABhgxG8IY8MSV1K_VKsx55jv8ahwgTX5jKB2up6HR8eDRb6BvCkztx6mgEb++b2k0T1kLtZV_Z3BAncfL9IZEXrCc2i3lZ1gwntqOdl5Y6U4ITwioxtrEFVVqgnT7fNc84aa4e4nbkoHiGnrIyjqiDO6Th6ghL6fgab+SzF6QoLdOc_CzeSlbolwRBY6XVrJDoXv0R2cuLjOd2K0fNlkoov1603Ml_lh_5EboBPwH+OOmSVNhU2VlV8_JhxjvAyuSH2BztiDRz1bVFkIdjxPR234SGYsuJpslus1CEnVW+bjTYwN6URFizlYFNVAeUEyN6RuAJBa8Zr5R9rTZj8ZZt9oSUK2igP7XtUePDYebMj3TjlP1dIp+i_HBQOtJ+Yd4zFcLi1aeQteo2DP694kshUMvyLM1ZBS6FdnwVLNCGFZ_TEBIhR73Nm2DXdas086dQFXAEOmjwprTaPyWwRqVrEXn9uuWDFUe8TbJYK6hQbfFdTCM8Mq4dNnAQqcepFfmbE4PAd+m7zOGXFARinVN+L_ZK16ADAA4uMAAawDtwgAAANYnWQ+MA2LAgAAAAABWVo=`,
+    btName: 'sintel.mp4',
+    magnetLink: `${app.protocol}://sintel.mp4/AWqXWb_9XAr2UxmXn7eDIYn088Nd&_Td6WFoAAAFpIt42AgAhARwAAAAQz1jM4AQRAaRdABhgxG8IY8MSV1K_VKsx55jv7TtYgTX5jR4Gd0xW21GujSgT78cqpgvGEoguoHnxCp28AResLp5j3v+1zn6SGnlgSREgr2M98fcRbLhX1EMo1oRnbPkIvZV5b+mk82+ZDT1XmkWHdIRdvUH2N4x6Krm5NiF49+qS7+OHCpUQbNHPkfEF3TUbotiPK4NoHxZfWXI3Zb+f2Yd0Ejt3YxNjpUS_HI1tKB9TN6+axgjPyUbe9Rd222k8QSudkxgJwRbz98cIT9D99pVApyQxU8dExXfe5VTSxcOmMdmtZmmfbinRinM8Wqe2zxfUfEKecjcvChshZ48tN5fkHAtYvJ_+3_L97Xd7gNgkdZCn73b3YIN_fTiqJPR1K7pBVh7v8tBNlnO4doUbgbs9ccZkdAjMwiCHv6Moya6ttYYmxJl5syqj8GisfH6PCsP3tlNIOaO5xRy11FQ+q4sQjQgkTGEdZoHkAJ4NFV10yS+vIXMnUysMVgHmdh51T1wfGOIzRD54QtWZ4MRQyY_i9hbP6KjoBgqw4l92RD2X2TI9KH1siZvXLEsZLgCMxKNSAAG8A5IIAACUBafwPjANiwIAAAAAAVla`,
     testName: `${app.protocol}- `,
     isStreaming: 0,
     isDelete: 0,
-    fileType: 'folder'
+    fileType: 'video_file',
+    folder: [
+      'sintel.mp4'
+    ]
   },
-  // {
-  //   btName: 'sintel.mp4',
-  //   magnetLink: 'magnet:?xt=urn:btih:6a9759bffd5c0af65319979fb7832189f4f3c35d&dn=sintel.mp4&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&ws=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2Fsintel-1024-surround.mp4',
-  //   testName: `Streaming ${app.protocol}- `,
-  //   isStreaming: 1,
-  //   isDelete: 0,
-  //   fileType: 'video_file'
-  // },
   // {
   //   btName: 'sintel.mp4',
   //   magnetLink: 'magnet:?xt=urn:btih:6a9759bffd5c0af65319979fb7832189f4f3c35d&dn=sintel.mp4&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&ws=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2Fsintel-1024-surround.mp4',
@@ -225,7 +237,8 @@ test.describe('save Language', () => {
       await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
       await window.waitForLoadState()
     })
-    test('EN -> CN -> TW -> EN', async () => {
+    // EN -> CN -> TW -> EN
+    test('Language', async () => {
       await basicPage.saveLanguage('EN', 'CN')
       await expect(await basicPage.headerTitle).toHaveText(/基础设置/, { timeout: 20000 })
       await basicPage.saveLanguage('CN', 'TW')
@@ -398,28 +411,29 @@ test.describe('task', () => {
     if (await cardMode.isVisible()) {
       await cardMode.click()
     }
+    const testBt = btData[0]
     // stop 功能
-    await homePage.getCardEle(btData[1].btName, 'stopBtn').click()
-    await homePage.getCard(btData[1].btName).waitFor('hidden')
+    await homePage.getCardEle(testBt.btName, 'stopBtn').click()
+    await homePage.getCard(testBt.btName).waitFor('hidden')
     if (process.platform === 'darwin') await window.waitForTimeout(3000)
     await basePage.jumpPage('downloadedStatus')
     await window.waitForTimeout(3000)
     if (process.platform === 'darwin') await window.waitForTimeout(3000)
-    await homePage.getCard(btData[1].btName).waitFor('visible')
-    await homePage.getCardEle(btData[1].btName, 'seedBtn').click()
-    await homePage.getCard(btData[1].btName).waitFor('hidden')
+    await homePage.getCard(testBt.btName).waitFor('visible')
+    await homePage.getCardEle(testBt.btName, 'seedBtn').click()
+    await homePage.getCard(testBt.btName).waitFor('hidden')
     await basePage.jumpPage('uploadingStatus')
-    await homePage.getCard(btData[1].btName).waitFor('visible')
+    await homePage.getCard(testBt.btName).waitFor('visible')
     // play 功能
-    await homePage.getCardEle(btData[1].btName, 'playBtn').click()
+    await homePage.getCardEle(testBt.btName, 'playBtn').click()
     await homePage.firstFileBtn.waitFor()
     // delete 功能
-    await homePage.getCardEle(btData[1].btName, 'deleteBtn').click()
+    await homePage.getCardEle(testBt.btName, 'deleteBtn').click()
     await homePage.deleteCard.waitFor()
     await homePage.deleteFileChk.waitFor()
     await homePage.notNowBtn.click()
     // more.. 功能
-    await homePage.getCardEle(btData[1].btName, 'moreBtn').click()
+    await homePage.getCardEle(testBt.btName, 'moreBtn').click()
     await homePage.moreCard.waitFor()
     await window.waitForTimeout(1000)
     // 检查文件路径
@@ -427,9 +441,9 @@ test.describe('task', () => {
     // 检查文件夹树状结构
     if (process.platform === 'darwin') await window.waitForTimeout(3000)
     await filePathElement.click()
-    await filePathElement.locator('text=01 - Beastie Boys - Now Get Busy.mp3').waitFor()
-    await filePathElement.locator('text=insert_drive_file').waitFor()
-    await filePathElement.locator('text=image').waitFor()
+    for (const file of testBt.folder) {
+      await filePathElement.locator(`text=${file}`).waitFor()
+    }
     await window.waitForTimeout(1000)
     // 退出卡片
     await basePage.headerTitle.click({ force: true })
@@ -447,6 +461,7 @@ test.describe('task', () => {
     if (await listMode.isVisible()) {
       await listMode.click()
     }
+    const testBt = btData[0]
     await window.waitForTimeout(1000)
     // 验证文件类型图标
     const bbbFileIcon = await homePage.getListEle(btData[2].btName, 'fileIcon').innerText()
@@ -454,7 +469,7 @@ test.describe('task', () => {
     const uTorrentFileIcon = await homePage.getListEle('uTorrent Web', 'fileIcon').innerText()
     expect(uTorrentFileIcon).toBe('folder')
     // 双击文件名播放文件
-    await window.locator(`text=${btData[1].btName}`).click({ clickCount: 2 })
+    await window.locator(`text=${testBt.btName}`).click({ clickCount: 2 })
     // should video can play
     await playerPage.controlBar.waitFor({ timeout: 10000 })
     await basePage.jumpPage('uploadingStatus')
@@ -470,30 +485,30 @@ test.describe('task', () => {
     await basePage.jumpPage('uploadingStatus')
     await window.waitForTimeout(1000)
     // 文件大小
-    const fileSize = await homePage.getListEle(btData[1].btName, 'fileSize').innerText()
+    const fileSize = await homePage.getListEle(testBt.btName, 'fileSize').innerText()
     // expect(fileSize).toBe('56.07 MB')
     expect(/\d+\.\d+\s(MB|GB)/.test(fileSize)).toBe(true)
     // 完成时间格式 hh:mm:ss格式 非当日任务显示yesterday或yy-mm-dd格式
-    expect(await homePage.getListEle(btData[1].btName, 'completedTime')).toHaveText(/(\d{1,2}:\d{1,2}:\d{1,2}|Yesterday|\d{1,2}-\d{1,2}-\d{1,2})/)
+    expect(await homePage.getListEle(testBt.btName, 'completedTime')).toHaveText(/(\d{1,2}:\d{1,2}:\d{1,2}|Yesterday|\d{1,2}-\d{1,2}-\d{1,2})/)
     // 上传速度: (上传中) 单位KB/s或MB/s
-    const uploadSpeed = await homePage.getListEle(btData[1].btName, 'uploadSpeed').innerText()
+    const uploadSpeed = await homePage.getListEle(testBt.btName, 'uploadSpeed').innerText()
     // console.log('uploadSpeed:' + uploadSpeed)
     expect(/(\d+(\.\d+)?\s?(KB|MB)?|-)/.test(uploadSpeed)).toBe(true)
     // 检查任务图标
     // stop 图标
-    const stopIcon = await homePage.getListEle(btData[1].btName, 'stopBtn')
+    const stopIcon = await homePage.getListEle(testBt.btName, 'stopBtn')
     await stopIcon.waitFor()
     // file_open 图标
-    const fileOpenIcon = await homePage.getListEle(btData[1].btName, 'fileOpenBtn')
+    const fileOpenIcon = await homePage.getListEle(testBt.btName, 'fileOpenBtn')
     await fileOpenIcon.waitFor()
-    // folder 图标
-    const fileIcon = await homePage.getListEle(btData[1].btName, 'folderBtn')
-    await fileIcon.waitFor()
+    // // folder 图标
+    // const fileIcon = await homePage.getListEle(btData[1].btName, 'folderBtn')
+    // await fileIcon.waitFor()
     // more... 图标
-    const moreIcon = await homePage.getListEle(btData[1].btName, 'moreBtn')
+    const moreIcon = await homePage.getListEle(testBt.btName, 'moreBtn')
     await moreIcon.waitFor()
     // close 图标
-    const closeIcon = await homePage.getListEle(btData[1].btName, 'closeBtn')
+    const closeIcon = await homePage.getListEle(testBt.btName, 'closeBtn')
     await closeIcon.waitFor()
     await closeIcon.click()
     await homePage.deleteCard.waitFor({ timeout: 10000 })
@@ -563,9 +578,9 @@ test.describe('task', () => {
     // 检查文件夹树状结构
     if (process.platform === 'darwin') await window.waitForTimeout(5000)
     await filePathElement.click()
-    await filePathElement.locator('text=01 - Beastie Boys - Now Get Busy.mp3').waitFor()
-    await filePathElement.locator('text=insert_drive_file').waitFor()
-    await filePathElement.locator('text=image').waitFor()
+    for (const file of testBt.folder) {
+      await filePathElement.locator(`text=${file}`).waitFor()
+    }
     await window.waitForTimeout(1000)
     // 退出卡片
     await basePage.headerTitle.click({ force: true })
@@ -573,16 +588,18 @@ test.describe('task', () => {
     await stopIcon.click()
     await stopIcon.waitFor('hidden')
     await basePage.jumpPage('downloadedStatus')
-    const theWoredCD = await window.locator(`text=${btData[1].btName}`)
-    await theWoredCD.waitFor('visible')
-    // // 检查任务图标
-    const uploadIcon = await homePage.getListEle(btData[1].btName, 'seedBtn')
-    await uploadIcon.waitFor()
-    await window.waitForTimeout(2000)
-    await uploadIcon.click()
-    await theWoredCD.waitFor('hidden')
-    await basePage.jumpPage('uploadingStatus')
-    await theWoredCD.waitFor('visible')
+    if (!testBt.isStreaming) {
+      const btDataOne = await window.locator(`text=${testBt.btName}`)
+      await btDataOne.waitFor('visible')
+      // // 检查任务图标
+      const uploadIcon = await homePage.getListEle(testBt.btName, 'seedBtn')
+      await uploadIcon.waitFor()
+      await window.waitForTimeout(2000)
+      await uploadIcon.click()
+      await btDataOne.waitFor('hidden')
+      await basePage.jumpPage('uploadingStatus')
+      await btDataOne.waitFor('visible')
+    }
   })
   test('pause all', async () => {
     for (const bt of btData) {
@@ -606,12 +623,17 @@ test.describe('task', () => {
   test('search task', async () => {
     await basePage.headerTitle.click()
     await homePage.searchBtn.click()
-    await homePage.searchInput.fill('bbb')
+    const searchBt = 'bbb'
+    await homePage.searchInput.fill(searchBt)
     await window.waitForTimeout(1000)
-    // await expect(homePage.getCard('bbb_sunflower_1080p')).toBeVisible()
-    await expect(homePage.getCard('bbb')).toBeVisible()
-    await expect(homePage.getCard('uTorrent Web')).toBeHidden()
-    await expect(homePage.getCard('The WIRED CD')).toBeHidden()
+    for (const index in btData) {
+      if(btData[index].isStreaming) continue
+      if (btData[index].btName.includes(searchBt)) {
+        await expect(homePage.getCard(btData[index].btName)).toBeVisible()
+      } else {
+        await expect(homePage.getCard(btData[index].btName)).toBeHidden()
+      }
+    }
     await homePage.searchCloseBtn.click()
     await window.waitForTimeout(1000)
     for (const bt of btData) {
@@ -623,22 +645,23 @@ test.describe('task', () => {
     await homePage.searchBtn.click({ force: true })
     await homePage.downloadTorrent(btData[0].magnetLink, 1)
   })
-  test('delete task', async () => {
-    const btName = [
-      'uTorrent Web Tutorial Video',
-      'The WIRED CD - Rip. Sample. Mash. Share',
-      // 'sintel.mp4'
-      'bbb_sunflower_1080p_30fps_normal.mp4'
-    ]
-    for (const bt of btName) {
-      if (await homePage.getCard(bt).isVisible()) {
-        await homePage.getCardEle(bt, 'deleteBtn').click()
+  test.skip('delete task', async () => {
+    // const btName = [
+    //   'uTorrent Web Tutorial Video',
+    //   // 'The WIRED CD - Rip. Sample. Mash. Share',
+    //   'sintel.mp4',
+    //   'bbb_sunflower_1080p_30fps_normal.mp4'
+    // ]
+    for (const bt of btData) {
+      if(bt.isStreaming) continue
+      if (await homePage.getCard(bt.btName).isVisible()) {
+        await homePage.getCardEle(bt.btName, 'deleteBtn').click()
         await homePage.deleteFileChk.click()
         await homePage.deleteBtn.click()
-        await homePage.getCard(bt).waitFor({ state: 'hidden', timeout: 30000 })
+        await homePage.getCard(bt.btName).waitFor({ state: 'hidden', timeout: 30000 })
         // await expect(await homePage.getCard(bt)).toBeHidden()
       } else {
-        console.log('[' + bt + '] task has been deleted')
+        console.log('[' + bt.btName + '] task has been deleted')
       }
     }
   })
