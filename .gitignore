@@ -121,8 +121,7 @@ build/electron/**/yarn.lock
 build/electron/UnPackaged/developer
 
 # patches/
-patches/@quasar+app+2.2.11.patch
-patches/@quasar+app+2.2.11.dev.patch
+patches/@quasar+app*
 
 # out/
 # Ignore out/ except for out/make/snapcraft/
