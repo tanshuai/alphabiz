@@ -1,7 +1,8 @@
-upgrade node 16
-Update team-provider-info.json
-Update index.js
 #871
-email context add os info when sign up #896
-try fix file keeping too much space error #887
-save md5 file
+patch rename,try release skip e2e
+advance daily release
+modify e2e test torrent
+modify skip test
+close createWriteStream when download asset end #841
+update build script for mac
+fix #888
