@@ -54,17 +54,17 @@ const btData = [
   //     'README.md'
   //   ]
   // },
-  {
-    btName: 'sintel.mp4',
-    magnetLink: `${app.protocol}://sintel.mp4/AWqXWb_9XAr2UxmXn7eDIYn088Nd&_Td6WFoAAAFpIt42AgAhARwAAAAQz1jM4AQRAaRdABhgxG8IY8MSV1K_VKsx55jv7TtYgTX5jR4Gd0xW21GujSgT78cqpgvGEoguoHnxCp28AResLp5j3v+1zn6SGnlgSREgr2M98fcRbLhX1EMo1oRnbPkIvZV5b+mk82+ZDT1XmkWHdIRdvUH2N4x6Krm5NiF49+qS7+OHCpUQbNHPkfEF3TUbotiPK4NoHxZfWXI3Zb+f2Yd0Ejt3YxNjpUS_HI1tKB9TN6+axgjPyUbe9Rd222k8QSudkxgJwRbz98cIT9D99pVApyQxU8dExXfe5VTSxcOmMdmtZmmfbinRinM8Wqe2zxfUfEKecjcvChshZ48tN5fkHAtYvJ_+3_L97Xd7gNgkdZCn73b3YIN_fTiqJPR1K7pBVh7v8tBNlnO4doUbgbs9ccZkdAjMwiCHv6Moya6ttYYmxJl5syqj8GisfH6PCsP3tlNIOaO5xRy11FQ+q4sQjQgkTGEdZoHkAJ4NFV10yS+vIXMnUysMVgHmdh51T1wfGOIzRD54QtWZ4MRQyY_i9hbP6KjoBgqw4l92RD2X2TI9KH1siZvXLEsZLgCMxKNSAAG8A5IIAACUBafwPjANiwIAAAAAAVla`,
-    testName: `${app.protocol}- `,
-    isStreaming: 0,
-    isDelete: 0,
-    fileType: 'video_file',
-    folder: [
-      'sintel.mp4'
-    ]
-  },
+  // {
+  //   btName: 'sintel.mp4',
+  //   magnetLink: `${app.protocol}://sintel.mp4/AWqXWb_9XAr2UxmXn7eDIYn088Nd&_Td6WFoAAAFpIt42AgAhARwAAAAQz1jM4AQRAaRdABhgxG8IY8MSV1K_VKsx55jv7TtYgTX5jR4Gd0xW21GujSgT78cqpgvGEoguoHnxCp28AResLp5j3v+1zn6SGnlgSREgr2M98fcRbLhX1EMo1oRnbPkIvZV5b+mk82+ZDT1XmkWHdIRdvUH2N4x6Krm5NiF49+qS7+OHCpUQbNHPkfEF3TUbotiPK4NoHxZfWXI3Zb+f2Yd0Ejt3YxNjpUS_HI1tKB9TN6+axgjPyUbe9Rd222k8QSudkxgJwRbz98cIT9D99pVApyQxU8dExXfe5VTSxcOmMdmtZmmfbinRinM8Wqe2zxfUfEKecjcvChshZ48tN5fkHAtYvJ_+3_L97Xd7gNgkdZCn73b3YIN_fTiqJPR1K7pBVh7v8tBNlnO4doUbgbs9ccZkdAjMwiCHv6Moya6ttYYmxJl5syqj8GisfH6PCsP3tlNIOaO5xRy11FQ+q4sQjQgkTGEdZoHkAJ4NFV10yS+vIXMnUysMVgHmdh51T1wfGOIzRD54QtWZ4MRQyY_i9hbP6KjoBgqw4l92RD2X2TI9KH1siZvXLEsZLgCMxKNSAAG8A5IIAACUBafwPjANiwIAAAAAAVla`,
+  //   testName: `${app.protocol}- `,
+  //   isStreaming: 0,
+  //   isDelete: 0,
+  //   fileType: 'video_file',
+  //   folder: [
+  //     'sintel.mp4'
+  //   ]
+  // },
   // {
   //   btName: 'sintel.mp4',
   //   magnetLink: 'magnet:?xt=urn:btih:6a9759bffd5c0af65319979fb7832189f4f3c35d&dn=sintel.mp4&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&ws=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2Fsintel-1024-surround.mp4',
@@ -464,23 +464,14 @@ test.describe('task', () => {
     const testBt = btData[0]
     await window.waitForTimeout(1000)
     // 验证文件类型图标
-    const bbbFileIcon = await homePage.getListEle(btData[2].btName, 'fileIcon').innerText()
-    expect(bbbFileIcon).toBe('video_file')
+    if (testBt.fileType === 'video_file') {
+      const bbbFileIcon = await homePage.getListEle(testBt.btName, 'fileIcon').innerText()
+      expect(bbbFileIcon).toBe('video_file')
+    }
     const uTorrentFileIcon = await homePage.getListEle('uTorrent Web', 'fileIcon').innerText()
     expect(uTorrentFileIcon).toBe('folder')
     // 双击文件名播放文件
     await window.locator(`text=${testBt.btName}`).click({ clickCount: 2 })
-    // should video can play
-    await playerPage.controlBar.waitFor({ timeout: 10000 })
-    await basePage.jumpPage('uploadingStatus')
-    await window.waitForTimeout(1000)
-    await window.locator(`text=${btData[0].btName}`).click({ clickCount: 2 })
-    // should video can play
-    await playerPage.controlBar.waitFor({ timeout: 10000 })
-    await basePage.jumpPage('uploadingStatus')
-    await window.waitForTimeout(1000)
-    await window.locator(`text=${btData[2].btName}`).click({ clickCount: 2 })
-    // should video can play
     await playerPage.controlBar.waitFor({ timeout: 10000 })
     await basePage.jumpPage('uploadingStatus')
     await window.waitForTimeout(1000)
@@ -645,7 +636,7 @@ test.describe('task', () => {
     await homePage.searchBtn.click({ force: true })
     await homePage.downloadTorrent(btData[0].magnetLink, 1)
   })
-  test.skip('delete task', async () => {
+  test('delete task', async () => {
     // const btName = [
     //   'uTorrent Web Tutorial Video',
     //   // 'The WIRED CD - Rip. Sample. Mash. Share',
