@@ -1,8 +1,7 @@
-#871
-patch rename,try release skip e2e
-advance daily release
-modify e2e test torrent
-modify skip test
-close createWriteStream when download asset end #841
-update build script for mac
-fix #888
+add GoogleAnalytics
+add wait time for quick start
+Update index.template.html
+#886
+#897
+modify subtitles prompt
+fix e2e test download error
