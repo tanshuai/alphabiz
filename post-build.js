@@ -16,9 +16,10 @@ const iconPath = 'favicon.ico'
 const appConfig = require('./developer/app');
 const appName = appConfig.name;
 
+const buildArch = process.env.BUILD_ARCH || process.arch
 const buildDarwin = () => {
   const plist = require('plist')
-  const appPath = resolve(__dirname, `build/electron/${appName}-darwin-x64/${appName}.app`)
+  const appPath = resolve(__dirname, `build/electron/${appConfig.displayName}-darwin-${buildArch}/${appConfig.displayName}.app`)
   const contentsPath = resolve(appPath, 'Contents')
   const resourcesPath = resolve(contentsPath, 'Resources')
   const infoPlistPath = resolve(contentsPath, 'Info.plist')

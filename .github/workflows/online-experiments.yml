@@ -21,7 +21,7 @@ jobs:
     strategy:
       matrix:
         # os: [ubuntu-latest, windows-latest, macos-latest]
-        os: [ubuntu-22.04]
+        os: [macos-latest]
         node-version: [16]
     environment:
       name: CICD
@@ -259,7 +259,6 @@ jobs:
           on_retry_command: rm -rf C:/Users/runneradmin/AppData/Local/node-gyp/
 
       - name: Run electron-packager
-        if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
           if ${{ contains(env.MODIFIED_FILE_LIST, 'release.json') }} ; \
           then if ${{ contains(steps.release.outputs.new-tag-name, 'nightly') }} ; \
@@ -268,33 +267,40 @@ jobs:
             fi
           else yarn node update-version.js --buildTime ${{ steps.vars.outputs.date }} ; \
           fi
-          yarn packager
+          BUILD_ARCH=arm64 yarn packager
         shell: bash
 
-      # fix lxd dir error in ubuntu20.04
-      - name: fix lxd dir error
-        run: |
-          sudo ln -s /var/snap/lxd/common/lxd /var/lib/lxd
-          sudo snap install multipass --classic
-
-      - name: Install Snapcraft
-        uses: samuelmeuli/action-snapcraft@v1
+      - name: Upload packager Results 🗃
+        if: always()
+        uses: actions/upload-artifact@v2
         with:
-          use_lxd: true
+          name: "${{ matrix.os }}-output"
+          path: build/electron/Alphabiz*
 
-      - name: Build snap 📦
-        run: yarn make:snap:ci
+      # # fix lxd dir error in ubuntu20.04
+      # - name: fix lxd dir error
+      #   run: |
+      #     sudo ln -s /var/snap/lxd/common/lxd /var/lib/lxd
+      #     sudo snap install multipass --classic
 
-      - name: Release ${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }} to GitHub 📰
-        if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
-        uses: softprops/action-gh-release@v1
-        with:
-          prerelease: true
-          name: ${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.release-name }}
-          tag_name: ${{ steps.unify.outputs.tag-name }}
-          body: ${{ env.DESCRIBE }}
-          files: |
-            ./out/installers/${{ steps.unify.outputs.tag-name }}/**
+      # - name: Install Snapcraft
+      #   uses: samuelmeuli/action-snapcraft@v1
+      #   with:
+      #     use_lxd: true
+
+      # - name: Build snap 📦
+      #   run: yarn make:snap:ci
+
+      # - name: Release ${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }} to GitHub 📰
+      #   if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
+      #   uses: softprops/action-gh-release@v1
+      #   with:
+      #     prerelease: true
+      #     name: ${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.release-name }}
+      #     tag_name: ${{ steps.unify.outputs.tag-name }}
+      #     body: ${{ env.DESCRIBE }}
+      #     files: |
+      #       ./out/installers/${{ steps.unify.outputs.tag-name }}/**
 
   appium-test:
     needs: build-1
