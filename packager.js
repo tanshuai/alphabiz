@@ -14,6 +14,8 @@ const appName = app.name
 const displayName = app.displayName
 
 const { getPackageDetailsFromPatchFilename } = require('patch-package/dist/PackageDetails')
+const { resolve } = require('path')
+const { execSync } = require('child_process')
 const patches = fs.readdirSync(path.resolve(__dirname, 'patches'))
   .map(getPackageDetailsFromPatchFilename)
   .filter(i => i && !i.isDevOnly)
