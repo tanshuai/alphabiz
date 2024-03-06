@@ -33,7 +33,7 @@ packageJson.productName = appName
 
 const beforeBuild = async () => {
   const { platform, arch } = process
-  const destDir = path.resolve(__dirname, `build/electron/${displayName}-${platform}-${arch}`)
+  const destDir = path.resolve(__dirname, `build/electron/${displayName}-${platform}-${buildArch}`)
   console.log('Before build', destDir)
   if (fs.existsSync(destDir)) {
     fs.rmSync(destDir, { recursive: true })
@@ -162,6 +162,7 @@ packager({
   afterCopy: [(buildPath, electronVersion, platform, arch, callback) => {
     console.log('Copy patches to', buildPath)
     fs.cpSync(resolve(__dirname, 'patches'), resolve(buildPath, 'patches'), { recursive: true })
+    if (platform === 'darwin') {fs.rmSync(resolve(buildPath, 'patches/electron-wix-msi+4.0.0.dev.patch'))}
     const result = execSync('npx patch-package', { cwd: buildPath })
     console.log(`Patch package result: ${result.toString()}`)
     // const yarnResult = execSync('yarn install --production', { cwd: buildPath })
