@@ -73,6 +73,10 @@ if (process.platform === 'linux') {
   )
 }
 
+const buildArch = process.env.BUILD_ARCH || process.arch
+const buildPlatform = process.env.BUILD_PLATFORM || process.platform
+console.log(resolve(__dirname, `out/${productName}-${buildPlatform}-${buildArch}/${productName}.app`))
+
 module.exports = {
   hooks: {
     packageAfterPrune: (conf, buildPath, electronVersion, platform, arch, callback) => {
@@ -165,10 +169,11 @@ module.exports = {
         icon: resolve(__dirname, 'developer/platform-assets/mac/volume-icon.icns'),
         iconSize: 96,
         overwrite: true,
+        arch: buildArch,
         background: resolve(__dirname, 'developer/platform-assets/mac/background.png'),
         contents: [
           { x: 460, y: 256, type: 'link', path: '/Applications' },
-          { x: 200, y: 256, type: 'file', path: resolve(__dirname, `out/${productName}-darwin-x64/${productName}.app`) }
+          { x: 200, y: 256, type: 'file', path: resolve(__dirname, `out/${productName}-${buildPlatform}-${buildArch}/${productName}.app`) }
         ]
       }
     },
@@ -190,10 +195,16 @@ module.exports = {
         version,
         homepage,
         icon: resolve(__dirname, 'developer/platform-assets/linux/512x512.png'),
-        mantainer: author,
+        maintainer: author,
         // TODO: add file associations here
-        mimeType: ['audio/*', 'video/mp4', 'video/*', 'application/x-bittorrent'],
+        mimeType: ['audio/*', 'video/mp4', 'video/*', 'application/x-bittorrent', `x-scheme-handler/${protocol}`],
         desktopTemplate: debDesktopTemplate
+      }
+    },
+    {
+      name: "@electron-forge/maker-snap",
+      config: {
+        version
       }
     },
     {

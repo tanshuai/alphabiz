@@ -1,5 +1,5 @@
 const { exec, execSync } = require('child_process')
-const { existsSync, copyFileSync, mkdirSync, readFileSync, writeFileSync, unlinkSync, rmSync } = require('fs')
+const { existsSync, copyFileSync, mkdirSync, readFileSync, writeFileSync, unlinkSync, rmSync, cpSync, readdirSync, statSync } = require('fs')
 const { resolve } = require('path')
 const { version: pkgVersion } = require('./package.json')
 const publicVersion = require('./public/version.json').version
@@ -10,6 +10,7 @@ const productName = appConfig.displayName;
 const displayName = appConfig.displayName;
 const description = appConfig.description;
 const author = appConfig.author;
+const { makeUniversalApp } = require('@electron/universal')
 
 const readline = require('readline')
 const { copySync } = require('fs-extra')
@@ -17,9 +18,86 @@ const { copySync } = require('fs-extra')
 const version = publicVersion || pkgVersion
 console.log(`version: ${version}`)
 
-const { platform, arch } = process
+// const { platform } = process
+const arch = process.env.BUILD_ARCH || process.arch
+const platform = process.env.BUILD_PLATFORM || process.platform
 
-const symlinkDir = require('symlink-dir')
+const unsupportedModules = [
+  /**
+   * Fixed by removing arch-based node-gyp config.
+   * See `patches` directory for details.
+   */
+  // 'bufferutil',
+  // 'utf-8-validate'
+]
+const treatMacFiles = (arm, x64) => {
+  const files = [...new Set(readdirSync(arm).concat(readdirSync(x64)))]
+  files.forEach(file => {
+    const armFile = resolve(arm, file)
+    const x64File = resolve(x64, file)
+    if (existsSync(armFile)) {
+      if (!existsSync(x64File)) {
+        if (file.includes('arm') || armFile.includes('node_modules')) return
+        rmSync(armFile, { recursive: true })
+        console.log(`Warn: Removed ${armFile} since it is not existed in x64 build`)
+        return
+      }
+      const isArmDir = statSync(armFile).isDirectory()
+      const isX64Dir = statSync(x64File).isDirectory()
+      if (isArmDir !== isX64Dir) {
+        rmSync(armFile, { recursive: true })
+        rmSync(x64File, { recursive: true })
+        console.log(`Warn: The ${file} is not same type in arm and x64`)
+        console.log(armFile, 'is', isArmDir ? 'directory' : 'file')
+        console.log(x64File, 'is', isX64Dir ? 'directory' : 'file')
+      }
+      if (isArmDir && isX64Dir) {
+        return treatMacFiles(armFile, x64File)
+      }
+      if (file === 'Info.plist') {
+        cpSync(armFile, x64File)
+        // console.log(`Use ${armFile} for common Info.plist`)
+      }
+      if (file.endsWith('.node')) {
+        if (unsupportedModules.some(mod => armFile.includes(`node_modules/${mod}`))) {
+          console.log(`Remove ${file} since it is not supported in universal.`)
+          console.log(armFile)
+          console.log(x64File)
+          rmSync(armFile, { recursive: true })
+          rmSync(x64File, { recursive: true })
+        }
+        // copyFileSync(x64File, armFile)
+        // console.log(`Found same .node file ${file}. Use x64 one\n${x64File}`)
+      }
+    } else if (existsSync(x64File) && !file.includes('x64') && !file.includes('x86') && !x64File.includes('node_modules')) {
+      rmSync(x64File, { recursive: true })
+      console.log(`Warn: Removed ${x64File} since it is not existed in arm build`)
+    }
+  })
+}
+const makeMacUniversal = async () => {
+  if (platform === 'darwin' || platform === 'mas') {
+    const dist = resolve(__dirname, `${appDirectoryRootPath}/electron`)
+    const x64Dist = resolve(dist, `${productName}-${platform}-x64`)
+    const armDist = resolve(dist, `${productName}-${platform}-arm64`)
+    if (existsSync(x64Dist) && existsSync(armDist)) {
+      const outAppPath = resolve(dist, `${productName}-${platform}-universal/${productName}.app`)
+      treatMacFiles(armDist, x64Dist)
+      await makeUniversalApp({
+        x64AppPath: resolve(x64Dist, `${productName}.app`),
+        arm64AppPath: resolve(armDist, `${productName}.app`),
+        outAppPath,
+        mergeASARs: true,
+        singleArchFiles: '{.*,*}',
+        force: true
+      })
+      console.log('Generated universal app:', outAppPath)
+      return
+    }
+    throw new Error('Require buiding both x64 and arm64 targets before building universal app')
+  }
+  throw new Error('Build mac universal is only available in macOS')
+}
 
 const doMake = async () => {
   const arg = platform === 'darwin'
@@ -50,8 +128,8 @@ const doMake = async () => {
   // } else copySync(packageDir, destDir, { recursive: true })
   // } else await symlinkDir(packageDir, destDir)
   console.log(`Executing: \x1b[32myarn ${arg}\x1b[0m`)
-  const prefix = `\x1b[32m  * make \x1b[0m`
-  const res = exec(`yarn ${arg}`)
+  const prefix = '\x1b[32m  * make \x1b[0m'
+  const res = exec(`yarn ${arg} --arch ${arch}`)
   res.stdout.on('data', d => {
     // process.stdout.clearLine()
     readline.clearLine(process.stdout, 0)
@@ -101,7 +179,7 @@ const doPostmake = () => {
     // move darwin installers
     toMoves.push([
       resolve(outDir, `${productName}.dmg`),
-      resolve(destDir, `${appConfig.fileName.toLowerCase()}-${version}.dmg`)
+      resolve(destDir, `${appConfig.fileName.toLowerCase()}-${arch}-${version}.dmg`)
     ])
   } else if (platform === 'linux') {
     // move linux installers
@@ -174,6 +252,11 @@ if (process.argv.includes('--make')) {
   doPostmake()
 } else if (process.argv.includes('--reset')) {
   doReset()
+} else if (process.argv.includes('--make-universal')) {
+  makeMacUniversal().catch(error => {
+    console.error('Error making universal app.', error && error.message, error)
+    process.exit(1)
+  })
 } else {
   console.warn('Require passing --make or --postmake')
   process.exit(1)
