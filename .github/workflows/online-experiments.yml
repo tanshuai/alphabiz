@@ -263,6 +263,7 @@ jobs:
             fi
           else yarn node update-version.js --buildTime ${{ steps.vars.outputs.date }} ; \
           fi
+          git update-index --chmod=+x ./universal/build-mac.sh
           ./universal/build-mac.sh
         shell: bash
 
