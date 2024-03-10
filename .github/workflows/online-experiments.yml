@@ -263,7 +263,8 @@ jobs:
             fi
           else yarn node update-version.js --buildTime ${{ steps.vars.outputs.date }} ; \
           fi
-          chmod ./universal/build-mac.sh
+          chmod +x ./universal/build-mac.sh
+          ./universal/build-mac.sh
         shell: bash
 
       - name: check
