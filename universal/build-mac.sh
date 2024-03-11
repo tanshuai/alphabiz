@@ -9,7 +9,7 @@ echo "Current working directory: $(dirname "$(realpath "$0/..")")"
 cd "$(dirname "$(realpath "$0/..")")"
 
 IS_DEV=false
-if [ $1 = "--dev" ]; then
+if [[ $1 = "--dev" ]]; then
   echo "dev"
   IS_DEV=true
   echo "Run in development mode."
