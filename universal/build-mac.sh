@@ -59,7 +59,13 @@ find "build/electron" -type d -name "*-arm64" -maxdepth 1 -exec cp -a "{}" "buil
 echo "Copied arm64 build to build/"
 sleep 1
 
+echo "check package"
+ls build/
+echo '---------------------------'
+ls build/electron/
+
 echo "\nBuilding universal app..."
+find "build/electron" -type d -name "*-x64" -maxdepth 1 -exec rm -r "{}" \;
 find "build/electron" -type d -name "*-arm64" -maxdepth 1 -exec rm -r "{}" \;
 find "build" -type d -name "*-x64" -maxdepth 1 -exec cp -a "{}" "build/electron/" \;
 find "build" -type d -name "*-arm64" -maxdepth 1 -exec cp -a "{}" "build/electron/" \;
