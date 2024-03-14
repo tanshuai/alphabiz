@@ -11,7 +11,6 @@ const buildArch = process.env.BUILD_ARCH || process.arch
 
 const app = require('./developer/app')
 const appName = app.name
-const displayName = app.displayName
 
 const { getPackageDetailsFromPatchFilename } = require('patch-package/dist/PackageDetails')
 const { resolve } = require('path')
@@ -41,21 +40,21 @@ const pruneNative = dir => {
     const p = resolve(dir, file)
     if (fs.statSync(p).isDirectory()) return pruneNative(p)
     if (
-      !p.endsWith('.node')
+      p.endsWith('.node')
       // || (
       //   unsupportedModules.some(m => p.includes(`node_modules/${m}`)) &&
       //   !p.includes('arm') && !p.includes('x64')
       // )
     ) {
       fs.rmSync(p)
-      // console.log('[Prune] remove', p)
+      console.log('[Prune] remove', p)
     }
   })
 }
 
 const beforeBuild = async () => {
   const { platform, arch } = process
-  const destDir = path.resolve(__dirname, `build/electron/${displayName}-${platform}-${buildArch}`)
+  const destDir = path.resolve(__dirname, `build/electron/${app.displayName}-${platform}-${buildArch}`)
   console.log('Before build', destDir)
   if (fs.existsSync(destDir)) {
     fs.rmSync(destDir, { recursive: true })
