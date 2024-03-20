@@ -40,7 +40,8 @@ const pruneNative = dir => {
     const p = resolve(dir, file)
     if (fs.statSync(p).isDirectory()) return pruneNative(p)
     if (
-      p.endsWith('.node')
+      /(\.node|\.mk|\.a|\.o|\.h)$/gm.test(p)
+      // p.endsWith('.node')
       // || (
       //   unsupportedModules.some(m => p.includes(`node_modules/${m}`)) &&
       //   !p.includes('arm') && !p.includes('x64')
