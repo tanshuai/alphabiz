@@ -10,7 +10,7 @@
     "postinstall": "patch-package --error-on-fail && node ./node_modules/symlink-dir/dist/cli.js node_modules/@zeeis/velectron node_modules/electron && ./node_modules/.bin/electron-rebuild -v 17.0.0",
     "packager": "node packager.js",
     "postpackager": "node post-build",
-    "unpackaged": "cd build/electron/UnPackaged && yarn install && ../../../node_modules/.bin/electron-rebuild",
+    "unpackaged": "cd build/electron/UnPackaged && yarn install && ../../../node_modules/.bin/electron-rebuild -v 17.0.0",
     "pretest:e2e:electron:main": "node update-version.js && node copy-patch.js --pre",
     "posttest:e2e:electron:main": "node copy-patch.js --post",
     "pretest:e2e:electron:wallet": "node update-version.js && node copy-patch.js --pre",
