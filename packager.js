@@ -40,8 +40,8 @@ const pruneNative = dir => {
     const p = resolve(dir, file)
     if (fs.statSync(p).isDirectory()) return pruneNative(p)
     if (
-      /(\.node|\.mk|\.a|\.o|\.h)$/gm.test(p)
-      // p.endsWith('.node')
+      // /(\.node|\.mk|\.a|\.o|\.h)$/gm.test(p)
+      !p.endsWith('.node')
       // || (
       //   unsupportedModules.some(m => p.includes(`node_modules/${m}`)) &&
       //   !p.includes('arm') && !p.includes('x64')
@@ -184,7 +184,7 @@ packager({
   afterCopy: [(buildPath, electronVersion, platform, arch, callback) => {
     console.log('Copy patches to', buildPath)
     fs.cpSync(resolve(__dirname, 'patches'), resolve(buildPath, 'patches'), { recursive: true })
-    if (platform !== 'win32') {fs.rmSync(resolve(buildPath, 'patches/electron-wix-msi+4.0.0.dev.patch'))}
+    fs.rmSync(resolve(buildPath, 'patches/electron-wix-msi+4.0.0.dev.patch'))
     const result = execSync('npx patch-package', { cwd: buildPath })
     console.log(`Patch package result: ${result.toString()}`)
     // const yarnResult = execSync('yarn install --production', { cwd: buildPath })
@@ -193,12 +193,12 @@ packager({
       unsupportedModules.forEach(mod => {
         const prebuildDir = resolve(buildPath, 'node_modules', mod, 'prebuilds')
         if (fs.existsSync(prebuildDir)) {
-          console.log('[Darwin] Remove prebuilds directory for', mod)
+          console.log('[Darwin] Remove prebuilds directory for', mod, prebuildDir)
           fs.rmSync(prebuildDir, { recursive: true })
         }
         const buildDir = resolve(buildPath, 'node_modules', mod, 'build')
         if (fs.existsSync(buildDir)) {
-          console.log('[Darwin] Remove build directory for', mod)
+          console.log('[Darwin] Remove build directory for', mod, buildDir)
           fs.rmSync(buildDir, { recursive: true })
         }
       })
