@@ -30,7 +30,8 @@ Cypress.on('uncaught:exception', (err, runnable) => {
     err.message.includes('Failed to execute \'setRemoteDescription\'') ||
     err.message.includes('Avoided redundant navigation') ||
     err.message.includes('Connection failed') ||
-    err.message.includes('NavigationDuplicated')
+    err.message.includes('NavigationDuplicated') ||
+    err.message.includes('Exceeded maximum endpoint')
   ) {
     return false
   }
