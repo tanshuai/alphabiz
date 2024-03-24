@@ -190,8 +190,14 @@ packager({
     // const yarnResult = execSync('yarn install --production', { cwd: buildPath })
     // console.log(`Yarn result: ${yarnResult.toString()}`)
     if (platform === 'darwin') {
-      // if (process.env.BUILD_ARCH) unsupportedModules.push('bufferutil')
-      unsupportedModules.forEach(mod => {
+      if (process.env.BUILD_ARCH) {
+        const modules = [
+          'bufferutil',
+          'utf-8-validate'
+        ]
+        unsupportedModules.push(...modules)
+      }
+        unsupportedModules.forEach(mod => {
         const prebuildDir = resolve(buildPath, 'node_modules', mod, 'prebuilds')
         if (fs.existsSync(prebuildDir)) {
           console.log('[Darwin] Remove prebuilds directory for', mod, prebuildDir)
