@@ -47,9 +47,9 @@ sleep 1
 echo "\nBuiding arm64 target.."
 echo "\x1b[32m  Runing \x1b[36m arch -arm64 -e BUILD_ARCH=arm64 yarn packager \x1b[32m This may take minutes\x1b[0m"
 if $IS_DEV; then
-  BUILD_ARCH=arm64 yarn packager;
+  arch -arm64 -e BUILD_ARCH=arm64 yarn packager --arch=arm64;
 else
-  BUILD_ARCH=arm64 yarn packager 1>>./mac-build.log 2>>./mac-build.log;
+  arch -arm64 -e BUILD_ARCH=arm64 yarn packager --arch=arm64 1>>./mac-build.log 2>>./mac-build.log;
 fi
 # The `cp` command will throw errors here like
 # cp: build/electron/*-x64: No such file or directory
