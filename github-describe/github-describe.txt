@@ -1,8 +1,1 @@
-fix error when `--dev` is not set in build-mac.sh
-add attr: location
-#886
-#886
-Update index.js
-#897
-#886 add log
-#893 add some log
+ignore maximum endpoint uncaught error
