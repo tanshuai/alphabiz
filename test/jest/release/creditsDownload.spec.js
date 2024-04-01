@@ -95,8 +95,8 @@ describe('download', () => {
         // 等待种子开始下载
         await homePage.downloadTorrentBtn.waitUntil(async () => {
           if (await homePage.getTask(torrentName) === null) return true
-          const statusText = await homePage.getTaskStatus(torrentName, { isLog: false })
-          return !statusText.include('Loading')
+          const statusText = await homePage.getTaskStatus(torrentName, { isLog: true })
+          return statusText.include('Downloading')
         }, {
           timeout: 60000 * 15,
           timeoutMsg: 'task not start'
