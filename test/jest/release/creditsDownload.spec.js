@@ -94,8 +94,9 @@ describe('download', () => {
         taskTitle.click()
         // 等待种子开始下载
         await homePage.downloadTorrentBtn.waitUntil(async () => {
+          await sleep(5000)
           if (await homePage.getTask(torrentName) === null) return true
-          const statusText = await homePage.getTaskStatus(torrentName, { isLog: true })
+          const statusText = await homePage.getTaskStatus(torrentName)
           return statusText.include('Downloading')
         }, {
           timeout: 60000 * 15,
@@ -126,9 +127,10 @@ describe('download', () => {
         taskTitle.click()
         // 等待种子开始下载
         await homePage.downloadTorrentBtn.waitUntil(async () => {
+          await sleep(5000)
           if (await homePage.getTask(torrentName) === null) return true
-          const statusText = await homePage.getTaskStatus(torrentName, { isLog: false })
-          return !statusText.includes('Loading')
+          const statusText = await homePage.getTaskStatus(torrentName)
+          return statusText.includes('Downloading')
         }, {
           timeout: 60000 * 10,
           timeoutMsg: 'task not start'
