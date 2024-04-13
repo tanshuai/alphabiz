@@ -12,8 +12,9 @@ const readline = require('readline')
 const { spawn } = require('child_process')
 const uuid = require('uuid')
 const Wix = require('electron-wix-msi/lib/creator')
+const __rootdir = resolve(__dirname, '../../..')
 
-const appDirectoryRootPath = require('../test.config.js').appDirectoryRootPath
+const appDirectoryRootPath = require('../../../test.config.js').appDirectoryRootPath
 
 const isTesting = !!process.env.WIX_TEST
 // Write logs in one line, disabled when testing
@@ -39,28 +40,23 @@ const logError = (...strs) => {
     })
   })
 }
-const curseUp = () => {
-  return new Promise(resolve => {
-    readline.moveCursor(process.stdout, 0, -1, () => resolve())
-  })
-}
 const exitWith = code => {
   // console.log('\n[Msi] Process with code', code)
   process.exit(code)
 }
 
-const appConfig = require('../developer/app');
+const appConfig = require('../../../developer/app');
 const productName = appConfig.displayName;
 const displayName = appConfig.displayName;
 const developerName = appConfig.developer;
 const upgradeCode = appConfig.upgradeCode;
 
-const { version, description } = require('../package.json')
+const { version, description } = require('../../../package.json')
 
 const WiSubStg = resolve(__dirname, 'WiSubStg.vbs')
 const WiLangId = resolve(__dirname, 'WiLangId.vbs')
-const appDirectory = resolve(__dirname, `../${appDirectoryRootPath}/electron/${productName}-win32-x64`)
-const outputDirectory = resolve(__dirname, '../out/make/wix/', process.arch)
+const appDirectory = resolve(__rootdir, `${appDirectoryRootPath}/electron/${productName}-win32-x64`)
+const outputDirectory = resolve(__rootdir, 'out/make/wix/', process.arch)
 
 const ensureDirectory = async () => {
   if (!existsSync(appDirectory)) {
@@ -78,7 +74,7 @@ const ensureDirectory = async () => {
   mkdirSync(outputDirectory, { recursive: true })
 }
 
-const icoPath = resolve(__dirname, '../developer/platform-assets/windows/icon.ico')
+const icoPath = resolve(__rootdir, 'developer/platform-assets/windows/icon.ico')
 const iconTemplate = `<Icon Id="icon.ico" SourceFile="${icoPath}"/>
     <Property Id="ARPPRODUCTICON" Value="icon.ico" />`
 const wixTemplate = readFileSync(resolve(__dirname, 'template.xml'))
@@ -124,9 +120,6 @@ const makeCulture = async (culture, asBase = false) => {
     ? allCulturesStr
     : culture.lang.toLowerCase()
   const localizationFile = resolve(__dirname, `localizations/${culture.lang}.wxl`)
-  const localizationFiles = cultures.map(({ lang }) => {
-    return resolve(__dirname, `localizations/${lang}.wxl`)
-  })
   // if (!existsSync(localizationFile)) {
   //   console.warn('Not exist', localizationFile)
   // }
@@ -153,12 +146,12 @@ const makeCulture = async (culture, asBase = false) => {
     ui: {
       chooseDirectory: true,
       images: {
-        background: resolve(__dirname, '../developer/platform-assets/windows/splash/background_493x312.png'),
-        banner: resolve(__dirname, '../developer/platform-assets/windows/splash/banner_493x58.png'),
-        exclamationIcon: resolve(__dirname, '../developer/icons/favicon-32x32.png'),
-        infoIcon: resolve(__dirname, '../developer/icons/favicon-32x32.png'),
-        newIcon: resolve(__dirname, '../developer/icons/favicon-16x16.png'),
-        upIcon: resolve(__dirname, '../developer/icons/favicon-16x16.png')
+        background: resolve(__rootdir, 'developer/platform-assets/windows/splash/background_493x312.png'),
+        banner: resolve(__rootdir, 'developer/platform-assets/windows/splash/banner_493x58.png'),
+        exclamationIcon: resolve(__rootdir, 'developer/icons/favicon-32x32.png'),
+        infoIcon: resolve(__rootdir, 'developer/icons/favicon-32x32.png'),
+        newIcon: resolve(__rootdir, 'developer/icons/favicon-16x16.png'),
+        upIcon: resolve(__rootdir, 'developer/icons/favicon-16x16.png')
       },
       localizations: [localizationFile]
     }
