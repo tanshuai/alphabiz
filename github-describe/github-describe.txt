@@ -1,9 +1,11 @@
-fix jest download test error
-add condition when jest test error
-fix drop file error #866
-fix jest test
-process exit when jest test fail
-add microsoft store recommend list
-add CustomSMSSender trigger #899
-fix uppercase extension errors
-init build-scripts #900
+Upgrade app version
+store version uniform recommended list
+fix appx package version
+move forge.config.js to build-scripts/common/ #900
+remove unused pack-app.js
+move appx files to build-scripts/windows/appx #900
+move electron-packager configs to build-scripts/common/electron-packager.js #900
+move snapcraft build scripts to build-scripts/linux/snapcraft #900
+fix root directory error
+move wix scripts to build-scripts/windows/wix #900
+update mac build scripts and add environment variables scripts #834 #900
