@@ -2,10 +2,11 @@ const { spawn } = require('child_process')
 const { existsSync, mkdirSync, copyFileSync, writeFileSync, readFileSync, rmSync, cpSync, renameSync } = require('fs')
 const path = require('path')
 const { resolve } = require('path')
-const appConfig = require('../developer/app')
-const publicVersion = require('../public/version.json').version
+const appConfig = require('../../../developer/app')
+const publicVersion = require('../../../public/version.json').version
 // console.log(publicVersion)
-const appDirectoryRootPath = require('../test.config.js').appDirectoryRootPath
+const appDirectoryRootPath = require('../../../test.config.js').appDirectoryRootPath
+const __rootdir = resolve(__dirname, '../../..')
 
 const checkCommand = (cmd, options = {}) => {
   return new Promise((resolve) => {
@@ -30,10 +31,10 @@ const checkEnv = async () => {
 }
 
 const prepareSnap = async () => {
-  const snapAppPath = resolve(__dirname, '../out/make/snapcraft', appConfig.name)
+  const snapAppPath = resolve(__rootdir, 'out/make/snapcraft', appConfig.name)
   if (existsSync(snapAppPath)) rmSync(snapAppPath, { recursive: true })
   mkdirSync(snapAppPath, { recursive: true })
-  const buildDist = resolve(__dirname, `../${appDirectoryRootPath}/electron/${appConfig.displayName}-linux-x64`)
+  const buildDist = resolve(__rootdir, `${appDirectoryRootPath}/electron/${appConfig.displayName}-linux-x64`)
   console.log(buildDist)
 
   cpSync(buildDist, snapAppPath, { recursive: true })
@@ -44,14 +45,14 @@ const prepareSnap = async () => {
     )
   }
 
-  const snapDir = resolve(__dirname, '../snap')
+  const snapDir = resolve(__rootdir, 'snap')
   if (existsSync(snapDir)) rmSync(snapDir, { recursive: true })
   if (!existsSync(snapDir)) mkdirSync(snapDir)
   const guiDir = resolve(snapDir, 'gui')
   if (!existsSync(guiDir)) mkdirSync(guiDir)
 
   copyFileSync(
-    resolve(__dirname, '../developer/icon-1024.png'),
+    resolve(__rootdir, 'developer/icon-1024.png'),
     resolve(guiDir, 'icon.png')
   )
 
@@ -88,8 +89,8 @@ const makeSnap = async () => {
  * the snap file to release directory manually.
  */
 const postMakeSnap = async () => {
-  const basePath = resolve(__dirname, '../out/installers/app.snap')
-  const targetDir = resolve(__dirname, `../out/installers/${publicVersion}`)
+  const basePath = resolve(__rootdir, 'out/installers/app.snap')
+  const targetDir = resolve(__rootdir, `out/installers/${publicVersion}`)
   if (!existsSync(targetDir)) mkdirSync(targetDir, { recursive: true })
   const targetPath = resolve(targetDir, `${appConfig.snapName}-${publicVersion}.snap`)
   renameSync(basePath, targetPath)
