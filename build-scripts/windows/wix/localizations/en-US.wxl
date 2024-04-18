@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  For Culture and Language code, see this url:
+  https://docs.microsoft.com/en-us/openspecs/office_standards/ms-oe376/6c085406-a698-4e12-9d4d-c3b0ee3dbc4a
+-->
+<WixLocalization Culture="en-us" Language="1033" Codepage="UTF-8" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+  <!-- The `Overridable` is not required, except building with multiple .wxl files -->
+  <!-- Add `Language` code here, this will be used for the msiexec -->
+  <String Id="ID" Overridable="yes">1033</String>
+  <String Id="CompletePackage" Overridable="yes">The complete package.</String>
+  <String Id="MainComponents" Overridable="yes">The main components to run the applications.</String>
+  <String Id="DowngradeWarning" Overridable="yes">A later version of this product is already installed. Setup will now exit.</String>
+  <String Id="LaunchAfterInstall" Overridable="yes">Launch app after install</String>
+</WixLocalization>
