@@ -1,11 +1,11 @@
 // UnPackaged files uploaded by private repository, webTorrent module without patch after 'YARN' installation.
-// So you need to run this file, the root directory of modified webtorrent copied to build/electron/UnPackaged/node_modules, 
+// So you need to run this file, the root directory of modified webtorrent copied to dist/electron/UnPackaged/node_modules, 
 // then run the playwright test, effective download function
 const fs = require('fs')
 const path = require('path')
 
-const modulesAppConfigPath = path.resolve(__dirname, 'build/electron/UnPackaged/node_modules/developer')
-const unPackagedAppConfigPath = path.resolve(__dirname, 'build/electron/UnPackaged/developer')
+const modulesAppConfigPath = path.resolve(__dirname, 'dist/electron/UnPackaged/node_modules/developer')
+const unPackagedAppConfigPath = path.resolve(__dirname, 'dist/electron/UnPackaged/developer')
 
 const copyModule = async () => {
   ['webtorrent',
@@ -15,7 +15,7 @@ const copyModule = async () => {
     'torrent-discovery', // this builds with self-dep bittorrent-tracker
     '@videojs'].forEach(dep => {
       const src = path.resolve(__dirname, 'node_modules', dep)
-      const dest = path.resolve(__dirname, 'build/electron/UnPackaged/node_modules', dep)
+      const dest = path.resolve(__dirname, 'dist/electron/UnPackaged/node_modules', dep)
       if (!fs.existsSync(src)) return
       if (fs.existsSync(dest)) fs.rmSync(dest, { recursive: true })
       const copyRecursive = (src, dest) => {
