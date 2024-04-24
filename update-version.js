@@ -4,9 +4,8 @@ const { exec } = require('child_process')
 const fs = require('fs')
 
 const versionJSON = './public/version.json'
-const appDirectoryRootPath = require('./test.config.js').appDirectoryRootPath
 
-const unpackagedVersionJSON = fs.readFileSync(`${appDirectoryRootPath}/electron/UnPackaged/version.json`)
+const unpackagedVersionJSON = fs.readFileSync('dist/electron/UnPackaged/version.json')
 const unpackagedVersionObj = JSON.parse(unpackagedVersionJSON)
 const content = {
   packageVer: '',

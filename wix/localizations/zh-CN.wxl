@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- For more infomation see en-US.wxl -->
-<WixLocalization Culture="zh-cn" Language="2052" Codepage="UTF-8" xmlns="http://schemas.microsoft.com/wix/2006/localization">
-  <String Id="ID" Overridable="yes">2052</String>
-  <String Id="CompletePackage" Overridable="yes">完整安装</String>
-  <String Id="MainComponents" Overridable="yes">运行程序所需的全部组件</String>
-  <String Id="DowngradeWarning" Overridable="yes">一个更新的版本已安装，安装程序将退出</String>
-  <String Id="LaunchAfterInstall" Overridable="yes">安装完成后打开应用</String>
-</WixLocalization>
