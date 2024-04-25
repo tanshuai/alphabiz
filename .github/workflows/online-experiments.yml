@@ -8,7 +8,7 @@ name: online-experiments
 on:
   push:
     paths:
-      - "**/online-experiments.yml"
+      - "!**/online-experiments.yml"
     branches: [main]
 
 jobs:
@@ -153,7 +153,7 @@ jobs:
       - name: Get unpackaged/version.json property
         id: unpackaged
         run: |
-          CONTENT=$(cat ./build/electron/UnPackaged/version.json)
+          CONTENT=$(cat ./dist/electron/UnPackaged/version.json)
           PACKAGE_VERSION=$(echo "$CONTENT" | perl -wnE"say for /(?<=packageVer\"\:\s\").*(?=\")/gm")
           echo "package-version=${PACKAGE_VERSION}"
           echo "package-version=${PACKAGE_VERSION}" >> $GITHUB_OUTPUT
