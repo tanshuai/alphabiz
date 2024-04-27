@@ -15,8 +15,23 @@ const beforeBuild = async () => {
   const destDir = path.resolve(__dirname, `dist/electron/${app.displayName}-${platform}-${buildArch}`)
   console.log('Before build', destDir)
   if (fs.existsSync(destDir)) {
-    fs.rmSync(destDir, { recursive: true })
-    console.log('删除成功！')
+    deleteFolderRecursive(destDir)
+  }
+}
+
+const deleteFolderRecursive = function (directoryPath) {
+  if (fs.existsSync(directoryPath)) {
+    fs.readdirSync(directoryPath).forEach((file, index) => {
+      const curPath = path.join(directoryPath, file)
+      if (fs.lstatSync(curPath).isDirectory()) {
+       // recurse
+        deleteFolderRecursive(curPath)
+      } else {
+        // delete file
+        fs.unlinkSync(curPath)
+      }
+    })
+    fs.rmdirSync(directoryPath)
   }
 }
 
