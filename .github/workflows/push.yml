@@ -318,7 +318,7 @@ jobs:
           && steps.slug.outputs.app-name == 'Alphabiz'
         run: |
           curl -H 'Authorization: token ${{ secrets.PAT }}' \
-          -L https://raw.githubusercontent.com/tanshuai/alphabiz-app/main/test-secret/recommends.txt \
+          -L "https://raw.githubusercontent.com/tanshuai/alpha.biz/main/static/recommends/v0.2.1.txt" \
           > public/recommends.txt
         shell: bash
 
