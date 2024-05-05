@@ -7,13 +7,18 @@ const path = require('path')
 const modulesAppConfigPath = path.resolve(__dirname, 'dist/electron/UnPackaged/node_modules/developer')
 const unPackagedAppConfigPath = path.resolve(__dirname, 'dist/electron/UnPackaged/developer')
 
+const { getPackageDetailsFromPatchFilename } = require('patch-package/dist/PackageDetails')
+const patches = fs.readdirSync(path.resolve(__dirname, 'patches'))
+  .map(getPackageDetailsFromPatchFilename)
+  .filter(i => i && !i.isDevOnly)
+  .map(i => i.name)
+
 const copyModule = async () => {
-  ['webtorrent',
-    'bittorrent-tracker',
-    'gun',
-    'run-parallel-limit',
+  [
+    ...patches,
     'torrent-discovery', // this builds with self-dep bittorrent-tracker
-    '@videojs'].forEach(dep => {
+    '@videojs'
+  ].forEach(dep => {
       const src = path.resolve(__dirname, 'node_modules', dep)
       const dest = path.resolve(__dirname, 'dist/electron/UnPackaged/node_modules', dep)
       if (!fs.existsSync(src)) return
