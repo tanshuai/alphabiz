@@ -1,11 +1,14 @@
-Upgrade app version
-store version uniform recommended list
-fix appx package version
-move forge.config.js to build-scripts/common/ #900
-remove unused pack-app.js
-move appx files to build-scripts/windows/appx #900
-move electron-packager configs to build-scripts/common/electron-packager.js #900
-move snapcraft build scripts to build-scripts/linux/snapcraft #900
-fix root directory error
-move wix scripts to build-scripts/windows/wix #900
-update mac build scripts and add environment variables scripts #834 #900
+move pkg_fmt.js to build-scripts/common/ #900
+fix path error
+push build-scripts to public repo
+modify build-scripts commit message
+move make.js to build-scripts/common/ #900
+delete appDirectoryRootPath #900
+#893
+fix quick-start errors #897
+skip e2e
+dev patch is not copied
+#893
+ignore web e2e test uncaught error
+fix display name errors
+add Info.plist for macOS file associations
