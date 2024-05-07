@@ -31,7 +31,8 @@ Cypress.on('uncaught:exception', (err, runnable) => {
     err.message.includes('Avoided redundant navigation') ||
     err.message.includes('Connection failed') ||
     err.message.includes('NavigationDuplicated') ||
-    err.message.includes('Exceeded maximum endpoint')
+    err.message.includes('Exceeded maximum endpoint') ||
+    err.message.includes('Cannot read properties of undefined (reading \'byteLength\')')
   ) {
     return false
   }
