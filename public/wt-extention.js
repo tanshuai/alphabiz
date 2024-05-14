@@ -18,7 +18,7 @@ const samePeerWires = new Map()
 
 const nonAbDownloaded = new Map()
 const payedNonAb = new Map()
-window.nonAbDownloaded = nonAbDownloaded
+// window.nonAbDownloaded = nonAbDownloaded
 const addNonAbDownloaded = (infoHash, bytes) => {
   if (!nonAbDownloaded.has(infoHash)) nonAbDownloaded.set(infoHash, 0)
   if (!payedNonAb.has(infoHash)) payedNonAb.set(infoHash, 0)
@@ -51,7 +51,7 @@ const delayPaments = []
 const transactionMap = new Map()
 // window.payedMap = payedMap
 
-const storedUser = localStorage.getItem('userInfo')
+const storedUser = typeof localStorage !== 'undefined' ? localStorage.getItem('userInfo') : null
 const userInfo = storedUser ? JSON.parse(storedUser) : {
   user: '',
   sub: ''
@@ -70,7 +70,7 @@ ipcRenderer.on('set-user', (e, user) => {
   console.log('set user', user)
   userInfo.user = user.user
   userInfo.sub = user.sub
-  localStorage.setItem('userInfo', JSON.stringify(userInfo))
+  if (typeof localStorage !== 'undefined') localStorage.setItem('userInfo', JSON.stringify(userInfo))
   client.torrents.forEach(tr => {
     tr.wires.forEach(wire => {
       if (wire._is_alphabiz_peer_ && wire.alphabiz_protocol) {
