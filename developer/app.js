@@ -24,6 +24,11 @@ const app = {
    */
   fileName: APP,
   /**
+   * Application ID for android/ios app. The format should be something like
+   * `org.author.appname`
+   */
+  appId: 'com.zeeis.alphabiz',
+  /**
    * The bin name for snapcraft, which can be used to launch your app
    * via terminal. Default: `alphabiz`
    */
