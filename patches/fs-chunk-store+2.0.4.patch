@@ -51,7 +51,7 @@ index 10d782b..c1fd471 100644
  
    if (opts.files) {
      self.path = opts.path
-+    console.log('new store', opts)
++    // console.log('new store', opts)
      if (!Array.isArray(opts.files)) {
        throw new Error('`files` option must be an array')
      }
