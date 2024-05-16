@@ -22,13 +22,13 @@ sleep 1
 # exit 0
 # DEBUG=* yarn electron-osx-sign --identity="$APPLE_DISTRIBUTION_KEY" $APP_PATH
 
-mkdir -p "$(dirname $RESULT_PATH)"
+mkdir -p "$(dirname "$RESULT_PATH")"
 productbuild --component "$APP_PATH" /Applications --sign "$APPLE_INSTALLER_KEY" "$RESULT_PATH"
 
 if [[ ! -z "$APPLE_ID" ]] && [[ ! -z "$APPLE_ASP" ]]; then
   echo "Validate pkg with your apple id..."
   sleep 1
-  xcrun altool --validate-app -f $RESULT_PATH -t osx -u $APPLE_ID -p $APPLE_ASP
+  xcrun altool --validate-app -f "$RESULT_PATH" -t osx -u $APPLE_ID -p $APPLE_ASP
 else
   echo "You can validate your package via \x1b[32mxcrun altool --validate-app -f \"$RESULT_PATH\" -t osx -u YOUR_APPLE_ID -p YOUR_APP_SPEC_PASS\x1b[0m"
 fi

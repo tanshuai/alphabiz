@@ -9,7 +9,7 @@ const { resolve } = require('path')
 const publicVersion = require('../../public/version.json').version
 
 const envs = [
-  `APP="${appConfig.name}"`,
+  `APP="${appConfig.displayName}"`,
   `BUILD_PLATFORM="mas"`,
   `PLATFORM="mas"`,
   `VERSION="${publicVersion}"`

@@ -14,7 +14,7 @@ const basePath = process.env.PROD
 const versionJSONPath = process.env.PROD ? 'version.json' : 'public/version.json'
 const versionJSON = fs.readFileSync(resolve(basePath, versionJSONPath))
 const versionObj = JSON.parse(versionJSON)
-const buildVersion = versionObj.version
+const buildVersion = process.env.BUILD_VERSION || versionObj.version
 const buildArch = process.env.BUILD_ARCH || process.arch
 const buildPlatform = process.env.BUILD_PLATFORM || process.platform
 
