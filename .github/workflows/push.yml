@@ -346,19 +346,17 @@ jobs:
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: 7z a -t7z -mx=9 "./out/installers/${{ steps.unify.outputs.tag-name }}/${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }}.7z" "./dist/electron/${{ steps.vars.outputs.package }}"
 
-      - name: get md5 file
-        if: |
-          (contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json'))
-          && contains(steps.vars.outputs.system, 'windows')
-        run: certutil -hashfile ./out/installers/${{ steps.unify.outputs.tag-name }}/*.msi MD5 > out/installers/${{ steps.unify.outputs.tag-name }}/msi-md5.txt
+      - name: Generate shasum files
+        run: node build-scripts/common/shasum.js out/installers/${{ steps.unify.outputs.tag-name }}
         shell: bash
+        continue-on-error: true # Missing .sha files is still ok
 
       - name: Release ${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }} to GitHub 📰
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         uses: softprops/action-gh-release@v1
         with:
           prerelease: true
-          name: ${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.release-name }}
+          name: ${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.tag-name }}-${{ steps.slug.outputs.sha7 }}
           tag_name: ${{ steps.unify.outputs.tag-name }}
           body: ${{ env.DESCRIBE }}
           files: |
@@ -489,11 +487,16 @@ jobs:
       - name: Pack snap 📦
         run: yarn make:snap:ci
 
+      - name: Generate shasum files
+        run: node build-scripts/common/shasum.js out/installers/${{ needs.nightly_job.outputs.tag-name }}
+        shell: bash
+        continue-on-error: true # Missing .sha files is still ok
+
       - name: Release ${{ needs.nightly_job.outputs.file-name-lower }}-${{ needs.nightly_job.outputs.package-name }}-${{ steps.vars.outputs.system }} to GitHub 📰
         uses: softprops/action-gh-release@v1
         with:
           prerelease: true
-          name: ${{ needs.nightly_job.outputs.file-name-lower }}-${{ needs.nightly_job.outputs.release-name }}
+          name: ${{ needs.nightly_job.outputs.file-name-lower }}-${{ needs.nightly_job.outputs.tag-name }}-${{ steps.sha.outputs.sha7 }}
           tag_name: ${{needs.nightly_job.outputs.tag-name}}
           body: ${{ env.DESCRIBE }}
           files: |
