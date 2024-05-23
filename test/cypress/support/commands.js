@@ -77,6 +77,17 @@ Cypress.Commands.add('newVisit', (isWebsite = false) => {
     window.localStorage.setItem(`library-pair@${libraryName}-test-cate-v4-2`, '{"epub":"8idxYmEadAwjoU7U1J056cyHzUeoXSslOBCAP73WZyc.mdvNkj-aK7AyEEJFo0vSm752BIgUPZHoDs7IbZuopTs","pub":"fBH0GXG8L38EBkqkBSyXbMFVHkEYUK7s4ynPupdvp8E.XD52mHLI7O-Ad1JzAkDn2brY5-GLfbkSgP-3pB6k4Qs","epriv":"rsdtLTMMiDthgCttGqsKJTYcMRgu6Z8GD8SP4GW3VYk","priv":"m6mRg3N8qLRq_wsr1wiazT6YYVUhqZJGEUKu_drxINQ"}')
   })
   window.localStorage.setItem('set-film-rate', 'G')
+  cy.task('appconfig').then(app => {
+    if (app.displayName === 'Alphabiz') {
+      cy.get('#version').then(($el) => {
+        const text = $el.text()
+        if (text.includes('internal') || text.includes('nightly')) {
+          cy.contains('Internal Release Notice', { timeout: 20000 })
+          cy.get('.q-card button').contains('close').click()
+        }
+      })
+    }
+  })
 })
 
 // cacheSession = true => call session()
