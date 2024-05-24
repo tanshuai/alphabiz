@@ -1,10 +1,10 @@
-name: CT - latest releases
+name: CT latest releases test
 on:
   schedule:
     - cron: "30 11 * * *"
   push:
     paths:
-      - "!**/latest-test.yml"
+      - "!**/test-lastest-release.yml"
     branches: [main]
 
 jobs:
