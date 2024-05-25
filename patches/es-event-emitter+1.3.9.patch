@@ -1,0 +1,68 @@
+diff --git a/node_modules/es-event-emitter/src/event-emitter.js b/node_modules/es-event-emitter/src/event-emitter.js
+index 4f9fbbb..46d9522 100644
+--- a/node_modules/es-event-emitter/src/event-emitter.js
++++ b/node_modules/es-event-emitter/src/event-emitter.js
+@@ -235,7 +235,7 @@ export default class EventEmitter {
+    *
+    * @return {this}
+    */
+-  emit(eventName/* , ...args*/) {
++  emit(eventName, ...args) {
+     /*
+       if (this._has(eventName)) {
+         this._getCallbacks(eventName)
+@@ -249,34 +249,36 @@ export default class EventEmitter {
+     const custom = _callbacks[eventName];
+     // Number of callbacks.
+     let i = custom ? custom.length : 0;
+-    let len = arguments.length;
+-    let args;
++    // let len = arguments.length;
++    // let args;
+     let current;
+ 
+-    if (i > 0 && len > 1) {
+-      args = new Array(len - 1);
++    // if (i > 0 && len > 1) {
++    //   args = new Array(len - 1);
+ 
+-      while (len--) {
+-        if (len === 1) {
+-          // We do not need first argument.
+-          break;
+-        }
+-        args[len] = arguments[len];
+-      }
+-    }
++    //   while (len--) {
++    //     if (len === 1) {
++    //       // We do not need first argument.
++    //       break;
++    //     }
++    //     args[len] = arguments[len];
++    //   }
++    // }
++    // console.log('event', eventName, args)
+ 
+     while (i--) {
+       current = custom[i];
++      current.callback.call(current.context, ...args)
+ 
+-      if (arguments.length > 1) {
+-        current.callback.call(current.context, args);
+-      } else {
+-        current.callback.call(current.context);
+-      }
++      // if (arguments.length > 1) {
++      //   current.callback.call(current.context, args);
++      // } else {
++      //   current.callback.call(current.context);
++      // }
+     }
+ 
+     // Just clean it.
+-    args = null;
++    // args = null;
+ 
+     return this;
+   }
