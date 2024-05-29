@@ -145,7 +145,7 @@ class BasePage {
   async clearLocalstorage () {
     await this.page.evaluate(() => { localStorage.clear() })
     await this.page.waitForTimeout(1000)
-    await this.page.newReload()
+    await this.newReload()
   }
 
   async setToken () {
@@ -158,7 +158,7 @@ class BasePage {
       localStorage.setItem('set-film-rate', 'G')
     }, libraryPair)
     await this.page.waitForTimeout(1000)
-    await this.page.newReload()
+    await this.newReload()
   }
 
   async quickSaveLanguage (targetLanguage) {
@@ -209,7 +209,7 @@ class BasePage {
     } else {
       await this.clearLocalstorage()
       await this.page.waitForTimeout(2000)
-      await this.page.newReload()
+      await this.newReload()
       await this.page.waitForLoadState()
       await this.page.waitForTimeout(2000)
     }
