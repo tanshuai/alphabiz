@@ -103,14 +103,6 @@ test('close set default', async () => {
     console.log('no wait for btn[dont show again]')
   }
 })
-test.skip('close Notice', async () => {
-  const version = await basePage.versionBtn.innerText()
-  if (version.includes('nightly')) this.skip()
-  const internalNoticeCss = '.q-card:has-text("Internal Release Notice")'
-  expect(await window.locator(internalNoticeCss)).toHaveCount(1, { timeout: 10000 })
-  await window.locator(`${internalNoticeCss} button:has-text("close")`).click()
-  await window.locator(internalNoticeCss).waitFor('hidden')
-})
 
 test.describe('custom', () => {
   test.beforeEach(async () => {
