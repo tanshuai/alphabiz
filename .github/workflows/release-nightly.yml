@@ -189,7 +189,7 @@ jobs:
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         id: nightly
         run: |
-          echo "commit-sha7=$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /(?<=-)\w{7}(?=\s)|^\w{7}(?=\s)/g')" >> $GITHUB_OUTPUT
+          echo "commit-sha7=$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /(?<=-)\w{7,8}(?=\s)|^\w{7,8}(?=\s)/g')" >> $GITHUB_OUTPUT
           export DESCRIBE=$(cat github-describe/github-describe.txt)
           echo "$DESCRIBE"
           echo "DESCRIBE<<EOF" >> $GITHUB_ENV
@@ -208,12 +208,12 @@ jobs:
           then echo "tag-name=${{ steps.release.outputs.new-tag-name }}" >> $GITHUB_OUTPUT ; \
             echo "isModifyReleaseJson=1" >> $GITHUB_OUTPUT ; \
             if ${{ contains(steps.release.outputs.new-tag-name, 'nightly') }} ; \
-            then echo "release-name=$(echo '${{ steps.release.outputs.new-tag-name }}' | perl -wnE'say for /^\d+\.\d+\.\d+\-?\w*/g' )-${{ steps.nightly.outputs.commit-sha7 }}" >> $GITHUB_OUTPUT ; \
-            else echo "release-name=${{ steps.release.outputs.new-tag-name }}" >> $GITHUB_OUTPUT ; \
+            then echo "release-name=${{ steps.release.outputs.new-tag-name }}-${{ steps.nightly.outputs.commit-sha7 }}" >> $GITHUB_OUTPUT ; \
+            else echo "release-name=${{ steps.release.outputs.new-tag-name }}-${{ steps.nightly.outputs.commit-sha7 }}" >> $GITHUB_OUTPUT ; \
             fi
             echo "package-name=${{ steps.release.outputs.new-tag-name }}" >> $GITHUB_OUTPUT ; \
           else echo "tag-name=${{ steps.unstable.outputs.unstable-version }}-nightly-${{ steps.vars.outputs.date }}" >> $GITHUB_OUTPUT ; \
-            echo "release-name=${{ steps.unstable.outputs.unstable-version }}-nightly-${{ steps.nightly.outputs.commit-sha7 }}" >> $GITHUB_OUTPUT ;  \
+            echo "release-name=${{ steps.unstable.outputs.unstable-version }}-nightly-${{ steps.vars.outputs.date }}-${{ steps.nightly.outputs.commit-sha7 }}" >> $GITHUB_OUTPUT ;  \
             echo "package-name=${{ steps.unstable.outputs.unstable-version }}-nightly-${{ steps.vars.outputs.date }}" >> $GITHUB_OUTPUT ; \
             echo "isModifyReleaseJson=0" >> $GITHUB_OUTPUT ; \
           fi
@@ -356,7 +356,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           prerelease: true
-          name: ${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.tag-name }}-${{ steps.sha.outputs.sha7 }}
+          name: ${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.release-name }}
           tag_name: ${{ steps.unify.outputs.tag-name }}
           body: ${{ env.DESCRIBE }}
           files: |
@@ -496,7 +496,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           prerelease: true
-          name: ${{ needs.nightly_job.outputs.file-name-lower }}-${{ needs.nightly_job.outputs.tag-name }}-${{ steps.sha.outputs.sha7 }}
+          name: ${{ needs.nightly_job.outputs.file-name-lower }}-${{ needs.nightly_job.outputs.release-name }}
           tag_name: ${{needs.nightly_job.outputs.tag-name}}
           body: ${{ env.DESCRIBE }}
           files: |
