@@ -579,6 +579,7 @@ test.describe('task', () => {
     // downloaded状态栏
     await stopIcon.click()
     await stopIcon.waitFor('hidden')
+    await window.waitForTimeout(3000)
     await basePage.jumpPage('downloadedStatus')
     await window.waitForTimeout(1000)
     const headerTitle = await basePage.headerTitle.innerText()
