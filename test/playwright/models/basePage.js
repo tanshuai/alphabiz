@@ -236,7 +236,7 @@ class BasePage {
         }
       } catch {
         await this.page.evaluate(() => localStorage.clear())
-        await this.page.reload()
+        await this.newReload()
         await this.signIn(username, password, isWaitAlert, isSetToken)
       }
     }
