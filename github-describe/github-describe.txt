@@ -1,9 +1,14 @@
-fix web whitescreen, close #907
-uniform version specification
+fix playwright e2e test error
+fix reload error
+clear build version env
+use AmplifyCli v10.7.3
+modify github release name
+add store default recommend list
+e2e test - close internal notice
+fix Generate shasum files in public repo
+amplify fallback to v5.6.0
+update amplify: config oauth
+fix versionState
+fix pinpoint
 fix e2e test error
-try quit app on system shutdown
-set BUILD_VERSION to force building specific version
-fix event emitter errors in web mode
-add condition to display Internal Release Notice #908
-collate workflow file name
-[mobile] Add support for safe areas for full-screen app
+fix build errors with customizations in ios target
