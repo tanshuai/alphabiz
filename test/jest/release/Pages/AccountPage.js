@@ -15,6 +15,20 @@ class AccountPage extends HomePage {
   get accountMoreBtn () { return this.page.$('//Custom[starts-with(@Name,"Lv.")]/following-sibling::Button[1]')}
   get signOutBtn () { return this.page.$('//*[@Name="Sign out"]') }
   get signOutAnywayBtn () { return this.page.$('//Button[@Name="Sign out anyway"]') }
+  get internalNoticeText () { return this.page.$('//*[@name="Internal Release Notice"]')}
+  get closeInternalNoticeBtn () { return this.page.$('//*[@name="Internal Release Notice"]/following-sibling::Button[2]') }
+
+  async closeInternalNotice () {
+    const windowTitle = await this.page.getTitle()
+    console.log('windowTitle', windowTitle)
+    if (windowTitle === 'Alphabiz') {
+      const version = await this.getAppVersion()
+      if (version.includes('internal') || version.includes('nightly')) {
+        await this.internalNoticeText.click()
+        await this.closeInternalNoticeBtn.click()
+      }
+    }
+  }
 
   async signIn (username, password, opt = { isWaitAlert: false }) {
     await this.username.setValue(username)
