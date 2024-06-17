@@ -407,7 +407,8 @@ jobs:
 
       - name: Run appium
         run: |
-          Start-Process PowerShell -ArgumentList "$env:JEST_TEST = 'true' && yarn test:appium"
+          $env:JEST_TEST = 'true'
+          Start-Process PowerShell -ArgumentList "yarn test:appium"
           Start-Sleep -s 10
 
       - name: E2E appium creditDownload test for 7z 🧪
