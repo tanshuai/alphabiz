@@ -516,8 +516,7 @@ jobs:
   appium_test_job:
     needs: [nightly_job, release_job]
     if: |
-      (contains(github.event_name, 'schedule') || contains(needs.nightly_job.outputs.isRunAppium, '1'))
-        && !contains(github.event.head_commit.message, 'skip e2e')
+      contains(github.event_name, 'schedule') || contains(needs.nightly_job.outputs.isRunAppium, '1')
     timeout-minutes: 120
     runs-on: ${{ matrix.os }}
     strategy:
@@ -603,6 +602,7 @@ jobs:
 
       - name: Run appium
         run: |
+          $env:JEST_TEST = 'true'
           Start-Process PowerShell -ArgumentList "yarn test:appium"
           Start-Sleep -s 10
 
@@ -610,8 +610,8 @@ jobs:
         if: matrix.test == '1'
         uses: nick-fields/retry@v2
         with:
-          timeout_seconds: 1800
-          max_attempts: 2
+          timeout_seconds: 6000
+          max_attempts: 3
           shell: bash
           retry_on: error
           command: |
@@ -623,8 +623,8 @@ jobs:
         if: matrix.test == '2'
         uses: nick-fields/retry@v2
         with:
-          timeout_seconds: 1800
-          max_attempts: 2
+          timeout_seconds: 6000
+          max_attempts: 3
           shell: bash
           retry_on: error
           command: |

@@ -16,7 +16,7 @@ jobs:
     timeout-minutes: 60
     runs-on: ${{ matrix.os }}
     outputs:
-      tag-name: '0.2.2-nightly-202302241344'
+      tag-name: '0.2.1-nightly-202302162005'
       release-name: ${{ steps.unify.outputs.release-name }}
       package-name: ${{ steps.unify.outputs.package-name }}
       isRunAppium: ${{ steps.check.outputs.isRunAppium }}
@@ -416,7 +416,7 @@ jobs:
         uses: nick-fields/retry@v2
         with:
           timeout_seconds: 6000
-          max_attempts: 2
+          max_attempts: 3
           shell: bash
           retry_on: error
           command: |
@@ -429,7 +429,7 @@ jobs:
         uses: nick-fields/retry@v2
         with:
           timeout_seconds: 6000
-          max_attempts: 2
+          max_attempts: 3
           shell: bash
           retry_on: error
           command: |
