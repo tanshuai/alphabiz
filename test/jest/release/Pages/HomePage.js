@@ -1,10 +1,12 @@
 const { sleep } = require('../../../utils/getCode')
 const fs = require('fs')
+const appconfig = require('../../../../developer/app')
+
 class HomePage {
   constructor (page) {
     this.page = page
   }
-
+  get appConfig () { return appconfig }
   // 标题栏
   get AppTitle () { return this.page.$('/Pane/Document/Group[1]/Text[1]') }
   get AppVersion () { return this.page.$('//*[@AutomationId="version"]/Text') }
@@ -25,12 +27,12 @@ class HomePage {
   get downloadedStatusTab () { return this.page.$('//*[@AutomationId="downloaded"]') }
   // 下载bt功能
   get downloadTorrentBtn () { return this.page.$('[name="DOWNLOAD"]') }
-  get downloadMagnetEdit () { return this.page.$('/Pane[@Name="Alphabiz"]//Edit[@Name="Download directory position"]/preceding::*[1]') }
-  get downloadDirectoryEdit () { return this.page.$('/Pane[@Name="Alphabiz"]//Edit[@Name="Download directory position"]') }
+  get downloadMagnetEdit () { return this.page.$(`/Pane[@Name="${appconfig.displayName}"]//Edit[@Name="Download directory position"]/preceding::*[1]`) }
+  get downloadDirectoryEdit () { return this.page.$(`/Pane[@Name="${appconfig.displayName}"]//Edit[@Name="Download directory position"]`) }
   // get confirmDownloadBtn () { return this.page.$('//Button[@Name="CANCEL"]/following-sibling::Button[@Name="DOWNLOAD"]') }
-  get confirmDownloadBtn () { return this.page.$('/Pane[@Name="Alphabiz"]//Button[@Name="CANCEL"]/following-sibling::Button[@Name="DOWNLOAD"]') }
+  get confirmDownloadBtn () { return this.page.$(`/Pane[@Name="${appconfig.displayName}"]//Button[@Name="CANCEL"]/following-sibling::Button[@Name="DOWNLOAD"]`) }
   // get cancelDownloadBtn () { return this.page.$('//Button[@Name="CANCEL"]') }
-  get cancelDownloadBtn () { return this.page.$('/Pane[@Name="Alphabiz"]//Button[@Name="CANCEL"]') }
+  get cancelDownloadBtn () { return this.page.$(`/Pane[@Name="${appconfig.displayName}"]//Button[@Name="CANCEL"]`) }
 
   // 任务卡片信息
 

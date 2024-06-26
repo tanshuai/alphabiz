@@ -118,7 +118,7 @@ describe('download', () => {
         console.log('任务未下载')
         // 下载bt种子
         await homePage.jumpPage('downloadingStatusTab')
-        await homePage.downloadTorrent('alphabiz://GoneNutty.avi/AaJKFjiFIyvGNE0Fur1wE36EC+Dl&_Td6WFoAAAFpIt42AgAhARwAAAAQz1jM4AC3AEZdABhqCGEMasx_OPsfBFf13OOYW5xF7e0HINkIZP9Ep1rbI74+n0R63w2OQgpQX9OpSJvNChXnpMoaSfWgK44ljmeAgDPktAAAAACE1btxAAFeuAEAAADqmdptPjANiwIAAAAAAVla', DownloadFilePath)
+        await homePage.downloadTorrent(`${homePage.appConfig.protocol}://GoneNutty.avi/AaJKFjiFIyvGNE0Fur1wE36EC+Dl&_Td6WFoAAAFpIt42AgAhARwAAAAQz1jM4AC3AEZdABhqCGEMasx_OPsfBFf13OOYW5xF7e0HINkIZP9Ep1rbI74+n0R63w2OQgpQX9OpSJvNChXnpMoaSfWgK44ljmeAgDPktAAAAACE1btxAAFeuAEAAADqmdptPjANiwIAAAAAAVla`, DownloadFilePath)
         // await homePage.downloadTorrent('alphabiz://ChinaCup.1080p.H264.AAC.mp4/AZLwy9+LB7G1y0HGGJis+f4UZlze&MDAyNzAwMjgwMDI5MDAyYTAwMmIwMDJjMDAyZCZ0cj0=', DownloadFilePath)
         await homePage.waitSeedFound(torrentName, 60000 * 20)
         // 查看种子任务卡片状态

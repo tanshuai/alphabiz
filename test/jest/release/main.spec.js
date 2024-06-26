@@ -43,7 +43,7 @@ describe('main', () => {
   it('title', async () => {
     const windowTitle = await client.getTitle()
     console.log(windowTitle)
-    expect(windowTitle).toBe('Alphabiz')
+    expect(windowTitle).toBe(homePage.appConfig.displayName)
     // const appTitle = await homePage.getAppTitle()
     // expect(appTitle).toBe('Alphabiz')
     console.log('outputPath:' + outputPath)
