@@ -16,7 +16,7 @@ jobs:
     timeout-minutes: 60
     runs-on: ${{ matrix.os }}
     outputs:
-      tag-name: '0.2.2-nightly-202302212022'
+      tag-name: '0.2.2-nightly-202302271843'
       release-name: ${{ steps.unify.outputs.release-name }}
       package-name: ${{ steps.unify.outputs.package-name }}
       isRunAppium: ${{ steps.check.outputs.isRunAppium }}
