@@ -90,10 +90,6 @@ const app = {
    */
   twitterAccount: '@alphabiz_app',
   /**
-   * Whether to display internal version notice when starting the app
-   */
-  isShowInternalNotice: true,
-  /**
    * Configure who can register accounts in your app
    */
   register: {
