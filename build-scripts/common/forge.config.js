@@ -204,7 +204,7 @@ module.exports = {
       config: {
         publisher,
         publisherName: publisher,
-        publisherDisplayName: appConfig.developer,
+        publisherDisplayName: appConfig.publisherDisplayName,
         assets: resolve(__rootdir, 'developer/platform-assets/windows/icon'),
         devCert: appxPfx,
         deploy: false,

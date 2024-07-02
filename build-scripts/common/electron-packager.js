@@ -86,7 +86,8 @@ const options = {
      * In some cases the process name may be changed to `Electron` in windows.
      * This tells windows to show process name as `displayName` correctly.
      */
-    FileDescription: app.displayName
+    FileDescription: app.displayName,
+    CompanyName: app.developer
   },
 
   /**
