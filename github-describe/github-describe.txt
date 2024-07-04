@@ -1,6 +1,5 @@
-fix app config in jest test
-add a third-party SMS method #899
-clear useless config
-fix i18n in src-common
-feat: set env REDIRECT_LOG to save electron logs to local
-remove exit logs and add init locale check
+remove  Shortcut Folder #909
+distinguish between developer and publisher #909
+remove useless module
+fix #916
+upgrade android min build abi to 31
