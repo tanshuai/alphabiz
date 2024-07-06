@@ -1,4 +1,5 @@
 const path = require('path')
+const { resolve } = path
 const { networkInterfaces } = require('os')
 
 /**
@@ -352,7 +353,38 @@ const removeTracker = (tr, url, onRemoved) => {
   }
 }
 
+function useRedirectLogs (path) {
+  const { appendFile } = require('fs')
+  const { format } = require('util')
+  const toLog = (...args) => {
+    return `[${new Date().toLocaleString()}] ${format(...args)}\n`
+  }
+  const logPath = resolve(path, 'webtorrent.log.log')
+  const warnPath = resolve(path, 'webtorrent.warn.log')
+  const errorPath = resolve(path, 'webtorrent.error.log')
+
+  const console = (function (c) {
+    return {
+      ...c,
+      log (...args) {
+        appendFile(logPath, toLog(...args), () => {})
+        c.log.apply(c, args)
+      },
+      warn (...args) {
+        appendFile(warnPath, toLog(...args), () => {})
+        c.warn.apply(c, args)
+      },
+      error (...args) {
+        appendFile(errorPath, toLog(...args), () => {})
+        c.error.apply(c, args)
+      }
+    }
+  })(window.console)
+  window.console = console
+}
+
 export default {
+  useRedirectLogs,
   torrentToJson,
   getLocalIPList,
   getPieceMap,
