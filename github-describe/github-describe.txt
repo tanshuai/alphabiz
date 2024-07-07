@@ -1,5 +1,3 @@
-remove  Shortcut Folder #909
-distinguish between developer and publisher #909
-remove useless module
-fix #916
-upgrade android min build abi to 31
+run jest test skip checking Launch Logs
+Update README.md
+allow redirecting app logs to specific directory #918
