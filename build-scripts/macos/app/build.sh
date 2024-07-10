@@ -6,7 +6,7 @@
 
 echo "Preparing build for macos .app target..."
 echo "App: $APP"
-echo "Version: $BUILD_VERSION"
+echo "Version: $VERSION"
 if [ -z "$BUILD_PLATFORM" ]; then
   printf "If you want to build the mas(Mac App Store) package, you need to add BUILD_PLATFORM=mas before you build apps."
   BUILD_PLATFORM="darwin"
@@ -32,9 +32,9 @@ sleep 1
 echo "Building x64 target..."
 printf "\x1b[32m  Runing \x1b[36m arch -x86_64 -e BUILD_ARCH=x64 yarn build \x1b[32m This may take minutes\x1b[0m\n"
 if $IS_DEV; then
-  arch -x86_64 -e BUILD_ARCH=x64 -e BUILD_PLATFORM="$BUILD_PLATFORM" -e BUILD_VERSION="$BUILD_VERSION" yarn build;
+  arch -x86_64 -e BUILD_ARCH=x64 -e BUILD_PLATFORM="$BUILD_PLATFORM" -e BUILD_VERSION="$VERSION" yarn build;
 else
-  arch -x86_64 -e BUILD_ARCH=x64 -e BUILD_PLATFORM="$BUILD_PLATFORM" -e BUILD_VERSION="$BUILD_VERSION" yarn build 1>>./build.log 2>>./build.log;
+  arch -x86_64 -e BUILD_ARCH=x64 -e BUILD_PLATFORM="$BUILD_PLATFORM" -e BUILD_VERSION="$VERSION" yarn build 1>>./build.log 2>>./build.log;
 fi
 # cp -R "dist/electron/*-x64" "dist/"
 echo "Successfully building x64 target"
@@ -45,9 +45,9 @@ sleep 1
 echo "Buiding arm64 target.."
 printf "\x1b[32m  Runing \x1b[36m arch -arm64 -e BUILD_ARCH=arm64 yarn build \x1b[32m This may take minutes\x1b[0m\n"
 if $IS_DEV; then
-  arch -arm64 -e BUILD_ARCH=arm64 -e BUILD_PLATFORM="$BUILD_PLATFORM" -e BUILD_VERSION="$BUILD_VERSION" yarn build;
+  arch -arm64 -e BUILD_ARCH=arm64 -e BUILD_PLATFORM="$BUILD_PLATFORM" -e BUILD_VERSION="$VERSION" yarn build;
 else
-  arch -arm64 -e BUILD_ARCH=arm64 -e BUILD_PLATFORM="$BUILD_PLATFORM" -e BUILD_VERSION="$BUILD_VERSION" yarn build 1>>./build.log 2>>./build.log;
+  arch -arm64 -e BUILD_ARCH=arm64 -e BUILD_PLATFORM="$BUILD_PLATFORM" -e BUILD_VERSION="$VERSION" yarn build 1>>./build.log 2>>./build.log;
 fi
 # The `cp` command will throw errors here like
 # cp: dist/electron/*-x64: No such file or directory

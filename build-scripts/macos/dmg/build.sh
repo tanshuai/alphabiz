@@ -21,19 +21,19 @@ echo "Making dmg..."
 sleep 1
 
 ensureExists "dist/electron/$APP-$BUILD_PLATFORM-x64/$APP.app"
-printf "\x1b[32m  Runing \x1b[36m BUILD_ARCH=x64 BUILD_PLATFORM=%1 yarn make \x1b[32m This may take minutes\x1b[0m\n" "$BUILD_PLATFORM"
+printf "\x1b[32m  Runing \x1b[36m BUILD_ARCH=x64 BUILD_PLATFORM=%s yarn make \x1b[32m This may take minutes\x1b[0m\n" "$BUILD_PLATFORM"
 BUILD_ARCH=x64 BUILD_PLATFORM=$BUILD_PLATFORM yarn make
 echo "Successfully make x64 dmg"
 sleep 1
 
 ensureExists "dist/electron/$APP-$BUILD_PLATFORM-arm64/$APP.app"
-printf "\x1b[32m  Runing \x1b[36m BUILD_ARCH=arm64 BUILD_PLATFORM=%1 yarn make \x1b[32m This may take minutes\x1b[0m\n" "$BUILD_PLATFORM"
+printf "\x1b[32m  Runing \x1b[36m BUILD_ARCH=arm64 BUILD_PLATFORM=%s yarn make \x1b[32m This may take minutes\x1b[0m\n" "$BUILD_PLATFORM"
 BUILD_ARCH=arm64 BUILD_PLATFORM=$BUILD_PLATFORM yarn make
 echo "Successfully make arm64 dmg"
 sleep 1
 
 ensureExists "dist/electron/$APP-$BUILD_PLATFORM-universal/$APP.app"
-printf "\x1b[32m  Runing \x1b[36m BUILD_ARCH=universal BUILD_PLATFORM=%1 yarn make \x1b[32m This may take minutes\x1b[0m\n" "$BUILD_PLATFORM"
+printf "\x1b[32m  Runing \x1b[36m BUILD_ARCH=universal BUILD_PLATFORM=%s yarn make \x1b[32m This may take minutes\x1b[0m\n" "$BUILD_PLATFORM"
 BUILD_ARCH=universal BUILD_PLATFORM=$BUILD_PLATFORM yarn make
 echo "Successfully make universal dmg"
 sleep 1
