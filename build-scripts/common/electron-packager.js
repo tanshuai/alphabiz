@@ -17,6 +17,7 @@ const versionObj = JSON.parse(versionJSON)
 const buildVersion = process.env.BUILD_VERSION || versionObj.version
 const buildArch = process.env.BUILD_ARCH || process.arch
 const buildPlatform = process.env.BUILD_PLATFORM || process.platform
+const isMas = buildPlatform === 'mas'
 
 const packagePath = resolve(__rootdir, './package.json')
 const package = fs.readFileSync(packagePath)
@@ -95,7 +96,12 @@ const options = {
    * This file also sets application category to "public.app-category.entertainment".
    * @see https://developer.apple.com/documentation/bundleresources/information_property_list/lsapplicationcategorytype
    */
-  extendInfo: resolve(__rootdir, 'build-scripts/macos/app/Info.plist'),
+  extendInfo: resolve(
+    __rootdir,
+    'build-scripts/macos/app/',
+    // The plist for mas does not include bindings to magnet url and torrent file
+    isMas ? 'Info.mas.plist' : 'Info.plist'
+  ),
   extraResource: [
     resolve(__rootdir, 'developer/icon-1024.png'),
     resolve(__rootdir, 'developer/favicon.ico'),
@@ -230,20 +236,6 @@ const options = {
     /@zeeis\/velectron/,
     /^exe-icon-extractor$/,
     /@types/
-  ],
-  protocols: [
-    {
-      name: 'alphabiz',
-      schemes: ['alphabiz']
-    },
-    {
-      name: 'magnet',
-      schemes: ['magnet']
-    },
-    {
-      name: 'thunder',
-      schemes: ['thunder']
-    }
   ]
 }
 
