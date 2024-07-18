@@ -414,9 +414,9 @@ jobs:
       
       - name: Pack 7z 📦
         run: |
-          7z a -t7z -mx=9 "./out/installers/${{needs.nightly_job.outputs.tag-name}}/${{ needs.nightly_job.outputs.file-name-lower }}-arm64-${{needs.nightly_job.outputs.tag-name}}-macos.7z" "./dist/electron/${{ needs.nightly_job.outputs.display-lower }}-darwin-arm64"
-          7z a -t7z -mx=9 "./out/installers/${{needs.nightly_job.outputs.tag-name}}/${{ needs.nightly_job.outputs.file-name-lower }}-x64-${{needs.nightly_job.outputs.tag-name}}-macos.7z" "./dist/electron/${{ needs.nightly_job.outputs.display-lower }}-darwin-x64"
-          7z a -t7z -mx=9 "./out/installers/${{needs.nightly_job.outputs.tag-name}}/${{ needs.nightly_job.outputs.file-name-lower }}-universal-${{needs.nightly_job.outputs.tag-name}}-macos.7z" "./dist/electron/${{ needs.nightly_job.outputs.display-lower }}-darwin-universal"
+          7z a -t7z -mx=9 "./out/installers/${{needs.nightly_job.outputs.tag-name}}/${{ needs.nightly_job.outputs.file-name-lower }}-arm64-${{needs.nightly_job.outputs.tag-name}}-macos.7z" "./dist/electron/${{ needs.nightly_job.outputs.display-name }}-darwin-arm64"
+          7z a -t7z -mx=9 "./out/installers/${{needs.nightly_job.outputs.tag-name}}/${{ needs.nightly_job.outputs.file-name-lower }}-x64-${{needs.nightly_job.outputs.tag-name}}-macos.7z" "./dist/electron/${{ needs.nightly_job.outputs.display-name }}-darwin-x64"
+          7z a -t7z -mx=9 "./out/installers/${{needs.nightly_job.outputs.tag-name}}/${{ needs.nightly_job.outputs.file-name-lower }}-universal-${{needs.nightly_job.outputs.tag-name}}-macos.7z" "./dist/electron/${{ needs.nightly_job.outputs.display-name }}-darwin-universal"
 
       - name: Release macos dmg to GitHub 📰
         uses: softprops/action-gh-release@v1
