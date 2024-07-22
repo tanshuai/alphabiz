@@ -1,7 +1,6 @@
-add platform argv
-unified version Name
-disable reCaptcha
-try fix dmg build script printf
-fix: #914
-add ec2 script
-upgrade capacitor to v4 and add clipboard plugin for mobile
+remove all magnet and torrent associations for mas build
+automatically run yarn in src-capacitor
+remove outlines for follow button
+use native clipboard access instead of web api
+add ec2 release host method
+remove .cxx folder
