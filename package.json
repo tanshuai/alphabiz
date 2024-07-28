@@ -72,7 +72,7 @@
     "@types/plist": "^3.0.2",
     "@zeeis/velectron": "^17.0.0",
     "appium": "^1.22.2",
-    "aws-sdk": "^2.1037.0",
+    "aws-sdk": "2.1076.0",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^27.4.6",
     "commander": "^10.0.0",
