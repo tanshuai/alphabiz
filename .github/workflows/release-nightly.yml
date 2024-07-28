@@ -33,6 +33,7 @@ jobs:
       release-name: ${{ steps.unify.outputs.release-name }}
       package-name: ${{ steps.unify.outputs.package-name }}
       isRunAppium: ${{ steps.check.outputs.isRunAppium }}
+      isBuildUniversal: ${{ steps.check.outputs.isBuildUniversal }}
       isModifyReleaseJson: ${{ steps.unify.outputs.isModifyReleaseJson }}
       repository: ${{ steps.check.outputs.repository }}
       display-name: ${{ steps.slug.outputs.display-name }}
@@ -224,6 +225,7 @@ jobs:
       - name: Checkout vars-date ${{ steps.vars.outputs.date }} ⬇️
         id: check
         run: |
+          echo "isBuildUniversal=1" >> $GITHUB_OUTPUT
           echo "repo-name: ${{ github.repository }}"
           echo "repository=${{ github.repository }}" >> $GITHUB_OUTPUT
           echo "slug----------------------"
@@ -353,7 +355,9 @@ jobs:
         continue-on-error: true # Missing .sha files is still ok
 
       - name: Release ${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }} to GitHub 📰
-        if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
+        if: |
+          (contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')) &&
+          (matrix.os != 'macos-latest' || contains(steps.check.outputs.isBuildUniversal, '0'))
         uses: softprops/action-gh-release@v1
         with:
           prerelease: true
@@ -369,8 +373,175 @@ jobs:
           && steps.slug.outputs.app-name == 'Alphabiz'
         run: yarn node publicTwitter.js
 
-  release_snapcraft_job:
+  strat_instances_job:
     needs: nightly_job
+    runs-on: ${{ matrix.os }}
+    if: |
+      (contains(github.event_name, 'schedule') || contains(needs.nightly_job.outputs.isModifyReleaseJson, '1')) &&
+      contains(needs.nightly_job.outputs.isBuildUniversal, '1')
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node-version: [16]
+      fail-fast: false
+    environment:
+      name: CICD
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.PAT }}
+      GITHUB_PAT: ${{ secrets.PAT }}
+      AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    steps:
+      - name: Get short SHA 🔑
+        id: sha
+        run: |
+          echo "sha7=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Checkout ${{ steps.sha.outputs.sha7 }} ⬇️
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: main
+      
+      - name: Setup Node.js ${{ matrix.node-version }} 📮
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "yarn"
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@zeeis"
+
+      - name: Install dependencies 👨🏻‍💻
+        uses: nick-fields/retry@v2
+        with:
+          timeout_seconds: 600
+          max_attempts: 2
+          shell: bash
+          retry_on: error
+          command: yarn
+          on_retry_command: rm -rf C:/Users/runneradmin/AppData/Local/node-gyp/
+
+      - name: start EC2 Instances
+        run: yarn node ./test/scripts/EC2.js --allocate
+        shell: bash
+
+  release_dmg_job:
+    needs: [strat_instances_job]
+    if: |
+      (contains(github.event_name, 'schedule') || contains(needs.nightly_job.outputs.isModifyReleaseJson, '1')) &&
+      contains(needs.nightly_job.outputs.isBuildUniversal, '1')
+    timeout-minutes: 120
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node-version: [16]
+        os: [macos-m1-runner]
+    environment:
+      name: CICD
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.PAT }}
+      GITHUB_PAT: ${{ secrets.PAT }}
+    steps:
+      - name: Get short SHA 🔑
+        id: sha
+        run: |
+          echo "sha7=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Checkout ${{ steps.sha.outputs.sha7 }} ⬇️
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Get message
+        id: vars
+        run: |
+          echo "system=macos" >> $GITHUB_OUTPUT
+          echo "date=$(TZ=UTC-8 git log -1 --date=format-local:"%Y%m%d%H%M" --format="%cd")" >> $GITHUB_OUTPUT
+
+      - name: Get release.json property
+        id: release
+        if: contains(needs.nightly_job.outputs.isModifyReleaseJson, '1')
+        run: |
+          CONTENT=$(cat ./release.json)
+          TARGET_TAG_NAME=$(echo "$CONTENT" | perl -wnE"say for /(?<=targetTagName\"\:\s\").*(?=\",)/gm")
+          NEW_TAG_NAME=$(echo "$CONTENT" | perl -wnE"say for /(?<=newTagName\"\:\s\").*(?=\")/gm")
+          echo "target-tag-name=${TARGET_TAG_NAME}"
+          echo "new-tag-name=${NEW_TAG_NAME}"
+          echo "target-tag-name=${TARGET_TAG_NAME}" >> $GITHUB_OUTPUT
+          echo "new-tag-name=${NEW_TAG_NAME}" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Checkout release.json target tag
+        id: checkout
+        if: contains(needs.nightly_job.outputs.isModifyReleaseJson, '1')
+        run: |
+          git checkout ${{ steps.release.outputs.target-tag-name }}
+          git show --name-only
+        shell: bash
+
+      - name: Install dependencies 👨🏻‍💻
+        uses: nick-fields/retry@v2
+        with:
+          timeout_seconds: 600
+          max_attempts: 2
+          shell: bash
+          retry_on: error
+          command: yarn
+          on_retry_command: rm -rf C:/Users/runneradmin/AppData/Local/node-gyp/
+      
+      - name: Prepare packing env
+        run: |
+          if ${{ contains(needs.nightly_job.outputs.isModifyReleaseJson, '1') }} ; \
+          then if ${{ contains(steps.release.outputs.new-tag-name, 'nightly') }} ; \
+            then yarn node update-version.js --newTag ${{needs.nightly_job.outputs.tag-name}} --SHA7 ${{ steps.sha.outputs.sha7 }} --buildTime ${{ steps.vars.outputs.date }} ; \
+            else yarn node update-version.js --newTag ${{needs.nightly_job.outputs.tag-name}} --SHA7 ${{ steps.sha.outputs.sha7 }} --buildTime ${{ steps.vars.outputs.date }} --stable; \
+            fi
+          else yarn node update-version.js --buildTime ${{ steps.vars.outputs.date }} ; \
+          fi
+          node ./build-scripts/macos/get-env.js --darwin
+          cp ./build-scripts/macos/.env ./.env
+        shell: bash
+
+      - name: Pack app 📦
+        run: |
+          ./build-scripts/macos/app/build.sh
+
+      - name: Pack dmg 📦
+        run: |
+          ./build-scripts/macos/dmg/build.sh
+      
+      - name: Pack 7z 📦
+        run: |
+          7z a -t7z -mx=9 "./out/installers/${{needs.nightly_job.outputs.tag-name}}/${{ needs.nightly_job.outputs.file-name-lower }}-arm64-${{needs.nightly_job.outputs.tag-name}}-macos.7z" "./dist/electron/${{ needs.nightly_job.outputs.display-name }}-darwin-arm64"
+          7z a -t7z -mx=9 "./out/installers/${{needs.nightly_job.outputs.tag-name}}/${{ needs.nightly_job.outputs.file-name-lower }}-x64-${{needs.nightly_job.outputs.tag-name}}-macos.7z" "./dist/electron/${{ needs.nightly_job.outputs.display-name }}-darwin-x64"
+          7z a -t7z -mx=9 "./out/installers/${{needs.nightly_job.outputs.tag-name}}/${{ needs.nightly_job.outputs.file-name-lower }}-universal-${{needs.nightly_job.outputs.tag-name}}-macos.7z" "./dist/electron/${{ needs.nightly_job.outputs.display-name }}-darwin-universal"
+
+      - name: Generate shasum files
+        run: node build-scripts/common/shasum.js out/installers/${{needs.nightly_job.outputs.tag-name}}
+        shell: bash
+        continue-on-error: true # Missing .sha files is still ok
+
+      - name: Release macos dmg to GitHub 📰
+        uses: softprops/action-gh-release@v1
+        with:
+          prerelease: true
+          name: ${{ needs.nightly_job.outputs.file-name-lower }}-${{ needs.nightly_job.outputs.release-name }}
+          tag_name: ${{needs.nightly_job.outputs.tag-name}}
+          files: |
+            ./out/installers/${{ needs.nightly_job.outputs.tag-name }}/**
+      
+      - name: Upload Test Results 🗃
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: "build-dmg-output"
+          path: build.log
+
+  release_snapcraft_job:
+    needs: [nightly_job]
     runs-on: ${{ matrix.os }}
     if: contains(github.event_name, 'schedule') || contains(needs.nightly_job.outputs.isModifyReleaseJson, '1')
     strategy:
@@ -514,7 +685,7 @@ jobs:
           snapcraft upload --release=edge ./out/installers/${{ needs.nightly_job.outputs.tag-name }}/*.snap
 
   appium_test_job:
-    needs: [nightly_job]
+    needs: [release_snapcraft_job]
     if: |
       contains(github.event_name, 'schedule') || contains(needs.nightly_job.outputs.isRunAppium, '1')
     timeout-minutes: 120
