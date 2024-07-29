@@ -389,7 +389,7 @@ jobs:
     env:
       NODE_AUTH_TOKEN: ${{ secrets.PAT }}
       GITHUB_PAT: ${{ secrets.PAT }}
-      AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+      AWS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     steps:
       - name: Get short SHA 🔑
