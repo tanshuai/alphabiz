@@ -225,7 +225,7 @@ jobs:
       - name: Checkout vars-date ${{ steps.vars.outputs.date }} ⬇️
         id: check
         run: |
-          echo "isBuildUniversal=1" >> $GITHUB_OUTPUT
+          echo "isBuildUniversal=0" >> $GITHUB_OUTPUT
           echo "repo-name: ${{ github.repository }}"
           echo "repository=${{ github.repository }}" >> $GITHUB_OUTPUT
           echo "slug----------------------"
