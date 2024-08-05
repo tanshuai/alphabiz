@@ -221,7 +221,10 @@ async function release () {
     ]
   })
   // console.log('HostsArr!', HostsArr)
-  if (!Array.isArray(HostsArr) || !HostsArr.length) return
+  if (!Array.isArray(HostsArr) || !HostsArr.length) {
+    console.log(`\x1b[36m No hosts need to be released... \x1b[0m`)
+    return
+  }
   const HostsIdArr = HostsArr.map((currentValue) => {
     return currentValue.HostId
   })
@@ -231,7 +234,7 @@ async function release () {
   console.log(`\x1b[36m Release Host... \x1b[0m`)
   const releaseHostResult = await releaseHost(HostsIdArr)
   console.log('releaseHostResult!', releaseHostResult)
-  if (releaseHostResult.Unsuccessful[0].Error) {
+  if (releaseHostResult.Unsuccessful.length && releaseHostResult.Unsuccessful[0].Error) {
     console.log('Error!', releaseHostResult.Unsuccessful[0].Error)
     throw Error('Release Host Unsuccessful!')
   }
