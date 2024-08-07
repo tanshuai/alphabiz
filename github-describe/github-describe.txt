@@ -1,8 +1,5 @@
-add wait email timeout
-e2e test add timeout
-add allocate host method
-fix throw Error
-fix account e2e test
-check Instance state
-add border for follow button, close #919
-fix download button error
+improve analytics
+modify release host
+disable unauthed identities
+fix displayName in postEdit
+try fix file selectors in android platform
