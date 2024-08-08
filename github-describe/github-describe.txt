@@ -1,5 +1,2 @@
-improve analytics
-modify release host
-disable unauthed identities
-fix displayName in postEdit
-try fix file selectors in android platform
+add common FileSelector for cross-platform usage
+add native share api
