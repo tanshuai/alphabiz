@@ -2,7 +2,8 @@
 /// <reference path="../../support/index.d.ts" />
 
 describe('LanguageSelection', () => {
-  beforeEach(() => {
+  beforeEach(function onBeforeEach () {
+    cy.setCookie('TestEnv', 'true')
   })
   it('lang', () => {
     cy.signIn('test1' + Cypress.env('testEmailDomain'), 'password', { isWebsite: true })

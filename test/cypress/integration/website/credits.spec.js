@@ -2,6 +2,9 @@
 /// <reference path="../../support/index.d.ts" />
 
 describe('Credits', () => {
+  beforeEach(function onBeforeEach () {
+    cy.setCookie('TestEnv', 'true')
+  })
   it('test1 to test2 transfer - check bill details', () => {
     let from
     let to

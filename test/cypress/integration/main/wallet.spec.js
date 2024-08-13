@@ -3,6 +3,7 @@
 
 describe.skip('wallet', () => {
   beforeEach(() => {
+    cy.setCookie('TestEnv', 'true')
     cy.signIn('test1' + Cypress.env('testEmailDomain'), 'password')
     cy.wait(2000)
     cy.checkOpenWallet()

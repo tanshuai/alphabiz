@@ -9,6 +9,7 @@
 // This test will pass when run against a clean Quasar project
 describe('Landing', () => {
   beforeEach(() => {
+    cy.setCookie('TestEnv', 'true')
     cy.visit('https://web.alpha.biz')
   })
   it('.should() - assert that <title> is correct', () => {
