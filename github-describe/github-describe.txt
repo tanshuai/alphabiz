@@ -1,7 +1,4 @@
-disable amplify analytics on development mode; allow unauthed identities
-add capacitor share, filesystem and device
-amplify analytics: disable on test mode
-google analytics: disable on test or dev mode
-fix account e2e test
-analytics
-fix selector error
+add test env
+pause player when hide window #418
+try improve performance for gun
+push patches
