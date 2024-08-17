@@ -10,12 +10,15 @@ const { DevelopmentPage } = require('./Pages/DevelopmentPage')
 const obj = require('./TestEnvironment')
 const { sleep } = require('../../utils/getCode')
 const { calculation } = require('../../utils/calculation')
+const appConfig = require('../../../developer/app')
 
 let client, homePage, accountPage, creditsPage, developmentPage
-jest.setTimeout(60000 * 30)
+const uploadUser = (appConfig.name === 'Alphabiz' ? 'down2' : 'down4') +  process.env.TEST_EMAIL_DOMAIN
 const outputFile = process.env.APP_TYPE === 'exe' ? '/exe' : process.env.APP_TYPE === 'msi' ? '/msi' : '/7z'
 const outputPath = path.resolve(__dirname, '../../output/release' + outputFile)
 let isSuccess = false
+
+jest.setTimeout(60000 * 30)
 describe('upload', () => {
   beforeAll(async () => {
     client = await wdio.remote(obj.opts)
@@ -48,7 +51,7 @@ describe('upload', () => {
     // const torrentName = 'ChinaCup.1080p.H264.AAC.mp4'
     // 判断是否已经登录
     await sleep(10000)
-    await accountPage.ensureSignIn(process.env.TEST2_EMAIL, process.env.TEST_PASSWORD, { isWaitAlert: true })
+    await accountPage.ensureSignIn(uploadUser, process.env.TEST_PASSWORD, { isWaitAlert: true })
 
     // 查看初始积分
     await homePage.jumpPage('creditsLink')
