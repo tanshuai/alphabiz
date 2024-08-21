@@ -1,4 +1,6 @@
-add test env
-pause player when hide window #418
-try improve performance for gun
-push patches
+run e2e test using different accounts
+#905
+lib loader: fix sort
+fix analytics
+use BUILD_VERSION if possible
+improve performance for downloader
