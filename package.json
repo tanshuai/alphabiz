@@ -1,7 +1,7 @@
 {
   "name": "alphabiz",
   "main": "electron/UnPackaged/electron-main.js",
-  "version": "0.2.1",
+  "version": "0.2.3",
   "description": "Alphabiz Blockchain Cryptocurrency Application",
   "productName": "Alphabiz",
   "author": "Alphabiz Team <ab@alpha.biz>",
