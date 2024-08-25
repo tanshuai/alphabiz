@@ -1,6 +1,3 @@
-run e2e test using different accounts
-#905
-lib loader: fix sort
-fix analytics
-use BUILD_VERSION if possible
-improve performance for downloader
+bump @zeeis/alphabiz-libdb to v0.0.91
+fix pause player
+upgrade version
