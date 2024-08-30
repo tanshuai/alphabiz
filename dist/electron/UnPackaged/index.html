@@ -1,6 +1,6 @@
 <!DOCTYPE html><html><head><title>Alphabiz</title><meta charset=utf-8><meta name=description content="Alphabiz Blockchain Cryptocurrency Application"><meta name=format-detection content="telephone=no"><meta name=msapplication-tap-highlight content=no><meta name=viewport content="user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1,width=device-width"><link rel=icon type=image/png sizes=128x128 href=developer/icons/favicon-128x128.png><link rel=icon type=image/png sizes=96x96 href=developer/icons/favicon-96x96.png><link rel=icon type=image/png sizes=32x32 href=developer/icons/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=developer/icons/favicon-16x16.png><link rel=icon type=image/ico href=developer/favicon.ico><script async src="https://www.googletagmanager.com/gtag/js?id=G-9NE14P89WD"></script><script>if (
       // (process.env.NODE_ENV === 'development') || // dev mode
-      (process && process.env.TEST_EMAIL_DOMAIN) || // test mode
+      ('process' in globalThis && process && process.env.TEST_EMAIL_DOMAIN) || // test mode
       (document.cookie || '').split(';').map(x => x.trim()).includes('TestEnv=true') // test mode
     ) {
       console.log('google analytics disabled.')
