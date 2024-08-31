@@ -293,13 +293,13 @@ jobs:
           unset REPO
         shell: bash
       
-      # - name: wallet E2E Test for Electron 🧪
-      #   if: "!contains(github.event.head_commit.message, 'skip e2e')"
-      #   run: |
-      #     export REPO=alphabiz
-      #     yarn test:e2e:electron:wallet
-      #     unset REPO
-      #   shell: bash
+      - name: wallet E2E Test for Electron 🧪
+        if: "!contains(github.event.head_commit.message, 'skip e2e')"
+        run: |
+          export REPO=alphabiz
+          yarn test:e2e:electron:wallet
+          unset REPO
+        shell: bash
 
       - name: E2E Test 🧪
         if: |
