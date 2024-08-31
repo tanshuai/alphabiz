@@ -1,7 +1,7 @@
 /// <reference path="cypress" />
 /// <reference path="../../support/index.d.ts" />
 
-describe.skip('wallet', () => {
+describe('wallet', () => {
   beforeEach(() => {
     cy.setCookie('TestEnv', 'true')
     cy.signIn('test1' + Cypress.env('testEmailDomain'), 'password')
