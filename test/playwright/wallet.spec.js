@@ -71,6 +71,7 @@ test.beforeAll(async () => {
 test.afterAll(async () => {
 })
 test.beforeEach(async () => {
+  await basePage.newReload()
   await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
 })
 test.afterEach(async ({ }, testInfo) => {
