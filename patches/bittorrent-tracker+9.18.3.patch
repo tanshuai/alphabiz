@@ -1,5 +1,5 @@
 diff --git a/node_modules/bittorrent-tracker/client.js b/node_modules/bittorrent-tracker/client.js
-index c091c31..73b71f5 100644
+index c091c31..cc77f40 100644
 --- a/node_modules/bittorrent-tracker/client.js
 +++ b/node_modules/bittorrent-tracker/client.js
 @@ -74,52 +74,75 @@ class Client extends EventEmitter {
@@ -69,7 +69,12 @@ index c091c31..73b71f5 100644
 -          nextTickWarn(new Error(`Invalid tracker port: ${announceUrl}`))
 -          return null
 -        }
--
++    const port = parsedUrl.port
++    if (port < 0 || port > 65535) {
++      nextTickWarn(new Error(`Invalid tracker port: ${announceUrl}`))
++      return null
++    }
+ 
 -        const protocol = parsedUrl.protocol
 -        if ((protocol === 'http:' || protocol === 'https:') &&
 -            typeof HTTPTracker === 'function') {
@@ -90,12 +95,6 @@ index c091c31..73b71f5 100644
 -        }
 -      })
 -      .filter(Boolean)
-+    const port = parsedUrl.port
-+    if (port < 0 || port > 65535) {
-+      nextTickWarn(new Error(`Invalid tracker port: ${announceUrl}`))
-+      return null
-+    }
-+
 +    const protocol = parsedUrl.protocol
 +    if ((protocol === 'http:' || protocol === 'https:') &&
 +      typeof HTTPTracker === 'function') {
@@ -114,6 +113,32 @@ index c091c31..73b71f5 100644
 +      nextTickWarn(new Error(`Unsupported tracker protocol: ${announceUrl}`))
 +      return null
 +    }
+   }
+ 
+   /**
+@@ -188,10 +211,21 @@ class Client extends EventEmitter {
+   }
+ 
+   _announce (opts) {
+-    this._trackers.forEach(tracker => {
+-      // tracker should not modify `opts` object, it's passed to all trackers
+-      tracker.announce(opts)
+-    })
++    const rIC = 'requestIdleCallback' in globalThis ? requestIdleCallback : fn => setTimeout(fn, 100)
++    // this._trackers.forEach(tracker => {
++    //   // tracker should not modify `opts` object, it's passed to all trackers
++    //   tracker.announce(opts)
++    // })
++    const announceNext = (index = 0) => {
++      rIC(() => {
++        const tracker = this._trackers[index]
++        if (tracker) {
++          tracker.announce(opts)
++          announceNext(index + 1)
++        }
++      })
++    }
++    announceNext()
    }
  
    /**
