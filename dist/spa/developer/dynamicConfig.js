@@ -1,1 +1,1 @@
-module.exports={remote:{url:"https://alpha.biz/app/remote_config"},local:{type:"local",version:"default:v1",oauth:{enable:!1,providers:["Github","Twitter"]},library:{show_explore:!1},update:{enable:!1}}};
+module.exports={remote:{url:"https://alpha.biz/app/remote_config"},local:{type:"local",version:"default:v1",oauth:{enable:!1,providers:["Github","Twitter"]},account:{phone_number:!1},library:{show_explore:!1},update:{enable:!1}}};
