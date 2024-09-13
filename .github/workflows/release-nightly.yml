@@ -40,9 +40,11 @@ jobs:
       file-name-lower: ${{ steps.slug.outputs.file-name-lower }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest]
         node-version: [16]
         include:
+          - os: macos-latest
+            node-version: 16
           - os: windows-latest
             node-version: 16
       fail-fast: false
@@ -114,6 +116,11 @@ jobs:
             echo "file-name-lower=$(echo ${FILENAME} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT ; \
           fi
         shell: bash
+
+      - uses: actions/setup-python@v5
+        if: runner.os == 'macOS'
+        with:
+          python-version: '3.8'
 
       - name: Setup Node.js ${{ matrix.node-version }} 📮
         uses: actions/setup-node@v3
