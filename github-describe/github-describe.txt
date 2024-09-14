@@ -1,2 +1,3 @@
-hide phone number way in sign up
-use computed
+update
+Update SignUp.vue
+Update SignUp.vue
