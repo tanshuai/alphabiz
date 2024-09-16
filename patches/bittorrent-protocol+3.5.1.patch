@@ -1,5 +1,5 @@
 diff --git a/node_modules/bittorrent-protocol/index.js b/node_modules/bittorrent-protocol/index.js
-index 722878a..76c5610 100644
+index 722878a..2c336e9 100644
 --- a/node_modules/bittorrent-protocol/index.js
 +++ b/node_modules/bittorrent-protocol/index.js
 @@ -39,6 +39,8 @@ function xor (a, b) {
@@ -122,29 +122,39 @@ index 722878a..76c5610 100644
      this._encryptionMethod = peerSelectBuffer.readUInt8(3)
      if (!CRYPTO_PROVIDE.includes(this._encryptionMethod)) {
        this._debug('Error: peer selected invalid crypto method')
-@@ -1156,10 +1183,11 @@ class Wire extends stream.Duplex {
+@@ -1156,10 +1183,16 @@ class Wire extends stream.Duplex {
    }
  
    _parsePe2 () {
 -    this._parse(96, pubKey => {
 +    this._parse(96, async pubKey => {
        this._onPe2(pubKey)
++      let trials = 0
        while (!this._setGenerators) {
          // Wait until generators have been set
 +        await new Promise(resolve => setTimeout(resolve, 500))
++        trials++
++        if (trials > 5) {
++          return false
++        }
        }
        this._parsePe4()
      })
-@@ -1170,10 +1198,11 @@ class Wire extends stream.Duplex {
+@@ -1170,10 +1203,16 @@ class Wire extends stream.Duplex {
      const hash1Buffer = Buffer.from(sha1.sync(Buffer.from(this._utfToHex('req1') + this._sharedSecret, 'hex')), 'hex')
      // synchronize on HASH('req1', S)
      this._parseUntil(hash1Buffer, 512)
 -    this._parse(20, buffer => {
 +    this._parse(20, async buffer => {
        this._onPe3(buffer)
++      let trials = 0
        while (!this._setGenerators) {
          // Wait until generators have been set
 +        await new Promise(resolve => setTimeout(resolve, 500))
++        trials++
++        if (trials > 5) {
++          return false
++        }
        }
        this._parsePe3Encrypted()
      })
