@@ -1,8 +1,8 @@
-remove english content from other langs
-remove english content from other langs
-fix useCredit
-fix i18n error in library
-e2e test close Internal Notice
-fix dp$utils
-improve DataPayment
-single instance of DataPaymentMixin
+check recommendation list not duplicate
+skip running tests on host-runner
+use AWS.SESV2
+remove logs
+fix sign error and add warn for proisioning profile
+use real paste event instead of simulate one
+fix i18n error for video rates
+fix minor errors
