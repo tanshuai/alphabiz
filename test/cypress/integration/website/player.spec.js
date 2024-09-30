@@ -3,7 +3,6 @@
 
 describe('Player', () => {
   beforeEach(function onBeforeEach () {
-    cy.setCookie('TestEnv', 'true')
   })
   it('.mkv', () => {
     cy.signIn('test1' + Cypress.env('testEmailDomain'), 'password', { isWebsite: true })
