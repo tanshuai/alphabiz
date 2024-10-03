@@ -555,7 +555,7 @@ export const useAlphabizProtocol = (client, torrent) => {
         }
         const prev = peerDownloaded.get(this.uniqueId)
         const delta = downloaded - prev
-        if (delta > trans.payedSize * 0.9 || torrent.done) {
+        if (delta > trans.payedSize * 0.9 || torrent.done || torrent.downloaded >= torrent.length * 0.9) {
           ipcRenderer.send('webtorrent-payment-finished', {
             id,
             remoteSub: this.remoteSub,
