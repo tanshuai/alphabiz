@@ -1,1 +1,3 @@
-fix e2e wallet test open tool
+fix quit on mac sleep
+fix #927
+try send finish event after done
