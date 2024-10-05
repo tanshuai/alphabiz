@@ -92,6 +92,18 @@ const makeMacUniversal = async () => {
         force: true
       })
       console.log('Generated universal app:', outAppPath)
+      const plist = require('plist')
+      const infoPlistPath = resolve(outAppPath, 'Contents/Info.plist')
+      const infoPlist = plist.parse(readFileSync(infoPlistPath, 'utf-8'))
+      if (process.env.BUILD_BUNDLE) {
+        infoPlist.CFBundleVersion = process.env.BUILD_BUNDLE
+        console.log('Set CFBundleVersion to', process.env.BUILD_BUNDLE)
+      }
+      delete infoPlist.NSBluetoothAlwaysUsageDescription
+      delete infoPlist.NSBluetoothPeripheralUsageDescription
+      delete infoPlist.NSCameraUsageDescription
+      delete infoPlist.NSMicrophoneUsageDescription
+      writeFileSync(infoPlistPath, plist.build(infoPlist), 'utf-8')
       return
     }
     throw new Error('Require buiding both x64 and arm64 targets before building universal app')

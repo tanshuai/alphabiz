@@ -1,6 +1,6 @@
 const { signApp } = require('@electron/osx-sign')
 const { existsSync } = require('fs')
-const { resolve } = require('path')
+const { resolve, join } = require('path')
 const { minVersion } = require('semver')
 
 const app = process.argv[2]
@@ -49,18 +49,25 @@ const signOptions = {
     // const opt = {
     //   hardenedRuntime: true,
     // }
-    if (filepath.endsWith(app)) {
+    if (filepath.includes('Login Helper.app')) {
       return {
-        // hardenedRuntime: true,
-        entitlements: resolve(__dirname, 'entitlements.mas.plist')
-      }
-    } else if (filepath.endsWith('.app') || filepath.endsWith('.framework')) {
-      return {
-        // hardenedRuntime: true,
-        entitlements: resolve(__dirname, 'entitlements.inherit.plist')
+        hardenedRuntime: false,
+        entitlements: resolve(__dirname, 'entitlements.loginhelper.plist')
       }
     }
-    return null
+    if (filepath.endsWith(app) || filepath.includes(join(app, 'Contents/MacOS'))) {
+      return {
+        hardenedRuntime: false,
+        entitlements: resolve(__dirname, 'entitlements.mas.plist')
+      }
+    }
+    // if (filepath.endsWith('.app') || filepath.endsWith('.framework')) {
+    return {
+      hardenedRuntime: false,
+      entitlements: resolve(__dirname, 'entitlements.inherit.plist')
+    }
+    // }
+    // return opt
   }
 }
 
