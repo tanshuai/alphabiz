@@ -1,1 +1,2 @@
-update build scripts, fix crashes after signed
+add infomations for build and fix launchpad icon error
+fix error when opening url when clipboard is not empty
