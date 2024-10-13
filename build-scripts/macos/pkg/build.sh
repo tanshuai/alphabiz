@@ -23,7 +23,7 @@ ARCH="universal"
 APP_PATH="dist/electron/$APP-$PLATFORM-$ARCH/$APP.app"
 if [ ! -e "$APP_PATH" ]; then
   echo "Cannot find build app. Running build script..."
-  . build-scripts/macos/app/build.sh
+  infiniteRetry build-scripts/macos/app/build.sh
 else
   echo "Found app build."
 fi
