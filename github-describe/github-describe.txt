@@ -1,3 +1,5 @@
-add i18n hint for torrent error
-skip saving graph if nothing updated
-fix sort completeTime error
+hide third-party auth for mas build
+fix cannot open about dialog from app menu
+infinite try for building
+redirect to library index if following any channel
+apply custom github url for app menu
