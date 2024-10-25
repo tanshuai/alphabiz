@@ -743,6 +743,17 @@ const seedTorrent = (token, files, options, isAutoUpload = false, callback = nul
     tr.isSeeding = true
   } else {
     info('[seed] Seed torrent with files', !!options.infoHash, options)
+    const uploadTasks = client.torrents.filter(tr => tr.progress === 1)
+    const uploadingFiles = uploadTasks.reduce((all, tr) => {
+      const files = tr.files.map(f => f.path)
+      all.push(...files)
+      return all
+    }, [])
+    if (files.some(file => {
+      return uploadingFiles.includes(file)
+    })) {
+      ipcRenderer.send('webtorrent-seed-error', 'task_exists')
+    }
     tr = client.seed(files, Object.assign(seedOpts, {
       skipVerify: !!options.infoHash,
       onProgress (current, total) {
