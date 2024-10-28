@@ -1,0 +1,90 @@
+diff --git a/node_modules/fs-xattr/index.js b/node_modules/fs-xattr/index.js
+index 70c19f6..95881d8 100644
+--- a/node_modules/fs-xattr/index.js
++++ b/node_modules/fs-xattr/index.js
+@@ -1,6 +1,4 @@
+-import { createRequire } from 'node:module'
+-
+-const addon = createRequire(import.meta.url)('./build/Release/xattr')
++const addon = require('./build/Release/xattr')
+ 
+ function validateArgument (key, val) {
+   switch (key) {
+@@ -21,14 +19,14 @@ function validateArgument (key, val) {
+ 
+ /* Async methods */
+ 
+-export function getAttribute (path, attr) {
++exports.getAttribute = function getAttribute (path, attr) {
+   path = validateArgument('path', path)
+   attr = validateArgument('attr', attr)
+ 
+   return addon.get(path, attr)
+ }
+ 
+-export function setAttribute (path, attr, value) {
++exports.setAttribute = function setAttribute (path, attr, value) {
+   path = validateArgument('path', path)
+   attr = validateArgument('attr', attr)
+   value = validateArgument('value', value)
+@@ -36,13 +34,13 @@ export function setAttribute (path, attr, value) {
+   return addon.set(path, attr, value)
+ }
+ 
+-export function listAttributes (path) {
++exports.listAttributes = function listAttributes (path) {
+   path = validateArgument('path', path)
+ 
+   return addon.list(path)
+ }
+ 
+-export function removeAttribute (path, attr) {
++exports.removeAttribute = function removeAttribute (path, attr) {
+   path = validateArgument('path', path)
+   attr = validateArgument('attr', attr)
+ 
+@@ -51,14 +49,14 @@ export function removeAttribute (path, attr) {
+ 
+ /* Sync methods */
+ 
+-export function getAttributeSync (path, attr) {
++exports.getAttributeSync = function getAttributeSync (path, attr) {
+   path = validateArgument('path', path)
+   attr = validateArgument('attr', attr)
+ 
+   return addon.getSync(path, attr)
+ }
+ 
+-export function setAttributeSync (path, attr, value) {
++exports.setAttributeSync = function setAttributeSync (path, attr, value) {
+   path = validateArgument('path', path)
+   attr = validateArgument('attr', attr)
+   value = validateArgument('value', value)
+@@ -66,13 +64,13 @@ export function setAttributeSync (path, attr, value) {
+   return addon.setSync(path, attr, value)
+ }
+ 
+-export function listAttributesSync (path) {
++exports.listAttributesSync = function listAttributesSync (path) {
+   path = validateArgument('path', path)
+ 
+   return addon.listSync(path)
+ }
+ 
+-export function removeAttributeSync (path, attr) {
++exports.removeAttributeSync = function removeAttributeSync (path, attr) {
+   path = validateArgument('path', path)
+   attr = validateArgument('attr', attr)
+ 
+diff --git a/node_modules/fs-xattr/package.json b/node_modules/fs-xattr/package.json
+index a57ae03..9fa64a2 100644
+--- a/node_modules/fs-xattr/package.json
++++ b/node_modules/fs-xattr/package.json
+@@ -3,7 +3,6 @@
+   "version": "0.4.0",
+   "license": "MIT",
+   "repository": "LinusU/fs-xattr",
+-  "type": "module",
+   "exports": "./index.js",
+   "files": [
+     "binding.gyp",
