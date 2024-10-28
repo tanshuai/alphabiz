@@ -7,10 +7,31 @@ const path = require('path')
 const { setSecure } = require('webtorrent/lib/peer')
 // const diskusage = require('diskusage')
 const FSChunkStore = require('fs-chunk-store')
+const is = require('electron-is')
+const { setAttributeSync, removeAttributeSync } = require('fs-xattr')
+const { utimes } = require('utimes')
 
 import { useAlphabizProtocol, useClientEvents } from './wt-extention.js'
 import preloader from './webtorrent-preload.js'
 import utils from './webtorrent-utils.js'
+
+const isMac = is.macOS()
+const setUtimes = path => {
+  if (fs.existsSync(path)) {
+    /**
+     * DO NOT TOUCH!
+     * The number is a magic code used by macOS. If the create time of file
+     * is not set to this value, the download progress pie will not shown
+     * in finder. This is the timestamp of `1984-01-24 08:00:00 +0000`.
+     */
+    utimes(path, {
+      btime: 443779200000
+    })
+    setAttributeSync(path, 'com.apple.progress.fractionCompleted', '0.01')
+  } else {
+    setTimeout(() => setUtimes(path), 1000)
+  }
+}
 
 /**
  * @typedef { import('../src/types').TrackerStatus } TrackerStatus
@@ -166,6 +187,7 @@ const initClient = (retries = 0) => {
     ipcRenderer.send('webtorrent-client-warn', e.message)
   })
   client.on('ready', () => {
+    console.log('initted')
     ipcRenderer.send('webtorrent-initted')
   })
   window.client = client
@@ -270,6 +292,23 @@ const updateTorrent = (once = false) => {
       }
       return t
     })
+    if (isMac) {
+      // TODO: update download progress for finder
+      torrents.forEach(tr => {
+        if (tr.upload || tr.progress === 1 || tr.isSeeding) return
+        // console.log('update progress for', tr)
+        const files = tr.files
+        files.forEach(f => {
+          if (('path' in f) && ('progress' in f) && fs.existsSync(f.path)) {
+            // The min value is '0.01'
+            if (f.progress < 0.01) return
+            // Set file progress
+            // console.log(`[Progress] Set file progress to ${f.progress}. ${f.path}`)
+            setAttributeSync(f.path, 'com.apple.progress.fractionCompleted', f.progress.toFixed(2))
+          }
+        })
+      })
+    }
     verbose('send torrents', torrents)
     // window._torrents = torrents
     // torrents.forEach(tr => ipcRenderer.send('webtorrent-data', tr))
@@ -341,6 +380,12 @@ const forceUpdateTorrent = () => {
 }
 
 const onDone = (tr) => {
+  if (isMac && tr.files && tr.files.length) {
+    tr.files.forEach(file => {
+      console.log(`[Done] Set file progress to 1. ${file.path}`)
+      removeAttributeSync(file.path, 'com.apple.progress.fractionCompleted', '1')
+    })
+  }
   if (tr.upload) return
   tr.isSeeding = true
   const json = torrentToJson(tr)
@@ -355,6 +400,9 @@ const onReady = (tr) => {
     // We just ignore them since we can do nothing to them.
     if (f.name.match(/^_____padding_file_(.*)____$/)) {
       info('deselect', f.name)
+    }
+    if (isMac && f.path) {
+      setUtimes(f.path)
     }
   })
   const json = torrentToJson(tr)
@@ -383,8 +431,8 @@ const onMetadata = (tr, conf) => {
   ipcRenderer.send('webtorrent-metadata', tr.infoHash)
   ipcRenderer.send('webtorrent-data', torrentToJson(tr))
 }
-const onWire = (wire, tr) => {
-  wire.use(useAlphabizProtocol(client, tr))
+const onWire = (wire, tr, abProtocol) => {
+  wire.use(abProtocol)
   if (wire.type === 'webrtc') {
     // info('onwire', wire.remoteAddress, wire.peerId)
     const setAddress = () => {
@@ -441,7 +489,8 @@ const addListeners = (tr, conf = {}, isSeeding = false) => {
     console.log('Torrent error', e, conf)
     ipcRenderer.send('webtorrent-error', torrentToJson(tr), e.message)
   })
-  tr.on('wire', wire => onWire(wire, tr))
+  const abProtocol = useAlphabizProtocol(client, tr)
+  tr.on('wire', wire => onWire(wire, tr, abProtocol))
   tr.on('discovery', () => {
     if (tr.discovery) {
       info('start discovery')
