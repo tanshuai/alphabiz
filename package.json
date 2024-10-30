@@ -104,6 +104,7 @@
   "optionalDependencies": {
     "electron-installer-debian": "^3.1.0",
     "exe-icon-extractor": "^1.0.8",
+    "fs-xattr": "^0.4.0",
     "fswin": "^3.23.119"
   },
   "resolutions": {
