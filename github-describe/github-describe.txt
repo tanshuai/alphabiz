@@ -1,12 +1,4 @@
-unified Player error message
-fix clear player error
-wait library loading
-rerun website e2e test
-bump @zeeis/alphabiz-libdb to v0.0.92, close #925
-rerun website test
-fix loading library in electron test
-add upload speed for tray
-fix task list update error after reloading webtorrent window
-show share-to-library for upload task
-show build version for mas build
-improve library performance
+fix sign in test error
+show download progress in finder for macOS
+load channels before login
+clear favorite store for mas
