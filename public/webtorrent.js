@@ -8,7 +8,6 @@ const { setSecure } = require('webtorrent/lib/peer')
 // const diskusage = require('diskusage')
 const FSChunkStore = require('fs-chunk-store')
 const is = require('electron-is')
-const { setAttributeSync, removeAttributeSync } = require('fs-xattr')
 const { utimes } = require('utimes')
 
 import { useAlphabizProtocol, useClientEvents } from './wt-extention.js'
@@ -16,7 +15,12 @@ import preloader from './webtorrent-preload.js'
 import utils from './webtorrent-utils.js'
 
 const isMac = is.macOS()
+const { setAttributeSync, removeAttributeSync } = isMac ? require('fs-xattr') : {
+  setAttributeSync () {},
+  removeAttributeSync () {}
+}
 const setUtimes = path => {
+  if (!isMac) return
   if (fs.existsSync(path)) {
     /**
      * DO NOT TOUCH!
