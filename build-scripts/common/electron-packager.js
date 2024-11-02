@@ -143,6 +143,7 @@ const options = {
     const patches = fs.readdirSync(resolve(__rootdir, 'patches'))
     for (const patch of patches) {
       if (!/\.dev\.patch$/gm.test(patch)) {
+        if (platform === 'win32' && /fs-xattr+.*\.patch$/gm.test(patch)) continue
         copyRecursive(resolve(__rootdir, `patches/${patch}`), resolve(buildPath, `patches/${patch}`))
       }
     }
