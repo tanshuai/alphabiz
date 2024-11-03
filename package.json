@@ -7,7 +7,7 @@
   "author": "Alphabiz Team <ab@alpha.biz>",
   "scripts": {
     "preunpackaged": "node update-version.js",
-    "postinstall": "patch-package --error-on-fail && node ./node_modules/symlink-dir/dist/cli.js node_modules/@zeeis/velectron node_modules/electron && ./node_modules/.bin/electron-rebuild -v 17.0.0",
+    "postinstall": "node build-scripts/common/skipPatch.js && node ./node_modules/symlink-dir/dist/cli.js node_modules/@zeeis/velectron node_modules/electron && ./node_modules/.bin/electron-rebuild -v 17.0.0",
     "build": "rm -rf dist/electron/UnPackaged/node_modules/ && cd dist/electron/UnPackaged && yarn install && cd ../../../ && cross-env CI=false node packager.js",
     "packager": "cross-env CI=false node packager.js",
     "unpackaged": "cd dist/electron/UnPackaged && yarn install && ../../../node_modules/.bin/electron-rebuild -v 17.0.0",
