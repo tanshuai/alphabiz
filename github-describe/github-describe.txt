@@ -1,4 +1,5 @@
-fix sign in test error
-show download progress in finder for macOS
-load channels before login
-clear favorite store for mas
+get all channels before login
+set fs-xattr as optional
+fix win optional module patch
+fix search error with `&nbsp;`
+add set-download hint for MAS version
