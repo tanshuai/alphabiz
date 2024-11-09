@@ -15,25 +15,46 @@ import preloader from './webtorrent-preload.js'
 import utils from './webtorrent-utils.js'
 
 const isMac = is.macOS()
-const { setAttributeSync, removeAttributeSync } = isMac ? require('fs-xattr') : {
+const { setAttributeSync, removeAttributeSync, listAttributesSync } = isMac ? require('fs-xattr') : {
   setAttributeSync () {},
-  removeAttributeSync () {}
+  removeAttributeSync () {},
+  listAttributesSync () {}
 }
-const setUtimes = path => {
+
+const setUtimes = (file) => {
   if (!isMac) return
-  if (fs.existsSync(path)) {
+  if (fs.existsSync(file.path)) {
+    const createdTime = Date.now()
+    const onDone = () => {
+      setTimeout(() => {
+        utimes(file.path, {
+          btime: createdTime
+        })
+        const attrs = listAttributesSync(file.path)
+        if (attrs && attrs.includes('com.apple.progress.fractionCompleted')) {
+          console.log(`[Done] Set file progress to 1. ${file.path}`)
+          // Reset created time
+          removeAttributeSync(file.path, 'com.apple.progress.fractionCompleted')
+        }
+      }, 200)
+    }
+    if (file.progress === 1) {
+      onDone()
+      return console.log(`${file.path} is finished. Skip adding progress.`)
+    }
+    file.on('done', onDone)
     /**
      * DO NOT TOUCH!
      * The number is a magic code used by macOS. If the create time of file
      * is not set to this value, the download progress pie will not shown
      * in finder. This is the timestamp of `1984-01-24 08:00:00 +0000`.
      */
-    utimes(path, {
+    utimes(file.path, {
       btime: 443779200000
     })
-    setAttributeSync(path, 'com.apple.progress.fractionCompleted', '0.01')
+    setAttributeSync(file.path, 'com.apple.progress.fractionCompleted', '0.01')
   } else {
-    setTimeout(() => setUtimes(path), 1000)
+    setTimeout(() => setUtimes(file), 100)
   }
 }
 
@@ -337,6 +358,7 @@ const updateTorrent = (once = false) => {
     const preloadTasks = []
     for (const [abUrl, values] of preloader.preloadTasks.entries()) {
       const { torrentPath, downloadPath, torrent } = values
+      if (!torrent) continue
       preloadTasks.push({ abUrl, torrentPath, downloadPath, torrent, postTitle: torrent.postTitle || '' })
     }
     for (const task of preloader.taskQueue) {
@@ -384,18 +406,23 @@ const forceUpdateTorrent = () => {
 }
 
 const onDone = (tr) => {
-  if (isMac && tr.files && tr.files.length) {
-    tr.files.forEach(file => {
-      console.log(`[Done] Set file progress to 1. ${file.path}`)
-      removeAttributeSync(file.path, 'com.apple.progress.fractionCompleted', '1')
-    })
-  }
-  if (tr.upload) return
+  setTimeout(() => {
+    if (isMac && tr.files && tr.files.length) {
+      tr.files.forEach(file => {
+        const attrs = listAttributesSync(file.path)
+        if (attrs && attrs.includes('com.apple.progress.fractionCompleted')) {
+          console.log(`[Done] Set file progress to 1. ${file.path}`)
+          removeAttributeSync(file.path, 'com.apple.progress.fractionCompleted', '1')
+        }
+      })
+    }
+  }, 1000)
+  if (tr.upload) return console.log('skip upload')
   tr.isSeeding = true
   const json = torrentToJson(tr)
+  if (!tr.completedTime) tr.completedTime = Date.now()
   ipcRenderer.send('webtorrent-done', json)
   ipcRenderer.send('webtorrent-finish-all-payments', json)
-  if (!tr.completedTime) tr.completedTime = Date.now()
 }
 /** @param { RawTorrent } tr */
 const onReady = (tr) => {
@@ -406,7 +433,7 @@ const onReady = (tr) => {
       info('deselect', f.name)
     }
     if (isMac && f.path) {
-      setUtimes(f.path)
+      setUtimes(f)
     }
   })
   const json = torrentToJson(tr)
