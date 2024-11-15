@@ -1,4 +1,3 @@
-remove .downloading postfix after task done
-use a larger spin for library loading
-try improve library loading
-update ios configs
+update iOS App Store build configs
+add function: ABDevliveryStatus, api: onNotifyMessage
+Update alphabiz.js
