@@ -31,6 +31,16 @@
        Square150x150Logo="assets\Square150x150Logo.png"
        Square44x44Logo="assets\Square44x44Logo.png">
       </uap:VisualElements>
+      <Extensions>
+        <uap:Extension Category="windows.protocol">
+          <uap:Protocol name="{{protocol}}"></uap:Protocol>
+          <uap:DisplayName>{{packageDisplayName}} URI</uap:DisplayName>
+        </uap:Extension>
+        <uap:Extension Category="windows.protocol">
+          <uap:Protocol name="{{shortProtocol}}"></uap:Protocol>
+          <uap:DisplayName>{{packageDisplayName}} URI</uap:DisplayName>
+        </uap:Extension>
+      </Extensions>
     </Application>
   </Applications>
 </Package>

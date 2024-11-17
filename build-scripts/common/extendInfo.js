@@ -2,6 +2,7 @@ const appConfig = require('../../developer/app')
 const { buildVersion } = require('./electron-packager')
 const buildPlatform = process.env.BUILD_PLATFORM || process.platform
 const isMas = buildPlatform === 'mas'
+const iconPath = 'favicon.ico'
 
 if (isMas && !process.env.APPLE_TEAM_ID) {
   console.warn('APPLE_TEAM_ID is not set in env. You need to change the `ElectronTeamID` in target Info.plist before sign.')
@@ -65,8 +66,8 @@ const normalInfo = {
     },
     {
       CFBundleTypeName: `${appConfig.displayName} Downloading File`,
-      CFBundleTypeExtensions: `${appConfig.shortProtocol}-downloading`,
-      CFBundleTypeRole: 'Viewer',
+      CFBundleTypeExtensions: 'downloading',
+      CFBundleTypeRole: 'Editor',
       CFBundleTypeIconFile: 'electron.ico',
       LSHandlerRank: 'Owner'
     },
@@ -75,7 +76,7 @@ const normalInfo = {
       CFBundleTypeOSTypes: [
         '****'
       ],
-      CFBundleTypeRole: 'Editor',
+      CFBundleTypeRole: 'Viewer',
       LSTypeIsPackage: false,
       LSHandlerRank: 'Owner'
     }
@@ -111,6 +112,19 @@ const normalInfo = {
           'abk'
         ]
       }
+    }
+  ],
+  CFBundleURLTypes: [{
+      CFBundleTypeRole: 'Editor',
+      CFBundleURLIconFile: iconPath,
+      CFBundleURLName: `${appConfig.displayName} URI`,
+      CFBundleURLSchemes: [appConfig.protocol]
+    },
+    {
+      CFBundleTypeRole: 'Editor',
+      CFBundleURLIconFile: iconPath,
+      CFBundleURLName: `${appConfig.displayName} short URI`,
+      CFBundleURLSchemes: [appConfig.shortProtocol]
     }
   ]
 }
@@ -171,8 +185,8 @@ const masInfo = {
     },
     {
       CFBundleTypeName: `${appConfig.displayName} Downloading File`,
-      CFBundleTypeExtensions: `${appConfig.shortProtocol}-downloading`,
-      CFBundleTypeRole: 'Viewer',
+      CFBundleTypeExtensions: 'downloading',
+      CFBundleTypeRole: 'Editor',
       CFBundleTypeIconFile: 'electron.ico',
       LSHandlerRank: 'Owner'
     },
@@ -181,9 +195,22 @@ const masInfo = {
       CFBundleTypeOSTypes: [
         '****'
       ],
-      CFBundleTypeRole: 'Editor',
+      CFBundleTypeRole: 'Viewer',
       LSTypeIsPackage: false,
       LSHandlerRank: 'Owner'
+    }
+  ],
+  CFBundleURLTypes: [{
+      CFBundleTypeRole: 'Editor',
+      CFBundleURLIconFile: iconPath,
+      CFBundleURLName: `${appConfig.displayName} URI`,
+      CFBundleURLSchemes: [appConfig.protocol]
+    },
+    {
+      CFBundleTypeRole: 'Editor',
+      CFBundleURLIconFile: iconPath,
+      CFBundleURLName: `${appConfig.displayName} short URI`,
+      CFBundleURLSchemes: [appConfig.shortProtocol]
     }
   ]
 }
