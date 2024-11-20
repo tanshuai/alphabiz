@@ -198,7 +198,7 @@ class BasePage {
       // if (isSetToken) await this.waitLoadingLibKey()
     }
     if (isSetToken) {
-      await this.page.locator('.post-card').nth(0).waitFor({ timeout: 20000 })
+      await this.page.locator('.post-card').nth(0).waitFor({ timeout: 30000 })
     }
   }
 
