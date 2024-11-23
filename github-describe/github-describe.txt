@@ -1,3 +1,6 @@
-add protocol bindings for appx
-add protocols in extendInfo for mac
-fix torrent errors
+i18n for YearMonthPicker
+improve loadingState
+change appx config `name` to `Name`
+add magnet
+add wait timeout
+fix errors in iOS sandbox
