@@ -1,2 +1,2 @@
-fix deliveryStatusPromise
-i18n for delivery status
+fix signup error
+fix bugs
