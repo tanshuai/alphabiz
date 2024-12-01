@@ -1,2 +1,2 @@
-fix signup error
-fix bugs
+Update i18n.js
+fix bug when playing downloading file
