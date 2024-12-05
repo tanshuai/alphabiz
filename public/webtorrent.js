@@ -673,7 +673,13 @@ const addTorrent = (token, conf, cb) => {
             // reason, we skip these pieces in range.
             for (let i = start + 1; i < end - 1; i++) {
               // Randomly verify parts of downloaded pieces
-              if (Math.random() > rate) tr._markVerified(i)
+              // if (Math.random() > rate) tr._markVerified(i)
+              tr._markVerified(i)
+              ctr++
+            }
+          } else {
+            if (!isNaN(range)) {
+              tr._markVerified(range)
               ctr++
             }
           }
