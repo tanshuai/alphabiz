@@ -1,2 +1,2 @@
-try fix url error when opening file in windows #125
-fix ios bugs
+improve deliveryStatus
+fix bugs and improve performance
