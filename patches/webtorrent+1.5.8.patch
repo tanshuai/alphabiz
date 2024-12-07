@@ -496,7 +496,7 @@ index 7e08906..960994c 100644
      }
  
 diff --git a/node_modules/webtorrent/lib/torrent.js b/node_modules/webtorrent/lib/torrent.js
-index ac7cb97..22e5eb0 100644
+index ac7cb97..3a7fe72 100644
 --- a/node_modules/webtorrent/lib/torrent.js
 +++ b/node_modules/webtorrent/lib/torrent.js
 @@ -49,8 +49,17 @@ const PIPELINE_MAX_DURATION = 1
@@ -630,7 +630,7 @@ index ac7cb97..22e5eb0 100644
  
      // don't use the cache if the store is already in memory
      if (this._storeCacheSlots > 0 && !(rawStore instanceof MemoryChunkStore)) {
-@@ -595,32 +686,73 @@ class Torrent extends EventEmitter {
+@@ -595,32 +686,74 @@ class Torrent extends EventEmitter {
      })
    }
  
@@ -666,7 +666,7 @@ index ac7cb97..22e5eb0 100644
 +        }
        }
 -      this.store.get(index, getOpts, (err, buf) => {
-+      parallelLimit(this.pieces.map((piece, index) => cb => {
++      parallelLimit(this.pieces.map((piece, index) => async cb => {
 +        this.verifyStatus.current++
 +        if (isVerifyError) return cb(null)
          if (this.destroyed) return cb(new Error('torrent is destroyed'))
@@ -679,6 +679,7 @@ index ac7cb97..22e5eb0 100644
 +        if (index === this.pieces.length - 1) {
 +          getOpts.length = this.lastPieceLength
 +        }
++        await new Promise(queueMicrotask)
 +        this.store.get(index, getOpts, (err, buf) => {
            if (this.destroyed) return cb(new Error('torrent is destroyed'))
  
@@ -724,7 +725,7 @@ index ac7cb97..22e5eb0 100644
    }
  
    rescanFiles (cb) {
-@@ -753,6 +885,8 @@ class Torrent extends EventEmitter {
+@@ -753,6 +886,8 @@ class Torrent extends EventEmitter {
      this._peers = null
      this._servers = null
      this._xsRequests = null
@@ -733,7 +734,7 @@ index ac7cb97..22e5eb0 100644
    }
  
    addPeer (peer) {
-@@ -893,6 +1027,7 @@ class Torrent extends EventEmitter {
+@@ -893,6 +1028,7 @@ class Torrent extends EventEmitter {
     * peer that has already sent a handshake.
     */
    _addIncomingPeer (peer) {
@@ -741,7 +742,7 @@ index ac7cb97..22e5eb0 100644
      if (this.destroyed) return peer.destroy(new Error('torrent is destroyed'))
      if (this.paused) return peer.destroy(new Error('torrent is paused'))
  
-@@ -1079,6 +1214,8 @@ class Torrent extends EventEmitter {
+@@ -1079,6 +1215,8 @@ class Torrent extends EventEmitter {
          // Stop sending updates to remote peer
          wire.ut_pex.reset()
        })
@@ -750,7 +751,7 @@ index ac7cb97..22e5eb0 100644
      }
  
      wire.use(ltDontHave())
-@@ -1144,6 +1281,7 @@ class Torrent extends EventEmitter {
+@@ -1144,6 +1282,7 @@ class Torrent extends EventEmitter {
      })
  
      wire.once('close', () => {
@@ -758,7 +759,7 @@ index ac7cb97..22e5eb0 100644
        clearTimeout(timeoutId)
      })
  
-@@ -1208,6 +1346,7 @@ class Torrent extends EventEmitter {
+@@ -1208,6 +1347,7 @@ class Torrent extends EventEmitter {
        const oldOffset = s.offset
  
        // check for newly downloaded pieces in selection
@@ -766,7 +767,7 @@ index ac7cb97..22e5eb0 100644
        while (this.bitfield.get(s.from + s.offset) && s.from + s.offset < s.to) {
          s.offset += 1
        }
-@@ -1262,7 +1401,9 @@ class Torrent extends EventEmitter {
+@@ -1262,7 +1402,9 @@ class Torrent extends EventEmitter {
      // update wires in random order for better request distribution
      const ite = randomIterate(this.wires)
      let wire
@@ -776,7 +777,7 @@ index ac7cb97..22e5eb0 100644
        this._updateWireWrapper(wire)
      }
    }
-@@ -1302,6 +1443,7 @@ class Torrent extends EventEmitter {
+@@ -1302,6 +1444,7 @@ class Torrent extends EventEmitter {
        if (wire.requests.length) return
  
        let i = self._selections.length
@@ -784,7 +785,7 @@ index ac7cb97..22e5eb0 100644
        while (i--) {
          const next = self._selections[i]
          let piece
-@@ -1313,6 +1455,7 @@ class Torrent extends EventEmitter {
+@@ -1313,6 +1456,7 @@ class Torrent extends EventEmitter {
            let tries = 0
            const filter = genPieceFilterFunc(start, end, tried)
  
@@ -792,7 +793,7 @@ index ac7cb97..22e5eb0 100644
            while (tries < len) {
              piece = self._rarityMap.getRarestPiece(filter)
              if (piece < 0) break
-@@ -1388,10 +1531,12 @@ class Torrent extends EventEmitter {
+@@ -1388,10 +1532,12 @@ class Torrent extends EventEmitter {
            let tries = 0
            const filter = genPieceFilterFunc(start, end, tried, rank)
  
@@ -805,7 +806,7 @@ index ac7cb97..22e5eb0 100644
              while (self._request(wire, piece, self._critical[piece] || hotswap)) {
                // body intentionally empty
                // request all non-reserved blocks in this piece
-@@ -1410,6 +1555,7 @@ class Torrent extends EventEmitter {
+@@ -1410,6 +1556,7 @@ class Torrent extends EventEmitter {
            for (piece = next.from + next.offset; piece <= next.to; piece++) {
              if (!wire.peerPieces.get(piece) || !rank(piece)) continue
  
@@ -813,7 +814,7 @@ index ac7cb97..22e5eb0 100644
              while (self._request(wire, piece, self._critical[piece] || hotswap)) {
                // body intentionally empty
                // request all non-reserved blocks in piece
-@@ -1471,6 +1617,7 @@ class Torrent extends EventEmitter {
+@@ -1471,6 +1618,7 @@ class Torrent extends EventEmitter {
  
      let numInterestedUnchoked = 0
      // leave one rechoke slot open for optimistic unchoking
@@ -821,7 +822,7 @@ index ac7cb97..22e5eb0 100644
      while (wireStack.length > 0 && numInterestedUnchoked < this._rechokeNumSlots - 1) {
        const wire = wireStack.pop() // next best quality peer
  
-@@ -1672,6 +1819,12 @@ class Torrent extends EventEmitter {
+@@ -1672,6 +1820,12 @@ class Torrent extends EventEmitter {
          if (!this.bitfield.get(i)) return
        }
        file.done = true
