@@ -1,1 +1,3 @@
-fix bugs in ios and improve UI in mobile mode
+#85
+#931
+#111
