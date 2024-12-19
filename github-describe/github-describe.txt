@@ -1,6 +1,3 @@
-#130
-fix version info
-improve logger
-log for subtitle
-fix server error in ios and add file transferer
-#126
+skip network status check for non-capacitor
+fix aws network check
+try fix metadata errors for streaming and add entitlements config for ios
