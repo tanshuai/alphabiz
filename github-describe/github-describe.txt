@@ -1,2 +1,1 @@
-fix deliveryStatusPromise
-update app version
+fix scroll page error in credits
