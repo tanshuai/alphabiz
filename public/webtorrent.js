@@ -714,6 +714,7 @@ const stopTorrent = infoHash => {
     tr.completed = true
   }
   if (tr) {
+    ipcRenderer.send('webtorrent-finish-all-payments', torrentToJson(tr))
     tr.destroy(() => {
       locked.delete(infoHash)
       ipcRenderer.send('webtorrent-stop', infoHash, tr.completed)
