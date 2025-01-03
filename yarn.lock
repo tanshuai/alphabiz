@@ -5329,6 +5329,11 @@ debug@^4.3.4:
   dependencies:
     ms "2.1.2"
 
+debug@~0.7.0:
+  version "0.7.4"
+  resolved "https://registry.yarnpkg.com/debug/-/debug-0.7.4.tgz#06e1ea8082c2cb14e39806e22e2f6f757f92af39"
+  integrity sha512-EohAb3+DSHSGx8carOSKJe8G0ayV5/i609OD0J2orCkuyae7SyZSz2aoLmQF2s0Pj5gITDebwPH7GFBlqOUQ1Q==
+
 debug@~4.1.1:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/debug/-/debug-4.1.1.tgz#3b72260255109c6b589cee050f1d516139664791"
@@ -9622,6 +9627,13 @@ napi-macros@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/napi-macros/-/napi-macros-2.0.0.tgz#2b6bae421e7b96eb687aa6c77a7858640670001b"
   integrity sha512-A0xLykHtARfueITVDernsAWdtIMbOJgKgcluwENp3AlsKN/PloyO10HtmoqnFAQAcxPkgZN7wdfPfEd0zNGxbg==
+
+nat-pmp@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/nat-pmp/-/nat-pmp-1.0.0.tgz#d5f3fb1dff52d9e20d16ad2aa1c41a54296a8c4a"
+  integrity sha512-DHh1Ko06d17x9iUoiWse39W8pYed34uPJj5sxAnfCju22zBF2LU2Dh3UhUhiQz9Rfp4otcBFmMeQhfJNGYdfRw==
+  dependencies:
+    debug "~0.7.0"
 
 natural-compare@^1.4.0:
   version "1.4.0"

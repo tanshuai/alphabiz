@@ -93,6 +93,7 @@
     "mail-listener2": "^0.3.1",
     "mailparser": "^3.4.0",
     "minimist": "^1.2.6",
+    "nat-pmp": "^1.0.0",
     "patch-package": "^6.4.7",
     "playwright": "^1.16.3",
     "start-server-and-test": "^1.14.0",
