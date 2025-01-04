@@ -13,6 +13,8 @@ const { utimes } = require('utimes')
 import { useAlphabizProtocol, useClientEvents } from './wt-extention.js'
 import preloader from './webtorrent-preload.js'
 import utils from './webtorrent-utils.js'
+import natTraversal from './nat.js'
+const natPorts = []
 
 const isMac = is.macOS()
 const { setAttributeSync, removeAttributeSync, listAttributesSync } = isMac ? require('fs-xattr') : {
@@ -194,6 +196,7 @@ const initClient = (retries = 0) => {
 
   info('init client', conf)
   client = new WebTorrent(conf)
+  client.natTraversal = natTraversal
   if (!isNaN(downloadSpeed)) client.throttleDownload(downloadSpeed)
   if (!isNaN(uploadSpeed) && !isNaN(payedUserShareRate)) client.throttleUpload(uploadSpeed, payedUserShareRate)
   client.on('error', e => {
@@ -214,6 +217,23 @@ const initClient = (retries = 0) => {
   client.on('ready', () => {
     console.log('initted')
     ipcRenderer.send('webtorrent-initted')
+  })
+  client.dht.once('listening', () => {
+    const address = client.dht.address()
+    console.log('DHT listening', address)
+    if (natTraversal.portMapping) {
+      natTraversal.portMapping(address.port, 'udp')
+      natPorts.push(address.port)
+    }
+  })
+  client.on('listening', () => {
+    console.log('Client listening', client._connPool)
+    if (client._connPool && client._connPool.tcpServer) {
+      const address = client._connPool.tcpServer.address()
+      console.log('TCP Server', address)
+      natTraversal.portMapping(address.port, 'tcp')
+      natPorts.push(address.port)
+    }
   })
   window.client = client
   useClientEvents(client)
@@ -1308,4 +1328,16 @@ const stopServer = () => {
     // ipcRenderer.send('webtorrent-window-error', e.error && e.error.message || e.message)
     return true
   })
+  ipcRenderer.on('before-quit', () => {
+    natPorts.forEach(port => {
+      natTraversal.portUnMapping(port)
+    })
+  })
+  if (typeof window !== 'undefined') {
+    window.addEventListener('beforeunload', () => {
+      natPorts.forEach(port => {
+        natTraversal.portUnMapping(port)
+      })
+    })
+  }
 })()
