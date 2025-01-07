@@ -33,13 +33,21 @@ class OauthPage extends BasePage {
     if (await this.page.locator('[data-testid="OAuth_Consent_Log_In_Button"]').isVisible()) {
       await this.page.locator('[data-testid="OAuth_Consent_Log_In_Button"]').click()
       await this.page.locator('input[autocomplete="username"]').fill(username)
+      await this.page.waitForTimeout(3000)
       await this.page.locator('div[role="button"]:has-text("Next")').click()
       await this.page.waitForTimeout(3000)
-      if (await this.page.locator('[data-testid="ocfEnterTextTextInput"]').isVisible()) {
-        await this.page.locator('[data-testid="ocfEnterTextTextInput"]').fill(username)
-        await this.page.locator('[data-testid="ocfEnterTextNextButton"]').click()
+      // if (await this.page.locator('[data-testid="ocfEnterTextTextInput"]').isVisible()) {
+      //   await this.page.locator('[data-testid="ocfEnterTextTextInput"]').fill(username)
+      //   await this.page.waitForTimeout(3000)
+      //   await this.page.locator('[data-testid="ocfEnterTextNextButton"]').click()
+      // }
+      if (await this.page.locator('input[name="password"]').isVisible()) {
+        await this.page.locator('input[name="password"]').fill(password)
+        await this.page.waitForTimeout(3000)
+        await this.page.locator('[data-testid="LoginForm_Login_Button"]').click()
       }
     }
+    await this.page.waitForTimeout(5000)
     if (await this.page.locator('[data-testid="OAuth_Consent_Button"]').isVisible()) {
       await this.page.locator('[data-testid="OAuth_Consent_Button"]').click()
     }
