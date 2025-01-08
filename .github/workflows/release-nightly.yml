@@ -64,6 +64,7 @@ jobs:
       TEST3_PHONE_NUMBER: ${{ secrets.TEST3_PHONE_NUMBER }}
       TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
       TEST_RESET_PASSWORD: ${{ secrets.TEST_RESET_PASSWORD }}
+      OAUTH_ACCOUNT_PASSWORD: ${{ secrets.OAUTH_ACCOUNT_PASSWORD }}
       TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
       TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
       TWITTER_ACCESS_TOKEN_KEY: ${{ secrets.TWITTER_ACCESS_TOKEN_KEY }}
@@ -307,9 +308,13 @@ jobs:
           && github.repository == 'tanshuai/alphabiz'
         run: yarn test:e2e:ci
 
+      - name: oauth E2E Test 🧪
+        if: "!contains(github.event.head_commit.message, 'skip e2e')"
+        run: yarn playwright test oauth
+
       - name: Upload Test Results 🗃
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: "${{ matrix.os }}-output"
           path: test/output/**
@@ -535,7 +540,7 @@ jobs:
       
       - name: Upload Test Results 🗃
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: "build-dmg-output"
           path: build.log
@@ -851,7 +856,7 @@ jobs:
 
       - name: Upload Test Results 🗃
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: "appium-test-${{ matrix.test }}-output"
           path: test/output/**
