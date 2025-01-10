@@ -23,6 +23,7 @@
     "test:e2e:ci": "cross-env E2E_TEST=true START_SERVER_AND_TEST_INSECURE=1 start-test \"http-server dist/spa --silent -S -C test/cypress/fixtures/E2E-TEST.pem -K test/cypress/fixtures/E2E-TEST-key.pem\" https://localhost:8080 \"cypress run --config-file test/cypress/cypress-config.json --spec \"test/cypress/integration/main/**\" --browser chrome\"",
     "test:e2e:website:ci": "cross-env E2E_TEST=true cypress run --config baseUrl=https://web.alpha.biz --config-file test/cypress/cypress-config.json --spec \"test/cypress/integration/website/**\" --browser chrome",
     "test:e2e:electron:main": "xvfb-maybe -- playwright test main",
+    "test:e2e:oauth": "xvfb-maybe -- playwright test oauth",
     "test:e2e:electron:wallet": "xvfb-maybe -- playwright test wallet",
     "test:e2e:config": "node test/playwright/customization/modifyConfig.js",
     "test:e2e:electron:custom": "xvfb-maybe -- playwright test customize.spec.js",
