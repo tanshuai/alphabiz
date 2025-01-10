@@ -310,9 +310,7 @@ jobs:
 
       - name: oauth E2E Test 🧪
         if: |
-          (contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json'))
-          && steps.slug.outputs.app-name == 'Alphabiz'
-          && !contains(github.event.head_commit.message, 'skip e2e')
+          !contains(github.event.head_commit.message, 'skip e2e')
         run: yaran test:e2e:oauth
 
       - name: Upload Test Results 🗃
