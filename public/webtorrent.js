@@ -218,7 +218,7 @@ const initClient = (retries = 0) => {
     console.log('initted')
     ipcRenderer.send('webtorrent-initted')
   })
-  client.dht.once('listening', () => {
+  client.dht.on('listening', () => {
     const address = client.dht.address()
     console.log('DHT listening', address)
     if (natTraversal.portMapping) {
