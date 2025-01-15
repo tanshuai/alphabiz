@@ -14,6 +14,9 @@ module.exports = {
         'Twitter'
       ]
     },
+    library: {
+      show_explore: false
+    },
     update: {
       enable: false
     }
