@@ -24,23 +24,28 @@ username = username + process.env.TEST_EMAIL_DOMAIN
 username2 = username2 + process.env.TEST_EMAIL_DOMAIN
 githubUsername = githubUsername + process.env.TEST_EMAIL_DOMAIN
 
-let browser, page
+let browser, context, page
 test.beforeAll(async () => {
   browser = await chromium.launch({
     headless: false,
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
   })
-  // browser = await chromium.launch()
-  page = await browser.newPage()
+
+  context = await browser.newContext();
+  await context.addCookies([{name:"TestEnv", value: 'true', url: "https://web.alpha.biz"}])
+  page = await context.newPage()
+
+  // page = await browser.newPage()
 
   // new Pege Object Model
   basePage = new BasePage(page)
   oauthPage = new OauthPage(page)
 })
 
-test.describe('github', () => {
+test.describe.only('github', () => {
   test('Ensure disconnected', async () => {
     await page.goto(`https://web.alpha.biz`, { timeout: 40000, waitUntil: 'domcontentloaded' })
+    console.log(await context.cookies())
     await basePage.signIn(username, password)
     await basePage.jumpPage('accountSettingLink')
     await page.waitForTimeout(5000)
