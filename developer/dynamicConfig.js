@@ -3,10 +3,11 @@
  */
 module.exports = {
   remote: {
-    url: 'https://alpha.biz/app/remote_config.json'
+    url: 'https://alpha.biz/app/remote_config'
   },
   local: {
-    id: 'local_config_v1',
+    type: 'local',
+    version: 'default:v1',
     oauth: {
       enable: false,
       providers: [
