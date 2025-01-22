@@ -14,11 +14,11 @@ if (process.platform === 'win32') {
 } else if (process.platform === 'linux') {
   username = 'test3'
   username2 = 'test4'
-  githubUsername = 'test2'
+  githubUsername = 'test4'
 } else {
   username = 'test5'
   username2 = 'test6'
-  githubUsername = 'test3'
+  githubUsername = 'test5'
 }
 username = username + process.env.TEST_EMAIL_DOMAIN
 username2 = username2 + process.env.TEST_EMAIL_DOMAIN
@@ -28,7 +28,6 @@ let browser, context, page
 test.beforeAll(async () => {
   browser = await chromium.launch({
     headless: false,
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
   })
 
   context = await browser.newContext();
@@ -42,10 +41,18 @@ test.beforeAll(async () => {
   oauthPage = new OauthPage(page)
 })
 
+// test.afterEach(async ({}, testInfo) => {
+//   if (testInfo.status !== testInfo.expectedStatus) {
+//     process.exit(1)
+//   }
+// })
+
 test.describe.only('github', () => {
-  test('Ensure disconnected', async () => {
+  test.beforeEach(async ({ }, testInfo) => {
+    test.setTimeout(60000 * 5)
+  })
+  test.only('Ensure disconnected', async () => {
     await page.goto(`https://web.alpha.biz`, { timeout: 40000, waitUntil: 'domcontentloaded' })
-    console.log(await context.cookies())
     await basePage.signIn(username, password)
     await basePage.jumpPage('accountSettingLink')
     await page.waitForTimeout(5000)
@@ -56,7 +63,7 @@ test.describe.only('github', () => {
     }
   })
 
-  test('Github connected', async () => {
+  test.only('Github connected', async () => {
     await oauthPage.githubStatusBtn.click()
     await oauthPage.signInGithub(githubUsername, oauthAccountPassword)
     await page.waitForURL('https://web.alpha.biz/**')
@@ -107,6 +114,9 @@ test.describe.only('github', () => {
 })
 
 test.describe('twitter', () => {
+  test.beforeEach(async ({ }, testInfo) => {
+    test.setTimeout(60000 * 5)
+  })
   test('Ensure disconnected', async () => {
     await page.goto(`https://web.alpha.biz`, { timeout: 40000, waitUntil: 'domcontentloaded' })
     await basePage.signIn(username, password)
