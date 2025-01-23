@@ -47,11 +47,11 @@ test.beforeAll(async () => {
 //   }
 // })
 
-test.describe.only('github', () => {
+test.describe('github', () => {
   test.beforeEach(async ({ }, testInfo) => {
     test.setTimeout(60000 * 5)
   })
-  test.only('Ensure disconnected', async () => {
+  test('Ensure disconnected', async () => {
     await page.goto(`https://web.alpha.biz`, { timeout: 40000, waitUntil: 'domcontentloaded' })
     await basePage.signIn(username, password)
     await basePage.jumpPage('accountSettingLink')
@@ -63,7 +63,7 @@ test.describe.only('github', () => {
     }
   })
 
-  test.only('Github connected', async () => {
+  test('Github connected', async () => {
     await oauthPage.githubStatusBtn.click()
     await oauthPage.signInGithub(githubUsername, oauthAccountPassword)
     await page.waitForURL('https://web.alpha.biz/**')
