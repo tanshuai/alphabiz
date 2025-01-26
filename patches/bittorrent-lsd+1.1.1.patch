@@ -1,0 +1,13 @@
+diff --git a/node_modules/bittorrent-lsd/index.js b/node_modules/bittorrent-lsd/index.js
+index 9e770f4..9e4a9eb 100644
+--- a/node_modules/bittorrent-lsd/index.js
++++ b/node_modules/bittorrent-lsd/index.js
+@@ -3,7 +3,7 @@ const dgram = require('dgram')
+ const EventEmitter = require('events').EventEmitter
+ const debug = require('debug')('bittorrent-lsd')
+ 
+-const ANNOUNCE_INTERVAL = 300000 // 5min
++const ANNOUNCE_INTERVAL = 30000 // 5min
+ const LSD_HOST = '239.192.152.143'
+ const LSD_PORT = 6771
+ 

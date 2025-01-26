@@ -257,7 +257,7 @@ index cbbc484..8c6f2e7 100644
      this.offset = file.offset
  
 diff --git a/node_modules/webtorrent/lib/peer.js b/node_modules/webtorrent/lib/peer.js
-index 19cb5ff..714a290 100644
+index 19cb5ff..e56bf06 100644
 --- a/node_modules/webtorrent/lib/peer.js
 +++ b/node_modules/webtorrent/lib/peer.js
 @@ -16,6 +16,20 @@ exports.enableSecure = () => {
@@ -319,7 +319,7 @@ index 19cb5ff..714a290 100644
 -    wire.once('pe3', () => {
 -      this.onPe3()
 +    wire.once('pe3', (ihh) => {
-+      // console.log('wire.onPe3', ihh)
++      console.log('wire.onPe3', ihh)
 +      this.onPe3(ihh)
      })
      wire.once('pe4', () => {
@@ -339,7 +339,7 @@ index 19cb5ff..714a290 100644
    }
  
    sendPe1 () {
-+    // console.log(this.swarm.infoHash, 'sendPe1')
++    console.log(this.swarm.infoHash, 'sendPe1')
      this.wire.sendPe1()
      this.sentPe1 = true
    }
@@ -357,7 +357,7 @@ index 19cb5ff..714a290 100644
  
    onPe2 () {
      this.sendPe3()
-+    // console.log(this.swarm.infoHash, 'onPe2')
++    console.log(this.swarm.infoHash, 'onPe2')
    }
  
    sendPe3 () {
@@ -367,19 +367,19 @@ index 19cb5ff..714a290 100644
    }
  
    onPe3 (infoHashHash) {
-+    // console.log('peer.js: onPe3', infoHashHash);
++    console.log('peer.js: onPe3', infoHashHash);
 +    if (!infoHashHash) return console.log('skip without infoHashHash')
 +    // setTimeout(() => {
      if (this.swarm) {
-+      // console.log('use swarm', this.swarm.infoHashHash, infoHashHash)
++      console.log('use swarm', this.swarm.infoHashHash, infoHashHash)
        if (this.swarm.infoHashHash !== infoHashHash) {
-+        // console.log('error infoHashHash', infoHashHash, this.swarm.infoHashHash)
++        console.log('error infoHashHash', infoHashHash, this.swarm.infoHashHash)
          this.destroy(new Error('unexpected crypto handshake info hash for this swarm'))
        }
 -      this.sendPe4()
 +      else this.sendPe4()
 +    } else {
-+      // console.log('noSwarm')
++      console.log('noSwarm')
 +      this.destroy(new Error('No swarm available'))
      }
 +    // console.log(this.swarm, 'onPe3', infoHashHash, this.swarm?.infoHashHash)
@@ -390,12 +390,12 @@ index 19cb5ff..714a290 100644
 +    if (!this.wire || !this.wire.sendPe4) return
      this.wire.sendPe4(this.swarm.infoHash)
      this.sentPe4 = true
-+    // console.log(this.swarm.infoHash, 'sendPe4')
++    console.log(this.swarm.infoHash, 'sendPe4')
    }
  
    onPe4 () {
      if (!this.sentHandshake) this.handshake()
-+    // console.log(this.swarm.infoHash, 'onPe4')
++    console.log(this.swarm.infoHash, 'onPe4')
    }
  
    clearPipes () {
@@ -425,11 +425,19 @@ index 19cb5ff..714a290 100644
        .pipe(new Transform({
          transform (chunk, _, callback) {
            self.emit('upload', chunk.length)
-@@ -357,14 +402,15 @@ class Peer extends EventEmitter {
+@@ -331,6 +376,7 @@ class Peer extends EventEmitter {
+     }
+     this.wire.handshake(this.swarm.infoHash, this.swarm.client.peerId, opts)
+     this.sentHandshake = true
++    debug('this.sentHandshake')
+   }
+ 
+   startConnectTimeout () {
+@@ -357,14 +403,15 @@ class Peer extends EventEmitter {
    }
  
    destroy (err) {
-+    // console.log('destroy', err, this.destroyed, this.type, this.id)
++    // if (err) console.log('destroy', err, this.destroyed, this.type, this.id, (new Error('e')).stack)
      if (this.destroyed) return
 -    this.destroyed = true
 -    this.connected = false
@@ -443,7 +451,7 @@ index 19cb5ff..714a290 100644
  
      const swarm = this.swarm
      const conn = this.conn
-@@ -374,14 +420,27 @@ class Peer extends EventEmitter {
+@@ -374,14 +421,27 @@ class Peer extends EventEmitter {
      this.conn = null
      this.wire = null
  
@@ -496,7 +504,7 @@ index 7e08906..960994c 100644
      }
  
 diff --git a/node_modules/webtorrent/lib/torrent.js b/node_modules/webtorrent/lib/torrent.js
-index ac7cb97..3a7fe72 100644
+index ac7cb97..c7d99a5 100644
 --- a/node_modules/webtorrent/lib/torrent.js
 +++ b/node_modules/webtorrent/lib/torrent.js
 @@ -49,8 +49,17 @@ const PIPELINE_MAX_DURATION = 1
@@ -835,11 +843,19 @@ index ac7cb97..3a7fe72 100644
        file.emit('done')
        this._debug(`file done: ${file.name}`)
      })
+@@ -1775,6 +1929,7 @@ class Torrent extends EventEmitter {
+     if (this.client.utp && peer.type === 'utpOutgoing') {
+       peer.conn = utp.connect(opts.port, opts.host)
+     } else {
++      // console.log(JSON.stringify(opts))
+       peer.conn = net.connect(opts)
+     }
+ 
 diff --git a/node_modules/webtorrent/lib/utp.js b/node_modules/webtorrent/lib/utp.js
-index 2cde3f4..21956e3 100644
+index 2cde3f4..7c6d6c7 100644
 --- a/node_modules/webtorrent/lib/utp.js
 +++ b/node_modules/webtorrent/lib/utp.js
-@@ -1,8 +1,3 @@
+@@ -1,8 +1 @@
 -module.exports = (() => {
 -  try {
 -    return require('utp-native')
@@ -848,6 +864,5 @@ index 2cde3f4..21956e3 100644
 -    return {}
 -  }
 -})()
-+// Patched by Alphabiz
-+// the `utp-native` causes memory leak in electron, disable it
 +module.exports = {}
+\ No newline at end of file
