@@ -51,6 +51,8 @@ jobs:
     env:
       NODE_AUTH_TOKEN: ${{ secrets.PAT }}
       GITHUB_PAT: ${{ secrets.PAT }}
+      GOOGLE_EMAIL_USERNAME: ${{ secrets.GOOGLE_EMAIL_USERNAME }}
+      GOOGLE_EMAIL_PASSWORD: ${{ secrets.GOOGLE_EMAIL_PASSWORD }}
       EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
       EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
       PHONE_NUMBER_ACCOUNT: ${{ secrets.PHONE_NUMBER_ACCOUNT }}
@@ -851,7 +853,8 @@ jobs:
             unset APP_TYPE
 
       - name: Upload Test Results 🗃
-        if: always()
+        if: |
+          cancelled() || failure()
         uses: actions/upload-artifact@v3
         with:
           name: "appium-test-${{ matrix.test }}-output"
