@@ -10,7 +10,7 @@ const password = process.env.TEST_PASSWORD
 if (process.platform === 'win32') {
   username = 'test1'
   username2 = 'test2'
-  githubUsername = 'test1'
+  githubUsername = process.env.TEST1_EMAIL
   twitterUsername = 'AlphabizT57517'
 } else if (process.platform === 'linux') {
   username = 'test3'
@@ -23,7 +23,7 @@ if (process.platform === 'win32') {
 }
 username = username + process.env.TEST_EMAIL_DOMAIN
 username2 = username2 + process.env.TEST_EMAIL_DOMAIN
-githubUsername = githubUsername + process.env.TEST_EMAIL_DOMAIN
+if (!githubUsername.includes('@')) githubUsername = githubUsername + process.env.TEST_EMAIL_DOMAIN
 
 let browser, context, page
 test.beforeAll(async () => {
@@ -83,7 +83,7 @@ test.describe('github', () => {
     await basePage.signOut()
   })
 
-  test('Login - connected', async () => {
+  test.only('Login - connected', async () => {
     await page.goto(`https://web.alpha.biz`, { timeout: 40000, waitUntil: 'domcontentloaded' })
     await oauthPage.signInWithGithubBtn.click()
     await oauthPage.signInGithub(githubUsername, oauthAccountPassword)
@@ -92,6 +92,8 @@ test.describe('github', () => {
     await page.locator('.q-card:has-text("Create or import library key") button:has-text("OK")').click()
     await page.locator('.post-card').nth(0).waitFor({ timeout: 30000 })
     await basePage.waitForAllHidden(await basePage.alert)
+
+    await basePage.signOut()
   })
 
   test('Github disconnected', async () => {
@@ -149,7 +151,7 @@ test.describe('twitter', () => {
     await basePage.signOut()
   })
 
-  test('Login - connected', async () => {
+  test.only('Login - connected', async () => {
     await page.goto(`https://web.alpha.biz`, { timeout: 40000, waitUntil: 'domcontentloaded' })
     await oauthPage.signInWithTwitterBtn.click()
     await oauthPage.signInTwitter(username, oauthAccountPassword, twitterUsername)
@@ -158,6 +160,8 @@ test.describe('twitter', () => {
     await page.locator('.q-card:has-text("Create or import library key") button:has-text("OK")').click()
     await page.locator('.post-card').nth(0).waitFor({ timeout: 30000 })
     await basePage.waitForAllHidden(await basePage.alert)
+
+    await basePage.signOut()
   })
 
   test('Twitter disconnected', async () => {
