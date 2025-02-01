@@ -44,7 +44,7 @@ class OauthPage extends BasePage {
   async signInTwitter (username, password, twitterUsername) {
     let newTime
     await this.page.waitForURL('https://twitter.com/i/oauth2/**')
-    await this.page.waitForTimeout(3000)
+    await this.page.waitForTimeout(5000)
     if (await this.page.locator('[data-testid="OAuth_Consent_Log_In_Button"]').isVisible()) {
       await this.page.locator('[data-testid="OAuth_Consent_Log_In_Button"]').click()
       await this.page.locator('input[autocomplete="username"]').fill(username)
@@ -67,8 +67,8 @@ class OauthPage extends BasePage {
         await this.page.locator('input[name="password"]').fill(password)
         newTime = new Date()
         await this.page.locator('[data-testid="LoginForm_Login_Button"]').click()
-        await this.page.waitForTimeout(5000)
       }
+      await this.page.waitForTimeout(7000)
       // if (await this.page.locator('text=Check your email').isVisible()) {
       //   console.log('twitter need Device Verification Code!')
       //   const verificationCode = await getMailCode({ type: 1, time: newTime, to: username, oauth: 'twitter' })
@@ -80,8 +80,8 @@ class OauthPage extends BasePage {
     }
     try {
       if (await this.page.locator('[data-testid="OAuth_Consent_Button"]').isVisible()) {
-      await this.page.locator('[data-testid="OAuth_Consent_Button"]').click()
-    }
+        await this.page.locator('[data-testid="OAuth_Consent_Button"]').click()
+      }
     } catch (err) {
 
     }

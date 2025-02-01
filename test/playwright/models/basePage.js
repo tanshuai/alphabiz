@@ -299,7 +299,7 @@ class BasePage {
     }
   }
 
-  async waitForAllHidden (locator, timeout = 10000, waitTime = 200) {
+  async waitForAllHidden (locator, timeout = 30000, waitTime = 200) {
     const start = Date.now()
     const elementsVisible = async () => (await locator.evaluateAll(elements => elements.map(element => element.hidden))).includes(false)
 
