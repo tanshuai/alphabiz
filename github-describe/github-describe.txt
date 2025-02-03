@@ -1,17 +1,7 @@
-#104
-set test env in oauth test
-add test log,skip push to public
-run oauth test in self-runner, skip push to public
-retry oauth rest, skip push to public
-retry oauth test - 2, skip push to public
-retry oauth test - 3, skip push to public
-retry oauth test - 4,add test timeout , skip push to public
-retry oauth test - 5, skip push to public
-skip verify code - 6, skip push to public
-#137
-retry oauth test - 7, skip push to public
-Update mixinKeychainLib.js
-catch navigation error - 8, skip push to public
-#141
-add oauth test #932
-add webtorrent debugs
+adjust the oauth test sequence
+modify github account
+fix white screen
+add timeout, skip push to public
+add default timeout, skip push to public
+fix #128 and try hide invalid posts #102
+modify oauth e2e test
