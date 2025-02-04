@@ -4,7 +4,7 @@ const { BasePage } = require('./models/basePage')
 const { OauthPage } = require('./models/oauthPage')
 
 let basePage, oauthPage
-let username, username2,githubUsername, twitterUsername
+let username, username2, githubUsername, twitterUsername
 const oauthAccountPassword = process.env.OAUTH_ACCOUNT_PASSWORD
 const password = process.env.TEST_PASSWORD
 if (process.platform === 'win32') {
@@ -28,11 +28,11 @@ if (!githubUsername.includes('@')) githubUsername = githubUsername + process.env
 let browser, context, page
 test.beforeAll(async () => {
   browser = await chromium.launch({
-    headless: false,
+    headless: false
   })
 
-  context = await browser.newContext();
-  await context.addCookies([{name:"TestEnv", value: 'true', url: "https://web.alpha.biz"}])
+  context = await browser.newContext()
+  await context.addCookies([{ name: 'TestEnv', value: 'true', url: 'https://web.alpha.biz' }])
   page = await context.newPage()
 
   // page = await browser.newPage()
@@ -49,11 +49,11 @@ test.beforeAll(async () => {
 // })
 
 test.describe('github', () => {
-  test.beforeEach(async ({ }, testInfo) => {
+  test.beforeEach(async () => {
     test.setTimeout(60000 * 5)
   })
   test('Ensure disconnected', async () => {
-    await page.goto(`https://web.alpha.biz`, { timeout: 40000, waitUntil: 'domcontentloaded' })
+    await page.goto('https://web.alpha.biz', { timeout: 40000, waitUntil: 'domcontentloaded' })
     await basePage.signIn(username, password)
     await basePage.jumpPage('accountSettingLink')
     await page.waitForTimeout(5000)
@@ -84,7 +84,7 @@ test.describe('github', () => {
   })
 
   test.only('Login - connected', async () => {
-    await page.goto(`https://web.alpha.biz`, { timeout: 40000, waitUntil: 'domcontentloaded' })
+    await page.goto('https://web.alpha.biz', { timeout: 40000, waitUntil: 'domcontentloaded' })
     await oauthPage.signInWithGithubBtn.click()
     await oauthPage.signInGithub(githubUsername, oauthAccountPassword)
     await page.waitForURL('https://web.alpha.biz/**')
@@ -108,7 +108,7 @@ test.describe('github', () => {
   })
 
   test('Login - disconnected', async () => {
-    await page.goto(`https://web.alpha.biz`, { timeout: 40000, waitUntil: 'domcontentloaded' })
+    await page.goto('https://web.alpha.biz', { timeout: 40000, waitUntil: 'domcontentloaded' })
     await oauthPage.signInWithGithubBtn.click()
     await oauthPage.signInGithub(githubUsername, oauthAccountPassword)
     await page.waitForURL('https://web.alpha.biz/**')
@@ -117,11 +117,11 @@ test.describe('github', () => {
 })
 
 test.describe('twitter', () => {
-  test.beforeEach(async ({ }, testInfo) => {
+  test.beforeEach(async () => {
     test.setTimeout(60000 * 5)
   })
   test('Ensure disconnected', async () => {
-    await page.goto(`https://web.alpha.biz`, { timeout: 40000, waitUntil: 'domcontentloaded' })
+    await page.goto('https://web.alpha.biz', { timeout: 40000, waitUntil: 'domcontentloaded' })
     await basePage.signIn(username, password)
     await basePage.jumpPage('accountSettingLink')
     await page.waitForTimeout(5000)
@@ -152,7 +152,7 @@ test.describe('twitter', () => {
   })
 
   test.only('Login - connected', async () => {
-    await page.goto(`https://web.alpha.biz`, { timeout: 40000, waitUntil: 'domcontentloaded' })
+    await page.goto('https://web.alpha.biz', { timeout: 40000, waitUntil: 'domcontentloaded' })
     await oauthPage.signInWithTwitterBtn.click()
     await oauthPage.signInTwitter(username, oauthAccountPassword, twitterUsername)
     await page.waitForURL('https://web.alpha.biz/**')
@@ -176,7 +176,7 @@ test.describe('twitter', () => {
   })
 
   test('Login - disconnected', async () => {
-    await page.goto(`https://web.alpha.biz`, { timeout: 40000, waitUntil: 'domcontentloaded' })
+    await page.goto('https://web.alpha.biz', { timeout: 40000, waitUntil: 'domcontentloaded' })
     await oauthPage.signInWithTwitterBtn.click()
     await oauthPage.signInTwitter(username, oauthAccountPassword, twitterUsername)
     await page.waitForURL('https://web.alpha.biz/**')
