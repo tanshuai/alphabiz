@@ -112,6 +112,23 @@ const app = {
     // list: ['US', 'CN']
     list: []
   },
+  library: {
+    /**
+     * Add channel id list here to auto-select recommend channels.
+     * The location is determined by `navigator.language`, not the
+     * language user set in settings.
+     */
+    recommends: {
+      default: [
+        'fxpebrsi9ij5pzinwdky', // Public short films
+        'cut44dbbfxjpqka39qix' // New Film Express
+      ],
+      'zh-CN': [
+        'vs52l0yqtqqpqtw33ycx', // 最新电影速递
+        'cut44dbbfxjpqka39qix' // New Film Express
+      ]
+    }
+  },
   update: require('./update'),
   takedown: require('./take-down'),
   /**
