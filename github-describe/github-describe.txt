@@ -1,1 +1,1 @@
-add timeout
+fix tray icon missing in linux snap
