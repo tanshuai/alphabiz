@@ -1,4 +1,1 @@
-add VideoJsPlayer
-fix transition
-player: double click
-improve fullscreen
+use dblclick
