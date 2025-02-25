@@ -197,6 +197,7 @@ jobs:
           echo "commit-sha7=$(git log -1 --pretty=%B --author="Alphabiz-Team" | perl -wnE'say for /(?<=-)\w{7,8}(?=\s)|^\w{7,8}(?=\s)/g')" >> $GITHUB_OUTPUT
           export DESCRIBE=$(cat github-describe/github-describe.txt)
           echo "$DESCRIBE"
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
           echo "DESCRIBE<<EOF" >> $GITHUB_ENV
           echo "$DESCRIBE" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
