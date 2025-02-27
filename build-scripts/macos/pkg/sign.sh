@@ -1,6 +1,12 @@
 #!/bin/sh
-# Sign .app for releasing
 # shellcheck source=../../common/set-env.sh
+# Sign .app for normal release
+# This script will sign darwin app for non-store builds.
+# Note that different from the `sign.sh` in macos/app which signs MAS build,
+# this script will sign app with hardened runtime which is required by apple
+# notarization service.
+# The app signed by this script is invalid for MAS submission.
+
 . "build-scripts/common/set-env.sh"
 
 ensureEnv "APP" "your app name"
@@ -10,7 +16,7 @@ ensureEnv "PLATFORM" "\"mas\""
 ensureEnv "APPLE_TEAM_ID" "org.your-org.app-name"
 
 ensureEnv "BUILD_ARCH"
-APP_PATH="out/$APP-$PLATFORM-$BUILD_ARCH/$APP.app"
+APP_PATH="dist/electron/$APP-$PLATFORM-$BUILD_ARCH/$APP.app"
 
 ensureEnv "APPLE_DISTRIBUTION_KEY" "\"Developer ID Distribution: Company Name (XXXXXXXXXX)\""
 
