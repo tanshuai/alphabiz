@@ -1,6 +1,5 @@
-improve videoJs Player
-[player] header
-i18n for player
-fix track in m3u8
+add code-signing for pkg target
+add execute permission
 improve VideoJsPlayer
-add player2 page
+use new Player
+update sign scripts for public release
