@@ -142,7 +142,7 @@ jobs:
           fi
           MODIFIED_FILE_LIST=$(echo $MODIFIED_FILE_LIST | tr '\n' ' ')
           echo "MODIFIED_FILE_LIST=$MODIFIED_FILE_LIST" >> "$GITHUB_ENV"
-          
+
           # EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
           # echo "MODIFIED_FILE_LIST<<$EOF" >> "$GITHUB_ENV"
           # echo "$MODIFIED_FILE_LIST" >> "$GITHUB_ENV"
@@ -400,8 +400,7 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_ASP: ${{ secrets.APPLE_ASP }}
         run: |
-          SIGN_APP="./out/${{ env.APP }}-darwin-x64/${{ env.APP }}.app"
-          ./build-scripts/macos/pkg/sign.sh
+          SIGN_APP="./dist/electron/${{ env.APP }}-${{ env.PLATFORM }}-${{ env.ARCH }}/${{ env.APP }}.app"
           # Throw error if file does not exist
           if [ ! -e "$SIGN_APP" ]; then
             echo "$SIGN_APP does not exist!"
@@ -414,6 +413,7 @@ jobs:
           echo "Verifying..."
           codesign -v -vvv "$SIGN_APP"
           pkgutil --check-signature "$SIGN_APP"
+          echo "Signature verified."
 
       - name: Pack app 📦
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
