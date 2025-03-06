@@ -202,12 +202,12 @@ jobs:
           export DESCRIBE=$(cat github-describe/github-describe.txt)
           echo "$DESCRIBE"
 
-          # DESCRIBE=$(echo $DESCRIBE | sed ':a;N;$!ba;s/\n/###/g')
-          # echo "DESCRIBE=$DESCRIBE" >> "$GITHUB_ENV"
+          DESCRIBE=$(head -n 1 github-describe/github-describe.txt)
+          echo "DESCRIBE=$DESCRIBE" >> "$GITHUB_ENV"
 
-          echo "DESCRIBE<<EOF" >> "$GITHUB_ENV"
-          echo "$DESCRIBE" >> "$GITHUB_ENV"
-          echo "EOF" >> "$GITHUB_ENV"
+          # echo "DESCRIBE<<EOF" >> "$GITHUB_ENV"
+          # echo "$DESCRIBE" >> "$GITHUB_ENV"
+          # echo "EOF" >> "$GITHUB_ENV"
         shell: bash
 
       # This step for unify the tag name

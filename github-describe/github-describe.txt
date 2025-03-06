@@ -1,6 +1,3 @@
-improve videoJs Player
-[player] header
-i18n for player
-fix track in m3u8
-improve VideoJsPlayer
-add player2 page
+#941
+auto select recommend channels for new users #148
+remove debug entry
