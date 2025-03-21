@@ -161,7 +161,21 @@ const app = {
   /**
    * Microsoft Store Product ID
    */
-  microsoftStoreProductId: '9PBCCV3MHK04'
+  microsoftStoreProductId: '9PBCCV3MHK04',
+  /**
+   * You can put some community(e.g. discord) links here. The icon can be url to
+   * an image or base64 encoded string like `blob:...`.
+   * The community icon will show on top-right corner of your app near the version
+   * label, which will open a new browser window to your community link.
+   * Set `enable: false` to hide your icon without removing link or icon url.
+   * If more than one communities are available, the icon will be changed to a
+   * drop-down list.
+   */
+  communities: [{
+    enable: true,
+    url: 'https://github.com/tanshuai/alphabiz',
+    icon: 'https://github.githubassets.com/favicons/favicon.svg'
+  }]
 }
 
 console.log('INIT APP CONFIG')
