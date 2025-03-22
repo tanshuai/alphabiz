@@ -51,6 +51,8 @@ jobs:
     env:
       NODE_AUTH_TOKEN: ${{ secrets.PAT }}
       GITHUB_PAT: ${{ secrets.PAT }}
+      CERT_DATA: ${{ secrets.APPLE_CERT_DATA }}
+      CERT_PASS: ${{ secrets.APPLE_CERT_PASSWORD }}
       GOOGLE_EMAIL_USERNAME: ${{ secrets.GOOGLE_EMAIL_USERNAME }}
       GOOGLE_EMAIL_PASSWORD: ${{ secrets.GOOGLE_EMAIL_PASSWORD }}
       EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
@@ -350,11 +352,16 @@ jobs:
         shell: bash
 
       - name: Setup coreutils
-        if: (contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')) && matrix.os == 'macos-latest'
+        if: |
+          (contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json'))
+          && contains(steps.vars.outputs.system, 'macos')
         run: brew install coreutils
 
       - name: Import cert
-        if: (contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')) && matrix.os == 'macos-latest' && ${{ env.CERT_PASS }}
+        if: |
+          (contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json'))
+          && contains(steps.vars.outputs.system, 'macos')
+          && env.CERT_PASS != ''
         env:
           CERT_DATA: ${{ secrets.APPLE_CERT_DATA }}
           CERT_PASS: ${{ secrets.APPLE_CERT_PASSWORD }}
@@ -384,7 +391,10 @@ jobs:
           echo "Keychain verified"
 
       - name: Sign app
-        if: (contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')) && matrix.os == 'macos-latest' && ${{ env.CERT_PASS }}
+        if: |
+          (contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json'))
+          && contains(steps.vars.outputs.system, 'macos')
+          && env.CERT_PASS != ''
         env:
           CERT_PASS: ${{ secrets.APPLE_CERT_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
@@ -423,7 +433,10 @@ jobs:
         shell: bash
 
       - name: Create And Sign Pkg
-        if: (contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')) && matrix.os == 'macos-latest' && ${{ env.CERT_PASS }}
+        if: |
+          (contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json'))
+          && contains(steps.vars.outputs.system, 'macos')
+          && env.CERT_PASS != ''
         env:
           CERT_DATA: ${{ secrets.APPLE_CERT_DATA }}
           CERT_PASS: ${{ secrets.APPLE_CERT_PASSWORD }}
