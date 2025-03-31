@@ -78,8 +78,8 @@ if [ -e "$APP_PATH/Contents/Frameworks/Squirrel.framework/Versions/A/Resources/S
   codesign -vvv -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --options runtime --entitlements "$INHERIT" "$APP_PATH/Contents/Frameworks/Squirrel.framework/Versions/A/Resources/ShipIt"
 fi
 
-# echo "Sign binary"
-# codesign -vvv -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --options runtime --entitlements "$INHERIT" "$APP_PATH/Contents/MacOS/$APP"
+echo "Sign binary"
+codesign -vvv -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --options runtime --entitlements "$INHERIT" "$APP_PATH/Contents/MacOS/$APP"
 # Use --deep for signing all other files
 echo "Sign .app"
 codesign -vvv -s "$APPLE_DISTRIBUTION_KEY" --deep --timestamp --options runtime --entitlements "$ENTITLEMENT" -f "$APP_PATH"
