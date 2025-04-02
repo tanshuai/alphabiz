@@ -391,45 +391,21 @@ jobs:
           security find-identity -v macos-build.keychain | grep "$APPLE_TEAM_ID" | grep "Developer ID Installer"
           echo "Keychain verified"
 
-      - name: Sign app
-        if: |
-          (contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json'))
-          && contains(steps.vars.outputs.system, 'macos')
-          && env.CERT_PASS != ''
-        env:
-          CERT_PASS: ${{ secrets.APPLE_CERT_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          APPLE_DISTRIBUTION_KEY: "Developer ID Application"
-          VERSION: ${{ steps.unify.outputs.tag-name }}
-          BUILD_VERSION: ${{ steps.unify.outputs.tag-name }}
-          PLATFORM: darwin
-          BUILD_PLATFORM: darwin
-          ARCH: x64
-          BUILD_ARCH: x64
-          APP: "${{ steps.slug.outputs.display-name }}"
-          APP_BUNDLE_ID: org.alpha.biz
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_ASP: ${{ secrets.APPLE_ASP }}
+      - name: Pack app 📦
+        if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
+          export PATH=$PATH:/c/Program\ Files\ \(x86\)/WiX\ Toolset\ v3.11/bin
           SIGN_APP="./dist/electron/${{ env.APP }}-${{ env.PLATFORM }}-${{ env.ARCH }}/${{ env.APP }}.app"
           # Throw error if file does not exist
           if [ ! -e "$SIGN_APP" ]; then
             echo "$SIGN_APP does not exist!"
             exit 5
           fi
-          # Force the codesignature
-          echo "Codesigning..."
-          ./build-scripts/macos/pkg/sign.sh
           # Verify the code signature
           echo "Verifying..."
           codesign -v -vvv "$SIGN_APP"
           pkgutil --check-signature "$SIGN_APP"
           echo "Signature verified."
-
-      - name: Pack app 📦
-        if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
-        run: |
-          export PATH=$PATH:/c/Program\ Files\ \(x86\)/WiX\ Toolset\ v3.11/bin
           yarn make
         shell: bash
 
