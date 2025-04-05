@@ -394,33 +394,35 @@ jobs:
       - name: Pack app 📦
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         env:
-          CERT_PASS: ${{ secrets.APPLE_CERT_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          APPLE_DISTRIBUTION_KEY: "Developer ID Application"
-          VERSION: ${{ steps.unify.outputs.tag-name }}
-          BUILD_VERSION: ${{ steps.unify.outputs.tag-name }}
-          PLATFORM: darwin
-          BUILD_PLATFORM: darwin
-          ARCH: x64
-          BUILD_ARCH: x64
-          APP: "${{ steps.slug.outputs.display-name }}"
-          APP_BUNDLE_ID: org.alpha.biz
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_ASP: ${{ secrets.APPLE_ASP }}
         run: |
           export PATH=$PATH:/c/Program\ Files\ \(x86\)/WiX\ Toolset\ v3.11/bin
-          SIGN_APP="./dist/electron/${{ env.APP }}-${{ env.PLATFORM }}-${{ env.ARCH }}/${{ env.APP }}.app"
-          # Throw error if file does not exist
-          if [ ! -e "$SIGN_APP" ]; then
-            echo "$SIGN_APP does not exist!"
-            exit 5
-          fi
-          # Verify the code signature
-          echo "Verifying..."
-          codesign -v -vvv "$SIGN_APP"
-          pkgutil --check-signature "$SIGN_APP"
-          echo "Signature verified."
           yarn make
+          if [[ ${{ steps.vars.outputs.system }} == *macos* ]] && [[ ! -z ${{ secrets.APPLE_ID }} ]]; then
+            export PLATFORM=darwin
+            export BUILD_PLATFORM=darwin
+            export ARCH=x64
+            export BUILD_ARCH=x64
+            export APP_BUNDLE_ID=org.alpha.biz
+            export CERT_PASS="${{ secrets.APPLE_CERT_PASSWORD }}"
+            export APPLE_TEAM_ID="${{ secrets.APPLE_TEAM_ID }}"
+            export APPLE_DISTRIBUTION_KEY=""Developer ID Application""
+            export VERSION="${{ steps.unify.outputs.tag-name }}"
+            export BUILD_VERSION="${{ steps.unify.outputs.tag-name }}"
+            export APP=""${{ steps.slug.outputs.display-name }}""
+            export APPLE_ID="${{ secrets.APPLE_ID }}"
+            export APPLE_ASP="${{ secrets.APPLE_ASP }}"
+            SIGN_APP="./dist/electron/${{ env.APP }}-${{ env.PLATFORM }}-${{ env.ARCH }}/${{ env.APP }}.app"
+            # Throw error if file does not exist
+            if [ ! -e "$SIGN_APP" ]; then
+              echo "$SIGN_APP does not exist!"
+              exit 5
+            fi
+            # Verify the code signature
+            echo "Verifying..."
+            codesign -v -vvv "$SIGN_APP"
+            pkgutil --check-signature "$SIGN_APP"
+            echo "Signature verified."
+          fi
         shell: bash
 
       - name: Create And Sign Pkg
