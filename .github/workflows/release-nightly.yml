@@ -410,7 +410,7 @@ jobs:
             export APP=""${{ steps.slug.outputs.display-name }}""
             export APPLE_ID="${{ secrets.APPLE_ID }}"
             export APPLE_ASP="${{ secrets.APPLE_ASP }}"
-            SIGN_APP="./dist/electron/${{ env.APP }}-${{ env.PLATFORM }}-${{ env.ARCH }}/${{ env.APP }}.app"
+            SIGN_APP="./dist/electron/$APP-$PLATFORM-$ARCH/$APP.app"
             # Throw error if file does not exist
             if [ ! -e "$SIGN_APP" ]; then
               echo "$SIGN_APP does not exist!"
