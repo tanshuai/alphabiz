@@ -394,8 +394,6 @@ jobs:
       - name: Pack app 📦
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: |
-          export PATH=$PATH:/c/Program\ Files\ \(x86\)/WiX\ Toolset\ v3.11/bin
-          yarn make
           if [[ ${{ steps.vars.outputs.system }} == *macos* ]] && [[ ! -z ${{ secrets.APPLE_ID }} ]]; then
             export PLATFORM=darwin
             export BUILD_PLATFORM=darwin
@@ -410,6 +408,10 @@ jobs:
             export APP=""${{ steps.slug.outputs.display-name }}""
             export APPLE_ID="${{ secrets.APPLE_ID }}"
             export APPLE_ASP="${{ secrets.APPLE_ASP }}"
+          fi
+          export PATH=$PATH:/c/Program\ Files\ \(x86\)/WiX\ Toolset\ v3.11/bin
+          yarn make
+          if [[ ${{ steps.vars.outputs.system }} == *macos* ]] && [[ ! -z ${{ secrets.APPLE_ID }} ]]; then
             SIGN_APP="./dist/electron/$APP-$PLATFORM-$ARCH/$APP.app"
             # Throw error if file does not exist
             if [ ! -e "$SIGN_APP" ]; then
