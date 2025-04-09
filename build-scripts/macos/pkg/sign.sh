@@ -52,6 +52,9 @@ LOGINHELPER="$ENTITLEMENTS_DIR/entitlements.loginhelper.plist"
 cat "$ENTITLEMENT"
 echo ""
 
+echo "Start signing"
+echo ""
+
 find "$UNV_PATH" -name "* Framework" -exec codesign -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --options runtime --entitlements "$INHERIT" "{}" \;
 find "$UNV_PATH" -name "*.dylib" -exec codesign -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --entitlements "$INHERIT" "{}" \;
 find "$UNV_PATH" -name "*.framework" -exec codesign -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --options runtime --entitlements "$INHERIT" "{}" \;
@@ -77,6 +80,8 @@ fi
 #   codesign -s "$APPLE_DISTRIBUTION_KEY" --timestamp -f --options runtime --entitlements "$INHERIT" "$UNV_PATH/Contents/Frameworks/Squirrel.framework/Versions/A/Squirrel"
 # fi
 
+echo "Sign .app"
+echo ""
 # # find -f "$UNV_PATH" -exec sh -c codesign -s "$APPLE_DISTRIBUTION_KEY" --timestamp --entitlements "$INHERIT" -f --deep "$UNV_PATH" \;
 # codesign -s "$APPLE_DISTRIBUTION_KEY" --timestamp --options runtime --entitlements "$ENTITLEMENT" -f "$UNV_PATH/Contents/MacOS/$APP"
 codesign -s "$APPLE_DISTRIBUTION_KEY" --deep --timestamp --options runtime --entitlements "$ENTITLEMENT" -f "$UNV_PATH"
