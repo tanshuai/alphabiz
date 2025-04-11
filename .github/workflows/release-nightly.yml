@@ -412,7 +412,7 @@ jobs:
           export PATH=$PATH:/c/Program\ Files\ \(x86\)/WiX\ Toolset\ v3.11/bin
           yarn make
           if [[ ${{ steps.vars.outputs.system }} == *macos* ]] && [[ ! -z ${{ secrets.APPLE_ID }} ]]; then
-            SIGN_APP="./dist/electron/$APP-$PLATFORM-$ARCH/$APP.app"
+            SIGN_APP="./out/$APP-$PLATFORM-$ARCH/$APP.app"
             # Throw error if file does not exist
             if [ ! -e "$SIGN_APP" ]; then
               echo "$SIGN_APP does not exist!"
