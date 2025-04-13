@@ -413,6 +413,7 @@ jobs:
           yarn make
           if [[ ${{ steps.vars.outputs.system }} == *macos* ]] && [[ ! -z ${{ secrets.APPLE_ID }} ]]; then
             SIGN_APP="./out/$APP-$PLATFORM-$ARCH/$APP.app"
+            ./build-scripts/macos/pkg/sign.sh
             # Throw error if file does not exist
             if [ ! -e "$SIGN_APP" ]; then
               echo "$SIGN_APP does not exist!"
