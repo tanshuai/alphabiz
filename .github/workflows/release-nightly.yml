@@ -402,10 +402,10 @@ jobs:
             export APP_BUNDLE_ID=org.alpha.biz
             export CERT_PASS="${{ secrets.APPLE_CERT_PASSWORD }}"
             export APPLE_TEAM_ID="${{ secrets.APPLE_TEAM_ID }}"
-            export APPLE_DISTRIBUTION_KEY=""Developer ID Application""
+            export APPLE_DISTRIBUTION_KEY="Developer ID Application"
             export VERSION="${{ steps.unify.outputs.tag-name }}"
             export BUILD_VERSION="${{ steps.unify.outputs.tag-name }}"
-            export APP=""${{ steps.slug.outputs.display-name }}""
+            export APP="${{ steps.slug.outputs.display-name }}"
             export APPLE_ID="${{ secrets.APPLE_ID }}"
             export APPLE_ASP="${{ secrets.APPLE_ASP }}"
           fi
@@ -413,12 +413,14 @@ jobs:
           yarn make
           if [[ ${{ steps.vars.outputs.system }} == *macos* ]] && [[ ! -z ${{ secrets.APPLE_ID }} ]]; then
             SIGN_APP="./out/$APP-$PLATFORM-$ARCH/$APP.app"
-            ./build-scripts/macos/pkg/sign.sh
+            echo "$SIGN_APP"
+            echo "$APP"
             # Throw error if file does not exist
             if [ ! -e "$SIGN_APP" ]; then
               echo "$SIGN_APP does not exist!"
               exit 5
             fi
+            ./build-scripts/macos/pkg/sign.sh
             # Verify the code signature
             echo "Verifying..."
             codesign -v -vvv "$SIGN_APP"
