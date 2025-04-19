@@ -16,7 +16,7 @@ ensureEnv "PLATFORM" "\"mas\""
 ensureEnv "APPLE_TEAM_ID" "org.your-org.app-name"
 
 ensureEnv "BUILD_ARCH"
-APP_PATH="dist/electron/$APP-$PLATFORM-$BUILD_ARCH/$APP.app"
+APP_PATH="out/$APP-$PLATFORM-$BUILD_ARCH/$APP.app"
 
 ensureEnv "APPLE_DISTRIBUTION_KEY" "\"Developer ID Distribution: Company Name (XXXXXXXXXX)\""
 
