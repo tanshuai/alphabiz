@@ -434,6 +434,7 @@ jobs:
           (contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json'))
           && contains(steps.vars.outputs.system, 'macos')
           && env.CERT_PASS != ''
+        continue-on-error: true # If sign failed, just continue for normal builds
         env:
           CERT_DATA: ${{ secrets.APPLE_CERT_DATA }}
           CERT_PASS: ${{ secrets.APPLE_CERT_PASSWORD }}
