@@ -1,7 +1,3 @@
-bump @zeeis/velectron to v21.3.3
-auto add  subtitle after openFile
-fix bug of remove track
-fix bug of player
-fix pause
-try fix jump and scroll
-sign app in out/
+#941
+auto select recommend channels for new users #148
+remove debug entry
