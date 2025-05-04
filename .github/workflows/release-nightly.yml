@@ -465,7 +465,7 @@ jobs:
             rm "$UNSIGNED_FILE"
           fi
           echo "Notarizing dmg..."
-          $SIGNED_DMG="out/installers/$VERSION/${{ steps.unify.outputs.app-name-lower }}-$ARCH-$VERSION.dmg"
+          SIGNED_DMG="out/installers/$VERSION/${{ steps.slug.outputs.app-name-lower }}-$ARCH-$VERSION.dmg"
           xcrun notarytool submit "$SIGNED_DMG" -v --apple-id "$APPLE_ID" --password "$APPLE_ASP" --team-id "$APPLE_TEAM_ID" -f json --wait
           xcrun stapler staple "$SIGNED_DMG"
           echo "Finish notarizing dmg"
