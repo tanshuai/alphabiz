@@ -1,3 +1,9 @@
-#941
-auto select recommend channels for new users #148
-remove debug entry
+hide setting
+try improve timeline
+improve removeTrack
+fix libraryShowExplore
+fix #160
+fix #158
+improve volumeButton
+reduce required loaded channels for explore
+Update index.js
