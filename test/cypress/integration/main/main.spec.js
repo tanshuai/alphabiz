@@ -1,13 +1,13 @@
 /// <reference path="cypress" />
 /// <reference path="../../support/index.d.ts" />
-describe('main',{
+describe('main', {
   retries: {
     runMode: 2,
     openMode: 2
   }
 }, function () {
   beforeEach(function onBeforeEach () {
-    if (Cypress.platform === 'win32') this.skip()
+    // if (Cypress.platform === 'win32') this.skip()
   })
   describe('LanguageSelection', () => {
     it('language', () => {

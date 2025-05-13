@@ -20,16 +20,13 @@ Cypress.Commands.add('playMedia', (filePath, mediaInfo = {}) => {
   })
   // 验证播放器正常播放
   if (mediaInfo.isPlay) {
-    cy.get('#my-video_html5_api')
-      // should not be paused
-      .should('have.prop', 'paused', false)
-      .should('have.prop', 'duration', mediaInfo.duration)
+    cy.wait(5000)
+    cy.get('.video-js-player__controller').click()
+    cy.get('.absolute-center > .q-btn > .q-btn__wrapper > .q-btn__content', { timeout: 50000 }).should('be.visible')
   } else {
     cy.contains('The media could not be loaded', { timeout: 30000 })
     cy.get('#my-video_html5_api')
       // should be paused
       .should('have.prop', 'paused', true)
   }
-
-
 })

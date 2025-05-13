@@ -1,11 +1,10 @@
 class PlayerPage {
   constructor (page) {
     this.page = page
-    this.bigPlayBtn = page.locator('.vjs-big-play-button')
-    this.controlBar = page.locator('.vjs-progress-control')
+    this.playArrow = page.locator('.absolute-center i:has-text("play_arrow")')
+    this.playPage = page.locator('.video-js-player__controller')
     this.fileInput = page.locator('[data-cy="file-input"]')
-    this.playing = page.locator('.vjs-playing video')
-    this.paused = page.locator('.vjs-paused video')
+    this.stopPlay = page.locator('button:has-text("stop")')
   }
 }
 
