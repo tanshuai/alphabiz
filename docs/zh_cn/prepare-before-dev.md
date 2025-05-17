@@ -98,14 +98,14 @@
 
 下载链接:
 
-- [Visual Studio 2017 Community](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&rel=15)
+- [Visual Studio 2019 Community](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&rel=16)
 - [Python3.11.3](https://www.python.org/downloads/release/python-3113/)
-- [Visual Studio 2017安装详细教程](https://pigeon.blog.csdn.net/article/details/83098880?spm=1001.2101.3001.6650.4&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-4-83098880-blog-105362609.235%5Ev36%5Epc_relevant_anti_vip_base&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-4-83098880-blog-105362609.235%5Ev36%5Epc_relevant_anti_vip_base&utm_relevant_index=9)
+- [Visual Studio 2019安装详细教程](https://blog.csdn.net/YSJ367635984/article/details/104648941?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522168613286216800186553666%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=168613286216800186553666&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~top_positive~default-1-104648941-null-null.142^v88^insert_down38v5,239^v2^insert_chatgpt&utm_term=Visual%20Studio%202019&spm=1018.2226.3001.4187)
 - [Python安装详细教程](https://blog.csdn.net/weixin_49237144/article/details/122915089?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522168439792116782427455931%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=168439792116782427455931&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~top_positive~default-2-122915089-null-null.142^v87^control_2,239^v2^insert_chatgpt&utm_term=python%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B&spm=1018.2226.3001.4187)
 
 <details><summary>Visual Studio至少安装项目(点击查看)</summary>
 
-安装 Visual Studio Community 2017 时，需要至少选择安装以下组件：
+安装 Visual Studio Community 2019 时，需要至少选择安装以下组件：
 - .NET 桌面开发
 - 使用 C++ 的桌面开发
 
