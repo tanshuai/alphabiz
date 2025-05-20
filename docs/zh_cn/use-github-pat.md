@@ -20,6 +20,12 @@
 //npm.pkg.github.com/:_authToken=YOUT_TOKEN
 ```
 
+**注意： 是`~`目录下, 不清楚请自行查找各操作系统下`~`目录所在位置。不要修改github 仓库根目录的`.npmrc`文件，以免在后面`yarn install`时，一直出现401错误。**
+
+- 前往`~`文件夹的命令行：
+在macOS和Linux中，使用命令 `cd ~`。
+在Windows中，使用命令 `cd %userprofile%`。
+
 ## 3. Login to github registry
 
 ``` sh
