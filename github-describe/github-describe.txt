@@ -1,1 +1,3 @@
-
+#941
+auto select recommend channels for new users #148
+remove debug entry
