@@ -1,3 +1,4 @@
-#941
-auto select recommend channels for new users #148
-remove debug entry
+add mute; fix subtitle style
+improve subtitle position
+add subtitle options
+try improve post loader for explore
