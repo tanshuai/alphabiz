@@ -130,7 +130,7 @@ test.describe('wallet', () => {
     await walletPage.checkCollectionLink('accountSettingLink', firstKey.address)
     // await walletPage.checkCollectionLink('basicLink', firstKey.address)
     await walletPage.checkCollectionLink('walletLink', firstKey.address, { isCloseDialog: false })
-    //验证转账功能
+    // 验证转账功能
     const amount = 100
     await walletPage.dwcAmountInput.fill(amount.toString())
     await walletPage.dwcTransferBtn.click()
@@ -147,7 +147,7 @@ test.describe('wallet', () => {
       recipientAddress: firstKey.address,
       amount: amount
     })
-      // .toBeLessThan toBeGreatedThen
+    // .toBeLessThan toBeGreatedThen
     expect(await walletPage.getCoin()).toBeLessThan(firstKey.coin - amount)
     firstKey.coin = await walletPage.getCoin()
   })
