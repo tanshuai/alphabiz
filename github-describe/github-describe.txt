@@ -1,4 +1,3 @@
-Update index.vue
-force pointer cursor
-Update yarn.lock
-stable ubuntu test
+#941
+auto select recommend channels for new users #148
+remove debug entry
