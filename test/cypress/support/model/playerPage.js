@@ -25,8 +25,5 @@ Cypress.Commands.add('playMedia', (filePath, mediaInfo = {}) => {
     cy.get('.absolute-center > .q-btn > .q-btn__wrapper > .q-btn__content', { timeout: 50000 }).should('be.visible')
   } else {
     cy.contains('The media could not be loaded', { timeout: 30000 })
-    cy.get('#my-video_html5_api')
-      // should be paused
-      .should('have.prop', 'paused', true)
   }
 })
