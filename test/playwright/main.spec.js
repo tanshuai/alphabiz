@@ -517,16 +517,17 @@ test.describe('task', () => {
     await closeIcon.click()
     await homePage.deleteCard.waitFor({ timeout: 10000 })
     await homePage.notNowBtn.click()
-    // "更多"功能检查Download url
-    await moreIcon.click()
-    await homePage.moreCard.waitFor()
-    await window.waitForTimeout(1000)
-    await homePage.copyUrlBtn.click()
-    await homePage.copySuccessAlert.waitFor('visible')
-    await basePage.waitForAllHidden(await homePage.copySuccessAlert)
-    await basePage.headerTitle.click({ force: true })
     // 验证app协议链接
     if (process.platform !== 'darwin') {
+      // "更多"功能检查Download url
+      await moreIcon.click()
+      await homePage.moreCard.waitFor()
+      await window.waitForTimeout(1000)
+      await homePage.copyUrlBtn.click()
+      await homePage.copySuccessAlert.waitFor('visible')
+      await basePage.waitForAllHidden(await homePage.copySuccessAlert)
+      await basePage.headerTitle.click({ force: true })
+
       await window.keyboard.press(`${basePage.modifier}+KeyV`)
       const protocolRegExp = new RegExp(`${app.protocol}:\/\/`)
       const shortProtocolRegExp = new RegExp(`${app.shortProtocol}:\/\/`)
