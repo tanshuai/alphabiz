@@ -1,3 +1,2 @@
-#941
-auto select recommend channels for new users #148
-remove debug entry
+fix web e2e player test
+fix e2e test in mac
