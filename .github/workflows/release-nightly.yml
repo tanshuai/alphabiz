@@ -395,8 +395,6 @@ jobs:
 
       - name: Pack app 📦
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
-        env:
-          APP: "${{ steps.slug.outputs.display-name }}"
         run: |
           if [[ ${{ steps.vars.outputs.system }} == *macos* ]] && [[ -n "${{ env.APPLE_ID }}" ]]; then
             export PLATFORM=darwin
