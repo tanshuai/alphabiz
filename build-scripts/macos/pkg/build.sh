@@ -22,7 +22,7 @@ if [ "$PLATFORM" = "mas" ]; then
   echo "Building mas pkg..."
   ARCH="universal"
   APP_PATH="dist/electron/$APP-$PLATFORM-$ARCH/$APP.app"
-  ensureExists "$APP_PATH"
+  # ensureExists "$APP_PATH"
   if [ ! -e "$APP_PATH" ]; then
     echo "Cannot find build app. Running build script..."
     infiniteRetry build-scripts/macos/app/build.sh

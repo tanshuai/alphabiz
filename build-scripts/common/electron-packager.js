@@ -26,7 +26,8 @@ packageJson.productName = appName
 
 const unsupportedModules = [
   'lzma-native',
-  'utp-native'
+  'utp-native',
+  'utimes'
 ]
 
 const removeDir = (dir = '') => {
@@ -168,6 +169,16 @@ const options = {
           console.log('[Darwin] Remove build directory for', mod)
           removeDir(buildDir)
         }
+        const buildTmpDir = resolve(buildPath, 'node_modules', mod, 'build-tmp-napi-v3')
+        if (fs.existsSync(buildTmpDir)) {
+          console.log('[Darwin] Remove build-tmp-napi-v3 directory for', mod)
+          removeDir(buildTmpDir)
+        }
+        const libDir = resolve(buildPath, 'node_modules', mod, 'lib')
+        if (fs.existsSync(libDir)) {
+          console.log('[Darwin] Remove lib directory for', mod)
+          removeDir(libDir)
+        }
       })
     }
     const buildName = `${app.displayName}-${platform}-${buildArch}`
@@ -203,8 +214,19 @@ const options = {
         if (fs.existsSync(releaseDir)) {
           console.log(`Module [${module}] releases:`, fs.readdirSync(releaseDir))
           pruneNative(resolve(moduleDir, 'build'))
+          pruneNative(resolve(moduleDir, 'build-tmp-napi-v3'))
           pruneNative(resolve(moduleDir, 'node-addon-api'))
         }
+      }
+      /**
+       * The `utimes` builds files to `lib/binding/napi-v{napi_build_version}`
+       * but requires `lib/binding/napi-v3` for running.
+       */
+      const utimesDir = resolve(buildPath, 'node_modules/utimes/lib/binding')
+      const utimesVn = resolve(utimesDir, 'napi-v{napi_build_version}')
+      const utimesV3 = resolve(utimesDir, 'napi-v3')
+      if (fs.existsSync(utimesVn) && !fs.existsSync(utimesV3)) {
+        fs.cpSync(utimesVn, utimesV3, { recursive: true })
       }
       callback()
     })
