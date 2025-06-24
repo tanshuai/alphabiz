@@ -18,19 +18,19 @@ const publicTwitter = async (describe) => {
     accessToken: process.env.TWITTER_ACCESS_TOKEN_KEY,
     accessSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET
   })
-  const res = await twitterClient.v2.userTimeline('424858141')
-  const lastDesc = res._realData.data[0].text
-  const tweetList = res._realData.data
+  // const res = await twitterClient.v2.userTimeline('424858141')
+  // const lastDesc = res._realData.data[0].text
+  // const tweetList = res._realData.data
 
-  for (const tweetObj of tweetList) {
-    const lastDesc = tweetObj.text
-    // console.log(tweetObj)
-    // console.log('------------------------')
-    if (describe === lastDesc + '\n' || describe === lastDesc.replace(/\r/gm, '\n')) {
-      console.log('duplicate content!')
-      return false
-    }
-  }
+  // for (const tweetObj of tweetList) {
+  //   const lastDesc = tweetObj.text
+  //   // console.log(tweetObj)
+  //   // console.log('------------------------')
+  //   if (describe === lastDesc + '\n' || describe === lastDesc.replace(/\r/gm, '\n')) {
+  //     console.log('duplicate content!')
+  //     return false
+  //   }
+  // }
   await twitterClient.v2.tweet(describe).catch(err => {
     if (!err.data.detail.includes('Tweet with duplicate content')) throw err
   })
