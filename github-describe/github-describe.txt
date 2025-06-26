@@ -1,4 +1,4 @@
-add workflow run conditions #947
-fix i18n for videojs
-fix scrollbar for amplify select
-fix: cannot trigger drop-and-play in player page
+show full-window recommend page for new users
+use table list as default resolve #948
+add optional hints for register resolve #948
+close #949
