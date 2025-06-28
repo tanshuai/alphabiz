@@ -282,6 +282,11 @@ test.describe('download ', () => {
         await window.waitForTimeout(2000)
         await basePage.jumpPage('downloadingStatus')
       }
+      // 确保切换到卡片模式
+      const cardMode = await homePage.toggleCardModeBtn
+      if (await cardMode.isVisible()) {
+        await cardMode.click()
+      }
       await homePage.searchBtn.click({ force: true })
       await window.waitForTimeout(2000)
       // 等待任务卡片加载
