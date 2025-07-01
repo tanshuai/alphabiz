@@ -1,4 +1,1 @@
-fix download e2e test
-try fix recommend errors
-automatically close not-enough-credit hint
-pause player when logged out
+try fix library login
