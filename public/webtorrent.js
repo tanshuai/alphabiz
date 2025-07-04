@@ -354,7 +354,7 @@ const updateTorrent = (once = false) => {
         })
       })
     }
-    verbose('send torrents', torrents)
+    info('send torrents', torrents)
     // window._torrents = torrents
     // torrents.forEach(tr => ipcRenderer.send('webtorrent-data', tr))
     ipcRenderer.send('webtorrent-torrents', torrents)
@@ -499,7 +499,7 @@ const onWire = (wire, tr, abProtocol) => {
 }
 const onInfoHash = (infoHash, tr, conf, isSeeding) => {
   info('infoHash', infoHash)
-  if (shouldDelete.includes(infoHash)) {
+  while (shouldDelete.includes(infoHash)) {
     shouldDelete.splice(shouldDelete.indexOf(infoHash), 1)
   }
   if (infoHashes.includes(infoHash)) {
