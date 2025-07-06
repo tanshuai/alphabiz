@@ -9,10 +9,10 @@ Cypress.Commands.add('getPoint', () => {
 Cypress.Commands.add('getReceiptCode', () => {
   cy.get('.q-btn').contains('Receive').click()
   cy.get('.q-banner[role="alert"]').invoke('text').then((receiptCodeText) => {
-    let receiptCode = receiptCodeText.replace(/(^\s*)|(\s*$)/g, '')
+    const receiptCode = receiptCodeText.replace(/(^\s*)|(\s*$)/g, '')
     cy.get('button').contains('Cancel').click()
     return cy.wrap(receiptCode)
-  })  
+  })
 })
 
 Cypress.Commands.add('transfer', (ID, amount) => {
@@ -35,9 +35,9 @@ Cypress.Commands.add('transfer', (ID, amount) => {
 
 Cypress.Commands.add('checkBillDetail', (info) => {
   if (info.user === 'transferee') {
-    cy.get('.q-card:nth(3) .q-table__grid-content > :nth-child(1)').click()
+    cy.get('.q-card:nth(4) .q-table__grid-content > :nth-child(1)').click()
   } else {
-    cy.get('.q-card:nth(2) .q-table__grid-content > :nth-child(1)').click()
+    cy.get('.q-card:nth(3) .q-table__grid-content > :nth-child(1)').click()
   }
   cy.get('.q-dialog__inner > .q-card', { timeout: 5000 }).should('be.visible').then($card => {
     cy.get('.rounded-borders > :nth-child(2)').contains(info.id)
