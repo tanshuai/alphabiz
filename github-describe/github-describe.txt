@@ -1,2 +1,1 @@
-Fix the bugs of points test
-try improve google analytics
+fix google analytics in production mode
