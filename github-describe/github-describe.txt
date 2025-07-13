@@ -1,4 +1,1 @@
-keep alive for downloader
-return delete result for taskList
-change gtag protocol
-add info for remote play
+ask for save settings before sign out
