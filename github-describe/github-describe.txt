@@ -1,1 +1,1 @@
-ask for save settings before sign out
+auto finish expense payments after 3 days
