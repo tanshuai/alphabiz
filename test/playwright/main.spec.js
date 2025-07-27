@@ -384,6 +384,7 @@ test.describe('download ', () => {
       // should video can play
       await window.waitForTimeout(5000)
       const progressControl = await playerPage.stopPlay
+      await playerPage.keyboardSpace
       await playerPage.playPage.click()
       await expect(progressControl).toBeVisible({ timeout: 30000 })
       await playerPage.stopPlay.click()
