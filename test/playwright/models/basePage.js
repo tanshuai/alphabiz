@@ -182,8 +182,10 @@ class BasePage {
     await this.page.waitForLoadState()
     if (process.platform === 'darwin') await this.page.waitForTimeout(2000)
     if (!await this.accountInput.isVisible()) this.jumpPage('accountSignIn')
-    await this.accountInput.fill(username)
-    await this.passwordInput.fill(password)
+    await this.accountInput.click()
+    await this.page.keyboard.type(username, { delay: 100 })
+    await this.passwordInput.click()
+    await this.page.keyboard.type(password, { delay: 100 })
     await this.signInBtn.click()
 
     if (isWaitAlert) {
