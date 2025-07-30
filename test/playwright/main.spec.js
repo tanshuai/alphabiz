@@ -94,6 +94,7 @@ test.beforeAll(async () => {
   test.setTimeout(90000)
   // Launch Electron app.
   electronApp = await electron.launch({
+    timeout: 90000,
     args: [
       '--inspect=5858',
       electronMainPath
@@ -168,8 +169,9 @@ test.describe('play video', () => {
     await basePage.jumpPage('playerLink')
   })
   test('avi_type', async () => {
-    const media = './test/cypress/fixtures/samples/GoneNutty.avi'
+    const media = 'test/cypress/fixtures/samples/GoneNutty.avi'
     // Upload
+    await window.waitForTimeout(5000)
     await playerPage.fileInput.setInputFiles(media, { timeout: 60000 })
     await window.waitForLoadState()
     // should video can play
@@ -522,6 +524,7 @@ test.describe('task', () => {
     const closeIcon = await homePage.getListEle(testBt.btName, 'closeBtn')
     await closeIcon.waitFor()
     await closeIcon.click()
+    await homePage.deleteConfirmd.click()
     await homePage.deleteCard.waitFor({ timeout: 10000 })
     await homePage.notNowBtn.click()
     // 验证app协议链接
