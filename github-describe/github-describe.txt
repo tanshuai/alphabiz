@@ -1,3 +1,5 @@
-change prefix show
-Display area code
-feat: support external i18n configurations
+Fix test switch language and play-while-downloading
+fix test reset torrent status
+修复删除任务测试用例错误
+Add subtitle error link
+try fix player errors
