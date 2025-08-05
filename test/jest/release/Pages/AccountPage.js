@@ -12,11 +12,18 @@ class AccountPage extends HomePage {
   get signInBtn () { return this.page.$('//Button[@Name="SIGN UP"]/preceding-sibling::Button[1]') }
   get importCloudKeyOKBtn () { return this.page.$('//Button[@Name="OK"]') }
   get accountSettingsTitle () { return this.page.$('//Text[@Name="Account"]') }
-  get accountMoreBtn () { return this.page.$('//Custom[starts-with(@Name,"Lv.")]/following-sibling::Button[1]')}
+  get accountMoreBtn () { return this.page.$('//Custom[starts-with(@Name,"Lv.")]/following-sibling::Button[1]') }
   get signOutBtn () { return this.page.$('//*[@Name="Sign out"]') }
   get signOutAnywayBtn () { return this.page.$('//Button[@Name="Sign out anyway"]') }
-  get internalNoticeText () { return this.page.$('//*[@name="Internal Release Notice"]')}
-  get closeInternalNoticeBtn () { return this.page.$('//*[@name="Internal Release Notice"]/following-sibling::Button[2]') }
+  get internalNoticeText () { return this.page.$('//Text[@Name="Internal Release Notice"]') }
+  get closeInternalNoticeBtn () { return this.page.$('//Text[@Name="Internal Release Notice"]/parent::*/Button[2]') }
+  get language () { return this.page.$('/Document[@Name="Alphabiz"]/Group/Group/Button[1]') }
+
+  async changeLanguage (targetLang = 'English') {
+    await this.language.click()
+    await sleep(1000)
+    await this.page.$(`//Text[@Name="${targetLang}"]"`).click()
+  }
 
   async closeInternalNotice () {
     const windowTitle = await this.page.getTitle()
@@ -31,6 +38,8 @@ class AccountPage extends HomePage {
   }
 
   async signIn (username, password, opt = { isWaitAlert: false }) {
+    await this.closeInternalNotice()
+    // await this.changeLanguage()
     await this.username.setValue(username)
     await sleep(2000)
     await this.password.setValue(password)
