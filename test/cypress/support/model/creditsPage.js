@@ -35,9 +35,9 @@ Cypress.Commands.add('transfer', (ID, amount) => {
 
 Cypress.Commands.add('checkBillDetail', (info) => {
   if (info.user === 'transferee') {
-    cy.get('.q-card:nth(4) .q-table__grid-content > :nth-child(1)').click()
+    cy.contains('.amount', '-1', { matchCase: true }).eq(0).click()
   } else {
-    cy.get('.q-card:nth(3) .q-table__grid-content > :nth-child(1)').click()
+    cy.contains('.amount', '1', { matchCase: true }).eq(0).click()
   }
   cy.get('.q-dialog__inner > .q-card', { timeout: 5000 }).should('be.visible').then($card => {
     cy.get('.rounded-borders > :nth-child(2)').contains(info.id)
