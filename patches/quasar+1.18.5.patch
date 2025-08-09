@@ -1,0 +1,33 @@
+diff --git a/node_modules/quasar/src/components/slider/QSlider.js b/node_modules/quasar/src/components/slider/QSlider.js
+index bf67847..c6cad99 100644
+--- a/node_modules/quasar/src/components/slider/QSlider.js
++++ b/node_modules/quasar/src/components/slider/QSlider.js
+@@ -19,6 +19,11 @@ export default Vue.extend({
+       default: null,
+       validator: v => typeof v === 'number' || v === null
+     },
++    disableKeydown: {
++      type: Boolean,
++      required: false,
++      default: false
++    },
+ 
+     labelValue: [ String, Number ]
+   },
+@@ -159,7 +164,15 @@ export default Vue.extend({
+         return
+       }
+ 
+-      stopAndPrevent(evt)
++      /**
++       * Patched by alphabiz team
++       * Allow player to handle keydown events for controlling
++       */
++      if (!this.disableKeydown) {
++        stopAndPrevent(evt)
++      } else {
++        console.log('[QSlider] Passthrough keydown event')
++      }
+ 
+       const
+         step = ([34, 33].includes(evt.keyCode) ? 10 : 1) * this.computedStep,
