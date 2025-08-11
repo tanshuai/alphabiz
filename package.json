@@ -57,6 +57,7 @@
     "videojs-ass": "^0.8.0",
     "videojs-ass-es6": "0.0.4",
     "videojs-hotkeys": "^0.2.27",
+    "quasar": "1.18.5",
     "webtorrent": "1.5.8"
   },
   "devDependencies": {
