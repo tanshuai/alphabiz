@@ -1,5 +1,1 @@
-Fix test compatibility with different platforms and playback failure
-Fix appium's closeInternalNoticeBtn
-Asynchronous errors
-Try to fix cypress points change
-fix progress controller errors
+Re-login
