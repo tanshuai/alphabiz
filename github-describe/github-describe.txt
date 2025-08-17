@@ -1,1 +1,4 @@
-update login/register behavior
+Bump semver from 7.3.8 to 7.5.3 in /src-capacitor/node
+Bump semver from 7.3.7 to 7.5.2
+fix mute in player
+fix errors with tel inputs
