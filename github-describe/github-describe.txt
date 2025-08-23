@@ -1,2 +1,3 @@
-try fix delete country code in signup
-fix tel input in signin
+fix delete with select-all
+add account test timeout-minutes
+report cpu arch in google analytics
