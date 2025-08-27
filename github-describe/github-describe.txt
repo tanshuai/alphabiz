@@ -1,2 +1,1 @@
-try fix input behavior
-fix tray icon in snap
+add doc for win-arm
