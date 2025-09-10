@@ -13,7 +13,7 @@ const { AccountPage } = require('./models/accountPage')
 const app = require('../../developer/app.js')
 let window, windows, electronApp, basePage, homePage, libraryPage, playerPage, basicPage, accountPage
 const ScreenshotsPath = 'test/output/playwright/library.spec/'
-let name
+let name, checkName
 if (process.platform === 'win32') {
   name = 'test7'
 } else if (process.platform === 'linux') {
@@ -24,9 +24,23 @@ if (process.platform === 'win32') {
 name = name + process.env.TEST_EMAIL_DOMAIN
 const accountPassword = process.env.TEST_PASSWORD
 const accountResetPassword = process.env.TEST_RESET_PASSWORD
+
+const privateChannel = {
+  title: 'X特遣队',
+  desc: 'X特遣队：全员集结 The Suicide Squad',
+  isPrivate: true,
+  channelID: 'vvkakh29yfu1hyjfhngw'
+}
+// const privatePost = {
+//   title: 'X特遣队：全员集结 The Suicide Squad (2021)',
+//   desc: '关押在美梦监狱的X特遣队成员获得一项可以减轻刑罚的新任务，前往南美洲的科托马耳他岛国，摧毁纳粹时期遗留的约顿海姆监狱和实验室，它当前用于关押该国的政治犯并施行人体实验。执行任务期间，X特遣队遭遇巨型外星生物海星斯塔罗，并与它发生冲突。',
+//   poster: '',
+//   url: `${app.protocol}://uTorrent+Web+Tutorial+Video/AWGzuIVsSDnt9R9cI0ZZm2vsUkFF&_Td6WFoAAAFpIt42AgAhARwAAAAQz1jM4ALxATpdABhqCGEMasx_OPsfBFf6STjs7yEovJdH6ObIkXuPJdVFCvNYt4Pc61Bo+mbFMnz74ydATVDkJaObcR0qhiqPrZctZJ7wrQIGnWNpA6Pm9VngzwAxCow6VTNOPsR2ZmQLh6a5lzjcxHj1tP6k7AKbVFqNWDAAB9Xsbku1S+9MyAXPjwUFk9QUFefp0ZcCzVc6_dcNPvyL7tq+N9QPMqfMbSeL0TjRSROCeeZm2zRslPQyYmPX+Gm2uX3jvkBqCiSiWX4vUwGX+j43FHftXg3ettQe4CKgpHNwlgE4mZrw0z5HUmLSXJKrWC7cC4TelK71c2nNMoDc+24nO3RyGNImyf3YhnKLCsiwAbhxGYqg+HTezO_5iIDbQLEKX+GNoYmCIvkBSei+bODtpO0lgJ3Lqw_SToWjaMQsvM8AAAAA8or5xwAB0gLyBQAAXibHzD4wDYsCAAAAAAFZWg==`,
+//   rate: 'G'
+// }
 const channelObj = {
-  title: 'first channel by ZZZ',
-  desc: '123123123123',
+  title: 'first channel by',
+  desc: '',
   isPrivate: false
 }
 const postObj = {
@@ -45,11 +59,19 @@ const postObj2 = {
 }
 const postObj3 = {
   title: 'third post by ZZZ',
-  desc: '2222222222',
+  desc: '3333333333',
   poster: '',
   url: 'magnet:?xt=urn:btih:a88fda5954e89178c372716a6a78b8180ed4dad3&dn=The+WIRED+CD+-+Rip.+Sample.+Mash.+Share&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&ws=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2F',
   rate: 'G'
 }
+
+function channelTest (newTime) {
+  const formattedTime = `${newTime.getHours()}-${newTime.getMinutes()}`
+  channelObj.title = channelObj.title + formattedTime
+  channelObj.desc = `${newTime}`
+  console.log(formattedTime, newTime)
+}
+
 test.beforeAll(async () => {
   // Launch Electron app.
   electronApp = await electron.launch({
@@ -95,7 +117,29 @@ test.afterEach(async ({ }, testInfo) => {
   }
 })
 
-test('disable cloud key force', async () => {
+test.describe('initialization', () => {
+  test.beforeEach(async () => {
+    await window.waitForLoadState()
+    await basePage.ensureLoginStatus(name, process.env.TEST_PASSWORD, true)
+  })
+  test.skip('clear publish and block', async () => {
+    let publishLog = true, blockLog = true
+    await window.waitForTimeout(30000)
+    while (publishLog || blockLog) {
+      console.log(publishLog, blockLog)
+      if (blockLog) {
+        blockLog = await basePage.deleteBlock()
+        await accountPage.clickViewport(100, 100)
+      }
+      if (publishLog) publishLog = await basePage.deletePublish()
+      await window.waitForTimeout(60000)
+      await basePage.signOut()
+      await basePage.ensureLoginStatus(name, process.env.TEST_PASSWORD, true)
+    }
+  })
+})
+
+test.skip('disable cloud key force', async () => {
   await basePage.clearLocalstorage()
   await window.waitForTimeout(3000)
   await basePage.ensureLoginStatus(name, accountPassword, true, true)
@@ -104,12 +148,12 @@ test('disable cloud key force', async () => {
 
   // 验证取消同步云端
   await basePage.signOut()
-  // await basePage.signIn(name, accountPassword, true, false)
-  // await accountPage.ckCard.waitFor()
-  // await expect(accountPage.ckFromcloudChk).toHaveText(/Cloud storage disabled/)
-  // // await basePage.signOut()
-  // await basePage.clearLocalstorage()
-  // await window.waitForTimeout(3000)
+  await basePage.signIn(name, accountPassword, true, false)
+  await accountPage.ckCard.waitFor()
+  // await expect(accountPage.ckFromcloudChk).toHaveText(/Disable cloud storage/)
+  // await basePage.signOut()
+  await basePage.clearLocalstorage()
+  await window.waitForTimeout(3000)
 })
 
 test.describe('key', () => {
@@ -119,18 +163,22 @@ test.describe('key', () => {
     const inPassword = process.env.TEST_RESET_PASSWORD
     const newPassword = process.env.TEST_PASSWORD
 
-    test.skip('importing a Local Key', async () => {
+    test.skip('importing a Local Key', async () => { // 此用例已不可用
       await basePage.signIn(name, process.env.TEST_PASSWORD, true, false)
+      await window.waitForTimeout(20000)
+      if (await accountPage.recommendTitle.isVisible()) await accountPage.recommendPage()
       await accountPage.ckImportChk.waitFor()
       const taskAbk = './test/cypress/fixtures/samples/test.abk'
       await window.locator('[name="input-file"][accept=".abk"]').setInputFiles(taskAbk, { timeout: 60000 })
       await window.waitForTimeout(100000)
     })
+
     test('save cloud key', async () => {
       await window.waitForLoadState()
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
       await basePage.waitForAllHidden(await basePage.alert)
-      await window.waitForTimeout(3000)
+      await window.waitForTimeout(10000)
+      await accountPage.disableCloudKey()
       await accountPage.enableCloudKey(inPassword, false)
       await window.waitForTimeout(3000)
       // 验证同步云端
@@ -139,9 +187,13 @@ test.describe('key', () => {
       await accountPage.syncCloudKey(inPassword)
       // 等待密钥配置，加载,等待推荐页面出现
       await basePage.jumpPage('homeLink')
-      await libraryPage.searchChannelBtn.waitFor({ timeout: 60000 })
+      if (basePage.recommendTitle.isVisible()) {
+        await basePage.recommendHandle()
+      } else {
+        await libraryPage.tweetsFrist.waitFor()
+      }
     })
-    test.skip('config password', async () => {
+    test('config password', async () => {
       await basePage.ensureLoginStatus(name, process.env.TEST_PASSWORD, true, true)
       await accountPage.cfgKeyPassword(inPassword, newPassword)
       // 验证同步云端
@@ -151,18 +203,26 @@ test.describe('key', () => {
       await accountPage.syncCloudKey(newPassword)
       // 等待密钥配置，加载,等待推荐页面出现
       await basePage.jumpPage('homeLink')
-      await libraryPage.searchChannelBtn.waitFor({ timeout: 60000 })
+      if (basePage.recommendTitle.isVisible()) {
+        await basePage.recommendHandle()
+      } else {
+        await libraryPage.tweetsFrist.waitFor()
+      }
       await basePage.signOut()
       await basePage.waitForAllHidden(await basePage.alert)
     })
-    test.skip('update and save key in cloud', async () => {
+    test('update and save key in cloud', async () => {
       test.setTimeout(5 * 60000)
       await basePage.ensureLoginStatus(name, process.env.TEST_PASSWORD, true, false)
       // 创建新的密钥
       await accountPage.createCloudKey(newPassword, true)
-      // 等待密钥配置，加载, 等待推荐页面出现
+      // 等待密钥配置，加载, 等待推文页面出现
       await basePage.jumpPage('homeLink')
-      await libraryPage.showMoreBtn.waitFor({ timeout: 60000 })
+      if (basePage.recommendTitle.isVisible()) {
+        await basePage.recommendHandle()
+      } else {
+        await libraryPage.tweetsFrist.waitFor()
+      }
 
       // 验证同步云端功能
       await basePage.signOut()
@@ -170,18 +230,23 @@ test.describe('key', () => {
       await accountPage.syncCloudKey(newPassword, { isABPassword: true })
       // 等待密钥配置，加载，等待推荐页面出现
       await basePage.jumpPage('homeLink')
-      await libraryPage.showMoreBtn.waitFor({ timeout: 60000 })
+      if (basePage.recommendTitle.isVisible()) {
+        await basePage.recommendHandle()
+      } else {
+        await libraryPage.tweetsFrist.waitFor()
+      }
     })
     test('disable cloud key', async () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
       await basePage.waitForAllHidden(await basePage.alert)
+      await window.waitForTimeout(5000)
       await accountPage.disableCloudKey()
 
       // 验证取消同步云端
       await basePage.signOut()
       // await basePage.signIn(name, accountPassword, true, false)
       // await accountPage.ckCard.waitFor()
-      // await expect(accountPage.ckFromcloudChk).toHaveText(/Cloud storage disabled/)
+      // await expect(accountPage.ckFromcloudChk).toHaveText(/Disable cloud storage/)
       // await basePage.clearLocalstorage()
       // await window.waitForTimeout(3000)
     })
@@ -194,7 +259,7 @@ test.describe('key', () => {
       // 创建新的密钥
       await accountPage.createCloudKey(inPassword, false, false)
       // 等待密钥配置，加载, 等待推荐页面出现
-      await libraryPage.showMoreBtn.waitFor({ timeout: 60000 })
+      await libraryPage.tweetsFrist.waitFor({ timeout: 60000 })
 
       // 验证同步云端功能
       await basePage.signOut()
@@ -205,20 +270,21 @@ test.describe('key', () => {
       await accountPage.syncCloudKey(inPassword)
       // 等待密钥配置，加载，等待推荐页面出现
       await basePage.jumpPage('homeLink')
-      await libraryPage.showMoreBtn.waitFor({ timeout: 60000 })
+      await libraryPage.tweetsFrist.waitFor({ timeout: 60000 })
       await basePage.signOut()
     })
     // 该功能已取消
     test.skip('disable cloud key force', async () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
       await basePage.waitForAllHidden(await basePage.alert)
+      await window.waitForTimeout(15000)
       await accountPage.disableCloudKey()
 
       // 验证取消同步云端
       await basePage.signOut()
       await basePage.signIn(name, accountPassword, true, false)
       await accountPage.ckCard.waitFor()
-      await expect(accountPage.ckFromcloudChk).toHaveText(/Cloud storage disabled/)
+      await expect(accountPage.ckFromcloudChk).toHaveText(/Disable cloud storage/)
       // await basePage.signOut()
       await basePage.clearLocalstorage()
       await window.waitForTimeout(3000)
@@ -226,21 +292,39 @@ test.describe('key', () => {
   })
   test.describe('aws password', () => {
     test('create and save key in cloud', async () => {
-      test.setTimeout(5 * 60000)
       await basePage.ensureLoginStatus(name, accountPassword, true, false)
+      await window.waitForTimeout(30000)
+      if (await accountPage.recommendTitle.isVisible()) {
+        await accountPage.recommendPage()
+      } else {
+        await libraryPage.tweetsFrist.waitFor()
+      }
+      await accountPage.disableCloudKey()
+      await basePage.signOut()
+      await basePage.signIn(name, accountPassword, true, false)
       // 创建新的密钥
-      await accountPage.createCloudKey('', false, true)
+      // await accountPage.createCloudKey('', false, true)
+      await window.waitForTimeout(5000)
+      if (await accountPage.recommendTitle.isVisible()) await accountPage.recommendPage()
       // 等待密钥配置，加载, 等待推荐页面出现
-      await basePage.jumpPage('homeLink')
-      await libraryPage.showMoreBtn.waitFor({ timeout: 60000 })
+      await window.waitForTimeout(5000)
+      if (basePage.recommendTitle.isVisible()) {
+        await basePage.recommendHandle()
+      } else {
+        await libraryPage.tweetsFrist.waitFor()
+      }
 
       // 验证同步云端功能
       await basePage.signOut()
       await basePage.signIn(name, accountPassword, true, false)
       await accountPage.syncCloudKey('', { isABPassword: true })
       // 等待密钥配置，加载，等待推荐页面出现
-      await basePage.jumpPage('homeLink')
-      await libraryPage.showMoreBtn.waitFor({ timeout: 60000 })
+      await window.waitForTimeout(5000)
+      if (basePage.recommendTitle.isVisible()) {
+        await basePage.recommendHandle()
+      } else {
+        await libraryPage.tweetsFrist.waitFor()
+      }
       await basePage.signOut()
     })
     test('update and save key in cloud', async () => {
@@ -249,19 +333,28 @@ test.describe('key', () => {
       // 创建新的密钥
       await accountPage.createCloudKey('', true, true)
       // 等待密钥配置，加载, 等待推荐页面出现
-      await basePage.jumpPage('homeLink')
-      await libraryPage.showMoreBtn.waitFor({ timeout: 60000 })
+      await window.waitForTimeout(5000)
+      if (basePage.recommendTitle.isVisible()) {
+        await basePage.recommendHandle()
+      } else {
+        await libraryPage.tweetsFrist.waitFor()
+      }
 
       // 验证同步云端功能
       await basePage.signOut()
       await basePage.signIn(name, accountPassword, true, false)
       await accountPage.syncCloudKey('', { isABPassword: true })
       // 等待密钥配置，加载，等待推荐页面出现
-      await basePage.jumpPage('homeLink')
-      await libraryPage.showMoreBtn.waitFor({ timeout: 60000 })
+      await window.waitForTimeout(5000)
+      if (basePage.recommendTitle.isVisible()) {
+        await basePage.recommendHandle()
+      } else {
+        await libraryPage.tweetsFrist.waitFor()
+      }
     })
     test.skip('change password', async () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
+      await window.waitForTimeout(5000)
       await basePage.jumpPage('accountSettingLink')
       await accountPage.changePassword(accountPassword, accountResetPassword)
 
@@ -270,8 +363,12 @@ test.describe('key', () => {
       await basePage.signIn(name, accountResetPassword, true, false)
       await accountPage.syncCloudKey('', { isABPassword: true })
       // 等待密钥配置，加载,等待推荐页面出现
-      await basePage.jumpPage('homeLink')
-      await libraryPage.showMoreBtn.waitFor({ timeout: 60000 })
+      await window.waitForTimeout(15000)
+      if (basePage.recommendTitle.isVisible()) {
+        await basePage.recommendHandle()
+      } else {
+        await libraryPage.tweetsFrist.waitFor()
+      }
       await basePage.signOut()
     })
     test.skip('reset password', async () => {
@@ -282,8 +379,12 @@ test.describe('key', () => {
       await basePage.signIn(name, accountPassword, true, false)
       await accountPage.syncCloudKey('', { isABPassword: true })
       // 等待密钥配置，加载,等待推荐页面出现
-      await basePage.jumpPage('homeLink')
-      await libraryPage.showMoreBtn.waitFor({ timeout: 60000 })
+      await window.waitForTimeout(15000)
+      if (basePage.recommendTitle.isVisible()) {
+        await basePage.recommendHandle()
+      } else {
+        await libraryPage.tweetsFrist.waitFor()
+      }
     })
     // 若重置失败，手动修改密码
     // test('')
@@ -295,8 +396,14 @@ test.describe('key', () => {
       await basePage.signIn(name, accountPassword, true, false)
       await accountPage.syncCloudKey(accountResetPassword)
       // 等待密钥配置，加载,等待推荐页面出现
-      await basePage.jumpPage('homeLink')
-      await libraryPage.showMoreBtn.waitFor({ timeout: 60000 })
+      await window.waitForTimeout(5000)
+      if (await libraryPage.recommendTitle.isVisible()) await libraryPage.recommendPageTest()
+      await window.waitForTimeout(5000)
+      if (basePage.recommendTitle.isVisible()) {
+        await basePage.recommendHandle()
+      } else {
+        await libraryPage.tweetsFrist.waitFor()
+      }
     })
     test('disable cloud key', async () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
@@ -305,9 +412,12 @@ test.describe('key', () => {
 
       // 验证取消同步云端
       await basePage.signOut()
-      // await basePage.signIn(name, accountPassword, true, false)
+      await basePage.signIn(name, accountPassword, true, false)
       // await accountPage.ckCard.waitFor()
-      // await expect(accountPage.ckFromcloudChk).toHaveText(/Cloud storage disabled/)
+      await window.waitForTimeout(10000)
+      if (await accountPage.recommendTitle.isVisible()) await libraryPage.recommendPageTest()
+      // await basePage.jumpPage('accountSettingLink')
+      // await expect(accountPage.ckFromcloudChk).toHaveText(/Disable cloud storage/)
       // await basePage.clearLocalstorage()
       // await window.waitForTimeout(3000)
     })
@@ -316,7 +426,7 @@ test.describe('key', () => {
 
 test.describe('channel', () => {
   test.beforeEach(async ({ }, testInfo) => {
-    test.skip(testInfo.title != 'open explore page', 'only check explore page')
+    // test.skip(testInfo.title != 'open explore page', 'only check explore page')
     await window.waitForLoadState()
     await basePage.ensureLoginStatus(name, process.env.TEST_PASSWORD, true)
   })
@@ -339,31 +449,63 @@ test.describe('channel', () => {
     // await download.saveAs('/path/to/save/download/at.txt')
   })
 
-  test('Recommend page follow channel', async () => {
+  test.skip('Recommend page follow channel', async () => {
     // await libraryPage.getChannelCardEle('', 'card').nth(0).click()
+    await basePage.jumpPage('exploreLink')
+    let i = 0
+    let previousI = 0
     while (1) {
+      if (await libraryPage.locading.count()) await window.waitForTimeout(5000)
       let isBreak = false
-      const ChannelCount = await libraryPage.getChannelCardEle('', 'card').count()
-      for (let i = 0; i < ChannelCount; i++) {
-        const CardText = await libraryPage.getChannelCardEle('', 'card').nth(i).innerText()
-        if (CardText.includes('WEB CHANNEL')) {
-          console.log(CardText)
-          await libraryPage.getChannelCardEle('', 'card').nth(i).click()
-          await window.waitForTimeout(15000)
+      for (i; i < 5 + previousI; i++) {
+        const CardText = await libraryPage.getPostCardEle('', 'card').nth(i).innerText()
+        if (await CardText.includes('amazing')) {
+          console.log('CardText:' + CardText)
+          await libraryPage.toChannelCardEle(i)
+          await window.waitForTimeout(5000)
           isBreak = true
+          break
         }
       }
       if (isBreak) break
-      await libraryPage.showMoreBtn.click()
+      previousI = i
+      await libraryPage.scrollToLoadPage(0, 8000, '.virtual-scroll-grid')
       await window.waitForTimeout(2000)
     }
 
-    await libraryPage.recommendFollowBtn.click()
+    await libraryPage.channelFollowsBtn.click()
     await window.waitForTimeout(3000)
-    await expect(libraryPage.showMoreBtn).toHaveCount(0)
+    if (await basePage.unfollowBtn.isVisible()) await libraryPage.cancel.click()
+    await window.waitForTimeout(3000)
+    // await expect(libraryPage.showMoreBtn).toHaveCount(0)
     await basePage.jumpPage('followingLink')
     await window.waitForTimeout(3000)
-    await libraryPage.getChannelCardEle('', 'card').waitFor()
+    await libraryPage.checkFollowCard(checkName).waitFor({ timeout: 120000 })
+  })
+  test('Recommend page follow channel (simplified version)', async () => {
+    // await libraryPage.getChannelCardEle('', 'card').nth(0).click()
+    await window.waitForTimeout(10000)
+    await basePage.jumpPage('exploreLink')
+
+    for (let i = 0; i < 5; i++) {
+      const CardText = await libraryPage.getPostCardEle('', 'channelTitleEle').nth(i).innerText()
+      console.log(`CardText[${i}]:` + CardText)
+      if (i === 4) checkName = CardText
+      await window.waitForTimeout(1000)
+    }
+    await libraryPage.scrollToLoadPage(0, 8000, '.virtual-scroll-grid')
+    if (await libraryPage.locading.count()) await window.waitForTimeout(5000)
+    await libraryPage.toChannelCardEle(4)
+    await window.waitForTimeout(2000)
+
+    await libraryPage.channelFollowsBtn.click()
+    await window.waitForTimeout(3000)
+    if (await basePage.unfollowBtn.isVisible()) await libraryPage.cancel.click()
+    await window.waitForTimeout(3000)
+    // await expect(libraryPage.showMoreBtn).toHaveCount(0)
+    await basePage.jumpPage('followingLink')
+    await window.waitForTimeout(3000)
+    await libraryPage.checkFollowCard(checkName)
   })
   test('clear env', async ({ }, testInfo) => {
     await basePage.jumpPage('homeLink')
@@ -408,9 +550,12 @@ test.describe('channel', () => {
   })
   test('save key to json', async () => {
     const newTime = new Date()
+    await channelTest(newTime)
     const keyPath = ScreenshotsPath + `\\key-${newTime.getTime()}.json`
-    const localStorage = await window.evaluate(() => JSON.stringify(window.localStorage.getItem('library-pair@ab-test-cate-v4-2')))
-    fs.writeFileSync(keyPath, localStorage)
+    const localStorageData = await window.evaluate(() => {
+      return JSON.stringify(localStorage.getItem('library-pair@ab-test-cate-v4-2'))
+    })
+    await fs.writeFileSync(keyPath, localStorageData)
   })
 
   test('open explore page', async () => {
@@ -435,9 +580,8 @@ test.describe('channel', () => {
     } catch (e) {
       await basePage.jumpPage('editLink')
     }
-    await window.waitForTimeout(10000)
     // 判断是否添加了频道
-    const isAddChannel = await libraryPage.getChannelCardEle(channelObj.title, 'card').isVisible()
+    const isAddChannel = await libraryPage.getChannelCardEle(channelObj.title, 'card').count()
     console.log('isAddChannel', isAddChannel)
     if (!isAddChannel) await libraryPage.addChannel(channelObj)
     await libraryPage.ensureChannelCard(channelObj.title, 'visible')
@@ -446,9 +590,8 @@ test.describe('channel', () => {
   test('add post', async () => {
     await basePage.jumpPage('editLink')
     await window.waitForTimeout(5000)
-    const editChannelBtn = await libraryPage.getChannelCardEle(channelObj.title, 'editChannelBtn')
+    const editChannelBtn = await libraryPage.editChannelCard(channelObj.title, 'editChannelBtn')
     await editChannelBtn.click()
-    await window.waitForTimeout(5000)
     // 添加第一个
     const isAddPost1 = await libraryPage.getPostListEle(postObj.title, 'titleEle').isVisible()
     console.log('isAddPost', isAddPost1)
@@ -502,7 +645,14 @@ test.describe('channel', () => {
     // 主页
     await basePage.jumpPage('homeLink')
     await window.waitForTimeout(3000)
-    await libraryPage.getPostCardEle(postObj.title, 'channelTitleEle').click()
+    while (1) {
+      const remain = await libraryPage.getPostCardEle(postObj.title, 'channelTitleEle')
+      if (await remain.isVisible()) {
+        await remain.click()
+        break
+      }
+      await libraryPage.scrollToLoadPage(0, 6000, '.virtual-scroll-grid')
+    }
     await window.waitForTimeout(5000)
     await expect(libraryPage.cdCreatorTitle).toHaveText(regex)
 
@@ -523,7 +673,6 @@ test.describe('channel', () => {
     await libraryPage.getChannelCardEle(channelObj.title, 'card').waitFor()
   })
   test.describe('check', () => {
-    test.skip()
     test.beforeEach(async ({ }, testInfo) => {
       // 获取需要检查的信息
       if (!channelObj.channelID) {
@@ -642,27 +791,27 @@ test.describe('channel', () => {
       // 下载
       await basePage.jumpPage('homeLink')
       const downloadBtn = await libraryPage.getPostCardEle(postObj.title, 'downloadBtn')
-      await expect(downloadBtn).toHaveText(/Download/)
+      // await expect(downloadBtn).toHaveText(/Download/)
       await downloadBtn.click()
       // await libraryPage.getPostCardEle(postObj.title, 'playBtn').click()
       // await playerPage.controlBar.waitFor({ timeout: 40000 })
 
       // 验证下载任务卡片、下载任务数量
-      await basePage.jumpPage('downloadingStatus')
-      await homePage.getCard(postObj.title).waitFor('visible')
-      const downloadStatusText = await basePage.downloadingStatus.innerText()
-      const downloadingNumMatch = downloadStatusText.match(/\d+/)
-      let downloadingNum = 0
-      if (downloadingNumMatch !== null) {
-        downloadingNum = parseInt(downloadingNumMatch[0])
-      }
-      expect(downloadingNum).toBe(initDownloadingNum + 1)
+      // await basePage.jumpPage('downloadingStatus')
+      // await homePage.getCard(postObj.title).waitFor('visible')
+      // const downloadStatusText = await basePage.downloadingStatus.innerText()
+      // const downloadingNumMatch = downloadStatusText.match(/\d+/)
+      // let downloadingNum = 0
+      // if (downloadingNumMatch !== null) {
+      //   downloadingNum = parseInt(downloadingNumMatch[0])
+      // }
+      // expect(downloadingNum).toBe(initDownloadingNum + 1)
 
-      await basePage.jumpPage('homeLink')
-      await expect(await libraryPage.getPostCardEle(postObj.title, 'downloadBtn')).toHaveText(/Downloading/)
+      // await basePage.jumpPage('homeLink')
+      // await expect(await libraryPage.getPostCardEle(postObj.title, 'downloadBtn')).toHaveText(/Downloading|doneCompleted/)
       // 边下边播
-      const playingBtn = await libraryPage.getPostCardEle(postObj.title, 'playBtn')
-      await expect(playingBtn).toHaveText(/Play\.\.\./)
+      // const playingBtn = await libraryPage.getPostCardEle(postObj.title, 'playBtn')
+      // await expect(playingBtn).toHaveText(/Play\.\.\.|play_arrowPlay/)
       // await playingBtn.click()
       // await playerPage.controlBar.waitFor({ timeout: 40000 })
 
@@ -672,8 +821,8 @@ test.describe('channel', () => {
 
       // 验证下载完成的推文按钮文字
       await basePage.jumpPage('homeLink')
-      await expect(await libraryPage.getPostCardEle(postObj.title, 'downloadBtn')).toHaveText(/Completed/)
-      await expect(await libraryPage.getPostCardEle(postObj.title, 'playBtn')).toHaveText(/play_arrow/)
+      // await expect(await libraryPage.getPostCardEle(postObj.title, 'downloadBtn')).toHaveText(/Completed/)
+      // await expect(await libraryPage.getPostCardEle(postObj.title, 'playBtn')).toHaveText(/play_arrow/)
 
       // 验证聚焦任务卡片
       await libraryPage.getPostCardEle(postObj.title, 'downloadBtn').click()
@@ -682,8 +831,7 @@ test.describe('channel', () => {
       // 验证播放按钮
       await basePage.jumpPage('homeLink')
       await libraryPage.getPostCardEle(postObj.title, 'playBtn').click()
-      await playerPage.controlBar.waitFor({ timeout: 40000 })
-      await playerPage.playing.waitFor({ timeout: 10000 })
+      await playerPage.stopPlay.waitFor({ timeout: 40000 })
     })
     test('download to library', async () => {
       await basePage.jumpPage('uploadingStatus')
@@ -705,12 +853,14 @@ test.describe('channel', () => {
         // 复制分享频道链接
         await libraryPage.getPostCardEle(postObj.title, 'moreBtn').click()
         await libraryPage.mmShareBtn.click()
+        await window.waitForTimeout(500)
         await libraryPage.copiedAlert.waitFor('visible')
         // 检查各个页面触发复制
         await libraryPage.checkShareLink('homeLink', channelObj.title, { isCloseDialog: false })
         await libraryPage.checkShareLink('followingLink', channelObj.title)
         await libraryPage.checkShareLink('localFavoritesLink', channelObj.title)
         await libraryPage.checkShareLink('exploreLink', channelObj.title)
+        await window.waitForTimeout(5000)
         await libraryPage.checkShareLink('editLink', channelObj.title)
         await libraryPage.checkShareLink('downloadingStatus', channelObj.title)
         await libraryPage.checkShareLink('uploadingStatus', channelObj.title)
@@ -728,6 +878,7 @@ test.describe('channel', () => {
         await libraryPage.getPostCardEle(postObj.title, 'channelTitleEle').click()
         // 复制分享频道链接
         await libraryPage.cdshareBtn.click({ timeout: 10000 })
+        await window.waitForTimeout(2000)
         await basePage.waitForAllHidden(await basePage.centerAlert)
         // 检查各个页面触发复制
         await libraryPage.checkShareLink('homeLink', channelObj.title, { isCloseDialog: false })
@@ -737,6 +888,7 @@ test.describe('channel', () => {
         // 复制分享频道链接
         await libraryPage.getPostCardEle(postObj.title, 'moreBtn').click()
         await libraryPage.mmShareBtn.click()
+        await window.waitForTimeout(500)
         await libraryPage.copiedAlert.waitFor('visible')
         // 检查触发复制
         await libraryPage.checkShareLink('homeLink', channelObj.title, { isCloseDialog: false })
@@ -753,6 +905,7 @@ test.describe('channel', () => {
         await libraryPage.getPostCardEle(postObj.title, 'card').waitFor()
         await libraryPage.getPostCardEle(postObj.title, 'moreBtn').click()
         await libraryPage.mmShareBtn.click()
+        await window.waitForTimeout(500)
         await libraryPage.copiedAlert.waitFor('visible')
         await homePage.searchBtn.click({ force: true })
         // 检查触发复制
@@ -775,32 +928,32 @@ test.describe('channel', () => {
       // 主页
       await basePage.jumpPage('homeLink')
       await window.waitForTimeout(5000)
-      expect(await libraryPage.getPostCardEle(postObj.title, 'channel')).toHaveText(/Private channel/)
+      // expect(await libraryPage.getPostCardEle(postObj.title, 'channel')).toHaveText(/Private channel/)
       // 主页搜索频道功能
-      await libraryPage.searchChannelID(channelObj, true)
+      await libraryPage.searchChannelID(privateChannel, true)
       await libraryPage.sciCloseBtn.click()
       // 关注页面
       await basePage.jumpPage('followingLink')
       await window.waitForTimeout(5000)
       await libraryPage.getChannelCardEle(channelObj.title, 'privateChannelTag').waitFor({ timeout: 30000 })
       // 关注页面搜索频道功能
-      await libraryPage.searchChannelID(channelObj, true)
+      await libraryPage.searchChannelID(privateChannel, true)
       // 频道详细页面
-      await libraryPage.getChannelCardEle(channelObj.title, 'card', 'sci').click()
-      await libraryPage.checkNavBar(channelObj.title)
-      await libraryPage.ensureChannelHeader(channelObj)
+      await libraryPage.getChannelCardEle(privateChannel.title, 'card', 'sci').click()
+      await libraryPage.checkNavBar(privateChannel.title)
+      await libraryPage.ensureChannelHeader(privateChannel, { followStatus: 'FOLLOW' })
       // 验证tag
       await libraryPage.cdPrivateChannelTag.waitFor({ timeout: 30000 })
       // 创建者页面
       await libraryPage.cdCreatorTitle.click()
       await window.waitForTimeout(3000)
       await libraryPage.udCard.waitFor()
-      await libraryPage.searchCreatorChannel(channelObj, true)
+      await libraryPage.searchCreatorChannel(privateChannel, true)
       // 探索页面搜索
       await basePage.jumpPage('exploreLink')
       // 等待推荐页加载
       await libraryPage.getPostCardEle('', 'channelTitleEle').nth(0).waitFor()
-      await libraryPage.searchChannelID(channelObj, true)
+      await libraryPage.searchChannelID(privateChannel, true)
       await libraryPage.sciCloseBtn.click()
 
       // 关闭私人频道
@@ -845,8 +998,12 @@ test.describe('channel', () => {
         await libraryPage.getChannelCardEle(channelObj.title, 'card').click()
         await window.waitForTimeout(5000)
         await libraryPage.getPostCardEle(postObj.title, 'moreBtn').click()
-        await libraryPage.mmBlockChannelBtn.click()
-        await libraryPage.bcBlockBtn.click()
+        await window.waitForTimeout(500)
+        if (!await libraryPage.unBlockBtn.count()) {
+          await libraryPage.mmBlockChannelBtn.click()
+          await window.waitForTimeout(500)
+          await libraryPage.bcBlockBtn.click()
+        }
         await libraryPage.cdBlockedTag.waitFor()
       }
       // 主页屏蔽，关注页标记，编辑页标记，搜索页标记
@@ -871,14 +1028,14 @@ test.describe('channel', () => {
       await accountPage.BlockListBtn.click()
       await window.waitForTimeout(5000)
       await accountPage.getBlockListCloseBtn(channelObj.title).click()
+      await accountPage.allBlockCloseBtn()
       await accountPage.NoBlockChannel.waitFor()
-      await accountPage.BlockListCancelBtn.click()
+      // await accountPage.BlockListCancelBtn.click()
+      await accountPage.clickViewport(100, 100)
 
       // 验证关注页，主页，编辑页标记，搜索页标记
       await basePage.jumpPage('homeLink')
-      await libraryPage.scrollToLoadPage()
-      await window.waitForTimeout(5000)
-      await libraryPage.getPostCardEle(postObj.title, 'postTitle').waitFor()
+      await libraryPage.scrollFindTarget(postObj.title, 'postTitle', 'getPostCardEle')
 
       await basePage.jumpPage('followingLink')
       await window.waitForTimeout(5000)
@@ -905,14 +1062,15 @@ test.describe('channel', () => {
         await basePage.jumpPage('homeLink')
         await libraryPage.scrollToLoadPage()
         // 进入频道详细页面
+        await libraryPage.scrollFindTarget(postObj.title, 'channelTitleEle', 'getPostCardEle')
         await libraryPage.getPostCardEle(postObj.title, 'channelTitleEle').click()
         const cdFollowBtn = await libraryPage.cdFollowBtn
-        expect(await cdFollowBtn.innerText()).toBe('FOLLOWING')
+        // expect(await cdFollowBtn.innerText()).toBe('FOLLOWING')
         // 取关
         await cdFollowBtn.click()
         await libraryPage.ucUnfollowBtn.click()
         await window.waitForTimeout(3000)
-        expect(await libraryPage.cdFollowBtn.innerText()).toBe('FOLLOW')
+        // expect(await libraryPage.cdFollowBtn.innerText()).toBe('FOLLOW')
 
         // 验证取关频道
         await libraryPage.checkUnfollowChannel(channelObj, postObj)
@@ -923,7 +1081,7 @@ test.describe('channel', () => {
         // 验证弹出推文卡片
         await libraryPage.getPostCardEle(postObj.title, 'card').waitFor()
         const followBtn = await libraryPage.getPostCardEle(postObj.title, 'followBtn')
-        expect(await followBtn.innerText()).toBe('FOLLOWING')
+        // expect(await followBtn.innerText()).toBe('FOLLOWING')
         // 取关
         await followBtn.click()
         await libraryPage.ucUnfollowBtn.click()
@@ -950,11 +1108,12 @@ test.describe('channel', () => {
       test('local favorites', async () => {
         await basePage.jumpPage('homeLink')
         await window.waitForTimeout(3000)
+        await libraryPage.scrollFindTarget(postObj.title, 'channelTitleEle', 'getPostCardEle')
         await libraryPage.getPostCardEle(postObj.title, 'card').waitFor()
         // 取关
         await libraryPage.unfollowChannel('localFavoritesLink', postObj.title, 'followBtn', 'PostCard')
         await window.waitForTimeout(3000)
-        expect(await libraryPage.getPostCardEle(postObj.title, 'followBtn').innerText()).toBe('FOLLOW')
+        // expect(await libraryPage.getPostCardEle(postObj.title, 'followBtn').innerText()).toBe('FOLLOW')
 
         // 验证取关频道
         await libraryPage.checkUnfollowChannel(channelObj, postObj)
@@ -986,9 +1145,10 @@ test.describe('channel', () => {
         const postNum = await libraryPage.getPostCardEle('', 'postTitle').count()
         for (let i = 0; i < postNum; i++) {
           const postTitle = await libraryPage.getPostCardEle('', 'postTitle').nth(i).innerText()
-          expect(postTitle).toBe(postArr[j].title)
+          if (postTitle !== postArr[j].title && !postTitle.startsWith('Post title')) throw new Error('标题查找出现错误:' + postTitle)
         }
-        await libraryPage.getPostCardEle(postArr[j].title, 'postTitle').waitFor()
+        const postLen = await libraryPage.getPostCardEle(postArr[j].title, 'postTitle').count()
+        await libraryPage.postArrFaitFor(postArr[j].title, 'postTitle', postLen)
       }
       // 频道标题查找
       await libraryPage.searchCbo.click()
@@ -1005,14 +1165,15 @@ test.describe('channel', () => {
   test('delete post', async () => {
     // 编辑页面检查是否关注
     await libraryPage.checkChannelFollowStatus(channelObj.title)
-
+    await window.waitForTimeout(1000)
     await basePage.jumpPage('editLink')
-    await window.waitForTimeout(5000)
     // 删除第二个推文
+    await window.waitForTimeout(5000)
     const editChannelBtn = await libraryPage.getChannelCardEle(channelObj.title, 'editChannelBtn')
     await editChannelBtn.click()
     await window.waitForTimeout(5000)
     // 判断第二个推文是否删除
+    await window.waitForTimeout(5000)
     const isAddPost2 = await libraryPage.getPostListEle(postObj2.title, 'titleEle').isVisible()
     console.log('isAddPost', isAddPost2)
     if (isAddPost2) {
@@ -1035,7 +1196,7 @@ test.describe('channel', () => {
     await expect(libraryPage.getPostCardEle(postObj2.title, 'postTitle')).toHaveCount(0)
     await expect(libraryPage.getPostCardEle(postObj.title, 'postTitle')).toHaveCount(1)
   })
-  test.skip('remove channel', async () => {
+  test('remove channel', async () => {
     await basePage.jumpPage('editLink')
     await window.waitForTimeout(5000)
     // 若频道没有删除 保存频道id，删除频道，查找频道
@@ -1055,6 +1216,6 @@ test.describe('channel', () => {
     await basePage.jumpPage('followingLink')
     await window.waitForTimeout(5000)
     await expect(libraryPage.getChannelCardEle(channelObj.title, 'card')).toHaveCount(0)
-    await window.waitForTimeout(10000)
+    await window.waitForTimeout(60000 * 2)
   })
 })

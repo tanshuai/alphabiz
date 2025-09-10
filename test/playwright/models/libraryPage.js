@@ -1,6 +1,7 @@
 const { expect } = require('@playwright/test')
 const { BasePage } = require('./basePage')
 const app = require('../../../developer/app.js')
+
 class LibraryPage extends BasePage {
   constructor (page) {
     super(page)
@@ -52,6 +53,7 @@ class LibraryPage extends BasePage {
     this.mmShareBtn = page.locator(`${menuClass} .q-item:has-text("share")`)
     this.mmBlockChannelBtn = page.locator(`${menuClass} .q-item >> nth=2`)
     this.mmBlockCreatorBtn = page.locator(`${menuClass} .q-item:has-text("block the creator")`)
+    this.unBlockBtn = page.locator('text=Unblock first chan...')
 
     // copy card
     const copyCardCss = '.q-card:has-text("Go to library")'
@@ -105,12 +107,20 @@ class LibraryPage extends BasePage {
     this.removeChannelBtn = page.locator('.q-card:has-text("remove channel") button:has-text("remove")')
 
     // recommend page start
-    this.recommendFollowBtn = page.locator('.library-recommend button:has-text("follow")')
-    this.showMoreBtn = page.locator('button:has-text("show more")')
+    this.showMoreBtn = page.locator('button:has-text("Show more for me")')
+    this.channelFollowsBtn = page.locator('span:has-text("Follow") >> nth=4')
+    this.cancel = page.locator('button:has-text("Cancel")')
+    this.locading = page.locator('text=Loading...')
+
+    this.getOne = page.locator('[style="width: 100%; height: 280px;"] >> nth=0')
+    this.beforeRecommendList = page.locator('[style="width: 100%; height: 280px;"]')
+    this.afterRecommendList = page.locator('[style="width: 100%; height: 280px;"]')
+    this.recommendFollowOenBtn = page.locator('button:has-text("starFollow 1 channels and continue")')
+    this.recommendTitle = page.locator('text=Recommend')
     // recommend page end
 
     // home page
-
+    this.tweetsFrist = page.locator('.image >> nth=0')
     // local favorites page start
     this.backUpBtn = page.locator('button:has-text("BACKUP")')
     this.favoriteCard = page.locator('.q-card:has-text("Import/Export Favorites") ')
@@ -167,10 +177,10 @@ class LibraryPage extends BasePage {
     this.apABUrlInput = page.locator(`input[aria-label="${app.name} URL"]`)
     this.apSelectUrlCbo = page.locator('label:has-text("Select from tasks")')
     this.apMagnetBtn = page.locator('text=Import from magnet')
-    this.apMagnetInput = page.locator('.q-card:has-text("magnet url") input')
-    this.apMagnetSubmitBtn = page.locator('.q-card:has-text("magnet url") button:has-text("done")')
+    this.apMagnetInput = page.locator('.q-card:has-text("magnet:? url") input')
+    this.apMagnetSubmitBtn = page.locator('.q-card:has-text("magnet:? url") button:has-text("done")')
     this.apFilmRateCbo = page.locator('label:has-text("Film rate")')
-    this.apAddSubtitleBtn = page.locator(`th:has-text("Subtitle list") button:has-text("add")`)
+    this.apAddSubtitleBtn = page.locator('th:has-text("Subtitle list") button:has-text("add")')
     this.apSubtitleListItem = page.locator('tabel:has-text("Subtitle list") tbody tr')
     this.apSubmitBtn = page.locator(`${addPost} button:has-text("Submit")`)
     this.apCloseBtn = page.locator(`${addPost} button:has-text("Cancel")`)
@@ -186,13 +196,15 @@ class LibraryPage extends BasePage {
     // creator detail page
     // Alert
     this.shareChannelAlert = page.locator('[role="alert"]:has-text("Share URL is copied to your clipboard")')
-    this.copiedAlert = page.locator('[role="alert"] >> text=/Copied/')
-    this.removedFavoriteAlert = page.locator('[role="alert"]:has-text("Removed favorite")')
+    this.copiedAlert = page.locator('[role="alert"] >> text=/Copied/ >> nth=0')
+    this.removedFavoriteAlert = page.locator('[role="alert"]:has-text("Removed favorite") >> nth=0')
+
+    // library following
   }
 
-  async scrollToLoadPage () {
-    await this.page.locator(".library-index").hover()
-    await this.page.mouse.wheel(0, 10000)
+  async scrollToLoadPage (x = 0, y = 10000, target = '.library-index') {
+    await this.page.locator(target).hover()
+    await this.page.mouse.wheel(x, y)
   }
 
   async checkNavBar (title, options = { timeout: 1000 }) {
@@ -209,10 +221,35 @@ class LibraryPage extends BasePage {
     return this.page.locator(postCard + ' ' + this.postCardEleObj[target])
   }
 
+  async postArrFaitFor (title, target, len) {
+    while (len) {
+      len--
+      const postCard = `.post-card:has(.post-title:has-text("${title}"))`
+      await this.page.locator(postCard + ' ' + this.postCardEleObj[target] + `>> nth=${len}`).waitFor()
+    }
+  }
+
   getChannelCardEle (title, target, position) {
     let channelCard = `.channel-card:has-text("${title}")`
     if (position) channelCard = this[position] + ' ' + channelCard
     return this.page.locator(channelCard + ' ' + this.channelCardEleObj[target])
+  }
+
+  toChannelCardEle (i) {
+    const target = `[style="background: rgb(40, 40, 40);"] >> nth=${i}`
+    this.page.locator(target).click()
+  }
+
+  publishChannelCard (title, target, position) {
+    let channelCard = `.channel-image .q-img__content:has-text("${title}")`
+    if (position) channelCard = this[position] + ' ' + channelCard
+    return this.page.locator(channelCard + ' ' + this.channelCardEleObj[target])
+  }
+
+  editChannelCard (title, target) {
+    let channelCard = `.channel-card:has-text("${title}")`
+    if (target) channelCard = channelCard + ' ' + this.channelCardEleObj[target]
+    return this.page.locator(channelCard)
   }
 
   /**
@@ -237,9 +274,17 @@ class LibraryPage extends BasePage {
 
     if (options.favorite) {
       const starBtn = await this.getPostCardEle(postObj.title, 'starBtn')
-      await expect(await starBtn.innerText()).toBe('star_border')
-      await starBtn.click()
-      expect(await starBtn.innerText()).toBe('star')
+      if (await starBtn.innerText() === 'star_border') {
+        await expect(await starBtn.innerText()).toBe('star_border')
+        await starBtn.click()
+        expect(await starBtn.innerText()).toBe('star')
+      } else if (await starBtn.innerText() === 'star') {
+        await expect(await starBtn.innerText()).toBe('star')
+        await starBtn.click()
+        expect(await starBtn.innerText()).toBe('star_border')
+        await starBtn.click()
+      }
+
       // 本地收藏页面验证
       await this.jumpPage('localFavoritesLink')
       await this.page.waitForTimeout(1000)
@@ -381,7 +426,7 @@ class LibraryPage extends BasePage {
     if (card === 'ChannelCard') cardMethod = 'getChannelCardEle'
     await this.jumpPage(page)
     await this.page.waitForTimeout(3000)
-    await this[cardMethod](title, 'card').waitFor()
+    if (page === 'homeLink') await this.scrollFindTarget(title, 'card', cardMethod)
     const followBtn = await this[cardMethod](title, element)
     const followBtnText = await followBtn.innerText()
     expect(followBtnText).toBe('FOLLOWING')
@@ -445,7 +490,8 @@ class LibraryPage extends BasePage {
   }
 
   async addChannel (channelObj) {
-    await this.addChannelEle.hover()
+    await this.addChannelBtn.click({ focus: true })
+    await this.cancel.click()
     await this.addChannelBtn.click()
     await this.addChannelCard.waitFor('visible')
     await this.acTitleInput.fill(channelObj.title)
@@ -468,7 +514,7 @@ class LibraryPage extends BasePage {
   }
 
   async ensureChannelCard (title, status) {
-    await this.getChannelCardEle(title, 'card').waitFor(status)
+    await this.publishChannelCard(title, 'card').waitFor(status)
   }
 
   async addPost (postObj, options = {}) {
@@ -494,11 +540,11 @@ class LibraryPage extends BasePage {
       await this.apMagnetInput.fill(postObj.url)
       // 复制粘贴magnet
       if (options.isTestCopy) {
-        await this.page.focus('.q-card:has-text("magnet url") input')
+        await this.page.focus('.q-card:has-text("magnet:? url") input')
         await this.page.keyboard.press(`${this.modifier}+KeyA`)
         await this.page.keyboard.press(`${this.modifier}+KeyC`)
         await this.apMagnetInput.fill('')
-        await this.page.focus('.q-card:has-text("magnet url") input')
+        await this.page.focus('.q-card:has-text("magnet:? url") input')
         await this.page.keyboard.press(`${this.modifier}+KeyV`)
       }
       await this.apMagnetSubmitBtn.click()
@@ -510,8 +556,8 @@ class LibraryPage extends BasePage {
     if (postObj.rate === 'G' || !postObj.rate) filmRate = 'General Audiences'
     await this.page.locator(`.q-menu >> text=${filmRate}`).click()
     if (postObj.subtitleList && typeof postObj.subtitleList === 'object') {
-      if (postObj.subtitleList['CN']) await this.addSubtitle('ZH', postObj.subtitleList['CN'])
-      if (postObj.subtitleList['EN']) await this.addSubtitle('EN', postObj.subtitleList['EN'])
+      if (postObj.subtitleList.CN) await this.addSubtitle('ZH', postObj.subtitleList.CN)
+      if (postObj.subtitleList.EN) await this.addSubtitle('EN', postObj.subtitleList.EN)
     }
     // await this.page.waitForTimeout(5000)
     // poster无效,等待处理
@@ -534,6 +580,7 @@ class LibraryPage extends BasePage {
     await this.addSubtitleCard.waitFor('hidden', { timeout: 20000 })
     // expect(await this.addSubtitleCard).toHaveCount(0, { timeout: 20000 })
   }
+
   async ensurePostList (postObj) {
     const postTitleText = await this.getPostListEle('', 'titleEle').nth(0).innerText()
     // console.log('postTitleText', postTitleText)
@@ -545,6 +592,40 @@ class LibraryPage extends BasePage {
     const postTimeText = await this.getPostListEle('', 'createTimeEle').nth(0).innerText()
     // console.log('postTimeText', postTimeText)
     expect(postTimeText).not.toBe('NaN-aN-aN aN:aN:aN')
+  }
+
+  async recommendPageTest () {
+    await this.recommendTitle.waitFor({ timeout: 60000 })
+    const beforeLen = await this.beforeRecommendList.count()
+    this.showMoreBtn.click()
+    await this.page.waitForTimeout(2000)
+    const afterLen = await this.afterRecommendList.count()
+    // this.page.on('console', msg => console.log(beforeLen, afterLen))
+    // await this.page.waitForTimeout(90000)
+    if (beforeLen === afterLen) throw new Error('显示更多推荐失败')
+    this.getOne.click()
+    this.recommendFollowOenBtn.click()
+  }
+
+  async scrollFindTarget (target, type, cardMethod) {
+    let i = 1
+    while (i) {
+      i++
+      await this.scrollToLoadPage()
+      await this.page.waitForTimeout(5000)
+      if (await this[cardMethod](target, type).isVisible()) break
+      if (i % 3 === 0) {
+        await this.jumpPage('followingLink')
+        await this.page.waitForTimeout(2000)
+        await this.jumpPage('homeLink')
+        await this.page.waitForTimeout(2000)
+      }
+    }
+  }
+
+  async checkFollowCard (checkName) {
+    console.log(checkName)
+    await this.page.locator(`text=${checkName} >> nth=0`).waitFor({ timeout: 120000 })
   }
 }
 
