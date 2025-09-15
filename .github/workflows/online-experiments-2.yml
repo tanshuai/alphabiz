@@ -79,4 +79,4 @@ jobs:
           on_retry_command: rm -rf C:/Users/runneradmin/AppData/Local/node-gyp/
 
       - name: oauth E2E Test 🧪
-        run: yarn test:e2e:library
+        run: yarn test:e2e:electron:library
