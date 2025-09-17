@@ -1126,7 +1126,7 @@ test.describe('channel', () => {
   test('delete post', async () => {
     // 编辑页面检查是否关注
     await libraryPage.checkChannelFollowStatus(channelObj.title)
-    await window.waitForTimeout(10000)
+    await window.waitForTimeout(15000)
     await basePage.jumpPage('editLink')
     // 删除第二个推文
     await window.waitForTimeout(5000)
