@@ -1,4 +1,3 @@
-fix build webtorrent error
-update modules
-bump @zeeis/alphabiz-libdb to v0.0.95
-try improve performance
+fix player errors
+remove hints for github PAT
+bump @zeeis/alphabiz-libdb to v0.0.96
