@@ -38,7 +38,7 @@ class HomePage {
 
   // 上传bt功能
   get uploadTorrentBtn () { return this.page.$('[name="UPLOAD"]') }
-  get torrentFileBtn () { return this.page.$('//*[@Name="File"]') }
+  get torrentFileBtn () { return this.page.$('//*[@Name="Select file..."]') }
   get fileNameEdit () { return this.page.$('//Edit[@ClassName="Edit"][@Name="File name:"]') }
   get confirmUploadBtn () { return this.page.$('//Button[@Name="CANCEL"]/following-sibling::Button[@Name="UPLOAD"]') }
 
@@ -73,6 +73,10 @@ class HomePage {
   async getPageTitle () {
     console.log('pageTitle :' + await this.pageTitle.getText())
     return await this.pageTitle.getText()
+  }
+
+  async setCardMode () {
+    await this.page.$('//*[@Name="REMOVE ALL"]/following-sibling::Button[2]').click()
   }
 
   async downloadTorrent (magnetLink, directory) {
@@ -180,6 +184,9 @@ class HomePage {
   async getTaskStatus (torrentName, opt = { isLog: true }) {
     await this.page.$('//Text[@Name="' + torrentName + '"]')
     const taskStatus = await this.page.$('//Text[@Name="' + torrentName + '"]/following-sibling::Text[starts-with(@Name,"Status:")]')
+    if (!taskStatus.isDisplayed()) {
+      await this.setCardMode()
+    }
     if (opt.isLog) console.log(await taskStatus.getText())
     return await taskStatus.getText()
   }
