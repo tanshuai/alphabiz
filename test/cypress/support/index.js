@@ -23,7 +23,7 @@ import './model/basicPage'
 import './model/toolPage'
 
 Cypress.on('uncaught:exception', (err, runnable) => {
-  const resizeObserverLoopError = 'ResizeObserver loop limit exceeded'
+  const resizeObserverLoopError = 'ResizeObserver loop'
   if (err.message.includes(resizeObserverLoopError) ||
     err.message.includes('User-Initiated Abort') ||
     err.message.includes('RTCError') ||
