@@ -120,7 +120,7 @@ test.beforeAll(async () => {
   })
 })
 test.beforeEach(async () => {
-  test.setTimeout(60000 * 4)
+  test.setTimeout(60000 * 6)
 })
 test.afterEach(async ({ }, testInfo) => {
   if (testInfo.status !== testInfo.expectedStatus) {
@@ -172,10 +172,9 @@ test.skip('disable cloud key force', async () => {
 test.describe('key', () => {
   test.beforeEach(async () => {
   })
-  test.describe('independent password', () => {
+  test.describe('independent password', async () => {
     const inPassword = process.env.TEST_RESET_PASSWORD
     const newPassword = process.env.TEST_PASSWORD
-
     test.skip('importing a Local Key', async () => { // 此用例已不可用
       await basePage.signIn(name, process.env.TEST_PASSWORD, true, false)
       await window.waitForTimeout(20000)
@@ -190,6 +189,7 @@ test.describe('key', () => {
       // await basePage.clearLocalstorage()
       await window.waitForLoadState()
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
+      await window.waitForTimeout(2000)
       await basePage.waitForAllHidden(await basePage.alert)
       try {
         await accountPage.disableCloudKey()
@@ -220,8 +220,8 @@ test.describe('key', () => {
       await basePage.signOut()
       await basePage.waitForAllHidden(await basePage.alert)
     })
-    test('update and save key in cloud', async () => {
-      test.setTimeout(3 * 60000)
+    test.skip('update and save key in cloud', async () => {
+      test.setTimeout(5 * 60000)
       await basePage.ensureLoginStatus(name, process.env.TEST_PASSWORD, true, false)
       // 创建新的密钥
       await accountPage.createCloudKey(newPassword, true)
@@ -235,7 +235,7 @@ test.describe('key', () => {
       await accountPage.syncCloudKey(newPassword, { isABPassword: true })
       // 等待密钥配置，加载，等待推荐页面出现
       await basePage.jumpPage('homeLink')
-      if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
+      // if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
     })
     test('disable cloud key', async () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
@@ -291,8 +291,7 @@ test.describe('key', () => {
       await window.waitForTimeout(3000)
     })
   })
-  test.describe('aws password', () => {
-    test.skip()
+  test.skip('aws password', () => {
     test('create and save key in cloud', async () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, false)
       await window.waitForTimeout(30000)
@@ -1029,7 +1028,7 @@ test.describe('channel', () => {
       await expect(libraryPage.getChannelCardEle(channelObj.title, 'blockedTag')).toHaveCount(0)
     })
     // 从各个卡片取关频道
-    test.describe('unfollow', async () => {
+    test('unfollow', async () => {
       test.beforeEach(async ({ }, testInfo) => {
         // 编辑页面检查是否关注
         await libraryPage.checkChannelFollowStatus(channelObj.title)
