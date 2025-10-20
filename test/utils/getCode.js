@@ -1,4 +1,3 @@
-// require('dotenv').config()
 const simpleParser = require('mailparser').simpleParser
 var MailListener = require('mail-listener2')
 
@@ -34,7 +33,7 @@ function makeid (length) {
   return result
 }
 
-function getCode(mail, options) {
+function getCode (mail, options) {
   const { type, to, from, oauth } = options;
   const emailTo = mail.to;
   const emailFrom = mail.from;
@@ -53,14 +52,20 @@ function getCode(mail, options) {
       return twitterCode ? twitterCode[0] : null;
 
     default:
-      if (to && emailTo.text === to || from && emailFrom.text && emailFrom.text.includes(from)) {
-        const targetStr = type ? mail.html : mail.text;
-        const codeReg = type ? /\d{6}(?=\sis\syour\sAlphabiz)/gm : /(?<=\bYou\sreceived\san\sinvitation\scode:\s)\w+\b/;
-        const code = codeReg.exec(targetStr);
-        return code ? code[0] : null;
-      } else {
-        return null;
+      const regexPatterns = [
+        /\d{6}(?=\sis\syour\sAlphabiz)/gm,
+        /(?<=\bYou\sreceived\san\sinvitation\scode:\s)\w+\b/g,
+        /(?<=Your\sverification\scode\sis\s)\d{6}/gm
+      ];
+      const targetStrs = [mail.html, mail.text];
+
+      for (let targetStr of targetStrs) {
+        for (let regex of regexPatterns) {
+          let code = regex.exec(targetStr);
+          if (code) return code[0];
+        }
       }
+      return null;
   }
 }
 
@@ -93,9 +98,23 @@ async function mailListener (options) {
       searchFilter: ['UNSEEN'], // the search filter being used after an IDLE notification has been retrieved
       markSeen: true
     })
+
+    const handleMail = (mail) => {
+      if (new Date(time) >= new Date(mail.date)) return
+      const emailTo = mail.to
+      const emailFrom = mail.from
+      if (from && !emailFrom?.text.includes(from)) return
+      if (to && emailTo.text !== to) return
+      const code = getCode(mail, options);
+      if (code) {
+        mailListener.stop()
+        resolve(code)
+      }
+    };
+
     mailListener.start() // start listening
     // 连接60秒后，返回0，并关闭连接
-    sleep(90000).then(res => {
+    sleep(60000).then(res => {
       resolve(0)
       mailListener.stop()
     })
@@ -108,42 +127,30 @@ async function mailListener (options) {
         f.on('message', function (msg, seqno) {
           msg.on('body', function (stream, info) {
             simpleParser(stream).then(mail => {
-              if (err) throw err
-              // 点击获取邮件 时间之后 收到的邮件
-              if (Date.parse(time) >= Date.parse(mail.date)) return
-              const code = getCode(mail, options)
-              if (code) { // if code != null
-                resolve(code)
-                mailListener.stop()
-              }
+              // console.log(mail)
+              handleMail(mail) // 排查
             }).catch(err => {
-              console.log(err)
+              reject(err)
             })
           })
         })
         // 抓取完一封邮件后触发
         f.on('error', function (err) {
-          if (err) throw err
+          reject(err)
         })
       })
     })
     // 连接结束时
     mailListener.on('server:disconnected', function () {
-      // console.log('imapDisconnected')
+      console.log('imapDisconnected')
     })
     mailListener.on('error', function (err) {
-      console.log(err)
       resolve(0)
     })
     // 新邮件到达时
     mailListener.on('mail', function (mail, seqno, attributes) {
       // 点击获取邮件 时间之后 收到的邮件
-      if (Date.parse(time) >= Date.parse(mail.date)) return
-      const code = getCode(mail, options)
-      if (code) { // if code != null
-        resolve(code)
-        mailListener.stop()
-      }
+      handleMail(mail)
     })
   })
 }
