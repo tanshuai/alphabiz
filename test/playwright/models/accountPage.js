@@ -245,7 +245,6 @@ class AccountPage extends BasePage {
   }
 
   async disableCloudKey () {
-    await this.page.waitForTimeout(10000)
     await this.jumpPage('accountSettingLink')
     await this.kcCloudBtn.waitFor()
     await this.page.waitForTimeout(3000)

@@ -107,8 +107,12 @@ class LibraryPage extends BasePage {
     this.removeChannelBtn = page.locator('.q-card:has-text("remove channel") button:has-text("remove")')
 
     // recommend page start
+    this.welcomeMessage = page.locator('.q-mt-md:has-text("welcome")')
     this.showMoreBtn = page.locator('button:has-text("Show more for me")')
-    this.channelFollowsBtn = page.locator('span:has-text("Follow") >> nth=4')
+    this.channelSelected = page.locator(".q-card.channel-card.selected")
+    this.chanel1Global = page.locator(".channel-card>>nth=0"); //全局推荐页的第一个频道定位
+    this.chanel1Local = page.locator(".channel-card.q-card>>nth=5"); //局部推荐页的第一个频道定位
+    this.channelFollowsBtn = page.locator('button:has-text("channels and continue")')
     this.cancel = page.locator('button:has-text("Cancel")')
     this.locading = page.locator('text=Loading...')
 
@@ -595,13 +599,11 @@ class LibraryPage extends BasePage {
   }
 
   async recommendPageTest () {
-    await this.recommendTitle.waitFor({ timeout: 60000 })
+    await this.showMoreBtn.waitFor({ timeout: 60000 })
     const beforeLen = await this.beforeRecommendList.count()
     this.showMoreBtn.click()
     await this.page.waitForTimeout(2000)
     const afterLen = await this.afterRecommendList.count()
-    // this.page.on('console', msg => console.log(beforeLen, afterLen))
-    // await this.page.waitForTimeout(90000)
     if (beforeLen === afterLen) throw new Error('显示更多推荐失败')
     this.getOne.click()
     this.recommendFollowOenBtn.click()
