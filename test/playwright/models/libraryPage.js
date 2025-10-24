@@ -124,7 +124,7 @@ class LibraryPage extends BasePage {
     // recommend page end
 
     // home page
-    this.tweetsFrist = page.locator('.image >> nth=0')
+    this.tweetsFrist = page.locator('.post-channel-info >> nth=0')
     // local favorites page start
     this.backUpBtn = page.locator('button:has-text("BACKUP")')
     this.favoriteCard = page.locator('.q-card:has-text("Import/Export Favorites") ')
