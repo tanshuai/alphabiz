@@ -27,7 +27,7 @@
     "test:e2e:electron:main": "xvfb-maybe -- playwright test main",
     "test:e2e:oauth": "xvfb-maybe -- playwright test oauth",
     "test:e2e:electron:wallet": "xvfb-maybe -- playwright test wallet",
-    "test:e2e:electron:library": "xvfb-maybe -- playwright test library",
+    "test:e2e:electron:library": "xvfb-maybe -- playwright test libKey",
     "test:e2e:config": "node test/playwright/customization/modifyConfig.js",
     "test:e2e:electron:custom": "xvfb-maybe -- playwright test customize.spec.js",
     "test:e2e:electron:download": "xvfb-maybe -- playwright test test/playwright/download.spec.js",
