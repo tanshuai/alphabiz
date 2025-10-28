@@ -1,1 +1,3 @@
-test library key
+test library key:  finish
+fix i18n error
+fix closeInternalNotice error
