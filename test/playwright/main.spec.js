@@ -261,6 +261,78 @@ test.describe('save Language', () => {
   })
 })
 
+test.describe('account', () => {
+  test('transfer - check bill details', async () => {
+    test.setTimeout(60000 * 5)
+    // 转账人账号、密码
+    const transferee = from
+    const transfereePassword = process.env.TEST_PASSWORD
+    // 收款人账号、密码
+    const payee = to
+    const payeePassword = process.env.TEST_PASSWORD
+    const transferAmount = 1
+    await window.evaluate(() => localStorage.clear())
+    await basePage.newReload()
+
+    // 登录收款人账号
+    await basePage.signIn(payee, payeePassword, 1)
+    await basePage.jumpPage('creditsLink')
+    await window.waitForTimeout(6000)
+    const firstHeaderTitle = await basePage.headerTitle.innerText()
+    if (!/Credits/.test(firstHeaderTitle)) await basePage.jumpPage('creditsLink')
+    await creditsPage.creditsText.click({ force: true })
+    // 获取收款人id
+    const payeeID = await creditsPage.getID()
+    // console.log('payeeID:' + payeeID)
+    await window.waitForTimeout(2000)
+    const payeePoint = await creditsPage.creditsText.innerText()
+    const payeeAfterPoint = Number(payeePoint) + transferAmount
+    // 退出收款人账号
+    await basePage.signOut()
+    await window.waitForTimeout(1000)
+    // 登录付款人账号
+    await basePage.signIn(transferee, transfereePassword, 1)
+    await basePage.jumpPage('creditsLink')
+    await window.waitForTimeout(6000)
+    const secondHeaderTitle = await basePage.headerTitle.innerText()
+    if (!/Credits/.test(secondHeaderTitle)) await basePage.jumpPage('creditsLink')
+    await creditsPage.creditsText.click({ force: true })
+    // 获取转账人id
+    const transfereeID = await creditsPage.getID()
+    let transfereePoint = await creditsPage.creditsText.innerText()
+    if (Number(transfereePoint) <= 0) {
+      console.log('金额不足')
+    }
+    await window.waitForTimeout(2000)
+    transfereePoint = await creditsPage.creditsText.innerText()
+    const transfereeAfterPoint = Number(transfereePoint) - transferAmount
+    // 转账
+    await creditsPage.transfer(payeeID, transferAmount.toString())
+    // 查看账单明细
+    await creditsPage.checkBillDetail([payeeID, 'Transfer', '-' + transferAmount, 'finish'], 'expense')
+    // 断言积分变化是否正确
+    await window.waitForTimeout(2000)
+    await window.waitForLoadState()
+    expect(await creditsPage.creditsText.innerText()).toBe(calculation('reduce', transfereePoint, transferAmount).toString())
+    // 退出付款人账号
+    await basePage.signOut()
+    await window.waitForTimeout(1000)
+    // 登录收款人账号
+    await basePage.signIn(payee, payeePassword, 1)
+    await basePage.jumpPage('creditsLink')
+    await window.waitForTimeout(6000)
+    const thirdHeaderTitle = await basePage.headerTitle.innerText()
+    if (!/Credits/.test(thirdHeaderTitle)) await basePage.jumpPage('creditsLink')
+    await window.waitForTimeout(2000)
+    // 查看账单
+    await creditsPage.checkBillDetail([transfereeID, 'Transfer', transferAmount.toString(), 'finish'], 'income')
+    // 断言积分变化是否正确
+    expect(await creditsPage.creditsText.innerText()).toBe(payeeAfterPoint.toString())
+    await basePage.signOut()
+    await window.waitForTimeout(1000)
+  })
+})
+
 test.describe('download ', () => {
   for (const bt of btData) {
     test((bt.testName ? bt.testName : '') + bt.btName, async () => {
@@ -747,81 +819,5 @@ test.describe('upload', () => {
     await window.click(':nth-match(button:has-text("Upload"), 2)')
     await window.waitForTimeout(1000)
     await window.click('text=' + btName, { timeout: 5000 })
-  })
-})
-
-test.describe('account', () => {
-  test('transfer - check bill details', async () => {
-    test.setTimeout(60000 * 5)
-    // 转账人账号、密码
-    // const transferee = userInfo[from].username
-    const transferee = from
-    const transfereePassword = process.env.TEST_PASSWORD
-    // 收款人账号、密码
-    // const payee = userInfo[to].username
-    const payee = to
-    const payeePassword = process.env.TEST_PASSWORD
-    const transferAmount = 1
-    await window.evaluate(() => localStorage.clear())
-    await basePage.newReload()
-
-    // 登录收款人账号
-    await basePage.signIn(payee, payeePassword, 1)
-    await basePage.jumpPage('creditsLink')
-    await window.waitForTimeout(6000)
-    const firstHeaderTitle = await basePage.headerTitle.innerText()
-    if (!/Credits/.test(firstHeaderTitle)) await basePage.jumpPage('creditsLink')
-    await creditsPage.creditsText.click({ force: true })
-    // await window.waitForTimeout(10000)
-    // 获取收款人id
-    const payeeID = await creditsPage.getID()
-    // console.log('payeeID:' + payeeID)
-    await window.waitForTimeout(2000)
-    const payeePoint = await creditsPage.creditsText.innerText()
-    const payeeAfterPoint = Number(payeePoint) + transferAmount
-    // 退出收款人账号
-    await basePage.signOut()
-    await window.waitForTimeout(1000)
-    // 登录付款人账号
-    await basePage.signIn(transferee, transfereePassword, 1)
-    await basePage.jumpPage('creditsLink')
-    await window.waitForTimeout(6000)
-    const secondHeaderTitle = await basePage.headerTitle.innerText()
-    if (!/Credits/.test(secondHeaderTitle)) await basePage.jumpPage('creditsLink')
-    await creditsPage.creditsText.click({ force: true })
-    // await window.waitForTimeout(10000)
-    // 获取转账人id
-    const transfereeID = await creditsPage.getID()
-    let transfereePoint = await creditsPage.creditsText.innerText()
-    if (Number(transfereePoint) <= 0) {
-      console.log('金额不足')
-    }
-    await window.waitForTimeout(2000)
-    transfereePoint = await creditsPage.creditsText.innerText()
-    const transfereeAfterPoint = Number(transfereePoint) - transferAmount
-    // 转账
-    await creditsPage.transfer(payeeID, transferAmount.toString())
-    // 查看账单明细
-    await creditsPage.checkBillDetail([payeeID, 'Transfer', '-' + transferAmount, 'finish'], 'expense')
-    // 断言积分变化是否正确
-    await window.waitForTimeout(2000)
-    await window.waitForLoadState()
-    expect(await creditsPage.creditsText.innerText()).toBe(calculation('reduce', transfereePoint, transferAmount).toString())
-    // 退出付款人账号
-    await basePage.signOut()
-    await window.waitForTimeout(1000)
-    // 登录收款人账号
-    await basePage.signIn(payee, payeePassword, 1)
-    await basePage.jumpPage('creditsLink')
-    await window.waitForTimeout(6000)
-    const thirdHeaderTitle = await basePage.headerTitle.innerText()
-    if (!/Credits/.test(thirdHeaderTitle)) await basePage.jumpPage('creditsLink')
-    await window.waitForTimeout(2000)
-    // 查看账单
-    await creditsPage.checkBillDetail([transfereeID, 'Transfer', transferAmount.toString(), 'finish'], 'income')
-    // 断言积分变化是否正确
-    expect(await creditsPage.creditsText.innerText()).toBe(payeeAfterPoint.toString())
-    await basePage.signOut()
-    await window.waitForTimeout(1000)
   })
 })
