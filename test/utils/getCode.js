@@ -197,11 +197,11 @@ async function getMailCode (options) {
     await sleep(5000)
     console.log('mailListener again')
     res = await mailListener(options)
-  }
-  if (!res) {
-    await sleep(5000)
-    console.log('mailListener again')
-    res = await mailListener(options)
+    if (!res) {
+      await sleep(5000)
+      console.log('mailListener again')
+      res = await mailListener(options)
+    }
   }
   return res
 }

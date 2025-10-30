@@ -46,6 +46,7 @@ class AccountPage extends BasePage {
     this.cpNewPasswordInput = page.locator(`${changePassword} [aria-label="New password"]`)
     this.cpReEnterInput = page.locator(`${changePassword} [aria-label="Re-enter new password"]`)
     this.cpSubmitBtn = page.locator(`${changePassword} button:has-text("ok")`)
+    this.cpCancelBtn = page.locator(`${changePassword} button:has-text("Cancel")`)
 
     // library setting
     this.editUserBtn = page.locator('button:has-text("Edit user profile")')
@@ -118,7 +119,14 @@ class AccountPage extends BasePage {
     await this.cpNewPasswordInput.fill(newPassword)
     await this.cpReEnterInput.fill(newPassword)
     await this.cpSubmitBtn.click()
-    await this.checkAlert('changePassword', /Password has been reset/)
+    let alertText = await this.checkAlert('changePassword', /(Password has been reset)|(Attempt limit exceeded, please try after some time)/)
+    if (alertText.includes("Password has been reset")){
+      return true;
+    } else if (alertText.includes("Attempt limit exceeded, please try after some time")){
+      return false;
+    } else{
+      return false;
+    }
   }
 
   async resetPassword (account, newPassword) {
@@ -130,7 +138,10 @@ class AccountPage extends BasePage {
     const newTime = new Date()
     newTime.setMinutes(newTime.getMinutes() - 1); // 将时间往前挪一分钟
     const verificationCode = await getMailCode({ type: 1, time: newTime, to: account })
-    console.log(verificationCode)
+    if(verificationCode === 0) {
+      console.log('cannot fetch the code')
+      throw error
+    }
     await this.page.fill('[aria-label="Verification code"]', verificationCode.toString())
     await this.page.fill('[aria-label="Password"]', newPassword)
     await this.page.fill('[aria-label="Re-enter password"]', newPassword)

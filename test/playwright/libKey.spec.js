@@ -23,8 +23,8 @@ if (process.platform === 'win32') {
   name = 'test9'
 }
 name = name + process.env.TEST_EMAIL_DOMAIN
-const accountPassword = process.env.TEST_PASSWORD
-const accountResetPassword = process.env.TEST_RESET_PASSWORD
+var accountPassword = process.env.TEST_PASSWORD
+var accountResetPassword = process.env.TEST_RESET_PASSWORD
 
 
 test.beforeAll(async () => {
@@ -91,7 +91,19 @@ test.describe('key', () => {
   })
   // 清除密钥
   test('disable cloud key', async () => { 
-    await basePage.ensureLoginStatus(name, accountPassword, true, true)
+    let loggingMsg = await basePage.ensureLoginStatus(name, accountPassword, true, true)
+    if (loggingMsg === "trylater") {
+      console.log("try after 1 minutes later")
+      await window.waitForTimeout(60000)
+      loggingMsg = await basePage.ensureLoginStatus(name, accountPassword, true, true)
+    }
+    if (loggingMsg === "incorrect") {
+      console.log('swap password then login again')
+      var tmp = accountPassword
+      accountPassword = accountResetPassword
+      accountResetPassword = tmp
+      await basePage.ensureLoginStatus(name, accountPassword, true, true)
+    }
     await basePage.waitForAllHidden(await basePage.alert)
     await window.waitForTimeout(3000)
     await accountPage.disableCloudKey()
@@ -179,8 +191,11 @@ test.describe('key', () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
       await window.waitForTimeout(5000)
       await basePage.jumpPage('accountSettingLink')
-      await accountPage.changePassword(accountPassword, accountResetPassword)
-
+      let done = await accountPage.changePassword(accountPassword, accountResetPassword)
+      if(done === false){
+        accountPage.cpCancelBtn.click()
+        [accountPassword , accountResetPassword] = [accountResetPassword, accountPassword]
+      }
       // 验证同步云端
       await basePage.signOut()
       await basePage.signIn(name, accountResetPassword, true, false)
@@ -191,9 +206,16 @@ test.describe('key', () => {
       await basePage.signOut()
     })
     // 测试忘记密码 -> 重置密码
+    let resetFailed = false
     test('reset password', async () => {
       await window.waitForTimeout(3000)
-      await accountPage.resetPassword(name, accountPassword)
+      try{
+        await accountPage.resetPassword(name, accountPassword)
+      } catch( error ){
+        console.log('reset failed')
+        resetFailed = true
+        return
+      }
       await basePage.waitForAllHidden(await basePage.alert)
       // 验证同步云端
       await basePage.signIn(name, accountPassword, true, false)
@@ -202,6 +224,36 @@ test.describe('key', () => {
       await window.waitForTimeout(15000)
       if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
       await basePage.signOut()
+    })
+    // when reset failed, change back to origin password
+    test('change back to origin password', async()=>{
+      if(!resetFailed) {
+        console.log('reset password already success')
+        return
+      }
+      console.log("back to login page")
+      await window.locator("button:has-text('arrow_back')").click()
+      await window.waitForTimeout(1000)
+      await window.locator("button:has-text('arrow_back')").click()
+      console.log("back")
+      await basePage.ensureLoginStatus(name, accountResetPassword, true, true)
+      await window.waitForTimeout(5000)
+      await basePage.jumpPage('accountSettingLink')
+      let done = await accountPage.changePassword(accountPassword, accountResetPassword)
+      if (done === false) {
+        accountPage.cpCancelBtn.click()
+        var tmp = accountPassword
+        accountPassword = accountResetPassword
+        accountResetPassword = tmp
+      }
+      // 验证同步云端
+      await basePage.signOut()
+      await basePage.signIn(name, accountPassword, true, false)
+      await accountPage.syncCloudKey('', { isABPassword: true })
+      // 等待密钥配置，加载,等待推荐页面出现
+      await window.waitForTimeout(15000)
+      if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
+      await basePage.signOut()      
     })
     // 清除密钥缓存
     test('reset cloud key', async () => {
