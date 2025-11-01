@@ -82,7 +82,8 @@ jobs:
         run: |
           export REPO=alphabiz
           yarn test:e2e:electron:library
-          unset REPO 
+          unset REPO
+        shell: bash
 
       - name: Upload Test Results 🗃
         if: always()
