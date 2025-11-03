@@ -137,7 +137,7 @@ class BasePage {
    *
    * @param {string} target - homeLink、playerLink、creditsLink、accountLink
    */
-  async jumpPage (firstTarget, secondTarget, initialization = true) {
+  async jumpPage (firstTarget, secondTarget) {
     const menuButton = await this[secondTarget] || await this[firstTarget]
     await this.page.waitForTimeout(500)
     const isHidden = await this[firstTarget].isHidden()
@@ -149,8 +149,16 @@ class BasePage {
         await this[firstTarget].click()
       }
     }
-    if (initialization) await this.recommendHandle()
     await menuButton.click()
+    if (firstTarget === 'accountMore') return
+    await this.page.waitForTimeout(1500)
+    if(await menuButton.isVisible()){
+      const buttonBoundingBox = await menuButton.boundingBox()
+      const {x,y,width,height} = buttonBoundingBox;
+      const clickX = x + width + 10 //假设相对于按钮的右侧有10px的空白区域
+      const clickY = y + height/2 //点击位置垂直居中
+      await this.page.mouse.click(clickX,clickY)
+    }
   }
 
   async closeInternalNotice () {
