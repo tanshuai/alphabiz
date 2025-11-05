@@ -1,3 +1,6 @@
-test library key:  finish
-fix i18n error
-fix closeInternalNotice error
+adjust e2e test sequence
+test library key: debug
+test library key: patch
+fix date-picker error with external languages
+test library key: left-drawMenu in small screen
+remove individual i18n files, migrating to src/i18n for external-i18n adaptation
