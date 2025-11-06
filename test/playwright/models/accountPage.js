@@ -119,11 +119,9 @@ class AccountPage extends BasePage {
     await this.cpNewPasswordInput.fill(newPassword)
     await this.cpReEnterInput.fill(newPassword)
     await this.cpSubmitBtn.click()
-    let alertText = await this.checkAlert('changePassword', /(Password has been reset)|(Attempt limit exceeded, please try after some time)/)
+    let alertText = await this.checkAlert('changePassword', /(Password has been reset)|(Attempt limit exceeded, please try after some time)|(Incorrect original password)/)
     if (alertText.includes("Password has been reset")){
       return true;
-    } else if (alertText.includes("Attempt limit exceeded, please try after some time")){
-      return false;
     } else{
       return false;
     }

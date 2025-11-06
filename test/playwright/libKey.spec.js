@@ -239,7 +239,7 @@ test.describe('key', () => {
       await basePage.ensureLoginStatus(name, accountResetPassword, true, true)
       await window.waitForTimeout(5000)
       await basePage.jumpPage('accountSettingLink')
-      let done = await accountPage.changePassword(accountPassword, accountResetPassword)
+      let done = await accountPage.changePassword(accountResetPassword, accountPassword)
       if (done === false) {
         accountPage.cpCancelBtn.click()
         var tmp = accountPassword
