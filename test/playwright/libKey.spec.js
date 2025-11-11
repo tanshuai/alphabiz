@@ -194,6 +194,10 @@ test.describe('librayKey:媒体库密钥测试', () => {
     })
     // 更新账户密码
     test('修改账户密码', async () => {
+      if (process.argv.includes('--excludePasswordTest')){
+        console.log('由push触发的工作流, 选择跳过密码更改的测试')
+        return
+      }
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
       await window.waitForTimeout(5000)
       await basePage.jumpPage('accountSettingLink')
@@ -214,6 +218,10 @@ test.describe('librayKey:媒体库密钥测试', () => {
     })
     // 测试忘记密码 -> 重置密码
     test('通过邮件重置账户密码', async () => {
+      if (process.argv.includes('--excludePasswordTest')) {
+        console.log('由push触发的工作流, 选择跳过密码更改的测试')
+        return
+      }
       await window.waitForTimeout(3000)
       try{
         await accountPage.resetPassword(name, accountPassword)
