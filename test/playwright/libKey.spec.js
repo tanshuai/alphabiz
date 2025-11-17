@@ -114,8 +114,15 @@ test.describe('librayKey:媒体库密钥测试', () => {
       console.log("macos环境，刷新页面")
       await basePage.newReload()
       await window.screenshot({ path: `${ScreenshotsPath}macos-disableCloudKey-screen.png` })
+      await this.page.waitForTimeout(500)
+      const count = await this.page.locator('.q-card:has-text("INTERNAL DEMO ONLY")').count()
+      if (count) await this.closeInternalNotice()
     }
     await accountPage.disableCloudKey()
+    if (process.platform === 'darwin') {
+      console.log("macos环境, 成功清除密钥")
+      await window.screenshot({ path: `${ScreenshotsPath}macos-disableCloudKey-screen.png` })
+    }
     await basePage.signOut()
   })
   test.describe('独立密码', () => { 
