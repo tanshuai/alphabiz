@@ -1,6 +1,8 @@
 name: Online experiments - 2
 
 on:
+  schedule:
+    - cron: "30 11 * * *"
   push:
     paths:
       - "**/online-experiments-2.yml"
@@ -78,9 +80,19 @@ jobs:
           command: yarn unpackaged
           on_retry_command: rm -rf C:/Users/runneradmin/AppData/Local/node-gyp/
 
-      - name: oauth E2E Test 🧪
+      - name: oauth E2E Test 🧪(include passwordTest)
+        if: github.event_name == 'schedule'
         run: |
           export REPO=alphabiz
+          yarn test:e2e:electron:library
+          unset REPO
+        shell: bash
+
+      - name: oauth E2E Test 🧪(exclude passwordTest)
+        if: github.event_name == 'push'
+        run: |
+          export REPO=alphabiz
+          export excludePasswordTest=1
           yarn test:e2e:electron:library
           unset REPO
         shell: bash
