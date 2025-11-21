@@ -124,9 +124,9 @@ test.describe('librayKey:媒体库密钥测试', () => {
       await console.log("macos环境, 成功清除密钥")
       await window.screenshot({ path: `${ScreenshotsPath}macos-disableCloudKey-screen.png` })
       await console.log('准备退出')
-      await basePage.signOut()
-      await window.screenshot({ path: `${ScreenshotsPath}macos-logout-screen.png` })
-      await console.log('退出')
+      //await basePage.signOut()
+      // await window.screenshot({ path: `${ScreenshotsPath}macos-logout-screen.png` })
+      // await console.log('退出')
     }
     if (process.platform === 'darwin') {
     } else{
@@ -143,7 +143,6 @@ test.describe('librayKey:媒体库密钥测试', () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
       await basePage.waitForAllHidden(await basePage.alert)
       await window.waitForTimeout(3000)
-      console.log('清除密钥')
       // isABPassword = false, 不使用账户密码
       await accountPage.disableCloudKey()
       console.log('使用独立密码新建密钥')
