@@ -96,6 +96,7 @@ class BasePage {
     this.passwordInput = page.locator('[aria-label="Password"]')
     this.signInBtn = page.locator('.q-card:has-text("Forgot your password?") >> button:has-text("Sign in") >> nth=0')
     this.signUpBtn = page.locator('button:has-text("Sign up")')
+    this.signOutItem = page.locator('.corner-menu__list div:has-text("Sign out").q-item')
     this.signOutAnywayBtn = page.locator('button:has-text("Sign out anyway")')
     this.languageBtn = page.locator('.signed-out-actions button:has-text("language")')
     this.account = page.locator('text = Account >> nth=1')
@@ -253,21 +254,22 @@ class BasePage {
   }
 
   async signOut () {
-    if (process.platform !== 'darwin') {
       await this.jumpPage('accountMore')
-      await this.page.click('text=Sign out')
+      if(await this.signOutItem.isVisible()){
+        console.log('捕获到退出选项')
+        const box = await this.signOutItem.boundingBox()
+        const {x,y,width,height} = box
+        const clickX = x + width/2
+        const clickY = y + height/2
+        await this.page.mouse.click(clickX,clickY)
+      }else{
+        console.log('没有捕获到退出选项')
+      }
       await this.page.waitForTimeout(1000)
       if (await this.signOutAnywayBtn.isVisible()) { await this.signOutAnywayBtn.click() }
       await this.signOutAlert.waitFor()
       await this.page.waitForTimeout(3000)
       await this.waitForAllHidden(await this.alert)
-    } else {
-      await this.clearLocalstorage()
-      await this.page.waitForTimeout(2000)
-      await this.newReload()
-      await this.page.waitForLoadState()
-      await this.page.waitForTimeout(2000)
-    }
   }
 
   /**

@@ -107,32 +107,18 @@ test.describe('librayKey:媒体库密钥测试', () => {
       accountResetPassword = tmp
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
     }
-    console.log('已经登录')
+    await console.log('已经登录')
     await basePage.waitForAllHidden(await basePage.alert)
     await window.waitForTimeout(3000)
-    if (process.platform === 'darwin') {
-      console.log("macos环境，刷新页面")
-      await basePage.newReload()
-      await window.screenshot({ path: `${ScreenshotsPath}macos-disableCloudKey-screen.png` })
-      await window.waitForTimeout(500)
-      const count = await window.locator('.q-card:has-text("INTERNAL DEMO ONLY")').count()
-      if (count) {
-        await basePage.closeInternalNotice()
-        await console.log('关闭弹窗')
-      }
-      await accountPage.disableCloudKey()
-      await console.log("macos环境, 成功清除密钥")
-      await window.screenshot({ path: `${ScreenshotsPath}macos-disableCloudKey-screen.png` })
-      await console.log('准备退出')
-      //await basePage.signOut()
-      // await window.screenshot({ path: `${ScreenshotsPath}macos-logout-screen.png` })
-      // await console.log('退出')
-    }
-    if (process.platform === 'darwin') {
-    } else{
-      await accountPage.disableCloudKey()
-      await basePage.signOut()
-    }
+    //await window.screenshot({ path: `${ScreenshotsPath}macos-disableCloudKey-screen.png` })
+    await console.log("准备清除密钥")
+    await accountPage.disableCloudKey()
+    await console.log("成功清除密钥")
+    //await window.screenshot({ path: `${ScreenshotsPath}macos-disableCloudKey-screen.png` })
+    await console.log('准备退出')
+    await basePage.signOut()
+    //await window.screenshot({ path: `${ScreenshotsPath}macos-logout-screen.png` })
+    await console.log('退出')
   })
   test.describe('独立密码', () => { 
     const inPassword = accountResetPassword
@@ -145,10 +131,12 @@ test.describe('librayKey:媒体库密钥测试', () => {
       await window.waitForTimeout(3000)
       // isABPassword = false, 不使用账户密码
       await accountPage.disableCloudKey()
-      console.log('使用独立密码新建密钥')
+      await console.log('使用独立密码新建密钥')
       await accountPage.enableCloudKey(inPassword, false)
+      await console.log('新建完毕')
       await window.waitForTimeout(3000)
       // 验证同步云端
+      await console.log('准备退出')
       await basePage.signOut()
       await basePage.signIn(name, accountPassword, true, false)
       await accountPage.syncCloudKey(inPassword)
