@@ -235,3 +235,53 @@ test.describe('explorePage: 探索页面测试', ()=>{
     await basePage.exploreLink.waitFor({ timeout: 60000, state:'detached' })
   })
 })
+test.describe('localFavorite: 本地收藏', ()=>{
+  test('add: 添加本地收藏', async()=>{
+    console.log('准备跳转到主页')
+    await basePage.jumpPage('homeLink')
+    console.log('跳转到主页, 滚屏加载页面')
+    //await libraryPage.scrollToLoadPage()
+    console.log('滚动结束')
+    // 获取第一张卡片的标题
+    console.log('获取第一张卡片的标题')
+    const cardTitleEle = await window.locator('.post-info .desc-main .desc-title .post-title >> nth=0')
+    console.log(cardTitleEle)
+    const title = await cardTitleEle.getAttribute('title');
+    console.log('title: ' + title)
+    console.log('获取第一张卡片的星星按钮')
+    const starBtn = await libraryPage.getPostCardEle(title, 'starBtn')
+    const starBtnText = await starBtn.innerText()
+    console.log(starBtnText)
+    if (starBtnText === 'star_border') {
+      console.log('星星没有点亮，准备点亮')
+      await starBtn.click()
+      console.log('成功点亮')
+    } else {
+      console.log('星星已经点亮')
+    }
+    console.log('准备跳转到本地收藏页面')
+    await basePage.jumpPage('localFavoritesLink')
+    console.log('已经跳转到本地收藏页面')
+    await window.waitForTimeout(1000)
+    console.log('等待卡片上的星星出现')
+    await libraryPage.getPostCardEle(title, 'starBtn').waitFor()
+    console.log('断定卡片上的星星是点亮的')
+    expect(await libraryPage.getPostCardEle(title, 'starBtn').innerText()).toBe('star')
+  })
+  test('delete: 取消本地收藏', async()=>{
+    // 设定现在正处于本地收藏页面
+    // 获取第一张卡片的标题
+    console.log('获取第一张卡片的标题')
+    const cardTitleEle = await window.locator('.post-info .desc-main .desc-title .post-title >> nth=0')
+    console.log(cardTitleEle)
+    const title = await cardTitleEle.getAttribute('title');
+    console.log('title: ' + title)
+    console.log('获取第一张卡片的星星按钮')
+    const starBtn = await libraryPage.getPostCardEle(title, 'starBtn')
+    console.log('取消收藏')
+    await starBtn.click()
+    console.log('等待卡片消失')
+    await starBtn.waitFor({timeout:2000, state:'detached'})
+    console.log('卡片已经消失')
+  })
+})
