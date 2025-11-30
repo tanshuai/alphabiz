@@ -1,7 +1,13 @@
+test library key: more detail
 test library key
 test library key
-test main
-test library key: try-solve-mac-error
-test library key: trigger by schedule
-bump @zeeis/alphabiz-libdb to v0.0.97 try fix data sync
-test library key: trigger by schedule
+test library key
+test library key
+test library key
+test library channel
+test library channel
+test library channel
+test library channel
+test library channel
+test library channel
+fix i18n on electron
