@@ -126,15 +126,15 @@ test.afterEach(async ({ }, testInfo) => {
   }
 })
 
-test('initialization: 频道测试的初始化', async () => {
+test('initialization-频道测试的初始化', async () => {
   await window.waitForLoadState()
   await console.log('准备登录')
   await basePage.ensureLoginStatus(name, process.env.TEST_PASSWORD, true)
   await console.log('登录成功')
 })
 
-test.describe('explorePage: 探索页面测试', ()=>{
-  test("open explore page: 开启探索页面",async ()=>{
+test.describe('explorePage-探索页面测试', ()=>{
+  test("open explore page-开启探索页面",async ()=>{
     console.log('准备跳转到基本设置')
     await basePage.jumpPage('basicLink')
     console.log('页面已跳转')
@@ -160,7 +160,7 @@ test.describe('explorePage: 探索页面测试', ()=>{
     console.log('页面跳转完成')
     await libraryPage.getPostCardEle('', 'channelTitleEle').nth(0).waitFor({ timeout: 60000 })
   })
-  test('search: 探索页面中搜索频道', async()=>{
+  test('search-探索页面中搜索频道', async()=>{
       test.setTimeout(5 * 60000)
       console.log('跳转到探索页面')
       await basePage.jumpPage('exploreLink')
@@ -212,7 +212,7 @@ test.describe('explorePage: 探索页面测试', ()=>{
         expect(postChannelTitle).toBe(postArr[0].channelTitle)
       }
   })
-  test("close explore page: 关闭探索页面", async()=>{
+  test("close explore page-关闭探索页面", async()=>{
     console.log('准备跳转到基本设置')
     await basePage.jumpPage('basicLink')
     console.log('页面已跳转')
@@ -235,7 +235,7 @@ test.describe('explorePage: 探索页面测试', ()=>{
     await basePage.exploreLink.waitFor({ timeout: 60000, state:'detached' })
   })
 })
-test.describe('localFavorite: 本地收藏', ()=>{
+test.describe('localFavorite-本地收藏', ()=>{
   test('add: 添加本地收藏', async()=>{
     console.log('准备跳转到主页')
     await basePage.jumpPage('homeLink')
@@ -268,7 +268,7 @@ test.describe('localFavorite: 本地收藏', ()=>{
     console.log('断定卡片上的星星是点亮的')
     expect(await libraryPage.getPostCardEle(title, 'starBtn').innerText()).toBe('star')
   })
-  test('delete: 取消本地收藏', async()=>{
+  test('delete-取消本地收藏', async()=>{
     // 设定现在正处于本地收藏页面
     // 获取第一张卡片的标题
     console.log('获取第一张卡片的标题')
@@ -286,7 +286,7 @@ test.describe('localFavorite: 本地收藏', ()=>{
   })
 })
 
-test.describe('shareChannel: 分享频道测试', ()=>{
+test.describe('shareChannel-分享频道测试', ()=>{
   test('postCard', async () => {
     await basePage.jumpPage('homeLink')
     await basePage.waitForAllHidden(await basePage.centerAlert)
