@@ -261,6 +261,7 @@ test.describe('librayKey:媒体库密钥测试', () => {
         await basePage.jumpPage('accountSettingLink')
         console.log("重新修改账户密码")
         await accountPage.changePassword(accountResetPassword, accountPassword)
+        await basePage.signOut()
       }
       await basePage.waitForAllHidden(await basePage.alert)
       // 验证同步云端
