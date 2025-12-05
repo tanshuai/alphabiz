@@ -18,6 +18,8 @@ For windows you need:
 - Visual Studio Build Tools
 - [WiX Toolset](https://wixtoolset.org) 3.11
 
+See [windows](windows.md) for more details.
+
 For Linux you need:
 - build-essential
   ```sh
