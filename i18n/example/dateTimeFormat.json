@@ -1,0 +1,32 @@
+{
+  "M": {
+    "month": "short"
+  },
+  "YM": {
+    "year": "numeric",
+    "month": "short"
+  },
+  "YMD": {
+    "year": "numeric",
+    "month": "short",
+    "day": "numeric"
+  },
+  "Hms": {
+    "hour": "numeric",
+    "minute": "numeric",
+    "second": "numeric"
+  },
+  "MDHms": {
+    "month": "short",
+    "day": "numeric",
+    "hour": "numeric",
+    "minute": "numeric"
+  },
+  "YMDHms": {
+    "year": "numeric",
+    "month": "long",
+    "day": "numeric",
+    "hour": "numeric",
+    "minute": "numeric"
+  }
+}
