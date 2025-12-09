@@ -62,6 +62,7 @@ test.beforeAll(async () => {
 })
 test.beforeEach(async () => {
   await window.evaluate(() => localStorage.clear())
+  basePage.checkForPopup()
 })
 test.afterEach(async ({}, testInfo) => {
   if (testInfo.status !== testInfo.expectedStatus) {

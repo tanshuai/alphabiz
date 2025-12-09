@@ -129,6 +129,7 @@ test.beforeAll(async () => {
 test.afterAll(async () => {
 })
 test.beforeEach(async () => {
+  basePage.checkForPopup()
 })
 test.afterEach(async ({}, testInfo) => {
   if (testInfo.status !== testInfo.expectedStatus) {

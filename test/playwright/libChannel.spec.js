@@ -123,23 +123,11 @@ test.beforeAll(async () => {
   })
 })
 
-async function checkForPopup () {
-  while (true) {
-    try {
-      // 等待弹窗出现，但如果5秒内没有出现就会抛出一个错误
-      await window.waitForSelector('.q-card:has-text("INTERNAL DEMO ONLY")', { timeout: 5000 });
-      // 如果上一行代码没有抛出错误，那么弹窗已经出现，我们可以关闭它
-      await basePage.closeInternalNotice()
-      console.log('checkForPopup关闭了弹窗')
-    } catch (error) {
-      // 我们捕获了错误，但什么都不做，因为错误只是表示弹窗没有出现
-    }
-  }
-}
+
 
 test.beforeEach(async () => {
   test.setTimeout(60000 * 6)
-  checkForPopup()
+  basePage.checkForPopup()
 })
 test.afterEach(async ({ }, testInfo) => {
   if (testInfo.status !== testInfo.expectedStatus) {
