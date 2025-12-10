@@ -231,6 +231,8 @@ test.describe('librayKey:媒体库密钥测试', () => {
         console.log('没有成功修改账户密码')
         accountPage.cpCancelBtn.click()
         [accountPassword , accountResetPassword] = [accountResetPassword, accountPassword]
+      } else {
+        console.log('修改成功')
       }
       // 验证同步云端
       await basePage.signOut()
@@ -267,6 +269,37 @@ test.describe('librayKey:媒体库密钥测试', () => {
       await basePage.waitForAllHidden(await basePage.alert)
       // 验证同步云端
       await basePage.signIn(name, accountPassword, true, false)
+      await accountPage.syncCloudKey('', { isABPassword: true })
+      // 等待密钥配置，加载,等待推荐页面出现
+      await window.waitForTimeout(15000)
+      if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
+      await basePage.signOut()
+    })
+    // 检查账户密码
+    test('检查最后的账户密码是否与环境变量一致', async () => {
+      if (process.env.excludePasswordTest) {
+        console.log('由push触发的工作流, 选择跳过密码更改的测试')
+        return
+      }
+      if (accountPassword == process.env.TEST_PASSWORD) {
+        console.log('一致')
+        return
+      }
+      console.log('不一致, 需要再次修改账户密码')
+      await basePage.ensureLoginStatus(name, accountPassword, true, true)
+      await window.waitForTimeout(5000)
+      await basePage.jumpPage('accountSettingLink')
+      let done = await accountPage.changePassword(accountPassword, accountResetPassword)
+      if (done === false) {
+        console.log('没有成功修改账户密码')
+        accountPage.cpCancelBtn.click()
+        [accountPassword, accountResetPassword] = [accountResetPassword, accountPassword]
+      } else {
+        console.log('修改成功')
+      }
+      // 验证同步云端
+      await basePage.signOut()
+      await basePage.signIn(name, accountResetPassword, true, false)
       await accountPage.syncCloudKey('', { isABPassword: true })
       // 等待密钥配置，加载,等待推荐页面出现
       await window.waitForTimeout(15000)
