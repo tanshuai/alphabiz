@@ -169,13 +169,14 @@ test.describe('explorePage-探索页面测试', ()=>{
   })
   test('search-探索页面中搜索频道', async()=>{
       test.setTimeout(5 * 60000)
+      await basePage.ensureLoginStatus(name, accountPassword, true, true)
       console.log('准备跳转到探索页面')
       await basePage.jumpPage('exploreLink')
       console.log('已跳转, 检查面包屑导航是否出现Explore')
       await libraryPage.checkNavBar('Explore', { timeout: 3000 })
       // 获取第一张卡片的标题
       console.log('等待第一张卡片出现')
-      const cardTitleEle = await window.waitForSelector('.post-info .desc-main .desc-title .post-title >> nth=0')
+      const cardTitleEle = await window.waitForSelector('.post-info .desc-main .desc-title .post-title >> nth=0', {timeout: 5*60000})
       console.log('使用第一张卡片做测试')
       const postTitle = await cardTitleEle.getAttribute('title');
       const postChannelTitle = await libraryPage.getPostCardEle(postTitle, 'channelTitleEle').nth(0).innerText()
@@ -216,6 +217,7 @@ test.describe('explorePage-探索页面测试', ()=>{
       }
   })
   test("close explore page-关闭探索页面", async()=>{
+    await basePage.ensureLoginStatus(name, accountPassword, true, true)
     console.log('准备跳转到基本设置')
     await basePage.jumpPage('basicLink')
     console.log('页面已跳转')
@@ -240,6 +242,7 @@ test.describe('explorePage-探索页面测试', ()=>{
 })
 test.describe('localFavorite-本地收藏', ()=>{
   test('add-添加本地收藏', async()=>{
+    await basePage.ensureLoginStatus(name, accountPassword, true, true)
     console.log('准备跳转到主页')
     await basePage.jumpPage('homeLink')
     console.log('跳转到主页, 滚屏加载页面')
@@ -290,6 +293,7 @@ test.describe('localFavorite-本地收藏', ()=>{
 
 test.describe('shareChannel-分享频道测试', ()=>{
   test('postCard', async () => {
+    await basePage.ensureLoginStatus(name, accountPassword, true, true)
     await basePage.jumpPage('homeLink')
     await basePage.waitForAllHidden(await basePage.centerAlert)
     await window.waitForTimeout(5000)
