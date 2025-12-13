@@ -22,6 +22,7 @@ if (process.platform === 'win32') {
   name = 'test9'
 }
 name = name + process.env.TEST_EMAIL_DOMAIN
+var accountPassword = process.env.TEST_PASSWORD
 
 const testChannel = {
   title: 'Free Guy',
