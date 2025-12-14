@@ -25,10 +25,10 @@ name = name + process.env.TEST_EMAIL_DOMAIN
 var accountPassword = process.env.TEST_PASSWORD
 
 const testChannel = {
-  title: 'Free Guy',
-  desc: '失控玩家 Free Guy(2021)',
-  isPrivate: true,
-  channelID: '5y2mk4yx2jmoylzlbkrf'
+  title: 'public short film',
+  desc: 'Collect popular short film',
+  isPrivate: false,
+  channelID: 'fxpebrsi9ij5pzinwdky'
 }
 const privateChannel = {
   title: 'X特遣队',
@@ -247,7 +247,7 @@ test.describe('localFavorite-本地收藏', ()=>{
     console.log('准备跳转到主页')
     await basePage.jumpPage('homeLink')
     console.log('跳转到主页, 滚屏加载页面')
-    //await libraryPage.scrollToLoadPage()
+    await libraryPage.scrollToLoadPage()
     console.log('滚动结束')
     // 获取第一张卡片的标题
     console.log('等待第一张卡片出现')
@@ -275,7 +275,10 @@ test.describe('localFavorite-本地收藏', ()=>{
     expect(await libraryPage.getPostCardEle(title, 'starBtn').innerText()).toBe('star')
   })
   test('delete-取消本地收藏', async()=>{
-    // 设定现在正处于本地收藏页面
+    await basePage.ensureLoginStatus(name, accountPassword, true, true)
+    console.log('准备跳转到本地收藏页面')
+    await basePage.jumpPage('localFavoritesLink')
+    console.log('已经跳转到本地收藏页面')
     // 获取第一张卡片的标题
     console.log('获取第一张卡片的标题')
     const cardTitleEle = await window.locator('.post-info .desc-main .desc-title .post-title >> nth=0')
@@ -321,5 +324,87 @@ test.describe('shareChannel-分享频道测试', ()=>{
     await libraryPage.checkShareLink('homeLink', channelTitle, { isCloseDialog: false })
     console.log('follow')
     await libraryPage.checkShareLink('followingLink', channelTitle)
+  })
+})
+
+test.describe('downLoad-测试下载功能',()=>{
+  test.beforeEach(async()=>{
+    await basePage.ensureLoginStatus(name, accountPassword, true, true)
+    console.log('准备跳转首页')
+    await basePage.jumpPage('homeLink')
+    console.log('跳转成功')
+    await basePage.waitForAllHidden(await basePage.centerAlert)
+    // 第一步，找到频道fxpebrsi9ij5pzinwdky
+    console.log('搜索频道')
+    await libraryPage.searchChannelID(testChannel, false)
+    // 进入频道
+    console.log('找到频道')
+    //await window.waitForSelector('.q-card:has-text("Search for channel ID") .channel-image .q-img__content:has-text("public short film")')
+    const targetChannel = window.locator('.q-card:has-text("Search for channel ID") .channel-image .q-img__content:has-text("public short film")')
+    if (await targetChannel.isVisible()) {
+      console.log('进入频道')
+      await targetChannel.click()
+    }
+  })
+  test('下载', async()=>{
+    // 第二步，找到目标电影
+    const downLoadBtn = window.locator('.post-info:has-text("Big Buck Bunny") .q-btn:has-text("Download")')    
+    // 第三步，点击下载按钮
+    console.log('点击下载按钮')
+    await downLoadBtn.click()
+    await window.waitForTimeout(2000)
+    // 跳转到下载
+    console.log('准备跳转到下载页')
+    await basePage.jumpPage('downloadingStatus')
+    console.log('跳转成功')
+    console.log('等待影片出现在下载队列')
+    await window.waitForTimeout(5000)
+    const downloadingItem = window.locator('.q-virtual-scroll__content:has-text("Big Buck Bunny")')
+    if(await downloadingItem.isVisible()){
+      console.log('影片正在下载中')
+    } else {
+      console.log('影片没有出现在下载队列中')
+    }
+    const cancelBtn = window.locator('.q-virtual-scroll__content:has-text("Big Buck Bunny") button:has-text("close")')
+    console.log('取消影片下载')
+    await cancelBtn.click()
+    const confirmBtn = window.locator('.q-card:has-text("Delete Big Buck Bunny") .block:has-text("Delete")')
+    console.log('准备从下载队列中移除')
+    await confirmBtn.click()
+    console.log('验证是否已经移除')
+    await window.waitForSelector('.q-virtual-scroll__content:has-text("Big Buck Bunny")', {state:'detached'})
+    console.log('已经移除')
+  })
+  test('边下边播', async()=>{
+    // 第二步，找到目标电影
+    const PlayBtn = window.locator('.post-info:has-text("Big Buck Bunny") .q-btn:has-text("Play...")')
+    // 第三步，点击边下边播按钮
+    console.log('点击边下边播按钮')
+    await PlayBtn.click()
+    // 自动跳转到playerLink
+    console.log('自动跳转到播放器页')
+    await window.waitForSelector('.video-js-player:has-text("Big Buck Bunny")', {timeout: 5*60000})
+    console.log('影片开始播放')
+    console.log('跳转成功')
+    // 跳转到下载页面
+    console.log('准备跳转到下载页')
+    await basePage.jumpPage('downloadingStatus')
+    console.log('跳转成功')
+    console.log('等待影片出现在下载队列')
+    const downloadingItem = window.locator('.q-virtual-scroll__content:has-text("Big Buck Bunny")')
+    if (await downloadingItem.isVisible()) {
+      console.log('影片正在下载中')
+    } else {
+      console.log('影片没有出现在下载队列中')
+    }
+    const cancelBtn = window.locator('.q-virtual-scroll__content:has-text("Big Buck Bunny") button:has-text("close")')
+    console.log('取消影片下载')
+    await cancelBtn.click()
+    const confirmBtn = window.locator('.q-card:has-text("Big Buck Bunny") .block:has-text("Delete")')
+    console.log('准备从下载队列中移除')
+    await confirmBtn.click()
+    console.log('验证是否已经移除')
+    await window.waitForSelector('.q-virtual-scroll__content:has-text("Big Buck Bunny")', { state: 'detached' })
+    console.log('已经移除')
   })
 })
