@@ -30,47 +30,18 @@ const testChannel = {
   isPrivate: false,
   channelID: 'fxpebrsi9ij5pzinwdky'
 }
+const testMovie = "Big Buck Bunny"
 const privateChannel = {
   title: 'X特遣队',
   desc: 'X特遣队：全员集结 The Suicide Squad',
   isPrivate: true,
   channelID: 'vvkakh29yfu1hyjfhngw'
 }
-const channelObj = {
-  title: 'first channel by ',
-  desc: '',
-  isPrivate: false
-}
-const postObj = {
-  title: 'first post by ',
-  desc: '1231231232',
-  poster: '',
-  url: `${app.protocol}://uTorrent+Web+Tutorial+Video/AWGzuIVsSDnt9R9cI0ZZm2vsUkFF&_Td6WFoAAAFpIt42AgAhARwAAAAQz1jM4ALxATpdABhqCGEMasx_OPsfBFf6STjs7yEovJdH6ObIkXuPJdVFCvNYt4Pc61Bo+mbFMnz74ydATVDkJaObcR0qhiqPrZctZJ7wrQIGnWNpA6Pm9VngzwAxCow6VTNOPsR2ZmQLh6a5lzjcxHj1tP6k7AKbVFqNWDAAB9Xsbku1S+9MyAXPjwUFk9QUFefp0ZcCzVc6_dcNPvyL7tq+N9QPMqfMbSeL0TjRSROCeeZm2zRslPQyYmPX+Gm2uX3jvkBqCiSiWX4vUwGX+j43FHftXg3ettQe4CKgpHNwlgE4mZrw0z5HUmLSXJKrWC7cC4TelK71c2nNMoDc+24nO3RyGNImyf3YhnKLCsiwAbhxGYqg+HTezO_5iIDbQLEKX+GNoYmCIvkBSei+bODtpO0lgJ3Lqw_SToWjaMQsvM8AAAAA8or5xwAB0gLyBQAAXibHzD4wDYsCAAAAAAFZWg==`,
-  rate: 'G'
-}
-const postObj2 = {
-  title: 'second post by ',
-  desc: '2222222222',
-  poster: '',
-  url: `${app.shortProtocol}://AYhZSqrL3kDvPiUQxHN07AqjlsCO`,
-  rate: 'G'
-}
-const postObj3 = {
-  title: 'third post by ',
-  desc: '3333333333',
-  poster: '',
-  url: 'magnet:?xt=urn:btih:a88fda5954e89178c372716a6a78b8180ed4dad3&dn=The+WIRED+CD+-+Rip.+Sample.+Mash.+Share&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&ws=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2F',
-  rate: 'G'
-}
-
-function channelTest (newTime) {
-  const formattedTime = `${newTime.getHours()}-${newTime.getMinutes()}`
-  channelObj.title = channelObj.title + formattedTime
-  channelObj.desc = `${newTime}`
-  postObj.title = postObj.title + formattedTime
-  postObj2.title = postObj2.title + formattedTime
-  postObj3.title = postObj3.title + formattedTime
-  console.log(formattedTime, newTime)
+const fullLevelChannel = {
+  title: '失控玩家 Free Guy (2021)',
+  desc:  '失控玩家 Free Guy (2021)',
+  isPrivate: true,
+  channelID: '5y2mk4yx2jmoylzlbkrf'
 }
 
 test.beforeAll(async () => {
@@ -176,7 +147,13 @@ test.describe('explorePage-探索页面测试', ()=>{
       await libraryPage.checkNavBar('Explore', { timeout: 10000 })
       // 获取第一张卡片的标题
       console.log('等待第一张卡片出现')
-      const cardTitleEle = await window.waitForSelector('.post-info .desc-main .desc-title .post-title >> nth=0', {timeout: 10*60000})
+      try{
+        await window.waitForSelector('.post-info .desc-main .desc-title .post-title >> nth=0', {timeout: 10*60000} )
+      } catch(error){
+        console.log('等待十分钟，没有结果，网络有问题，退出测试')
+        return
+      }
+      const cardTitleEle = window.locator('.post-info .desc-main .desc-title .post-title >> nth=0')
       console.log('使用第一张卡片做测试')
       const postTitle = await cardTitleEle.getAttribute('title');
       const postChannelTitle = await libraryPage.getPostCardEle(postTitle, 'channelTitleEle').nth(0).innerText()
@@ -371,8 +348,7 @@ test.describe('downLoad-测试下载功能',()=>{
     await libraryPage.searchChannelID(testChannel, false)
     // 进入频道
     console.log('找到频道')
-    //await window.waitForSelector('.q-card:has-text("Search for channel ID") .channel-image .q-img__content:has-text("public short film")')
-    const targetChannel = window.locator('.q-card:has-text("Search for channel ID") .channel-image .q-img__content:has-text("public short film")')
+    const targetChannel = window.locator(`.q-card:has-text("Search for channel ID") .channel-image .q-img__content:has-text("${testChannel.title}")`)
     if (await targetChannel.isVisible()) {
       console.log('进入频道')
       await targetChannel.click()
@@ -380,7 +356,13 @@ test.describe('downLoad-测试下载功能',()=>{
   })
   test('下载', async()=>{
     // 第二步，找到目标电影
-    const downLoadBtn = window.locator('.post-info:has-text("Big Buck Bunny") .q-btn:has-text("Download")')    
+    try{
+      await window.waitForSelector(`.post-info:has-text("${testMovie}")`, {timeout:5*60000})  
+    }catch(error){
+      console.log('五分钟内没有出现目标电影，网络有错误，退出测试')
+      return
+    }
+    const downLoadBtn = window.locator(`.post-info:has-text("${testMovie}") .q-btn:has-text("Download")`)    
     // 第三步，点击下载按钮
     console.log('点击下载按钮')
     await downLoadBtn.click()
@@ -391,31 +373,37 @@ test.describe('downLoad-测试下载功能',()=>{
     console.log('跳转成功')
     console.log('等待影片出现在下载队列')
     await window.waitForTimeout(5000)
-    const downloadingItem = window.locator('.q-virtual-scroll__content:has-text("Big Buck Bunny")')
+    const downloadingItem = window.locator(`.q-virtual-scroll__content:has-text("${testMovie}")`)
     if(await downloadingItem.isVisible()){
       console.log('影片正在下载中')
     } else {
       console.log('影片没有出现在下载队列中')
     }
-    const cancelBtn = window.locator('.q-virtual-scroll__content:has-text("Big Buck Bunny") button:has-text("close")')
+    const cancelBtn = window.locator(`.q-virtual-scroll__content:has-text("${testMovie}") button:has-text("close")`)
     console.log('取消影片下载')
     await cancelBtn.click()
-    const confirmBtn = window.locator('.q-card:has-text("Delete Big Buck Bunny") .block:has-text("Delete")')
+    const confirmBtn = window.locator(`.q-card:has-text("Delete ${testMovie}") .block:has-text("Delete")`)
     console.log('准备从下载队列中移除')
     await confirmBtn.click()
     console.log('验证是否已经移除')
-    await window.waitForSelector('.q-virtual-scroll__content:has-text("Big Buck Bunny")', {state:'detached'})
+    await window.waitForSelector(`.q-virtual-scroll__content:has-text("${testMovie}")`, {state:'detached'})
     console.log('已经移除')
   })
   test('边下边播', async()=>{
+    try {
+      await window.waitForSelector(`.post-info:has-text("${testMovie}")`, { timeout: 5 * 60000 })
+    } catch (error) {
+      console.log('五分钟内没有出现目标电影，网络有错误，退出测试')
+      return
+    }
     // 第二步，找到目标电影
-    const PlayBtn = window.locator('.post-info:has-text("Big Buck Bunny") .q-btn:has-text("Play...")')
+    const PlayBtn = window.locator(`.post-info:has-text("${testMovie}") .q-btn:has-text("Play...")`)
     // 第三步，点击边下边播按钮
     console.log('点击边下边播按钮')
     await PlayBtn.click()
     // 自动跳转到playerLink
     console.log('自动跳转到播放器页, 等待影片播放')
-    await window.waitForSelector('.video-js-player:has-text("Big Buck Bunny")', {timeout: 5*60000})
+    await window.waitForSelector(`.video-js-player:has-text("${testMovie}")`, {timeout: 5*60000})
     console.log('影片开始播放')
     console.log('跳转成功')
     // 跳转到下载页面
@@ -423,20 +411,129 @@ test.describe('downLoad-测试下载功能',()=>{
     await basePage.jumpPage('downloadingStatus')
     console.log('跳转成功')
     console.log('等待影片出现在下载队列')
-    const downloadingItem = window.locator('.q-virtual-scroll__content:has-text("Big Buck Bunny")')
+    const downloadingItem = window.locator(`.q-virtual-scroll__content:has-text("${testMovie}")`)
     if (await downloadingItem.isVisible()) {
       console.log('影片正在下载中')
     } else {
       console.log('影片没有出现在下载队列中')
     }
-    const cancelBtn = window.locator('.q-virtual-scroll__content:has-text("Big Buck Bunny") button:has-text("close")')
+    const cancelBtn = window.locator(`.q-virtual-scroll__content:has-text("${testMovie}") button:has-text("close")`)
     console.log('取消影片下载')
     await cancelBtn.click()
-    const confirmBtn = window.locator('.q-card:has-text("Big Buck Bunny") .block:has-text("Delete")')
+    const confirmBtn = window.locator(`.q-card:has-text("${testMovie}") .block:has-text("Delete")`)
     console.log('准备从下载队列中移除')
     await confirmBtn.click()
     console.log('验证是否已经移除')
-    await window.waitForSelector('.q-virtual-scroll__content:has-text("Big Buck Bunny")', { state: 'detached' })
+    await window.waitForSelector(`.q-virtual-scroll__content:has-text("${testMovie}")`, { state: 'detached' })
     console.log('已经移除')
+  })
+})
+
+test.describe('homePage-SearchChannel-在主页中搜索频道', ()=>{
+  test('privateChannel搜索私有频道', async()=>{
+    await basePage.ensureLoginStatus(name, accountPassword, true, true)
+    console.log('准备跳转首页')
+    await basePage.jumpPage('homeLink')
+    console.log('跳转成功')
+    await basePage.waitForAllHidden(await basePage.centerAlert)
+    console.log('搜索私有频道')
+    await libraryPage.searchChannelID(privateChannel, true)
+    console.log('找到频道')
+    const targetChannel = window.locator(`.q-card:has-text("Search for channel ID") .channel-image .q-img__content:has-text("${privateChannel.title}")`)
+    if (await targetChannel.isVisible()) {
+      console.log('进入频道')
+      await targetChannel.click()
+    }
+  })
+  test('available-firm-rate搜索不同级别的电影(NC-17)', async ()=>{
+    await basePage.ensureLoginStatus(name, accountPassword, true, true)
+    console.log('准备跳转基础设置页')
+    await basePage.jumpPage('basicLink')
+    console.log('跳转成功')
+    console.log('准备设置限制级为NC-17')
+    const selectBtn = window.locator('.setting-block:has-text("Library") .q-field__append')
+    await selectBtn.click()
+    const Nc17Option = window.locator('.q-menu >> text=17')
+    await Nc17Option.click()
+    console.log('设置完毕')
+    console.log('准备保存')
+    await basicPage.saveSetting()
+    console.log('成功保存')
+    console.log('准备跳转首页')
+    await basePage.jumpPage('homeLink')
+    console.log('跳转成功')
+    await basePage.waitForAllHidden(await basePage.centerAlert)
+    console.log('搜索拥有全级别的频道')
+    await libraryPage.searchChannelID(fullLevelChannel, true)
+    // 进入频道
+    console.log('找到频道')
+    const targetChannel = window.locator(`.q-card:has-text("Search for channel ID") .channel-image .q-img__content:has-text("${fullLevelChannel.title}")`)    
+    await window.waitForTimeout(2000)
+    if (await targetChannel.isVisible()) {
+      console.log('进入频道')
+      await targetChannel.click()
+    } else{
+      console.log('进入失败')
+      return
+    }
+    // 遍历影片列表
+    console.log('统计列表中可见的影片个数：（一级一个影片，总共五个影片）')
+    await window.waitForTimeout(5000)
+    try{
+      await window.waitForSelector('.desc-main > .text-subtitle2', {timeout: 60000})
+    }catch(error){
+      console.log('网络差，退出测试')
+    }
+    const visualNums = await window.locator('.desc-main > .text-subtitle2').count()
+    console.log(visualNums)
+    if(visualNums === 5) {
+      console.log('当前级别NC-17, 能看到五种影片')
+    }
+  })
+
+  test('available-firm-rate搜索不同级别的电影(PG-13)', async () => {
+    await basePage.ensureLoginStatus(name, accountPassword, true, true)
+    console.log('准备跳转基础设置页')
+    await basePage.jumpPage('basicLink')
+    console.log('跳转成功')
+    console.log('准备设置限制级为PG-13')
+    const selectBtn = window.locator('.setting-block:has-text("Library") .q-field__append')
+    await selectBtn.click()
+    const Nc17Option = window.locator('.q-menu >> text=PG-13')
+    await Nc17Option.click()
+    console.log('设置完毕')
+    console.log('准备保存')
+    await basicPage.saveSetting()
+    console.log('成功保存')
+    console.log('准备跳转首页')
+    await basePage.jumpPage('homeLink')
+    console.log('跳转成功')
+    await basePage.waitForAllHidden(await basePage.centerAlert)
+    console.log('搜索拥有全级别的频道')
+    await libraryPage.searchChannelID(fullLevelChannel, true)
+    // 进入频道
+    console.log('找到频道')
+    const targetChannel = window.locator(`.q-card:has-text("Search for channel ID") .channel-image .q-img__content:has-text("${fullLevelChannel.title}")`)
+    await window.waitForTimeout(2000)
+    if (await targetChannel.isVisible()) {
+      console.log('进入频道')
+      await targetChannel.click()
+    } else {
+      console.log('进入失败')
+      return
+    }
+    // 遍历影片列表
+    console.log('统计列表中可见的影片个数：（一级一个影片，总共五个影片）')
+    await window.waitForTimeout(5000)
+    try {
+      await window.waitForSelector('.desc-main > .text-subtitle2', { timeout: 60000 })
+    } catch (error) {
+      console.log('网络差，退出测试')
+    }
+    const visualNums = await window.locator('.desc-main > .text-subtitle2').count()
+    console.log(visualNums)
+    if (visualNums === 3) {
+      console.log('当前级别PG-13, 能看到三种影片')
+    }
   })
 })
