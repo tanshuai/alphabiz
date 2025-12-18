@@ -22,13 +22,23 @@ const check = (lang, overwrite = false) => {
   }
   const data = JSON.parse(readFileSync(file, 'utf-8'))
   let changed = false
+  let missingVar = false
   for (const key in example) {
+    const value = example[key]
     if (!(key in data)) {
-      const value = example[key]
       console.log(`[${lang}] Missing key "${key}".${overwrite ? ` The key is added and you should translate it.` : ''}`)
       data[key] = value
       changed = true
     }
+    const trans = data[key]
+    const matches = value.match(/\{.+?}/g)
+    if (!matches) continue
+    matches.forEach(s => {
+      if (!trans.includes(s)) {
+        console.log(`[${lang}] key "${key}" does not have variable "${s}"`)
+        missingVar = true
+      }
+    })
   }
   for (const key in data) {
     if (!(key in example)) {
@@ -37,7 +47,9 @@ const check = (lang, overwrite = false) => {
       changed = true
     }
   }
-  if (changed) {
+  if (missingVar) {
+    console.log(`[${lang}] Some of vars are missing and you should change them manually.`)
+  } else if (changed) {
     console.log(`[${lang}] Found something should be changed.`)
     if (overwrite) {
       writeFileSync(file, JSON.stringify(data, null, 2))
