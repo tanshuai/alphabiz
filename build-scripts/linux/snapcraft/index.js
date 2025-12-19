@@ -6,6 +6,7 @@ const appConfig = require('../../../developer/app')
 const publicVersion = require('../../../public/version.json').version
 // console.log(publicVersion)
 const __rootdir = resolve(__dirname, '../../..')
+const buildArch = process.env.BUILD_ARCH || process.env.ARCH || process.arch
 
 const checkCommand = (cmd, options = {}) => {
   return new Promise((resolve) => {
@@ -33,7 +34,7 @@ const prepareSnap = async () => {
   const snapAppPath = resolve(__rootdir, 'out/make/snapcraft', appConfig.name)
   if (existsSync(snapAppPath)) rmSync(snapAppPath, { recursive: true })
   mkdirSync(snapAppPath, { recursive: true })
-  const buildDist = resolve(__rootdir, `dist/electron/${appConfig.displayName}-linux-x64`)
+  const buildDist = resolve(__rootdir, `dist/electron/${appConfig.displayName}-linux-${buildArch}`)
   console.log(buildDist)
 
   cpSync(buildDist, snapAppPath, { recursive: true })
