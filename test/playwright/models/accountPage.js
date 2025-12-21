@@ -156,11 +156,16 @@ class AccountPage extends BasePage {
   async isUseABPassword (password, isABPassword) {
     if (!isABPassword) {
       await this.page.waitForTimeout(1000)
+      console.log('点击使用独立密码的选项')
       await this.ecsUseInPasswordBtn.click()
+      console.log('点击完毕, 等待弹窗')
       await this.eipCard.waitFor()
+      console.log('弹窗出现')
       await this.eipInput.nth(0).fill(password)
       await this.eipInput.nth(1).fill(password)
+      console.log('输入独立密码')
       await this.eipOKBtn.click()
+      console.log('点击确认')
     } else {
       await this.ecsUseAbPasswordBtn.click()
     }
@@ -214,17 +219,28 @@ class AccountPage extends BasePage {
 
   // account page keychain
   async enableCloudKey (password, isABPassword) {
+    console.log('准备跳转到用户设置页')
     await this.jumpPage('accountSettingLink')
+    console.log('跳转成功')
+    console.log('等待开启云存储的按钮出现')
     await this.kcEnCloudBtn.waitFor()
+    console.log('开启云存储的按钮已出现')
+    console.log('断言有一个"cloud_off"的字样')
     await expect(this.kcCard).toHaveText(/cloud_off/)
+    console.log('断言成功')
+    console.log('点击开启按钮')
     await this.kcEnCloudBtn.click()
+    console.log('点击完毕')
     await this.page.waitForTimeout(1000)
+    console.log('输入密码')
     await this.isUseABPassword(password, isABPassword)
     // wait alert
     await this.checkAlert('enableCloudKey', /Success/)
     // check keychain banner
     await this.kcDisCloudBtn.waitFor()
+    console.log('断言出现文本"Sync Keychain with Amazon Web Services"')
     await expect(this.kcCard).toHaveText(/Sync Keychain with Amazon Web Services/)
+    console.log('断言成功')
     if (isABPassword) {
       await expect(this.kcCard).toHaveText(/Alphabiz account password/)
     }

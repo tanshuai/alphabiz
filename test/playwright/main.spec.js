@@ -251,7 +251,7 @@ test.describe('切换语言设置', () => {
       await window.waitForLoadState()
     })
     // EN -> CN -> TW -> EN
-    test('语言重复切换: EN->CN->TW->EN', async () => {
+    test('语言重复切换-EN->CN->TW->EN', async () => {
       console.log('EN->CN')
       await basicPage.saveLanguage('EN', 'CN')
       await expect(await basicPage.headerTitle).toHaveText(/基础设置/, { timeout: 20000 })
