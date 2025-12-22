@@ -125,11 +125,11 @@ test.beforeAll(async () => {
   basicPage = new BasicPage(window)
   // // fix electron test - ServiceWorker is not defined
   // await basePage.newReload()
+  basePage.checkForPopup()
 })
 test.afterAll(async () => {
 })
 test.beforeEach(async () => {
-  basePage.checkForPopup()
 })
 test.afterEach(async ({}, testInfo) => {
   if (testInfo.status !== testInfo.expectedStatus) {

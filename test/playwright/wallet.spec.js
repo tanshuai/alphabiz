@@ -67,11 +67,11 @@ test.beforeAll(async () => {
   //     console.log(`Console log: ${msg.text()} \n ${msg.location().url} \n lineNumber:${msg.location().lineNumber} \n columnNumber:${msg.location().columnNumber} \n`)
   //   }
   // })
+  basePage.checkForPopup()
 })
 test.afterAll(async () => {
 })
 test.beforeEach(async () => {
-  basePage.checkForPopup()
   await basePage.newReload()
   await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
 })

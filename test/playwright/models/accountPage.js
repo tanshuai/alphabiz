@@ -271,6 +271,8 @@ class AccountPage extends BasePage {
       await this.dcDisCloudBtn.waitFor()
       await this.dcDisCloudBtn.click({ timeout: 9000 })
       // await this.checkAlert('disableCloudKey', /Success/)
+    } else {
+      console.log('云存储原本关闭，无需操作')
     }
     await this.account.click()
     await this.kcEnCloudBtn.waitFor()
