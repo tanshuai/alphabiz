@@ -115,10 +115,10 @@ test('initialization-频道测试的初始化', async () => {
   await basePage.ensureLoginStatus(name, process.env.TEST_PASSWORD, true)
   await console.log('登录成功')
   console.log('是否有Follow菜单项')
-  const haveFollowLink = await window.waitForSelector('.left-drawer-menu >> text=following',{timeout:10000})
-  if (haveFollowLink){
+  try{
+    await window.waitForSelector('.left-drawer-menu >> text=following',{timeout:10000})
     console.log('有')
-  }else{
+  }catch(error){
     console.log('没有')
     console.log('等待出现推荐页面的第一个频道')
     await window.waitForSelector('.channel-card >> nth=5',{timeout:60000})
