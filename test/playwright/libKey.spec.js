@@ -111,7 +111,14 @@ test.describe('librayKey:媒体库密钥测试', () => {
     }
     await console.log('已经登录')
     await basePage.waitForAllHidden(await basePage.alert)
-    await window.waitForTimeout(3000)
+    // await window.waitForTimeout(3000) //遇到稍微卡一点的，3s不够用，会出现执行后续操作时重定位到主页
+    try {
+      console.log('等待主页中的工具栏的图标出现，否则稍等片刻会强制跳转回主页')
+      await window.waitForSelector('.q-toolbar:has-text("Type") >> text="arrow_drop_down"', { timeout: 60000 })
+      console.log('已出现，页面加载完毕')
+    } catch (error) {
+      console.log('网络差，页面没有加载出来')
+    }
     //await window.screenshot({ path: `${ScreenshotsPath}macos-disableCloudKey-screen.png` })
     await console.log("准备清除密钥")
     await accountPage.disableCloudKey()
@@ -130,7 +137,14 @@ test.describe('librayKey:媒体库密钥测试', () => {
       await window.waitForLoadState()
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
       await basePage.waitForAllHidden(await basePage.alert)
-      await window.waitForTimeout(3000)
+      // await window.waitForTimeout(3000)
+      try {
+        console.log('等待主页中的工具栏的图标出现，否则稍等片刻会强制跳转回主页')
+        await window.waitForSelector('.q-toolbar:has-text("Type") >> text="arrow_drop_down"', { timeout: 60000 })
+        console.log('已出现，页面加载完毕')
+      } catch (error) {
+        console.log('网络差，页面没有加载出来')
+      }
       // isABPassword = false, 不使用账户密码
       try{
         await accountPage.disableCloudKey()

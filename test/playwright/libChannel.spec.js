@@ -466,7 +466,7 @@ test.describe('downLoad-测试下载功能',()=>{
 })
 
 test.describe('homePage-SearchChannel-在主页中搜索频道', ()=>{
-  test('privateChannel搜索私有频道', async()=>{
+  test('privateChannel搜索频道', async()=>{
     await basePage.ensureLoginStatus(name, accountPassword, true, true)
     console.log('准备跳转首页')
     await basePage.jumpPage('homeLink')
