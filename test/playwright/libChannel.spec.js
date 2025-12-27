@@ -475,10 +475,19 @@ test.describe('homePage-SearchChannel-在主页中搜索频道', ()=>{
     console.log('搜索私有频道')
     await libraryPage.searchChannelID(privateChannel, true)
     console.log('找到频道')
+    // 等待频道出现
+    try{
+      await window.waitFor(`.q-card:has-text("Search for channel ID") .channel-image .q-img__content:has-text("${privateChannel.title}")`, {timeout: 60000})
+    }catch(error){
+      console.log('没有找到频道, 关闭搜索页')
+      await libraryPage.sciCloseBtn.click()
+      console.log('已关闭')
+      return
+    }
     const targetChannel = window.locator(`.q-card:has-text("Search for channel ID") .channel-image .q-img__content:has-text("${privateChannel.title}")`)
     if (await targetChannel.isVisible()) {
-      console.log('进入频道')
       await targetChannel.click()
+      console.log('进入频道')
     }
   })
   test('available-firm-rate搜索不同级别的电影(NC-17)', async ()=>{
