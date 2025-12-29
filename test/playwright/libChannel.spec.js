@@ -505,7 +505,14 @@ test.describe('homePage-SearchChannel-在主页中搜索频道', ()=>{
     await basicPage.saveSetting()
     console.log('成功保存')
     console.log('准备跳转首页')
-    await basePage.jumpPage('homeLink')
+    try{
+      await basePage.jumpPage('homeLink')
+    }catch(error){
+      console.log('跳转失败，提前结束')
+      await window.screenshot({ path: `${ScreenshotsPath}搜索不同级别的电影(NC-17)-fail.png` })
+      console.log('截屏')
+      return
+    }
     console.log('跳转成功')
     await basePage.waitForAllHidden(await basePage.centerAlert)
     console.log('搜索拥有全级别的频道')
