@@ -374,10 +374,24 @@ test.describe('shareChannel-分享频道测试', ()=>{
     await libraryPage.copiedAlert.waitFor('visible')
     // 检查各个页面触发复制
     console.log('检查各个页面-粘贴触发-定位到对应频道')
-    await libraryPage.checkShareLink('homeLink', channelTitle, { isCloseDialog: false })
-    console.log('home页面测试成功')
-    await libraryPage.checkShareLink('followingLink', channelTitle, { isCloseDialog: false })
-    console.log('follow页面测试成功')
+    try{
+      await libraryPage.checkShareLink('homeLink', channelTitle, { isCloseDialog: false })
+      console.log('home页面测试成功')
+    } catch(error){
+      console.log('home页面测试失败')
+      await window.screenshot({ path: `${ScreenshotsPath}home页面粘贴分享链接失败.png` })
+      console.log('截屏')
+      return
+    }
+    try {
+      await libraryPage.checkShareLink('followingLink', channelTitle, { isCloseDialog: false })
+      console.log('follow页面测试成功')
+    } catch (error) {
+      console.log('follow页面测试失败')
+      await window.screenshot({ path: `${ScreenshotsPath}follow页面粘贴分享链接失败.png` })
+      console.log('截屏')
+      return
+    }
   })
 })
 
@@ -549,6 +563,7 @@ test.describe('homePage-SearchChannel-在主页中搜索频道', ()=>{
     }catch(error){
       console.log('网络差，退出测试')
       await window.screenshot({ path: `${ScreenshotsPath}统计列表中可见的影片个数(NC-17)-fail.png` })
+      console.log('截屏')
       return
     }
     const visualNums = await window.locator('.desc-main > .text-subtitle2').count()
@@ -596,8 +611,9 @@ test.describe('homePage-SearchChannel-在主页中搜索频道', ()=>{
     try {
       await window.waitForSelector('.desc-main > .text-subtitle2', { timeout: 60000 })
     } catch (error) {
-      await window.screenshot({ path: `${ScreenshotsPath}统计列表中可见的影片个数(PG-13)-fail.png` })
       console.log('网络差，退出测试')
+      await window.screenshot({ path: `${ScreenshotsPath}统计列表中可见的影片个数(PG-13)-fail.png` })
+      console.log('截屏')
       return
     }
     const visualNums = await window.locator('.desc-main > .text-subtitle2').count()
