@@ -44,7 +44,11 @@ test.beforeAll(async () => {
   basePage = new BasePage(window)
   homePage = new HomePage(window)
   libraryPage = new LibraryPage(window)
-  basePage.checkForPopup()
+  try {
+    basePage.checkForPopup()
+  } catch (error) {
+    // 不做处理
+  }
 })
 test.beforeEach(async () => {
 })

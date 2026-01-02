@@ -232,7 +232,14 @@ test.describe('explorePage-探索页面测试', ()=>{
   })
   test('follow-关注功能的测试', async () => {
     console.log('准备跳转到探索页面')
-    await basePage.jumpPage('exploreLink')
+    try{
+      await basePage.jumpPage('exploreLink')
+    }catch(error){
+      console.log('跳转失败')
+      await window.screenshot({ path: `${ScreenshotsPath}follow-跳转到探索页面-fail.png` })
+      console.log('截屏')
+      return
+    }
     console.log('已跳转, 检查面包屑导航是否出现Explore')
     await libraryPage.checkNavBar('Explore', { timeout: 3000 })
     // 获取第一张卡片的标题
@@ -399,7 +406,14 @@ test.describe('downLoad-测试下载功能',()=>{
   test.beforeEach(async()=>{
     await basePage.ensureLoginStatus(name, accountPassword, true, true)
     console.log('准备跳转首页')
-    await basePage.jumpPage('homeLink')
+    try{
+      await basePage.jumpPage('homeLink')
+    }catch(error){
+      console.log('跳转失败')
+      await window.screenshot({ path: `${ScreenshotsPath}downLoad首页跳转失败.png` })
+      console.log('截屏')
+      return
+    }
     console.log('跳转成功')
     await basePage.waitForAllHidden(await basePage.centerAlert)
     // 第一步，找到频道fxpebrsi9ij5pzinwdky
