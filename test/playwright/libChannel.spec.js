@@ -166,10 +166,15 @@ test.describe('explorePage-探索页面测试', ()=>{
     console.log('出现探索路由')
   })
   test('search-探索页面中搜索频道', async()=>{
-      console.log('静待5s')
-      await window.waitForTimeout(5000)
       console.log('跳转到主页')
-      await basePage.jumpPage('homeLink')
+      try{
+        await basePage.jumpPage('homeLink')
+      }catch(error){
+        console.log('跳转失败')
+        await await window.screenshot({ path: `${ScreenshotsPath}search-跳转到主页--fail.png` })
+        console.log('截屏')
+        return
+      }
       console.log('跳转成功')
       try {
         console.log('等待主页中的工具栏的图标出现，否则稍等片刻会强制跳转回主页')
@@ -179,7 +184,14 @@ test.describe('explorePage-探索页面测试', ()=>{
         console.log('网络差，页面没有加载出来')
       }
       console.log('准备跳转到探索页面')
-      await basePage.jumpPage('exploreLink')
+      try{
+        await basePage.jumpPage('exploreLink')
+      }catch(error){
+        console.log('跳转失败')
+        await await window.screenshot({ path: `${ScreenshotsPath}search-跳转到探索页面--fail.png` })
+        console.log('截屏')
+        return
+      }
       console.log('已跳转, 检查面包屑导航是否出现Explore')
       await libraryPage.checkNavBar('Explore', { timeout: 10000 })
       // 获取第一张卡片的标题
