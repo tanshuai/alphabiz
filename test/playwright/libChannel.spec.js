@@ -168,7 +168,7 @@ test.describe('explorePage-探索页面测试', ()=>{
   test('search-探索页面中搜索频道', async()=>{
       console.log('跳转到主页')
       try{
-        await basePage.jumpPage('homeLink')
+        await basePage.jumpPage('exploreLink')
       }catch(error){
         console.log('跳转失败')
         await await window.screenshot({ path: `${ScreenshotsPath}search-跳转到主页--fail.png` })
