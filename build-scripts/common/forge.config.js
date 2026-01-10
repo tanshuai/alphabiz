@@ -185,6 +185,7 @@ module.exports = {
       config: {
         name: productName,
         bin: productName,
+        arch: buildArch,
         genericName: productName,
         categories: ['AudioVideo', 'Network', 'Utility'],
         description,

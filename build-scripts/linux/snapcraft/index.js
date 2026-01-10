@@ -64,6 +64,7 @@ const prepareSnap = async () => {
       .replace(/{{\s*displayName\s*}}/g, appConfig.displayName)
       .replace(/{{\s*snapName\s*}}/g, appConfig.snapName)
       .replace(/{{\s*description\s*}}/g, appConfig.description)
+      .replace(/{{\s*arch\s*}}/g, buildArch)
   }
 
   const snapcraftTemplate = resolve(__dirname, 'snapcraft.template')
