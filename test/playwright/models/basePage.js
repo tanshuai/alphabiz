@@ -139,7 +139,6 @@ class BasePage {
    * @param {string} target - homeLink、playerLink、creditsLink、accountLink
    */
   async jumpPage (firstTarget, secondTarget) {
-    console.log('jumpPage函数')
     const menuButton = await this[secondTarget] || await this[firstTarget]
     await this.page.waitForTimeout(500)
     const isHidden = await this[firstTarget].isHidden()
@@ -185,16 +184,13 @@ class BasePage {
 
   async checkForPopup () {
   while (true) {
-    try {
-      // 等待弹窗出现，但如果5秒内没有出现就会抛出一个错误
-      await this.page.waitForSelector('.q-card:has-text("INTERNAL DEMO ONLY")', {timeout:5000})
-      console.log('checkForPopup发现了弹窗')
-      await this.closeInternalNotice()
-      console.log('checkForPopup关闭了弹窗')
-      this.page.waitForTimeout(5000)
-    } catch (error) {
-      // 我们捕获了错误，但什么都不做，因为错误只是表示弹窗没有出现
-    }
+      // 循环时间，监督弹窗的出现
+    const element = await this.page.waitForSelector('.q-card:has-text("INTERNAL DEMO ONLY")', { timeout: 2147483647, optional: true })
+      if(element){
+        console.log('checkForPopup发现了弹窗')
+        await this.closeInternalNotice()
+        console.log('checkForPopup关闭了弹窗')
+      }
   }
 }
 
@@ -295,15 +291,15 @@ class BasePage {
    * @param {*} password 
    * @param {*} isWaitAlert 
    * @param {*} isSetToken 
-   * @returns message {"incorrect", "trylater", "success"}
+   * @returns message {"incorrect", "trylater", "success", "alreadyIn"}
    */
   // Determine whether to log in and log in for download tests
   async ensureLoginStatus (username, password, isWaitAlert, isSetToken = true) {
     await this.page.waitForTimeout(500)
-    const count = await this.page.locator('.q-card:has-text("INTERNAL DEMO ONLY")').count()
+    // const count = await this.page.locator('.q-card:has-text("INTERNAL DEMO ONLY")').count()
     // if (count) await this.closeInternalNotice()
     // if not logged in
-    let message ;
+    let message = "alreadyIn";
     if (await this.accountInput.isVisible()) {
       message = await this.signIn(username, password, isWaitAlert, isSetToken)
     } else {
