@@ -262,8 +262,13 @@ class AccountPage extends BasePage {
 
   async disableCloudKey () {
     await this.jumpPage('accountSettingLink')
-    await this.kcCloudBtn.waitFor()
-    await this.page.waitForTimeout(3000)
+    console.log('成功跳转到用户设置页')
+    console.log('滚屏')
+    await this.page.locator('.q-page').hover()
+    await this.page.mouse.wheel(0, 1000)
+    console.log('等待按钮出现')
+    await this.kcCloudBtn.waitFor({timeout:10000})
+    console.log('kcCloudBtn按钮出现')
     const kcCardText = await this.kcCard.innerText()
     if (kcCardText.includes('Sync Keychain with Amazon Web Services')) {
       // await expect(this.kcCard).toHaveText(/Sync Keychain with Amazon Web Services/)
@@ -273,9 +278,12 @@ class AccountPage extends BasePage {
       // await this.checkAlert('disableCloudKey', /Success/)
     } else {
       console.log('云存储原本关闭，无需操作')
+      return
     }
     await this.account.click()
-    await this.kcEnCloudBtn.waitFor()
+    console.log('等待出现kcEnCloudBtn')
+    await this.kcEnCloudBtn.waitFor({ timeout: 10000 })
+    console.log('kcEnCloudBtn出现了')
     // await expect(this.kcCard).toHaveText(/Cloud storage disabled/)
   }
 

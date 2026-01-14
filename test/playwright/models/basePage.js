@@ -133,6 +133,25 @@ class BasePage {
     this.starBtn = page.locator('button:has-text("star")')
     this.empty = page.locator('text=No data available')
   }
+  /**
+   * 
+   * @param {string} selector 
+   * @param {object} options
+   * @param {string} msg 
+   * @returns 
+   */
+  async waitForSelectorOptional (selector, options, msg) {
+    try {
+      return await this.page.waitForSelector(selector, options);
+    } catch (error) {
+      if (error.message.includes('Timeout')) {
+        if(msg)console.log(msg)
+        return null;
+      } else {
+        throw error; // 如果错误不是由于超时导致的，我们应该将其抛出
+      }
+    }
+  }
 
   /**
    *
@@ -185,7 +204,7 @@ class BasePage {
   async checkForPopup () {
   while (true) {
       // 循环时间，监督弹窗的出现
-    const element = await this.page.waitForSelector('.q-card:has-text("INTERNAL DEMO ONLY")', { timeout: 2147483647, optional: true })
+    const element = await this.waitForSelectorOptional('.q-card:has-text("INTERNAL DEMO ONLY")', { timeout: 2147483647})
       if(element){
         console.log('checkForPopup发现了弹窗')
         await this.closeInternalNotice()

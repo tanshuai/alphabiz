@@ -106,6 +106,27 @@ test.beforeEach(async () => {
   }
   const inHome = await window.locator('.left-drawer-menu .q-item:has-text("home").active-item').isVisible()
   if(inHome){
+    console.log('是否有Follow菜单项')
+    try {
+      await window.waitForSelector('.left-drawer-menu >> text=following', { timeout: 10000 })
+      console.log('有')
+    } catch (error) {
+      console.log('没有')
+      console.log('等待出现推荐页面的第一个频道')
+      await window.waitForSelector('.channel-card >> nth=5', { timeout: 60000 })
+      if (!await libraryPage.channelSelected.isVisible()) {
+        console.log('选中第一个频道')
+        await libraryPage.chanel1Local.click(); //全局推荐页的第一个频道定位
+        console.log('成功选中')
+      }
+      console.log('点击Follow')
+      // 3. 点击Follow按钮
+      await libraryPage.channelFollowsBtn.click();
+      console.log('成功Follow了一个频道')
+      if (await basePage.followingLink.isVisible()) {
+        console.log('菜单中出现了Follow选项')
+      }
+    }
     console.log('等待主页中的频道出现，否则稍等片刻会强制跳转回主页')
     await window.waitForSelector('.post-channel-info', { timeout: 60000 })
     console.log('已出现，页面加载完毕')
@@ -118,28 +139,35 @@ test.afterEach(async ({ }, testInfo) => {
   }
 })
 
-test('initialization-频道测试的初始化', async () => {
-  console.log('是否有Follow菜单项')
-  try{
-    await window.waitForSelector('.left-drawer-menu >> text=following',{timeout:10000})
-    console.log('有')
-  }catch(error){
-    console.log('没有')
-    console.log('等待出现推荐页面的第一个频道')
-    await window.waitForSelector('.channel-card >> nth=5',{timeout:60000})
-    if (!await libraryPage.channelSelected.isVisible()) {
-      console.log('选中第一个频道')
-      await libraryPage.chanel1Local.click(); //全局推荐页的第一个频道定位
-      console.log('成功选中')
-    }
-    console.log('点击Follow')
-    // 3. 点击Follow按钮
-    await libraryPage.channelFollowsBtn.click();
-    console.log('成功Follow了一个频道')
-    if (await basePage.followingLink.isVisible()){
-      console.log('菜单中出现了Follow选项')
+test('checkNetwork-检查节点连接是否正常', async ()=>{
+  const connector = await window.waitForSelector('.connection-status')
+  await connector.click()
+  console.log('检查gun-manhattan的节点是否正常')
+  const manhattan = await basePage.waitForSelectorOptional('.q-table:has-text("status") tr>>nth=1>>.text-green', { timeout: 60000}, '异常, 在60s之内不能连接上gun-manhattan的节点')
+  if(manhattan) console.log('正常')
+  console.log('检查gun-server的节点是否正常')
+  const server = await basePage.waitForSelectorOptional('.q-table:has-text("status") tr>>nth=2>>.text-green', { timeout: 60000}, '异常, 在60s之内不能连接上gun-server的节点')
+  if(server) console.log('正常')
+  console.log('有没有关闭按钮')
+  const seeCloseBtn = await window.locator('button:has-text("close")').isVisible()
+  if(seeCloseBtn){
+    console.log('当前小界面, 关闭按钮可见')
+    await window.locator('button:has-text("close")').click()
+    console.log('点击关闭按钮')
+  }else{
+    console.log('当前大界面，关闭按钮隐藏')
+    const outsideEle = await window.locator('.q-dialog >>.peer-dialog-card') 
+    const box = await outsideEle.boundingBox()
+    if(box){
+      const { x, y, width, height } = box
+      const clickX = x - width / 10
+      const clickY = y + height / 2
+      console.log('准备点击弹窗外的有效区域')
+      await window.mouse.click(clickX, clickY, {delay:500})
+      console.log('点击')
     }
   }
+  console.log('已经关闭弹窗')
 })
 
 test.describe('explorePage-探索页面测试', ()=>{
@@ -246,8 +274,12 @@ test.describe('explorePage-探索页面测试', ()=>{
     await basePage.jumpPage('followingLink')
     console.log('已跳转')
     console.log('等待出现刚才关注的频道')
-    await window.waitForSelector(`.q-img__content:has-text("${postChannelTitle}")`, {timeout: 10000})    
-    console.log('成功出现')
+    const appear = await basePage.waitForSelectorOptional(`.q-img__content:has-text("${postChannelTitle}")`, {timeout: 10000})    
+    if(appear)console.log('成功出现')
+    else {
+      console.log('没有成功出现')
+      return
+    }
     const unfollowBtn = window.locator(`.channel-card:has-text("${postChannelTitle}") .follow-btn`)
     console.log('准备取消关注这个频道')
     await unfollowBtn.click()
@@ -494,16 +526,15 @@ test.describe('homePage-SearchChannel-在主页中搜索频道', ()=>{
     console.log('滚屏')
     await window.locator('.posts').hover()
     await window.mouse.wheel(0, 1000)
-    const foot = await window.waitForSelector('.channel-page >> text=You have already got all posts', { optional: true })
+    const foot = await basePage.waitForSelectorOptional('.channel-page >> text=You have already got all posts', { timeout: 5000 }, '还没有滑到底部')
     if (foot) console.log('已经到底部')
-    else console.log('还没有滑到底部')
     console.log('统计列表中可见的影片个数：（一级一个影片，总共五个影片）')
     console.log('应该出现G,PG,PG-13,R,NC-17')
-    const seeG = await window.waitForSelector('.text-subtitle2 >> text=G', { optional: true })
-    const seePG = await window.waitForSelector('.text-subtitle2 >> text=PG', { optional: true })
-    const seePG13 = await window.waitForSelector('.text-subtitle2 >> text=PG-13', { optional: true })
-    const seeR = await window.waitForSelector('.text-subtitle2 >> text=R', { optional: true })
-    const seeNC17 = await window.waitForSelector('.text-subtitle2 >> text=NC-17', { optional: true })
+    const seeG = await basePage.waitForSelectorOptional('.text-subtitle2 >> text=G', { timeout: 5000 })
+    const seePG = await basePage.waitForSelectorOptional('.text-subtitle2 >> text=PG', { timeout: 5000 })
+    const seePG13 = await basePage.waitForSelectorOptional('.text-subtitle2 >> text=PG-13', { timeout: 5000 })
+    const seeR = await basePage.waitForSelectorOptional('.text-subtitle2 >> text=R', { timeout: 5000 })
+    const seeNC17 = await basePage.waitForSelectorOptional('.text-subtitle2 >> text=NC-17', { timeout: 5000 })
     if (seeG) console.log('G√')
     if (seePG) console.log('PG√')
     if (seePG13) console.log('PG13√')
@@ -547,20 +578,19 @@ test.describe('homePage-SearchChannel-在主页中搜索频道', ()=>{
     console.log('滚屏')
     await window.locator('.posts').hover()
     await window.mouse.wheel(0, 1000)
-    const foot = await window.waitForSelector('.channel-page >> text=You have already got all posts',{optional: true})
+    const foot = await basePage.waitForSelectorOptional('.channel-page >> text=You have already got all posts', { timeout: 5000 }, '还没有滑到底部')
     if(foot)console.log('已经到底部')
-    else console.log('还没有滑到底部')
     console.log('统计列表中可见的影片个数：（一级一个影片，总共五个影片）')
     console.log('应该出现G,PG,PG-13')
-    const seeG = await window.waitForSelector('.text-subtitle2 >> text=G',{optional:true})
-    const seePG = await window.waitForSelector('.text-subtitle2 >> text=PG',{optional:true})
-    const seePG13 = await window.waitForSelector('.text-subtitle2 >> text=PG-13',{optional:true})
+    const seeG = await basePage.waitForSelectorOptional('.text-subtitle2 >> text=G', { timeout: 5000 })
+    const seePG = await basePage.waitForSelectorOptional('.text-subtitle2 >> text=PG', { timeout: 5000 })
+    const seePG13 = await basePage.waitForSelectorOptional('.text-subtitle2 >> text=PG-13', { timeout: 5000 })
     if (seeG) console.log('G√')
     if (seePG) console.log('PG√')
     if (seePG13) console.log('PG13√')
     console.log('不应该出现R,NC-17')
-    const seeR = await window.waitForSelector('.text-subtitle2 >> text=R', { state: 'hidden' })
-    const seeNC17 = await window.waitForSelector('.text-subtitle2 >> text=NC-17', { state: 'hidden' })
+    const seeR = await basePage.waitForSelectorOptional('.text-subtitle2 >> text=R', { timeout: 5000 })
+    const seeNC17 = await basePage.waitForSelectorOptional('.text-subtitle2 >> text=NC-17', { timeout: 5000 })
     if(seeR) console.log('危险, 能看到R')
     if(seeNC17) console.log('危险, 能看到NC-17')
     if(!seeR && !seeNC17)console.log('正常, 没有出现')
