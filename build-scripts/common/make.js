@@ -252,11 +252,15 @@ if (process.argv.includes('--make')) {
         }
       }
     }
+    const i18nDir = resolve(__rootdir, 'src/i18n')
+    const languages = readdirSync(i18nDir).filter(i => i.match(/^\w{2}-\w{2}$/))
     appxTemplate = appxTemplate
       .replace('{{description}}', description)
       .replace('{{appxPackageIdentityName}}', appConfig.appxPackageIdentityName)
       .replace(/{{protocol}}/g, appConfig.protocol)
       .replace(/{{shortProtocol}}/g, appConfig.shortProtocol)
+      .replace(/{{arch}}/g, arch)
+      .replace(/{{languages}}/g, languages.map(i => `    <Resource Language="${i.toLowerCase()}" />`).join('\n').trim())
     writeFileSync(xmlFilePath, appxTemplate)
     process.on('exit', () => {
       writeFileSync(xmlFilePath, oldAppxTemplate)

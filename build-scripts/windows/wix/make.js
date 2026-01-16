@@ -53,7 +53,7 @@ const { version, description } = require(resolve(__rootdir, 'package.json'))
 
 const WiSubStg = resolve(__dirname, 'WiSubStg.vbs')
 const WiLangId = resolve(__dirname, 'WiLangId.vbs')
-const appDirectory = resolve(__rootdir, `dist/electron/${productName}-win32-x64`)
+const appDirectory = resolve(__rootdir, `dist/electron/${productName}-win32-${process.arch}`)
 const outputDirectory = resolve(__rootdir, 'out/make/wix/', process.arch)
 
 const ensureDirectory = async () => {

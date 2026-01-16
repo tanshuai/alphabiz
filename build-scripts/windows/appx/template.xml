@@ -4,7 +4,7 @@
    xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
    xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities">
   <Identity Name="{{appxPackageIdentityName}}"
-    ProcessorArchitecture="x64"
+    ProcessorArchitecture="{{arch}}"
     Publisher="{{publisherName}}"
     Version="{{packageVersion}}" />
   <Properties>
@@ -14,7 +14,7 @@
     <Logo>assets\StoreLogo.png</Logo>
   </Properties>
   <Resources>
-    <Resource Language="en-us" />
+    {{languages}}
   </Resources>
   <Dependencies>
     <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.14316.0" MaxVersionTested="10.0.14316.0" />
