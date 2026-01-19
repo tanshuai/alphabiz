@@ -98,13 +98,9 @@ test.describe('librayKey:媒体库密钥测试', () => {
     await basePage.ensureLoginStatus(name, accountPassword, true, true)
     console.log('已经登录')
     await basePage.waitForAllHidden(await basePage.alert)
-    try {
-      console.log('等待主页中的工具栏的图标出现，否则稍等片刻会强制跳转回主页')
-      await window.waitForSelector('.q-toolbar:has-text("Type") >> text="arrow_drop_down"', { timeout: 60000 })
-      console.log('已出现，页面加载完毕')
-    } catch (error) {
-      console.log('网络差，主页没有加载出来')
-    }
+    console.log('等待主页中的频道出现，否则稍等片刻会强制跳转回主页')
+    await window.waitForSelector('.post-channel-info', { timeout: 60000 })
+    console.log('已出现，页面加载完毕')
     await console.log("准备清除密钥")
     await accountPage.disableCloudKey()
     await console.log("成功清除密钥")
@@ -120,14 +116,9 @@ test.describe('librayKey:媒体库密钥测试', () => {
       await window.waitForLoadState()
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
       await basePage.waitForAllHidden(await basePage.alert)
-      // await window.waitForTimeout(3000)
-      try {
-        console.log('等待主页中的工具栏的图标出现，否则稍等片刻会强制跳转回主页')
-        await window.waitForSelector('.q-toolbar:has-text("Type") >> text="arrow_drop_down"', { timeout: 60000 })
-        console.log('已出现，页面加载完毕')
-      } catch (error) {
-        console.log('网络差，页面没有加载出来')
-      }
+      console.log('等待主页中的频道出现，否则稍等片刻会强制跳转回主页')
+      await window.waitForSelector('.post-channel-info', { timeout: 60000 })
+      console.log('已出现，页面加载完毕')
       // isABPassword = false, 不使用账户密码
       try{
         await accountPage.disableCloudKey()
@@ -145,11 +136,9 @@ test.describe('librayKey:媒体库密钥测试', () => {
       await accountPage.syncCloudKey(inPassword)
       // 等待密钥配置，加载,等待推荐页面出现
       await basePage.jumpPage('homeLink')
-      try{
-        await window.locator('.post-card').nth(0).waitFor({ timeout: 60000 })
-      }catch(error){
-        console.log('网络差，没有加载出卡片')
-      }
+      console.log('等待主页中的频道出现，否则稍等片刻会强制跳转回主页')
+      await window.waitForSelector('.post-channel-info', { timeout: 60000 })
+      console.log('已出现，页面加载完毕')
     })
     test('修改独立密码', async () => {
       //修改独立密码
@@ -165,7 +154,9 @@ test.describe('librayKey:媒体库密钥测试', () => {
       await accountPage.syncCloudKey(newPassword)
       // 等待密钥配置，加载,等待推荐页面出现
       await basePage.jumpPage('homeLink')
-      await window.locator('.post-card').nth(0).waitFor({ timeout: 30000 })
+      console.log('等待主页中的频道出现，否则稍等片刻会强制跳转回主页')
+      await window.waitForSelector('.post-channel-info', { timeout: 60000 })
+      console.log('已出现，页面加载完毕')
     }) 
     test('结束前清除密钥', async () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
@@ -203,7 +194,7 @@ test.describe('librayKey:媒体库密钥测试', () => {
       await basePage.signOut()
       console.log('重新登录')
       await basePage.signIn(name, accountPassword, true, false)
-      console.log('等待出现第一张卡片，证明保存了上次Follow的频道')
+      console.log('等待出现第一张卡片, 证明保存了上次Follow的频道')
       await window.locator('.post-card').nth(0).waitFor({ timeout: 60000 })
       console.log('退出')
       await basePage.signOut()
