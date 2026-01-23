@@ -145,14 +145,12 @@ test.describe('librayKey:媒体库密钥测试', () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
       console.log('修改访问密钥的独立密码')
       await accountPage.cfgKeyPassword(inPassword, newPassword)
-      // 验证同步云端
       await basePage.signOut()
       await basePage.waitForAllHidden(await basePage.alert)
       console.log('重新登录')
       await basePage.signIn(name, accountPassword, true, false)
       console.log('输入新的独立密码来导入密钥')
       await accountPage.syncCloudKey(newPassword)
-      // 等待密钥配置，加载,等待推荐页面出现
       await basePage.jumpPage('homeLink')
       console.log('等待主页中的频道出现，否则稍等片刻会强制跳转回主页')
       await window.waitForSelector('.post-channel-info', { timeout: 60000 })
@@ -163,22 +161,17 @@ test.describe('librayKey:媒体库密钥测试', () => {
       await basePage.waitForAllHidden(await basePage.alert)
       await window.waitForTimeout(5000)
       await accountPage.disableCloudKey()
-      // 验证取消同步云端
       await basePage.signOut()
     })
   })
   test.describe('账户密码', () => {
     test('登陆后自动创建媒体库密钥并备份到云', async () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, false)
-      // 1. 等待showMoreBtn出现，可能有时候加载很慢
       console.log('等待showMore按钮出现')
       await libraryPage.showMoreBtn.waitFor({timeout: 60000})
-      // 2. 判断是否有选中频道(.channel-card.selected)
-      // 问题：判断语句 怎么用？
       console.log('是否已经有选中的频道')
       if (!await libraryPage.channelSelected.isVisible()) {
         console.log('没有，现在选上第一个频道卡片')
-        //如果没有，则选中第一个.channel - card元素
         await libraryPage.chanel1Global.click(); //全局推荐页的第一个频道定位
       } else {
         console.log('有')

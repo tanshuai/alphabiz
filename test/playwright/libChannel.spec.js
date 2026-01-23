@@ -116,7 +116,7 @@ test.beforeEach(async () => {
       await window.waitForSelector('.channel-card >> nth=5', { timeout: 60000 })
       if (!await libraryPage.channelSelected.isVisible()) {
         console.log('选中第一个频道')
-        await libraryPage.chanel1Local.click(); //全局推荐页的第一个频道定位
+        await libraryPage.chanel1Local.click(); //局部推荐页的第一个频道定位
         console.log('成功选中')
       }
       console.log('点击Follow')
