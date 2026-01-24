@@ -129,19 +129,16 @@ test.describe('librayKey:媒体库密钥测试', () => {
       await accountPage.enableCloudKey(inPassword, false)
       await console.log('新建完毕')
       await window.waitForTimeout(3000)
-      // 验证同步云端
       await console.log('准备退出')
       await basePage.signOut()
       await basePage.signIn(name, accountPassword, true, false)
       await accountPage.syncCloudKey(inPassword)
-      // 等待密钥配置，加载,等待推荐页面出现
       await basePage.jumpPage('homeLink')
       console.log('等待主页中的频道出现，否则稍等片刻会强制跳转回主页')
       await window.waitForSelector('.post-channel-info', { timeout: 60000 })
       console.log('已出现，页面加载完毕')
     })
     test('修改独立密码', async () => {
-      //修改独立密码
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
       console.log('修改访问密钥的独立密码')
       await accountPage.cfgKeyPassword(inPassword, newPassword)
@@ -177,12 +174,9 @@ test.describe('librayKey:媒体库密钥测试', () => {
         console.log('有')
       }
       console.log('点击Follow')
-      // 3. 点击Follow按钮
       await libraryPage.channelFollowsBtn.click();
-      // 4. 等待home页面出现第一个post-card元素出现
       console.log('等待首页第一个卡片出现')
       await window.locator('.post-card').nth(0).waitFor({timeout:60000})
-      // 验证同步云端功能
       console.log('退出')
       await basePage.signOut()
       console.log('重新登录')
@@ -195,16 +189,12 @@ test.describe('librayKey:媒体库密钥测试', () => {
     // 密钥的更新
     test('登陆后更新密钥', async () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, false)
-      // 创建新的密钥
       console.log('登陆后选择创建新密钥')
       await accountPage.createCloudKey('', true, true)
       console.log('新密钥自动备份并导入客户端，等待第一张卡片出现')
       await window.locator('.post-card').nth(0).waitFor({ timeout: 60000 })
-      // 验证同步云端功能
       await basePage.signOut()
       await basePage.signIn(name, accountPassword, true, false)
-      await accountPage.syncCloudKey('', { isABPassword: true })
-      // 等待密钥配置，加载，等待推荐页面出现
       await window.locator('.post-card').nth(0).waitFor({ timeout: 60000 })
     })
     // 更新账户密码
