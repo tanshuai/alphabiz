@@ -214,11 +214,9 @@ test.describe('librayKey:媒体库密钥测试', () => {
       } else {
         console.log('修改成功')
       }
-      // 验证同步云端
       await basePage.signOut()
       await basePage.signIn(name, accountResetPassword, true, false)
       await accountPage.syncCloudKey('', { isABPassword: true })
-      // 等待密钥配置，加载,等待推荐页面出现
       await window.waitForTimeout(15000)
       if (!await basePage.recommendHandle()) await libraryPage.tweetsFrist.waitFor()
       await basePage.signOut()
@@ -247,10 +245,8 @@ test.describe('librayKey:媒体库密钥测试', () => {
         await basePage.signOut()
       }
       await basePage.waitForAllHidden(await basePage.alert)
-      // 验证同步云端
       await basePage.signIn(name, accountPassword, true, false)
       await accountPage.syncCloudKey('', { isABPassword: true })
-      // 等待密钥配置，加载,等待推荐页面出现
       await window.waitForTimeout(15000)
       await basePage.signOut()
     })
@@ -276,11 +272,9 @@ test.describe('librayKey:媒体库密钥测试', () => {
       } else {
         console.log('修改成功')
       }
-      // 验证同步云端
       await basePage.signOut()
       await basePage.signIn(name, accountResetPassword, true, false)
       await accountPage.syncCloudKey('', { isABPassword: true })
-      // 等待密钥配置，加载,等待推荐页面出现
       await window.waitForTimeout(15000)
       console.log('清除密钥')
       await accountPage.disableCloudKey()
