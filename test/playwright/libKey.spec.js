@@ -28,31 +28,24 @@ var accountResetPassword = process.env.TEST_RESET_PASSWORD
 
 
 test.beforeAll(async () => {
-  // Launch Electron app.
   electronApp = await electron.launch({
     args: [
       '--inspect=5858',
       electronMainPath
     ]
   })
-  // Evaluation expression in the Electron context.
   await electronApp.evaluate(async ({ app }) => {
-    // This runs in the main Electron process, parameter here is always
-    // the result of the require('electron') in the main app script.
     return app.getAppPath()
   })
-  // Get the first window that the app opens, wait if necessary.
   window = await electronApp.firstWindow()
 
   await window.waitForTimeout(6000)
-  // should main window
   windows = electronApp.windows()
 
   for (const win of windows) {
     console.log(await win.title())
     if (await win.title() === 'Alphabiz') window = win
   }
-  // new Pege Object Model
   basePage = new BasePage(window)
   homePage = new HomePage(window)
   libraryPage = new LibraryPage(window)
