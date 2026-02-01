@@ -183,16 +183,22 @@ class BasePage {
 
   async closeInternalNotice () {
     const internalNoticeCss = '.q-card:has-text("INTERNAL DEMO ONLY")'
-    await this.page.locator(internalNoticeCss).waitFor()
-    await Promise.all[
-      this.page.locator(internalNoticeCss).waitFor({ state: 'hidden', timeout: 30000 }),
-      this.page.locator(`${internalNoticeCss} button:has-text("close")`).click()
-    ]
+    try{
+      await this.page.locator(internalNoticeCss).waitFor()
+      await Promise.all[
+        this.page.locator(internalNoticeCss).waitFor({ state: 'hidden', timeout: 5000 }),
+        this.page.locator(`${internalNoticeCss} button:has-text("close")`).click()
+      ]
+    }catch(error){
+      console.log('弹窗消失')
+    }
     await this.page.waitForTimeout(2000)
   }
 
   async newReload () {
     console.log('调用一次newReload')
+    const internalNoticeCss = '.q-card:has-text("INTERNAL DEMO ONLY")'
+    await this.page.waitForSelector(internalNoticeCss, {state:'hidden'})
     await this.page.reload()
     if (app.displayName === 'Alphabiz') {
       const version = await this.versionBtn.innerText()
@@ -207,22 +213,14 @@ class BasePage {
     // 循环时间，监督弹窗的出现
     try {
       await this.page.waitForSelector('.q-card:has-text("INTERNAL DEMO ONLY")', { timeout: 45464646 });
-      console.log('疑似弹窗，观察1s')
-      await this.page.waitForTimeout(1000)
-      const confirm = await this.page.waitForSelector('.q-card:has-text("INTERNAL DEMO ONLY")', { timeout: 1000 });
-      if(confirm){
-        console.log('checkForPopup发现了弹窗')
-        await this.closeInternalNotice() 
-        console.log('checkForPopup关闭了弹窗')
-      }else{
-        console.log('消失了')
-      }
+      console.log('checkForPopup发现了弹窗')
+      await this.closeInternalNotice() 
+      console.log('checkForPopup关闭了弹窗')
     } catch (error) {
       if (error.message.includes('Timeout')) {
         return null;
       } else {
         console.log(error.message)
-        await this.page.waitForTimeout(5000)
       }
     }
   }
@@ -271,7 +269,7 @@ class BasePage {
       this.jumpPage('accountSignIn')
     } else{
       console.log('看见了accountInput')
-      this.page.waitForTimeout(1000)
+      await this.page.waitForTimeout(1000)
     }
     await this.accountInput.click()
     await this.page.keyboard.type(username, { delay: 100 })

@@ -10,7 +10,6 @@ const { PlayerPage } = require('./models/playerPage')
 const { BasicPage } = require('./models/basicPage')
 const { AccountPage } = require('./models/accountPage')
 
-const app = require('../../developer/app.js')
 let window, windows, electronApp, basePage, homePage, libraryPage, playerPage, basicPage, accountPage
 const ScreenshotsPath = 'test/output/playwright/library_key.spec/'
 
