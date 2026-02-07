@@ -222,11 +222,7 @@ class BasePage {
       await this.closeInternalNotice() 
       console.log('checkForPopup关闭了弹窗')
     } catch (error) {
-      if (error.message.includes('Timeout')) {
-        return null;
-      } else {
         console.log(error.message)
-      }
     }
   }
 }

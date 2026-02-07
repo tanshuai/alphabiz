@@ -97,6 +97,7 @@ test.beforeAll(async () => {
 })
 
 test.afterAll(async()=>{
+  console.log('测试完成之后，退出登录')
   await basePage.signOut()
 })
 
