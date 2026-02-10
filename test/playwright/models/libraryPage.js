@@ -109,7 +109,7 @@ class LibraryPage extends BasePage {
     // recommend page start
     this.welcomeMessage = page.locator('.q-mt-md:has-text("welcome")')
     this.showMoreBtn = page.locator('button:has-text("Show more for me")')
-    this.channelSelected = page.locator(".q-card.channel-card.selected")
+    this.channelSelected = page.locator(".q-card.channel-card.selected >> nth = 0")
     this.chanel1Global = page.locator(".channel-card>>nth=0"); //全局推荐页的第一个频道定位
     this.chanel1Local = page.locator(".channel-card.q-card>>nth=5"); //局部推荐页的第一个频道定位
     this.channelFollowsBtn = page.locator('button:has-text("channels and continue")')
