@@ -251,15 +251,18 @@ test.describe('切换语言设置', () => {
       if (process.platform === 'darwin') {
         test.skip()
       }
+    })
+    // EN -> CN -> TW -> EN
+    test('语言重复切换-EN->CN->TW->EN', async () => {
       // 确保语言en
       await basePage.clearLocalstorage()
       await window.waitForTimeout(3000)
       await basePage.quickSaveLanguage('EN')
-      await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1) //登陆
+      const message = await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1) //登陆
+      if (message == "success") {
+        await basePage.waitForAllHidden(await basePage.alert)
+      }
       await window.waitForLoadState()
-    })
-    // EN -> CN -> TW -> EN
-    test('语言重复切换-EN->CN->TW->EN', async () => {
       const inHome = await window.locator('.left-drawer-menu .q-item:has-text("home").active-item').isVisible()
       if (inHome) {
         console.log('是否有Follow菜单项')
