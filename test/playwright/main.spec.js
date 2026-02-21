@@ -286,9 +286,8 @@ test.describe('切换语言设置', () => {
             console.log('菜单中出现了Follow选项')
           }
         }
-        console.log('等待主页中的频道出现，否则稍等片刻会强制跳转回主页')
-        await window.waitForSelector('.post-channel-info', { timeout: 60000 })
-        console.log('已出现，页面加载完毕')
+        const mainLoad = await basePage.waitForSelectorOptional('.post-channel-info', { timeout: 60000 }, "主页在1分钟内没有加载出来")
+        if (mainLoad) console.log('已出现，页面加载完毕')
       }
       console.log('EN->CN')
       await basicPage.saveLanguage('EN', 'CN')

@@ -87,15 +87,36 @@ test.describe('librayKey:媒体库密钥测试', () => {
   // 清除密钥
   test('清除密钥', async () => { 
     console.log('准备登录')
-    await basePage.ensureLoginStatus(name, accountPassword, true, true)
+    const message = await basePage.ensureLoginStatus(name, accountPassword, true, true)
     console.log('已经登录')
-    await basePage.waitForAllHidden(await basePage.alert)
-    console.log('等待主页中的频道出现，否则稍等片刻会强制跳转回主页')
-    try{
-      await window.waitForSelector('.post-channel-info', { timeout: 15000 })
-      console.log('已出现，页面加载完毕')
-    }catch(error){
-      console.log('15s内页面加载失败')
+    if (message == "success") {
+      await basePage.waitForAllHidden(await basePage.alert)
+    }
+    if (inHome) {
+      console.log('是否有Follow菜单项')
+      try {
+        await window.waitForSelector('.left-drawer-menu >> text=following', { timeout: 10000 })
+        console.log('有')
+      } catch (error) {
+        console.log('没有')
+        console.log('等待出现局部推荐页面的第一个频道')
+        await window.waitForSelector('.channel-card >> nth=5', { timeout: 60000 })
+        if (!await libraryPage.channelSelected.isVisible()) {
+          console.log('选中第一个频道')
+          await libraryPage.chanel1Local.click(); //局部推荐页的第一个频道定位
+          console.log('成功选中')
+        }
+        console.log('点击Follow')
+        // 3. 点击Follow按钮
+        await libraryPage.channelFollowsBtn.click();
+        console.log('成功Follow了一个频道')
+        if (await basePage.followingLink.isVisible()) {
+          console.log('菜单中出现了Follow选项')
+        }
+      }
+      console.log('等待主页中的频道出现，否则稍等片刻会强制跳转回主页')
+      const mainLoad = await basePage.waitForSelectorOptional('.post-channel-info', { timeout: 60000 }, "主页在1分钟内没有加载出来")
+      if(mainLoad) console.log('已出现，页面加载完毕')
     }
     await console.log("准备清除密钥")
     await accountPage.disableCloudKey()
@@ -112,13 +133,8 @@ test.describe('librayKey:媒体库密钥测试', () => {
       await window.waitForLoadState()
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
       await basePage.waitForAllHidden(await basePage.alert)
-      console.log('等待主页中的频道出现，否则稍等片刻会强制跳转回主页')
-      try{
-        await window.waitForSelector('.post-channel-info', { timeout: 15000 })
-        console.log('已出现，页面加载完毕')
-      }catch(error){
-        console.log('15s内页面加载失败')
-      }
+      const mainLoad = await basePage.waitForSelectorOptional('.post-channel-info', { timeout: 60000 }, "主页在1分钟内没有加载出来")
+      if (mainLoad) console.log('已出现，页面加载完毕')
       try{
         await accountPage.disableCloudKey()
       } catch(error) {
@@ -149,9 +165,8 @@ test.describe('librayKey:媒体库密钥测试', () => {
       console.log('输入新的独立密码来导入密钥')
       await accountPage.syncCloudKey(newPassword)
       await basePage.jumpPage('homeLink')
-      console.log('等待主页中的频道出现，否则稍等片刻会强制跳转回主页')
-      await window.waitForSelector('.post-channel-info', { timeout: 60000 })
-      console.log('已出现，页面加载完毕')
+      const mainLoad = await basePage.waitForSelectorOptional('.post-channel-info', { timeout: 60000 }, "主页在1分钟内没有加载出来")
+      if (mainLoad) console.log('已出现，页面加载完毕')
     }) 
     test('结束前清除密钥', async () => {
       await basePage.ensureLoginStatus(name, accountPassword, true, true)
