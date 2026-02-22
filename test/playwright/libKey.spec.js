@@ -92,6 +92,7 @@ test.describe('librayKey:媒体库密钥测试', () => {
     if (message == "success") {
       await basePage.waitForAllHidden(await basePage.alert)
     }
+    const inHome = await window.locator('.left-drawer-menu .q-item:has-text("home").active-item').isVisible()
     if (inHome) {
       console.log('是否有Follow菜单项')
       try {
