@@ -302,7 +302,18 @@ test.describe('切换语言设置', () => {
     test('确保最后的语言是EN', async () => {
       try{
         console.log('先跳转到基础设置页')
-        await window.locator('.q-item:has-text("assignment")').click()
+        const basicIcon = window.locator('.q-item:has-text("assignment")')
+        console.log('判断是否是小屏')
+        const isHidden = await basicIcon.isHidden()
+        if (isHidden) {
+          console.log('是小屏幕')
+          await basePage.menuIcon.click({ timeout: 60000 })
+          console.log('点击三条杠')
+        }else{
+          console.log('是大屏幕')
+        }
+        await basicIcon.click()
+        console.log('点击基础设置')
         console.log('跳转到基础设置页, 断言标题是Basic')
         await expect(await basicPage.headerTitle).toHaveText(/Basic/, { timeout: 5000 })
         console.log('√断言成功')
