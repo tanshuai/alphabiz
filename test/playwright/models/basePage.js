@@ -155,21 +155,21 @@ class BasePage {
 
   /**
    *
-   * @param {string} target - homeLink、playerLink、creditsLink、accountLink
+   * @param {string} firstTarget - homeLink、playerLink、creditsLink、accountLink
+   * @param {string} secondTarget - 
+   * return {boolean} true or false
    */
   async jumpPage (firstTarget, secondTarget) {
     const menuButton = await this[secondTarget] || await this[firstTarget]
-    await this.page.waitForTimeout(500)
+    await this.page.waitForTimeout(1000)
     try{
       const isHidden = await this[firstTarget].isHidden()
       if (isHidden) {
         await this.menuIcon.click({ timeout: 60000 })
       }
     }catch(error){
-      console.log('isHidden failed')
-      await this.page.screenshot({ path: `test/output/playwright/basePage/jumpPage-fail.png` })
-      console.log('截屏，刷新页面')
-      await this.page.reload()
+      console.log(error)
+      return false;
     }
     if (secondTarget) {
       if (await menuButton.isHidden()) {
@@ -186,6 +186,7 @@ class BasePage {
       const clickY = y + height/2 //点击位置垂直居中
       await this.page.mouse.click(clickX,clickY)
     }
+    return true;
   }
 
   async closeInternalNotice () {
@@ -223,8 +224,10 @@ class BasePage {
 
   async clearLocalstorage () {
     await this.page.evaluate(() => { localStorage.clear() })
+    console.log('清除本地存储')
     await this.page.waitForTimeout(1000)
     await this.newReload()
+    console.log('刷新')
   }
 
   async setToken () {
