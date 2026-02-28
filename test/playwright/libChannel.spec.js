@@ -416,15 +416,16 @@ test.describe('shareChannel-分享频道测试', ()=>{
     await libraryPage.copiedAlert.waitFor('visible')
     // 检查各个页面触发复制
     console.log('检查各个页面-粘贴触发-定位到对应频道')
-    try{
-      await libraryPage.checkShareLink('homeLink', channelTitle, { isCloseDialog: false })
-    }catch(error){
-      console.log(error, "home页面测试失败");
-      test.skip();
+    if(await libraryPage.checkShareLink('homeLink', channelTitle, { isCloseDialog: false })){
+      console.log('home页面触发失败')
+    } else{
+      console.log('home页面触发成功')
     }
-    console.log('home页面测试成功')
-    await libraryPage.checkShareLink('followingLink', channelTitle, { isCloseDialog: false })
-    console.log('follow页面测试成功')
+    if(await libraryPage.checkShareLink('followingLink', channelTitle, { isCloseDialog: false })){
+      console.log('follow页面触发失败')
+    } else {
+      console.log('follow页面触发成功')
+    }
   })
 })
 
