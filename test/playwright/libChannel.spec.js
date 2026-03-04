@@ -231,7 +231,7 @@ test.describe('explorePage-探索页面测试', ()=>{
       console.log('统计过滤后的推文数量')
       const postNumByTitle = await window.locator('.post-card .post-title').count()
       console.log(postNumByTitle)
-      console.log('逐一遍历，断言推文标题一致')
+      console.log('逐一遍历，断言推文标题都包含目标字符串')
       for (let i = 0; i < postNumByTitle; i++) {
         const postTitle = await window.locator('.post-card .post-title').nth(i).innerText()
         if (!postTitle.includes(post.title)) throw new Error('标题查找出现错误:' + postTitle)
@@ -247,7 +247,7 @@ test.describe('explorePage-探索页面测试', ()=>{
       console.log('统计过滤后的推文数量')
       const postNumByChannel = await window.locator('.post-card .channel-title').count()
       console.log(postNumByChannel)
-      console.log('逐一遍历, 断言推文标题都一致')
+      console.log('逐一遍历, 断言频道名称都包含目标字符串')
       for (let i = 0; i < postNumByChannel; i++) {
         const postChannelTitle = await window.locator('.post-card .channel-title').nth(i).innerText()
         if (!postChannelTitle.includes(post.channelTitle)) throw new Error('频道查找出现错误:' + postTitle)
@@ -417,14 +417,14 @@ test.describe('shareChannel-分享频道测试', ()=>{
     // 检查各个页面触发复制
     console.log('检查各个页面-粘贴触发-定位到对应频道')
     if(await libraryPage.checkShareLink('homeLink', channelTitle, { isCloseDialog: false })){
-      console.log('home页面触发失败')
-    } else{
       console.log('home页面触发成功')
+    } else{
+      console.log('home页面触发失败')
     }
     if(await libraryPage.checkShareLink('followingLink', channelTitle, { isCloseDialog: false })){
-      console.log('follow页面触发失败')
-    } else {
       console.log('follow页面触发成功')
+    } else {
+      console.log('follow页面触发失败')
     }
   })
 })
@@ -604,6 +604,7 @@ test.describe('homePage-SearchChannel-在主页中搜索频道', ()=>{
     console.log('准备保存')
     await basicPage.saveSetting()
     console.log('成功保存')
+    await window.waitForTimeout(2000)
     console.log('准备跳转首页')
     if (!await basePage.jumpPage('homeLink')) {
       console.log('跳转失败')
@@ -663,6 +664,7 @@ test.describe('homePage-SearchChannel-在主页中搜索频道', ()=>{
     console.log('准备保存')
     await basicPage.saveSetting()
     console.log('成功保存')
+    await window.waitForTimeout(2000)
     console.log('准备跳转首页')
     if (!await basePage.jumpPage('homeLink')) {
       console.log('跳转失败')
