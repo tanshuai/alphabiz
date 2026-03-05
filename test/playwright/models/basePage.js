@@ -180,8 +180,10 @@ class BasePage {
     }
     if (await menuButton.isVisible()) {
       await menuButton.click()
+      console.log('点击目标菜单')
+    } else{
+      console.log('目标菜单不可见')
     }
-    console.log('点击目标菜单')
     if (firstTarget === 'accountMore'){
       console.log('是账号管理（负责登录和退出）')
       return true
