@@ -109,9 +109,10 @@ test.beforeEach(async () => {
   if(message == "success") {
     await basePage.waitForAllHidden(await basePage.alert)
   }
-  const inHome = await window.locator('.left-drawer-menu .q-item:has-text("home").active-item').isVisible()
-  if(inHome){
-    console.log('是否有Follow菜单项')
+  const inHome = await window.locator('.left-drawer-menu .q-item:has-text("home").active-item').count()
+  if(inHome > 0){
+    console.log('当前在首页')
+    console.log('检查是否有Follow菜单项')
     try {
       await window.waitForSelector('.left-drawer-menu >> text=following', { timeout: 10000 })
       console.log('有')
