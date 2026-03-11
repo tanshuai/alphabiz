@@ -163,17 +163,16 @@ class BasePage {
     try{
       const menuButton = await this[secondTarget] || await this[firstTarget]
       await this.page.waitForTimeout(1000)
-      let menuShrink = false;
-      const leftMenu = await this[firstTarget].count()
-      if (leftMenu > 0) {
-        await this[firstTarget].isVisible()
+      let menuShrink = false; //侧边栏菜单是否收缩
+      const leftMenu = await this[firstTarget].isVisible() //试过count(), 始终大于0
+      if (leftMenu) {
         console.log('当前大窗口，左侧菜单栏可见')
       } else {
         menuShrink = true;
-        console.log('当前小窗口，左侧菜单栏不可见')
+        console.log('当前小窗口，侧边栏收缩')
         if (this.menuIcon.isVisible()) {
           await this.menuIcon.click()
-          console.log('点击菜单图标（三条杠）')
+          console.log('点击菜单图标, 展开侧边栏')
         }
       }
       if (secondTarget) {
@@ -192,12 +191,13 @@ class BasePage {
         return true
       }
       if (menuShrink && await menuButton.isVisible()) {
+        console.log('小窗口操作后, 需要收回侧边栏')
         const buttonBoundingBox = await menuButton.boundingBox()
         const { x, y, width, height } = buttonBoundingBox;
         const clickX = x + width + 20 //假设相对于按钮的右侧有20px的空白区域
         const clickY = y + height / 2 //点击位置垂直居中
         await this.page.mouse.click(clickX, clickY)
-        console.log('小窗口点击右侧旁白，收回左侧菜单栏')
+        console.log('点击右侧旁白，收回左侧菜单栏')
       }
       return true;
     }catch(error){
