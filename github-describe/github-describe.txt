@@ -3,11 +3,8 @@ test library
 test library
 test library
 test library
-fix language codes
 test library
 test library
-test main
-test main
 test library
 test library
-add init script for linux and mac
+test library
