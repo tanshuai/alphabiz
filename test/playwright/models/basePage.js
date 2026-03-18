@@ -355,12 +355,13 @@ class BasePage {
       message = await this.signIn(username, password, isWaitAlert, isSetToken)
     } else {
       console.log('左边栏是否可见')
-      const leftBar = await this.waitForSelectorOptional(`${leftDrawerClass} #downloading`,{timeout:5000},'左边栏不可见')
-      if (!leftBar) {
-        console.log('当前是小窗口, 点击菜单图标，弹出左边栏')
+      const leftMenu = await this[firstTarget].isVisible() //试过count(), 始终大于0
+      if (leftMenu) {
+        console.log('左侧菜单栏可见')
+      } else {
+        console.log('左侧菜单栏不可见')
         await this.menuIcon.click({noWaitAfter: true})
-      }else{
-        console.log('可见，当前是大窗口')
+        console.log('点击菜单按钮，弹出左边栏')
       }
       console.log('是否存在登录的选项')
       if (await this.accountSignIn.isVisible()) {
