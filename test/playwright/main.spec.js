@@ -285,7 +285,7 @@ test.describe('切换语言设置', () => {
       }
     })
     // EN -> CN -> TW -> EN
-    test('语言重复切换-EN->CN->TW->EN', async () => {
+    test('语言重复切换-EN-CN-TW-EN', async () => {
       // 确保语言en
       await basePage.clearLocalstorage()
       await window.waitForTimeout(3000)
@@ -325,13 +325,19 @@ test.describe('切换语言设置', () => {
       if (mainLoad) console.log('已出现，页面加载完毕')
       console.log('EN->CN')
       await basicPage.saveLanguage('EN', 'CN')
+      console.log('断言导航栏标题是--基础设置')
       await expect(await basicPage.headerTitle).toHaveText(/基础设置/, { timeout: 20000 })
+      console.log('断言成功')
       console.log('CN->TW')
       await basicPage.saveLanguage('CN', 'TW')
+      console.log('断言导航栏标题是--基礎設置')
       await expect(await basicPage.headerTitle).toHaveText(/基礎設置/, { timeout: 20000 })
+      console.log('断言成功')
       console.log('TW->EN')
       await basicPage.saveLanguage('TW', 'EN')
+      console.log('断言导航栏标题是--Basic')
       await expect(await basicPage.headerTitle).toHaveText(/Basic/, { timeout: 20000 })
+      console.log('断言成功')
     })
     test('确保最后的语言是EN', async () => {
       try{
