@@ -10,10 +10,12 @@ const { HomePage } = require('./models/homePage')
 const { PlayerPage } = require('./models/playerPage')
 const { CreditsPage } = require('./models/creditsPage')
 const { BasicPage } = require('./models/basicPage')
+const { LibraryPage } = require('./models/libraryPage')
 
 const { calculation } = require('../utils/calculation')
 const app = require('../../developer/app.js')
-let window, windows, electronApp, basePage, homePage, playerPage, creditsPage, basicPage
+const { addConsoleHandler } = require('selenium-webdriver/lib/logging.js')
+let window, windows, electronApp, basePage, homePage, playerPage, creditsPage, basicPage, libraryPage
 const ScreenshotsPath = 'test/output/playwright/main.spec/'
 let from
 let to
@@ -123,6 +125,7 @@ test.beforeAll(async () => {
   playerPage = new PlayerPage(window)
   creditsPage = new CreditsPage(window)
   basicPage = new BasicPage(window)
+  libraryPage = new LibraryPage(window)
   // // fix electron test - ServiceWorker is not defined
   // await basePage.newReload()
   basePage.checkForPopup()
@@ -526,10 +529,43 @@ test.describe('账户设置', () => {
   })
 })
 
-test.describe('download 视频下载', () => {
+test.describe.only('download 视频下载', () => {
   for (const bt of btData) {
     test((bt.testName ? bt.testName : '') + bt.btName, async () => {
-      await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
+      const message = await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
+      if (message == "success") {
+        await basePage.waitForAllHidden(await basePage.alert)
+      }
+      const inHome = await window.locator('.left-drawer-menu .q-item:has-text("home").active-item').count()
+      if (inHome > 0) {
+        console.log('当前在首页')
+        console.log('检查是否存在Follow菜单项')
+        //等待
+        await basePage.waitForSelectorOptional('.left-drawer-menu >> text=following', { timeout: 10000 }, '不可见')
+        const followExist = await window.locator('.left-drawer-menu >> text=following').count() //小屏（不可见但存在）
+        if (followExist > 0) {
+          console.log('有')
+        } else {
+          console.log('没有')
+          console.log('等待出现局部推荐页面的第一个频道')
+          await window.waitForSelector('.channel-card >> nth=5', { timeout: 60000 })
+          if (!await libraryPage.channelSelected.isVisible()) {
+            console.log('选中第一个频道')
+            await libraryPage.chanel1Local.click(); //局部推荐页的第一个频道定位
+            console.log('成功选中')
+          }
+          console.log('点击Follow')
+          // 3. 点击Follow按钮
+          await libraryPage.channelFollowsBtn.click();
+          console.log('成功Follow了一个频道')
+          if (await basePage.followingLink.isVisible()) {
+            console.log('菜单中出现了Follow选项')
+          }
+        }
+        console.log('等待主页中的频道出现，否则稍等片刻会强制跳转回主页')
+        const mainLoad = await basePage.waitForSelectorOptional('.post-channel-info', { timeout: 60000 }, "主页在1分钟内没有加载出来")
+        if (mainLoad) console.log('已出现，页面加载完毕')
+      }
       if (bt.btName === 'uTorrent Web Tutorial Video') {
         test.setTimeout(60000 * 5)
       } else if (bt.btName === 'The WIRED CD - Rip. Sample. Mash. Share') {
@@ -541,23 +577,30 @@ test.describe('download 视频下载', () => {
       }
       await window.waitForLoadState()
 
-      // 跳转到 home
+      // 跳转到 下载中
+      console.log('准备跳转到下载中')
       await basePage.jumpPage('downloadingStatus')
+      console.log('成功跳转')
       try {
+        console.log('等待出现按钮--移除所有')
         await homePage.downRemoveAllBtn.waitFor({ timeout: 5000 })
+        console.log('出现')
       } catch (e) {
-        await window.waitForTimeout(2000)
-        await basePage.jumpPage('downloadingStatus')
+        console.log('没有出现')
       }
       // 确保切换到卡片模式
       const cardMode = await homePage.toggleCardModeBtn
+      console.log('卡片模式是否可见')
       if (await cardMode.isVisible()) {
+        console.log('可见')
         await cardMode.click()
+        console.log('点击')
       }
       await homePage.searchBtn.click({ force: true })
-      await window.waitForTimeout(2000)
-      // 等待任务卡片加载
+      console.log('点击查找按钮')
+      console.log('等待任务卡片出现')
       if (!await homePage.getCard(bt.btName).isVisible()) {
+        console.log('任务卡片不可见')
         await window.waitForTimeout(2000)
       }
       // download bbb_sunflower_1080p_30fps_normal.mp4 下载中状态多等一会
@@ -574,35 +617,50 @@ test.describe('download 视频下载', () => {
       // 判断 任务 在downloading状态
       if (await homePage.getCard(bt.btName).isVisible()) {
         // 等待下载完成
+        console.log('等待下载完成')
         const DownloadStatus = await (await homePage.getCardEle(bt.btName, 'statusText')).innerText()
         //  判断 文件存在，下载完成
+        console.log('判断文件存在，下载完成')
         if (DownloadStatus === 'Status: Paused') await homePage.getCardEle(bt.btName, 'resumeBtn').click()
         try {
           await homePage.getCardEle(bt.btName, 'statusText', 'Downloading').click({ timeout: 60000 })
         } catch (error) {
+          console.log('准备跳转到--上传中')
           await basePage.jumpPage('uploadingStatus')
+          console.log('跳转成功')
           await homePage.searchBtn.click({ force: true })
+          console.log('点击查找按钮')
           await homePage.getCardEle(bt.btName, 'statusText', 'Seeding').click({ timeout: 30000 })
         }
       } else {
         // 判断 任务 在seeding状态
+        console.log('判断任务在seeding状态')
+        console.log('准备跳转到--上传中')
         await basePage.jumpPage('uploadingStatus')
+        console.log('跳转成功')
         await homePage.searchBtn.click({ force: true })
+        console.log('点击查找按钮')
         await window.waitForTimeout(1000)
         if (!await homePage.getCard(bt.btName).isVisible()) {
           // 任务不存在  bt未开始下载
+          console.log('任务不存在，bt未开始下载')
+          console.log('准备跳转到--下载中')
           await basePage.jumpPage('downloadingStatus')
+          console.log('跳转成功')
           await homePage.searchBtn.click({ force: true })
+          console.log('点击查找')
           await homePage.downloadTorrent(bt.magnetLink)
           if (!bt.btName.includes('uTorrent')) {
             await window.click('text=' + bt.btName, { timeout: 5 * 60000 })
             // 等待 任务 加载 验证， 判断任务是 下载中
+            console.log('等待任务加载，判断任务是下载中')
             await homePage.getCardEle(bt.btName, 'statusText', 'Downloading').click({ timeout: 5 * 60000 })
           }
         }
       }
 
       // 等待下载完成
+      console.log('等待下载完成')
       if (await homePage.getCardEle(bt.btName, 'statusText').isVisible()) {
         const btStatus = await (await homePage.getCardEle(bt.btName, 'statusText')).innerText()
         if (btStatus === 'Status: Downloading') {
@@ -645,8 +703,10 @@ test.describe('download 视频下载', () => {
       }
       // 点击 Play 按钮
       await homePage.getCardEle(bt.btName, 'playBtn').click({ timeout: 2 * 60000 })
+      console.log('点击播放按钮')
       // 点击播放列表的第一个文件，跳转到player页面
       await homePage.firstFileBtn.click()
+      console.log('点击播放列表的第一个文件，跳转到播放器页面')
 
       // should video can play
       await window.waitForTimeout(5000)
@@ -657,6 +717,7 @@ test.describe('download 视频下载', () => {
       await playerPage.stopPlay.click()
       // 是否删除种子
       if (bt.isDelete) {
+        console.log('删除种子')
         await basePage.jumpPage('uploadingStatus')
         await homePage.getCardEle(bt.btName, 'deleteBtn').click()
         await homePage.deleteFileChk.click()
