@@ -46,19 +46,29 @@ class HomePage {
   async jumpPage (firstTarget, secondTarget) {
     await sleep(2000)
     const menuLink = await this[secondTarget] || await this[firstTarget]
+    console.log('检查一级目录是否可见')
     if (!(await this[firstTarget].isDisplayed())) {
+      console.log('不可见，当前是小窗口')
       await this.menuBtn.click()
+      console.log('点击菜单按钮展开侧边栏')
       await sleep(1000)
-      if (!(await this[firstTarget].isDisplayed())) {
-        await this.menuBtn.click()
+      if (secondTarget) {
+        if (!(await menuLink.isDisplayed())) {
+          await this[firstTarget].click()
+        }
       }
-    }
-    if (secondTarget) {
-      if (!(await menuLink.isDisplayed())) {
-        await this[firstTarget].click()
+      await menuLink.click()
+      console.log('点击目标菜单项')
+    }else{
+      console.log('可见，当前是大窗口')
+      if (secondTarget) {
+        if (!(await menuLink.isDisplayed())) {
+          await this[firstTarget].click()
+        }
       }
+      await menuLink.click()
+      console.log('点击目标菜单项')
     }
-    await menuLink.click()
   }
 
   async getAppTitle () {
@@ -82,16 +92,20 @@ class HomePage {
   async downloadTorrent (magnetLink, directory) {
     await this.downloadTorrentBtn.click()
     await this.downloadMagnetEdit.setValue(magnetLink)
+    console.log('fill the magnet')
     if (directory) {
       // setValue功能的自动清除内容不稳定，手动清除输入框内容
+      console.log('clear the content')
       const text = await this.page.$('//Edit[@Name="Download directory position"]').getText()
       const backSpaces = new Array(text.length).fill('\uE003')
       await sleep(2000)
       await this.downloadDirectoryEdit.setValue(backSpaces)
       await sleep(2000)
       await this.downloadDirectoryEdit.setValue(directory)
+      console.log('fill the directory')
     }
     await this.confirmDownloadBtn.click()
+    console.log('confirm download')
   }
 
   async uploadTorrent (directory) {
