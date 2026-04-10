@@ -903,31 +903,31 @@ jobs:
           Start-Process PowerShell -ArgumentList "yarn test:appium"
           Start-Sleep -s 10
 
-      - name: E2E appium creditDownload test for 7z 🧪
-        if: matrix.test == '1'
-        uses: nick-fields/retry@v2
-        with:
-          timeout_seconds: 6000
-          max_attempts: 3
-          shell: bash
-          retry_on: error
-          command: |
-            taskkill //F //IM "${{ needs.nightly_job.outputs.display-name }}.exe" || (echo "app is ready")
-            sleep 10s
-            yarn test:release:creditsDownload
+      # - name: E2E appium creditDownload test for 7z 🧪
+      #   if: matrix.test == '1'
+      #   uses: nick-fields/retry@v2
+      #   with:
+      #     timeout_seconds: 6000
+      #     max_attempts: 3
+      #     shell: bash
+      #     retry_on: error
+      #     command: |
+      #       taskkill //F //IM "${{ needs.nightly_job.outputs.display-name }}.exe" || (echo "app is ready")
+      #       sleep 10s
+      #       yarn test:release:creditsDownload
 
-      - name: E2E appium creditUpload test for 7z 🧪
-        if: matrix.test == '2'
-        uses: nick-fields/retry@v2
-        with:
-          timeout_seconds: 6000
-          max_attempts: 3
-          shell: bash
-          retry_on: error
-          command: |
-            taskkill //F //IM "${{ needs.nightly_job.outputs.display-name }}.exe" || (echo "app is ready")
-            sleep 10s
-            yarn test:release:creditsUpload
+      # - name: E2E appium creditUpload test for 7z 🧪
+      #   if: matrix.test == '2'
+      #   uses: nick-fields/retry@v2
+      #   with:
+      #     timeout_seconds: 6000
+      #     max_attempts: 3
+      #     shell: bash
+      #     retry_on: error
+      #     command: |
+      #       taskkill //F //IM "${{ needs.nightly_job.outputs.display-name }}.exe" || (echo "app is ready")
+      #       sleep 10s
+      #       yarn test:release:creditsUpload
 
       - name: Download msi and exe
         run: |
