@@ -1,9 +1,2 @@
-test library
-test library
-test library
-test library
-test main
-test main
-test main
-test main
-test main
+test appium
+test appium
