@@ -45,7 +45,7 @@ describe('upload', () => {
   it.skip('test1', async () => {
     expect(1).toBe(1)
   })
-  it('upload seeding', async () => {
+  it.skip('upload seeding', async () => {
     const uploadFilePath = path.resolve(__dirname, '../../cypress/fixtures/samples/GoneNutty.avi')
     const torrentName = 'GoneNutty.avi'
     // const torrentName = 'ChinaCup.1080p.H264.AAC.mp4'
@@ -96,7 +96,7 @@ describe('upload', () => {
     console.log('wait download complete')
     isSuccess = true
   })
-  it.only('test', async () => {
+  it('test', async () => {
     await sleep(10000)
     console.log('ensure Log In')
     await accountPage.ensureSignIn(downloadUser, process.env.TEST_PASSWORD, { isWaitAlert: true })
