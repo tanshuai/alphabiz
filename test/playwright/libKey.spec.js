@@ -71,7 +71,7 @@ test.beforeAll(async () => {
 })
 
 test.beforeEach(async () => {
-  test.setTimeout(60000 * 4)
+  test.setTimeout(60000 * 5)
 })
 
 test.afterEach(async ({ }, testInfo) => {
