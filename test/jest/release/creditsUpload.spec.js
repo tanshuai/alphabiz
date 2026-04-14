@@ -99,7 +99,7 @@ describe('upload', () => {
   it('test', async () => {
     await sleep(10000)
     console.log('ensure Log In')
-    await accountPage.ensureSignIn(downloadUser, process.env.TEST_PASSWORD, { isWaitAlert: true })
+    await accountPage.ensureSignIn(uploadUser, process.env.TEST_PASSWORD, { isWaitAlert: true })
     console.log('Login')
     console.log('ready sign out')
     await accountPage.signOut()
