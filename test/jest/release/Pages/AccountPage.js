@@ -132,7 +132,8 @@ class AccountPage extends HomePage {
 
   async signOut () {
     if (!(await this.signOutBtn.isDisplayed())) {
-      await this.accountSettingsTitle.waitForDisplayed({ timeout: 20000 })
+      // await this.accountSettingsTitle.waitForDisplayed({ timeout: 20000 })
+      await sleep(5000)
       await this.accountMoreBtn.click()
     }
     await this.signOutBtn.click()
