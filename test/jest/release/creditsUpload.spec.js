@@ -101,6 +101,12 @@ describe('upload', () => {
     console.log('ensure Log In')
     await accountPage.ensureSignIn(uploadUser, process.env.TEST_PASSWORD, { isWaitAlert: true })
     console.log('Login')
+    console.log('判断左侧栏是否可见')
+    while (!(await accountPage.libraryGroup.isDisplayed())) {
+      console.log('locate full-screen button')
+      await accountPage.fullScreenBtn.click()
+      console.log('full screen!')
+    }
     console.log('ready sign out')
     await accountPage.signOut()
     console.log('sign out')

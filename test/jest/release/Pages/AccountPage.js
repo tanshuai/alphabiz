@@ -9,16 +9,22 @@ class AccountPage extends HomePage {
   get signInText () { return this.page.$('//Text[@Name="Sign in"]') }
   get username () { return this.page.$('//Edit[@Name="Phone number or email"]') }
   get password () { return this.page.$('//Edit[@Name="Password"]') }
+  get resetPassword () { return this.page.$('//*[@Name="Reset password"]')}
   get signInBtn () { return this.page.$('//Button[@Name="SIGN UP"]/preceding-sibling::Button[1]') }
   get importCloudKeyOKBtn () { return this.page.$('//Button[@Name="OK"]') }
   get accountSettingsTitle () { return this.page.$('//Text[@Name="Account"]') }
-  get accountMoreBtn () { return this.page.$('//Custom[starts-with(@Name,"Lv.")]/following-sibling::Button[1]') }
+  get libraryGroup() {return this.page.$('//Group[@Name="Library"]')}
+  get publishGroup () { return this.page.$('//Group[@Name="Publish"]') }
+  get fullScreenBtn () { return this.page.$('//Text[@Name="Alphabiz"]/following-sibling::Button[2]')}
+  get menuBtn () { return this.page.$('//Button[@Name="Menu"]') }
+  get accountMoreBtn () {return this.page.$('//Group[@Name="Library"]/preceding-sibling::Button[1]')}
+  // get accountMoreBtn () { return this.page.$('//Custom[starts-with(@Name,"Lv.")]/following-sibling::Button[1]') }
   // get accountMoreBtn () { return this.page.$('//Custom[starts-with(@Name,"Lv.")]/ancestor::Group[3]/Button[1]') }
   get signOutBtn () { return this.page.$('//*[@Name="Sign out"]') }
   get signOutAnywayBtn () { return this.page.$('//Button[@Name="Sign out anyway"]') }
   get internalNoticeText () { return this.page.$('//Text[@Name="Internal Release Notice"]') }
   get closeInternalNoticeBtn () { return this.page.$('//Text[@Name="Internal Release Notice"]/parent::*/Button[2]') }
-  get language () { return this.page.$('/Document[@Name="Alphabiz"]/Group/Group/Button[1]') }
+  get language () { return this.page.$('//*[@Name="Alphabiz"]/Group/Group/Button[1]') }
   get reUsername () { return this.page.$('/Group[@Name="+86"]/Group/Edit[@Name="+86"]') }
 
   async changeLanguage (targetLang = 'English') {
@@ -80,16 +86,6 @@ class AccountPage extends HomePage {
         })
       }
       await sleep(5000)
-      if (!(await this.page.$('//*[@Name="Credits"]').isDisplayed())) {
-        console.log('//*[@Name="Credits"]不可见（小窗口）')
-        await this.page.$('//Button[@Name="Menu"]').click()
-        console.log('点击三道杠，展开侧边栏')
-        // console.log('等待三个点出现，验证侧边栏展开')
-        // await this.accountMoreBtn.waitForDisplayed({ timeout: 30000 })
-        await sleep(5000)
-      }else{
-        console.log('//*[@Name="Credits"]可见（大窗口）')
-      }
     }
   }
 
@@ -123,21 +119,28 @@ class AccountPage extends HomePage {
         await this.menuBtn.click()
         console.log('点击菜单按钮')
       }
-      console.log('等待accountMoreBtn出现')
-      // await this.accountMoreBtn.waitForDisplayed({ timeout: 15000 })
+      console.log('wait 5s')
       await sleep(5000)
-      console.log('已经出现')
     }
   }
 
   async signOut () {
-    if (!(await this.signOutBtn.isDisplayed())) {
-      // await this.accountSettingsTitle.waitForDisplayed({ timeout: 20000 })
+    console.log('判断左侧栏是否可见')
+    if (!(await this.libraryGroup.isDisplayed())) {
+      console.log('libraryGroup不可见 左侧栏 is hidden')
+      await this.menuBtn.click()
+      console.log('点击三道杠，展开侧边栏')
       await sleep(5000)
-      await this.accountMoreBtn.click()
+    } else {
+      console.log('libraryGroup可见 左侧栏 can see')
     }
+    console.log('locate the button')
+    await this.accountMoreBtn.click()
+    console.log('show the options')
     await this.signOutBtn.click()
+    console.log('click the signOut button')
     await this.signOutAnywayBtn.click()
+    console.log('confirm to sign out')
     await this.username.waitForDisplayed({ timeout: 20000 })
   }
 }
