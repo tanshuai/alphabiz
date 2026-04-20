@@ -72,7 +72,7 @@ describe('download', () => {
     expect(await homePage.getTask(torrentName)).toBe(null)
     // expect(1).toBe(1)
   })
-  it('test', async() => {
+  it.skip('test', async() => {
     await sleep(10000)
     console.log('ensure Log In')
     await accountPage.ensureSignIn(downloadUser, process.env.TEST_PASSWORD, { isWaitAlert: true })
@@ -88,12 +88,18 @@ describe('download', () => {
     console.log('sign out')
     await sleep(10000)
   })
-  it.skip('download seeding', async () => {
+  it('download seeding', async () => {
     const DownloadFilePath = path.resolve(__dirname, '../../download')
     await sleep(10000)
     console.log('ensure Log In')
     await accountPage.ensureSignIn(downloadUser, process.env.TEST_PASSWORD, { isWaitAlert: true })
     console.log('Login')
+    console.log('判断左侧栏是否可见')
+    while (!(await accountPage.libraryGroup.isDisplayed())) {
+      console.log('locate full-screen button')
+      await accountPage.fullScreenBtn.click()
+      console.log('full screen!')
+    }
     // 查看初始积分
     console.log('准备跳转到creaditsLink')
     await homePage.jumpPage('creditsLink')
