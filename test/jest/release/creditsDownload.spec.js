@@ -99,6 +99,9 @@ describe('download', () => {
     let limit = 4
     while (limit > 0 && !(await accountPage.libraryGroup.isDisplayed())) {
       limit = limit - 1
+      if (!fs.existsSync(outputPath)) {
+        fs.mkdirSync(outputPath, { recursive: true })
+      }
       await client.saveScreenshot(outputPath + `/click-full-screen-limit${limit}.png`)
       console.log('locate full-screen button')
       await accountPage.fullScreenBtn.click()
