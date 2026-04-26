@@ -106,6 +106,7 @@ describe('download', () => {
       console.log('locate full-screen button')
       await accountPage.fullScreenBtn.click()
       console.log('full screen!')
+      await sleep(1000)
     }
     // 查看初始积分
     console.log('准备跳转到creaditsLink')
