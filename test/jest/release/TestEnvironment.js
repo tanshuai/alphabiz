@@ -20,7 +20,8 @@ export const opts = {
     deviceName: 'WindowsPC',
     appWaitDuration: 60000,
     createSessionTimeout: 60000,
-    app: AlphabizAppPath
+    app: AlphabizAppPath,
+    waitForAppLaunch: 25
   },
   logLevel: 'error'
   // afterTest: function (test) {
