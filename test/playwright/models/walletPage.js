@@ -122,8 +122,13 @@ class WalletPage extends BasePage {
   async ensureClearKey () {
     const isVisibleGetStartCard = await this.getStartedCard.isVisible()
     // console.log('isVisibleGetStartCard', isVisibleGetStartCard)
-    if (isVisibleGetStartCard) return
+    if (isVisibleGetStartCard) {
+      console.log('getStart卡片可见')
+      return
+    }
+    console.log('getStart卡片不可见')
     await this.deleteKey()
+    console.log('删除Key')
     await this.page.waitForTimeout(1000)
   }
   async createKey () {
