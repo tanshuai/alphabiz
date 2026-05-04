@@ -13,7 +13,7 @@ const { calculation } = require('../../utils/calculation')
 const appConfig = require('../../../developer/app')
 
 let client, homePage, accountPage, creditsPage, developmentPage
-const uploadUser = (appConfig.name === 'Alphabiz' ? 'down2' : 'down4') +  process.env.TEST_EMAIL_DOMAIN
+const uploadUser = (appConfig.name === 'Alphabiz' ? 'down2' : 'down4') + process.env.TEST_EMAIL_DOMAIN
 const outputFile = process.env.APP_TYPE === 'exe' ? '/exe' : process.env.APP_TYPE === 'msi' ? '/msi' : '/7z'
 const outputPath = path.resolve(__dirname, '../../output/release' + outputFile)
 let isSuccess = false
@@ -98,9 +98,17 @@ describe('upload', () => {
     await homePage.jumpPage('creditsLink')
     console.log('成功跳转')
     let changedCredit
-    while (1) {
+    // 5s 40min就是2400s
+    for (let i = 0; i < 480; i++) {
       changedCredit = await creditsPage.checkCredits()
-      if (calculation('reduce', changedCredit, initialCredit) >= 0.001) break
+      if (calculation('reduce', changedCredit, initialCredit) >= 0.001) {
+        console.log('credit change')
+        // break;
+      }
+      if (calculation('reduce', changedCredit, initialCredit) >= 0.005) {
+        console.log('credit reduce >= 0.005')
+        break;
+      }
       await sleep(5000)
     }
     console.log('credits increase:' + changedCredit)
