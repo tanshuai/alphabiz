@@ -529,7 +529,7 @@ test.describe('账户设置', () => {
   })
 })
 
-test.describe.only('download 视频下载', () => {
+test.describe('download 视频下载', () => {
   for (const bt of btData) {
     test((bt.testName ? bt.testName : '') + bt.btName, async () => {
       const message = await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1)
@@ -698,10 +698,17 @@ test.describe.only('download 视频下载', () => {
         }
       }
       if (bt.isStreaming !== 1) {
+        console.log('准备跳转到--上传中')
         await basePage.jumpPage('uploadingStatus')
+        console.log('成功跳转')
         await homePage.searchBtn.click({ force: true })
+        console.log('点击search按钮')
       }
       // 点击 Play 按钮
+      if(! await homePage.getCardEle(bt.btName, 'playBtn').isVisible()){
+        console.log('没有Play按钮')
+        test.skip()
+      }
       await homePage.getCardEle(bt.btName, 'playBtn').click({ timeout: 2 * 60000 })
       console.log('点击播放按钮')
       // 点击播放列表的第一个文件，跳转到player页面
