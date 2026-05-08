@@ -102,12 +102,8 @@ describe('upload', () => {
     for (let i = 0; i < 480; i++) {
       changedCredit = await creditsPage.checkCredits()
       if (calculation('reduce', changedCredit, initialCredit) >= 0.001) {
-        console.log('credit change')
+        //console.log('credit change')
         // break;
-      }
-      if (calculation('reduce', changedCredit, initialCredit) >= 0.005) {
-        console.log('credit reduce >= 0.005')
-        break;
       }
       await sleep(5000)
     }
