@@ -370,6 +370,7 @@ test.describe('切换语言设置', () => {
       await basePage.clearLocalstorage()
       await window.waitForTimeout(3000)
       await basePage.quickSaveLanguage('EN')
+      console.log('在登陆页设置语言为EN')
       const message = await basePage.ensureLoginStatus(to, process.env.TEST_PASSWORD, 1) //登陆
       if (message == "success") {
         await basePage.waitForAllHidden(await basePage.alert)
@@ -427,15 +428,15 @@ test.describe('切换语言设置', () => {
       try{
         console.log('先跳转到基础设置页')
         const basicIcon = window.locator('.q-item:has-text("assignment")')
-        console.log('判断是否是小屏')
-        const isHidden = await basicIcon.isHidden()
-        if (isHidden) {
-          console.log('是小屏幕')
-          await basePage.menuIcon.click({ timeout: 60000 })
-          console.log('点击三条杠')
-        }else{
-          console.log('是大屏幕')
-        }
+        // console.log('判断是否是小屏')
+        // const isHidden = await basicIcon.isHidden()
+        // if (isHidden) {
+        //   console.log('是小屏幕')
+        //   await basePage.menuIcon.click({ timeout: 60000 })
+        //   console.log('点击三条杠')
+        // }else{
+        //   console.log('是大屏幕')
+        // }
         await basicIcon.click()
         console.log('点击基础设置')
         console.log('跳转到基础设置页, 断言标题是Basic')

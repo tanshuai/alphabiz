@@ -50,15 +50,15 @@ class BasicPage extends BasePage {
     console.log('跳转到基础设置页')
     // await this.jumpPage(basicPage) //因为语言不是EN，所以不能使用jumpPage
     const basicIcon = this.page.locator('.q-item:has-text("assignment")')
-    console.log('判断是否是小屏')
-    const isHidden = await basicIcon.isHidden()
-    if (isHidden) {
-      console.log('是小屏幕')
-      await basePage.menuIcon.click({ timeout: 60000 })
-      console.log('点击三条杠')
-    } else {
-      console.log('是大屏幕')
-    }
+    // console.log('判断是否是小屏')
+    // const isHidden = await basicIcon.isHidden()
+    // if (isHidden) {
+    //   console.log('是小屏幕')
+    //   await basePage.menuIcon.click({ timeout: 60000 })
+    //   console.log('点击三条杠')
+    // } else {
+    //   console.log('是大屏幕')
+    // }
     await basicIcon.click()
     console.log('点击基础设置')
     console.log('跳转成功')
