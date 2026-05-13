@@ -263,7 +263,8 @@ test.describe('librayKey:媒体库密钥测试', () => {
           console.log('点击')
         }
         await window.waitForTimeout(1000)
-        if (await window.locator("button:has-text('arrow_back')").isVisible()) {
+        const arrow_back = basePage.waitForSelectorOptional("button:has-text('arrow_back')",{timeout: 5000}, '没有回退按钮')
+        if(arrow_back){
           console.log('看见后退按钮')
           await window.locator("button:has-text('arrow_back')").click()
           console.log('点击')
