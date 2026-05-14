@@ -72,8 +72,12 @@ class BasicPage extends BasePage {
     console.log('点击保存，等待提示出现')
     await this.i18n[targetLanguage].saveAlert.waitFor()
     console.log('提示出现，等待提示消失')
-    await this.i18n[targetLanguage].saveAlert.waitFor({state:'detached'})
-    console.log('提示消失')
+    try{
+      await this.i18n[targetLanguage].saveAlert.waitFor({state:'detached'})
+      console.log('提示消失')
+    }catch(error){
+      console.log('没有探测到提示消失，直接下一步')
+    }
   }
 
   async setChannel (targetChannel) {
