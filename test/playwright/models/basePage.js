@@ -300,7 +300,7 @@ class BasePage {
       language = 'English'
       for(let i = 0 ; i < 5; i ++){
         await this.languageBtn.click()
-        enOption = await this.waitForSelectorOptional('label .q-item__section >> nth=0',{timeout: 5000}, 'click has no effect')
+        const enOption = await this.waitForSelectorOptional('label .q-item__section >> nth=0',{timeout: 5000}, 'click has no effect')
         if(enOption){
           await this.page.locator('label .q-item__section >> nth=0').click()
           break;
