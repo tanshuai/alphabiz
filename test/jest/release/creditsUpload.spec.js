@@ -54,18 +54,6 @@ describe('upload', () => {
     console.log('ready to login')
     await accountPage.ensureSignIn(uploadUser, process.env.TEST_PASSWORD, { isWaitAlert: true })
     console.log('login')
-    console.log('判断左侧栏是否可见')
-    let limit = 4
-    while (limit > 0 && !(await accountPage.libraryGroup.isDisplayed())) {
-      limit = limit - 1
-      if (!fs.existsSync(outputPath)) {
-        fs.mkdirSync(outputPath, { recursive: true })
-      }
-      await client.saveScreenshot(outputPath + `/click-full-screen-limit${limit}.png`)
-      console.log('locate full-screen button')
-      await accountPage.fullScreenBtn.click()
-      console.log('full screen!')
-    }
     // 查看初始积分
     console.log('准备跳转到积分页')
     await homePage.jumpPage('creditsLink')
@@ -98,14 +86,13 @@ describe('upload', () => {
     await homePage.jumpPage('creditsLink')
     console.log('成功跳转')
     let changedCredit
-    // 5s 40min就是2400s
-    for (let i = 0; i < 480; i++) {
+    for (let i = 0; i < 30; i++) {
       changedCredit = await creditsPage.checkCredits()
       if (calculation('reduce', changedCredit, initialCredit) >= 0.001) {
         //console.log('credit change')
         // break;
       }
-      await sleep(5000)
+      await sleep(60000)
     }
     console.log('credits increase:' + changedCredit)
     await sleep(10000)
