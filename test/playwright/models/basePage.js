@@ -327,7 +327,7 @@ class BasePage {
       await this.setToken()
     }
     await this.page.waitForLoadState()
-    if (process.platform === 'darwin') await this.page.waitForTimeout(2000)
+    await this.page.waitForTimeout(2000)
     if (!await this.accountInput.isVisible()) {
       console.log('看不到accountInput')
       this.jumpPage('accountSignIn')

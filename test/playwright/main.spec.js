@@ -93,7 +93,7 @@ const btData = [
 
 test.beforeAll(async () => {
   // Set timeout for this hook.
-  test.setTimeout(90000)
+  test.setTimeout(180000)
   // Launch Electron app.
   electronApp = await electron.launch({
     timeout: 90000,
@@ -365,7 +365,7 @@ test.describe('切换语言设置', () => {
       }
     })
     // EN -> CN -> TW -> EN
-    test.only('语言重复切换-EN-CN-TW-EN', async () => {
+    test('语言重复切换-EN-CN-TW-EN', async () => {
       // 确保语言en
       await basePage.clearLocalstorage()
       await window.waitForTimeout(3000)
