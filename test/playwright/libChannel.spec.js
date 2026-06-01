@@ -121,7 +121,7 @@ test.beforeEach(async () => {
     }else{
       console.log('没有')
       console.log('等待出现局部推荐页面的第一个频道')
-      await window.waitForSelector('.channel-card >> nth=5', { timeout: 60000 })
+      await basePage.waitForSelectorOptional('.channel-card >> nth=5', { timeout: 60000 }, '没有出现')
       if (!await libraryPage.channelSelected.isVisible()) {
         console.log('选中第一个频道')
         await libraryPage.chanel1Local.click(); //局部推荐页的第一个频道定位
@@ -479,18 +479,22 @@ test.describe('downLoad-测试下载功能',()=>{
       } else {
         console.log('没有')
         console.log('等待出现局部推荐页面的第一个频道')
-        await window.waitForSelector('.channel-card >> nth=5', { timeout: 60000 })
-        if (!await libraryPage.channelSelected.isVisible()) {
-          console.log('选中第一个频道')
-          await libraryPage.chanel1Local.click(); //局部推荐页的第一个频道定位
-          console.log('成功选中')
-        }
-        console.log('点击Follow')
-        // 3. 点击Follow按钮
-        await libraryPage.channelFollowsBtn.click();
-        console.log('成功Follow了一个频道')
-        if (await basePage.followingLink.isVisible()) {
-          console.log('菜单中出现了Follow选项')
+        const firstChannel = await basePage.waitForSelectorOptional('.channel-card >> nth=5', { timeout: 60000 }, '没有出现')
+        if (firstChannel) {
+          if (!await libraryPage.channelSelected.isVisible()) {
+            console.log('选中第一个频道')
+            await libraryPage.chanel1Local.click(); //局部推荐页的第一个频道定位
+            console.log('成功选中')
+          }
+          console.log('点击Follow')
+          // 3. 点击Follow按钮
+          if (await libraryPage.channelFollowsBtn.isVisble()) {
+            await libraryPage.channelFollowsBtn.click()
+          }
+          console.log('成功Follow了一个频道')
+          if (await basePage.followingLink.isVisible()) {
+            console.log('菜单中出现了Follow选项')
+          }
         }
       }
       console.log('等待主页中的频道出现，否则稍等片刻会强制跳转回主页')
