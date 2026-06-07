@@ -80,6 +80,12 @@ jobs:
           command: yarn unpackaged
           on_retry_command: rm -rf C:/Users/runneradmin/AppData/Local/node-gyp/
 
+      - name: set displayResolution(For Win)
+        if: runner.os == 'Windows'
+        run: |
+          Set-DisplayResolution -Width 1920 -Height 1080 -Force
+        shell: powershell
+
       - name: oauth E2E Test 🧪(include passwordTest)
         if: github.event_name == 'schedule'
         run: |
