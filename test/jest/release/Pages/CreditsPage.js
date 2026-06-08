@@ -8,7 +8,6 @@ class CreditsPage {
   async checkCredits () {
     await this.CreditsText.waitForDisplayed({ timeout: 20000 })
     const creditsText = await this.CreditsText.getText()
-    console.log('creditsText', creditsText)
     return Number(creditsText)
   }
 }

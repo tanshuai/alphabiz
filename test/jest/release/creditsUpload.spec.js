@@ -86,11 +86,15 @@ describe('upload', () => {
     await homePage.jumpPage('creditsLink')
     console.log('成功跳转')
     let changedCredit
+    let currentCredit = initialCredit
     for (let i = 0; i < 500; i++) {
       changedCredit = await creditsPage.checkCredits()
-      if (calculation('reduce', changedCredit, initialCredit) >= 0.001) {
-        //console.log('credit change')
-        // break;
+      if(i%10==0) console.log(changedCredit)
+      const delta = calculation('reduce', changedCredit, currentCredit)
+      if (delta >= 0.001) {
+        console.log(delta)
+        currentCredit = changedCredit
+        console.log(`currentCredit: ${currentCredit}`)
       }
       await sleep(5000)
     }
