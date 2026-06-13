@@ -126,7 +126,7 @@ class HomePage {
   }
 
   async waitSeedFound (torrentName, time) {
-    const taskTitle = await this.page.$('//Text[@Name="' + torrentName + '"]')
+    const taskTitle = await this.page.$('//DataItem[@Name="' + torrentName + ' -"]')
     await taskTitle.waitUntil(async function () {
       return (await this.isDisplayed()) === true
     }, {
@@ -207,6 +207,10 @@ class HomePage {
     }
     if (opt.isLog) console.log(await taskStatus.getText())
     return await taskStatus.getText()
+  }
+  async isTaskUploading (torrentName) {
+    const isUp = await this.page.$(`//DataItem[starts-with(@Name,"${torrentName}"]/following-sibling::DataItem[@Name="Loading"]`).isDisplayed()
+    return isUp
   }
 
   async getTaskDownloadSpeed (torrentName) {

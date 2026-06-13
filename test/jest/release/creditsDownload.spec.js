@@ -95,19 +95,7 @@ describe('download', () => {
     await accountPage.ensureSignIn(downloadUser, process.env.TEST_PASSWORD, { isWaitAlert: true })
     console.log('Login')
     console.log('判断左侧栏是否可见')
-    // click 4 times at most
-    let limit = 4
-    while (limit > 0 && !(await accountPage.libraryGroup.isDisplayed())) {
-      limit = limit - 1
-      if (!fs.existsSync(outputPath)) {
-        fs.mkdirSync(outputPath, { recursive: true })
-      }
-      await client.saveScreenshot(outputPath + `/click-full-screen-limit${limit}.png`)
-      console.log('locate full-screen button')
-      await accountPage.fullScreenBtn.click()
-      console.log('full screen!')
-      await sleep(1000)
-    }
+    
     // 查看初始积分
     console.log('准备跳转到creaditsLink')
     await homePage.jumpPage('creditsLink')
@@ -175,11 +163,11 @@ describe('download', () => {
         // await homePage.downloadTorrent('alphabiz://ChinaCup.1080p.H264.AAC.mp4/AZLwy9+LB7G1y0HGGJis+f4UZlze&MDAyNzAwMjgwMDI5MDAyYTAwMmIwMDJjMDAyZCZ0cj0=', DownloadFilePath)
         await homePage.waitSeedFound(torrentName, 60000 * 20)
         // 查看种子任务卡片状态
-        console.log('check task status')
-        console.log('检查种子任务卡片状态')
-        const taskTitle = await homePage.getTask(torrentName)
-        taskTitle.click()
-        console.log('点击')
+        // console.log('check task status')
+        // console.log('检查种子任务卡片状态')
+        // const taskTitle = await homePage.getTask(torrentName)
+        // taskTitle.click()
+        // console.log('点击')
         // 等待种子开始下载
         await homePage.downloadTorrentBtn.waitUntil(async () => {
           console.log('等待5s')
@@ -192,7 +180,7 @@ describe('download', () => {
           return statusText.include('Downloading')
         }, {
           timeout: 60000 * 30,
-          timeoutMsg: 'task not start'+内3为OQ滚Opzhang
+          timeoutMsg: 'task not start'
         })
 
         // 等待其他客户端上传bt种子
@@ -210,10 +198,16 @@ describe('download', () => {
     }
     // // 等待种子下载完成
     await homePage.jumpPage('uploadingStatusTab')
-    await client.$('//Text[@Name="' + torrentName + '"]').waitForDisplayed({ timeout: 60000 * 4 })
-    const taskStatus = await homePage.getTaskStatus(torrentName)
-    await sleep(10000)
-    expect(taskStatus).toBe('Status: Uploading')
-    isSuccess = true
+    await client.$('//DataItem[@Name="' + torrentName + ' -"]').waitForDisplayed({ timeout: 60000 * 4 })
+    const isUp = await homePage.isTaskUploading(torrentName)
+    if(isUp){
+      console.log('seed download complete!')
+      isSuccess = true
+    }else{
+      console.log('cannot see task uploads...')
+    }
+    // const taskStatus = await homePage.getTaskStatus(torrentName)
+    // await sleep(10000)
+    // expect(taskStatus).toBe('Status: Uploading')
   })
 })

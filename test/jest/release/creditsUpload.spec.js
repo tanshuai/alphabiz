@@ -95,11 +95,12 @@ describe('upload', () => {
         console.log(delta)
         currentCredit = changedCredit
         console.log(`currentCredit: ${currentCredit}`)
+        break;
       }
       await sleep(5000)
     }
-    console.log('credits increase:' + changedCredit)
-    await sleep(10000)
+    console.log('十分钟后退出')
+    await sleep(60000*10)
     console.log('wait download complete')
     isSuccess = true
   })
