@@ -126,7 +126,7 @@ class HomePage {
   }
 
   async waitSeedFound (torrentName, time) {
-    const taskTitle = await this.page.$('//DataItem[@Name="' + torrentName + ' -"]')
+    const taskTitle = await this.page.$(`//DataItem[starts-with(@Name, "${torrentName}"]`)
     await taskTitle.waitUntil(async function () {
       return (await this.isDisplayed()) === true
     }, {
@@ -174,8 +174,10 @@ class HomePage {
   async getTask (torrentName) {
     // console.log(await this.page.$('//Text[@Name="' + torrentName + '"]').isDisplayed())
     if (await this.page.$('//Text[@Name="' + torrentName + '"]').isDisplayed()) {
+      console.log('列表中看到目标任务')
       return await this.page.$('//Text[@Name="' + torrentName + '"]')
     } else {
+      console.log('列表中没有看到目标任务')
       return null
     }
   }
