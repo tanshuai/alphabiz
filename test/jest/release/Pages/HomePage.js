@@ -126,7 +126,7 @@ class HomePage {
   }
 
   async waitSeedFound (torrentName, time) {
-    const taskTitle = await this.page.$(`//DataItem[starts-with(@Name, "${torrentName}"]`)
+    const taskTitle = await this.page.$(`//DataItem[starts-with(@Name, "${torrentName}")]`)
     await taskTitle.waitUntil(async function () {
       return (await this.isDisplayed()) === true
     }, {
