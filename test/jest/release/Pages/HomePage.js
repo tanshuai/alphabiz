@@ -125,14 +125,24 @@ class HomePage {
     console.log('确定传输')
   }
 
-  async waitSeedFound (torrentName, time) {
-    const taskTitle = await this.page.$(`//DataItem[starts-with(@Name, "${torrentName}")]`)
-    await taskTitle.waitUntil(async function () {
-      return (await this.isDisplayed()) === true
-    }, {
-      timeout: time,
-      timeoutMsg: 'no seeds found'
-    })
+  /**
+   * 卡片模式是Text
+   * 列表模式是DataItem
+   * @param {*} torrentName 
+   * @param {*} time 
+   */
+  async waitSeedFound (torrentName, time, isCard=false) {
+    if(isCard){
+        await this.page.$(`//DataItem[@Name="${torrentName} -")]`)
+                        .waitUntil(async function () {
+                            return (await this.isDisplayed()) === true
+                          }, {timeout: time,timeoutMsg: 'no seeds found'})
+    }else{
+      await this.page.$(`//Text[@Name="${torrentName}")]`)
+        .waitUntil(async function () {
+          return (await this.isDisplayed()) === true
+        }, { timeout: time, timeoutMsg: 'no seeds found' })
+    }
   }
 
   async waitSeedUpload (torrentName) {
