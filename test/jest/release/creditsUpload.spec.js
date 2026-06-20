@@ -98,6 +98,8 @@ describe('upload', () => {
       }
       await sleep(5000)
     }
+    console.log('再运行10分钟')
+    await sleep(60000*10)
     console.log('wait download complete')
     isSuccess = true
   })
