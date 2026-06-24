@@ -133,12 +133,12 @@ class HomePage {
    */
   async waitSeedFound (torrentName, time, isCard=false) {
     if(isCard){
-        await this.page.$(`//DataItem[@Name="${torrentName} -"])]`)
+        await this.page.$(`//DataItem[@Name="${torrentName} -"]`)
                         .waitUntil(async function () {
                             return (await this.isDisplayed()) === true
                           }, {timeout: time,timeoutMsg: 'no seeds found'})
     }else{
-      await this.page.$(`//Text[@Name="${torrentName}")]`)
+      await this.page.$(`//Text[@Name="${torrentName}"]`)
         .waitUntil(async function () {
           return (await this.isDisplayed()) === true
         }, { timeout: time, timeoutMsg: 'no seeds found' })
