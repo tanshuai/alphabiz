@@ -189,7 +189,7 @@ describe('download', () => {
     // // 等待种子下载完成
     await homePage.jumpPage('uploadingStatusTab')
     await client.$(`//Text[@Name="${torrentName}"]`).waitForDisplayed({ timeout: 60000 * 4 })
-    const isUp = await homePage.isTaskUploading(torrentName)
+    const isUp = await homePage.isTaskUploading(torrentName, true)
     if(isUp){
       console.log('seed download complete!')
       isSuccess = true

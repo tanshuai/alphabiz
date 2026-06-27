@@ -220,9 +220,11 @@ class HomePage {
     if (opt.isLog) console.log(await taskStatus.getText())
     return await taskStatus.getText()
   }
-  async isTaskUploading (torrentName) {
-    const isUp = await this.page.$(`//DataItem[starts-with(@Name,"${torrentName}"]/following-sibling::DataItem[@Name="Loading"]`).isDisplayed()
-    return isUp
+  async isTaskUploading (torrentName, isCard=false) {
+    if(!isCard){
+      return await this.page.$(`//DataItem[@Name="${torrentName} -"]`).isDisplayed()
+    }
+    return await this.page.$(`//Text[@Name="${torrentName}"]`).isDisplayed()
   }
 
   async getTaskDownloadSpeed (torrentName) {
