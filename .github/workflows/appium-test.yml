@@ -3,7 +3,7 @@ name: appium-credit-test
 on:
   push:
     paths:
-      - "**.js"
+      - "**/appium-test.yml"
     branches: [main]
 env:
       NODE_AUTH_TOKEN: ${{ secrets.PAT }}
