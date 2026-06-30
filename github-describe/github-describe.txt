@@ -1,8 +1,8 @@
+test appium
+test appium
+test appium
+test appium
 test main
-test main
-test appium
-test appium
-test appium
 test main
 test appium
 test appium
