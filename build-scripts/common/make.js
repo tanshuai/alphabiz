@@ -255,7 +255,7 @@ if (process.argv.includes('--make')) {
     const i18nDir = resolve(__rootdir, 'src/i18n')
     const publicLocales = resolve(__rootdir, 'i18n/locales')
     const languages = existsSync(i18nDir)
-      ? readdirSync(i18nDir).filter(i => i.match(/^\w{2}-\w{2}$/))
+      ? readdirSync(i18nDir).filter(i => i.match(/^\w{2}-\w{2}$/)).map(i => i.toLowerCase())
       : existsSync(publicLocales)
         ? readFileSync(publicLocales, 'utf-8').split('\n').map(line => {
           const [lang] = line.replace(/#.*$/, '').trim().split(' ')
