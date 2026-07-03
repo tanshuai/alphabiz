@@ -1,9 +1,2 @@
-test appium
-test appium
-test appium
-test appium
-test main
-test main
-test appium
-test appium
-test appium
+test key
+fix i18n errors
