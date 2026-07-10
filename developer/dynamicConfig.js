@@ -15,6 +15,9 @@ module.exports = {
         'Twitter'
       ]
     },
+    account: {
+      phone_number: false
+    },
     library: {
       show_explore: false
     },
