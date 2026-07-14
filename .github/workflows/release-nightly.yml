@@ -40,11 +40,11 @@ jobs:
       file-name-lower: ${{ steps.slug.outputs.file-name-lower }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os:  [ubuntu-latest] # [ubuntu-latest, macos-latest-large]
         node-version: [16]
-        include:
-          - os: windows-latest
-            node-version: 16
+        # include:
+        #   - os: windows-latest
+        #     node-version: 16
       fail-fast: false
     environment:
       name: CICD
@@ -115,6 +115,11 @@ jobs:
           fi
         shell: bash
 
+      - uses: actions/setup-python@v5
+        if: runner.os == 'macOS'
+        with:
+          python-version: '3.8'
+
       - name: Setup Node.js ${{ matrix.node-version }} 📮
         uses: actions/setup-node@v3
         with:
@@ -132,7 +137,7 @@ jobs:
           if [[ ${{ matrix.os }} = "ubuntu-latest" ]] ; \
           then echo "system=ubuntu" >> $GITHUB_OUTPUT ; \
             echo "package=${{ steps.slug.outputs.display-name }}-linux-x64" >> $GITHUB_OUTPUT ; \
-          elif [[ ${{ matrix.os }} = "macos-latest" ]] ; \
+          elif [[ ${{ matrix.os }} = "macos-latest-large" ]] ; \
           then echo "system=macos" >> $GITHUB_OUTPUT ; \
             echo "package=${{ steps.slug.outputs.display-name }}-darwin-x64" >> $GITHUB_OUTPUT ; \
           elif [[ ${{ matrix.os }} = "windows-latest" ]] ; \
@@ -310,12 +315,12 @@ jobs:
           Set-DisplayResolution -Width 1920 -Height 1080 -Force
         shell: powershell
       
-      - name: screen resolution(For Mac)
-        if: runner.os == 'macOS'
-        run: |
-          system_profiler SPDisplaysDataType | grep Resolution
-          "/Library/Application Support/VMware Tools/vmware-resolutionSet" 2560 1440
-          system_profiler SPDisplaysDataType | grep Resolution
+      # - name: screen resolution(For Mac)
+      #   if: runner.os == 'macOS'
+      #   run: |
+      #     system_profiler SPDisplaysDataType | grep Resolution
+      #     "/Library/Application Support/VMware Tools/vmware-resolutionSet" 2560 1440
+      #     system_profiler SPDisplaysDataType | grep Resolution
 
       - name: main E2E Test for Electron 🧪
         if: "!contains(github.event.head_commit.message, 'skip e2e')"
@@ -486,7 +491,14 @@ jobs:
           xcrun notarytool submit "$SIGNED_DMG" -v --apple-id "$APPLE_ID" --password "$APPLE_ASP" --team-id "$APPLE_TEAM_ID" -f json --wait
           xcrun stapler staple "$SIGNED_DMG"
           echo "Finish notarizing dmg"
-
+      
+      - name: check
+        if: runner.os == 'macOS'
+        run: |
+          ls
+          echo "------------------------"
+          ls ./dist/electron
+      
       - name: Package for ${{ steps.vars.outputs.system }}-${{ steps.unify.outputs.tag-name }} Release 🗜️
         if: contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')
         run: 7z a -t7z -mx=9 "./out/installers/${{ steps.unify.outputs.tag-name }}/${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }}.7z" "./dist/electron/${{ steps.vars.outputs.package }}"
@@ -499,7 +511,7 @@ jobs:
       - name: Release ${{ steps.slug.outputs.file-name-lower }}-${{ steps.unify.outputs.package-name }}-${{ steps.vars.outputs.system }} to GitHub 📰
         if: |
           (contains(steps.vars.outputs.event-name, 'schedule') || contains(env.MODIFIED_FILE_LIST, 'release.json')) &&
-          (matrix.os != 'macos-latest' || contains(steps.check.outputs.isBuildUniversal, '0'))
+          (matrix.os != 'macos-latest-large' || contains(steps.check.outputs.isBuildUniversal, '0'))
         uses: softprops/action-gh-release@v1
         with:
           prerelease: true
@@ -725,7 +737,7 @@ jobs:
           if [[ ${{ matrix.os }} = "ubuntu-latest" ]] ; \
           then echo "system=ubuntu" >> $GITHUB_OUTPUT ; \
             echo "package=${{ steps.slug.outputs.display-name }}-linux-x64" >> $GITHUB_OUTPUT ; \
-          elif [[ ${{ matrix.os }} = "macos-latest" ]] ; \
+          elif [[ ${{ matrix.os }} = "macos-latest-large" ]] ; \
           then echo "system=macos" >> $GITHUB_OUTPUT ; \
             echo "package=${{ steps.slug.outputs.display-name }}-darwin-x64" >> $GITHUB_OUTPUT ; \
           elif [[ ${{ matrix.os }} = "windows-latest" ]] ; \
@@ -794,9 +806,28 @@ jobs:
           sudo snap install multipass --classic
 
       - name: Install Snapcraft
-        uses: samuelmeuli/action-snapcraft@v1
-        with:
-          use_lxd: true
+        run: |
+          echo $USER
+          echo '------------------------------'
+          sudo snap install snapcraft --classic --channel 7.x/stable
+          sudo snap install lxd
+          sudo usermod --append --groups lxd $USER
+          echo '------------------------------'
+          echo /snap/bin >> $GITHUB_PATH
+          sudo chown root:root /
+          sudo /snap/bin/lxd.migrate -yes
+          sudo /snap/bin/lxd waitready
+          sudo /snap/bin/lxd init --auto
+          sudo lxc storage create mypool dir
+          echo '------------------------------'
+          groups
+      
+      # - name: Install Snapcraft
+      #   uses: samuelmeuli/action-snapcraft@v1
+      #   with:
+      #     use_lxd: true
+        # env:
+        #   INPUT_CHANNEL: 7.x/stable
 
       - name: Pack snap 📦
         run: yarn make:snap:ci
