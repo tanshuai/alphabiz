@@ -40,11 +40,11 @@ jobs:
       file-name-lower: ${{ steps.slug.outputs.file-name-lower }}
     strategy:
       matrix:
-        os:  [ubuntu-latest] # [ubuntu-latest, macos-latest-large]
+        os:  [ubuntu-latest, macos-latest-large]
         node-version: [16]
-        # include:
-        #   - os: windows-latest
-        #     node-version: 16
+        include:
+          - os: windows-latest
+            node-version: 16
       fail-fast: false
     environment:
       name: CICD
