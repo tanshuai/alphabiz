@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <meta name="theme-color" content="#07111f">
+    <meta
+      name="description"
+      content="The public maintenance status of AlphaBiz, a GPL-2.0 historical decentralized-media and Web3 project."
+    >
+    <title>AlphaBiz · Maintenance revival</title>
+    <link rel="stylesheet" href="./assets/maintenance.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <a class="brand" href="./" aria-label="AlphaBiz maintenance home">
+        <span class="brand-mark" aria-hidden="true">A</span>
+        <span>AlphaBiz</span>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="#status">Status</a>
+        <a href="#history">History</a>
+        <a href="#release-gates">Release gates</a>
+        <a href="https://github.com/tanshuai/alphabiz">GitHub</a>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> GPL-2.0 · Maintenance revival</p>
+          <h1 id="hero-title">Returning AlphaBiz to a verifiable maintenance baseline.</h1>
+          <p class="hero-lede">
+            AlphaBiz is a GPL-2.0 historical project and public maintenance repository for a
+            desktop and mobile product that explored decentralized media, P2P streaming, and
+            Web3 applications. The repository is being secured and documented before any new
+            production binary is considered.
+          </p>
+          <div class="actions">
+            <a class="button button-primary" href="https://github.com/tanshuai/alphabiz">View public repository</a>
+            <a class="button button-secondary" href="https://github.com/tanshuai/alphabiz/releases">Legacy release archive</a>
+          </div>
+        </div>
+        <aside class="notice" aria-label="Current release notice">
+          <span class="notice-label">Current release policy</span>
+          <strong>No new production binary yet.</strong>
+          <p>Security, CI, packaging, and smoke-test gates must pass first.</p>
+        </aside>
+      </section>
+
+      <section class="metrics" aria-label="Public repository history">
+        <article><strong>1.2k+</strong><span>GitHub stars</span></article>
+        <article><strong>385</strong><span>public forks</span></article>
+        <article><strong>2.5k+</strong><span>commits</span></article>
+        <article><strong>380+</strong><span>published releases</span></article>
+      </section>
+      <p class="metrics-note">Historical public figures, not a claim of current binary support.</p>
+
+      <section class="section" id="status" aria-labelledby="status-title">
+        <div class="section-heading">
+          <p class="eyebrow">Transparent status</p>
+          <h2 id="status-title">What is available today</h2>
+        </div>
+        <div class="card-grid">
+          <article class="card">
+            <span class="card-state state-active">Available</span>
+            <h3>Public repository</h3>
+            <p>Packaged application files, tooling, documentation, and public release history remain available for inspection.</p>
+            <a href="https://github.com/tanshuai/alphabiz">Browse the public repository <span aria-hidden="true">→</span></a>
+          </article>
+          <article class="card">
+            <span class="card-state state-legacy">Deprecated</span>
+            <h3>Legacy binaries</h3>
+            <p>Release 0.3.3 and earlier installers are historical artifacts. They are not recommended for production use.</p>
+            <a href="https://github.com/tanshuai/alphabiz/releases/tag/0.3.3">Inspect release 0.3.3 <span aria-hidden="true">→</span></a>
+          </article>
+          <article class="card">
+            <span class="card-state state-blocked">Not trusted</span>
+            <h3>Legacy APPX</h3>
+            <p>The historical APPX package is deprecated and must not be treated as carrying current signing trust.</p>
+          </article>
+        </div>
+      </section>
+
+        <div class="scope-note">
+          <strong>Repository scope</strong>
+          <p>
+            The current public repository is not a complete, unminified source publication.
+            Any additional full-source publication is undergoing a separate provenance, secret,
+            license, and privacy audit.
+          </p>
+        </div>
+
+      <section class="section split" id="history" aria-labelledby="history-title">
+        <div class="section-heading">
+          <p class="eyebrow">Project history</p>
+          <h2 id="history-title">A public foundation worth maintaining</h2>
+        </div>
+        <div class="feature-list">
+          <article>
+            <span aria-hidden="true">01</span>
+            <div><h3>Decentralized marketplace</h3><p>A marketplace and credit system built with decentralized technologies.</p></div>
+          </article>
+          <article>
+            <span aria-hidden="true">02</span>
+            <div><h3>P2P media delivery</h3><p>Peer-to-peer media delivery and streaming across desktop application targets.</p></div>
+          </article>
+          <article>
+            <span aria-hidden="true">03</span>
+            <div><h3>Application framework</h3><p>A framework for media and Web3 experiences across Windows, macOS, and Linux.</p></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="release-gates" aria-labelledby="gates-title">
+        <div class="section-heading">
+          <p class="eyebrow">Evidence before release</p>
+          <h2 id="gates-title">The next binary must earn production status</h2>
+          <p>AlphaBiz will not publish a new production binary until each gate has current, reviewable evidence.</p>
+        </div>
+        <ol class="gate-list">
+          <li><span>1</span><div><strong>Security</strong><p>No tracked signing keys or credential material; modern scanning and least-privilege automation.</p></div></li>
+          <li><span>2</span><div><strong>Reproducibility</strong><p>A clean checkout can install dependencies and build through a documented, repeatable path.</p></div></li>
+          <li><span>3</span><div><strong>Quality</strong><p>Required CI, static analysis, and platform smoke tests pass from the release candidate.</p></div></li>
+          <li><span>4</span><div><strong>Release integrity</strong><p>Artifacts, checksums, provenance, and signing expectations are explicit and independently checkable.</p></div></li>
+        </ol>
+      </section>
+
+      <section class="section link-panel" aria-labelledby="links-title">
+        <div>
+          <p class="eyebrow">Work in the open</p>
+          <h2 id="links-title">Follow the evidence, not a marketing claim.</h2>
+        </div>
+        <div class="link-list">
+          <a href="https://github.com/tanshuai/alphabiz">Public repository <span aria-hidden="true">↗</span></a>
+          <a href="https://github.com/tanshuai/alphabiz/actions">Automation history <span aria-hidden="true">↗</span></a>
+          <a href="https://github.com/tanshuai/alphabiz/releases">Release archive <span aria-hidden="true">↗</span></a>
+          <a href="https://github.com/tanshuai/alphabiz/security">Private security reporting <span aria-hidden="true">↗</span></a>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>AlphaBiz · GPL-2.0 maintenance revival</span>
+      <a href="https://github.com/tanshuai/alphabiz/blob/main/LICENSE">GPL-2.0 license</a>
+    </footer>
+  </body>
+</html>
