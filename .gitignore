@@ -72,6 +72,17 @@ typings/
 .env
 .env.test
 
+# Signing keys and local TLS credentials must never be committed.
+*.pfx
+*.p12
+*.p8
+*.ppk
+*.key
+*.jks
+*.keystore
+*-key.pem
+*private*.pem
+
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 
