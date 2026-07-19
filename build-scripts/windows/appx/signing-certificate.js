@@ -2,8 +2,12 @@
 
 const fs = require('fs')
 const path = require('path')
+const { spawnSync } = require('child_process')
 
-const ENV_NAME = 'ALPHABIZ_APPX_PFX_PATH'
+const PATH_ENV = 'ALPHABIZ_APPX_PFX_PATH'
+const PASSWORD_ENV = 'ALPHABIZ_APPX_PFX_PASSWORD'
+const FINGERPRINT_ENV = 'ALPHABIZ_APPX_CERT_SHA256'
+const RETIRED_FINGERPRINT = '986AAE60A0B76AD7A28E8BBBBC479B7E8B2564F86A33060513EC350FC22D6035'
 const repositoryRoot = path.resolve(__dirname, '../../..')
 
 function isInsideRepository (candidate) {
@@ -15,48 +19,111 @@ function isInsideRepository (candidate) {
   )
 }
 
-function getAppxSigningCertificatePath ({ required = false } = {}) {
-  const configuredPath = process.env[ENV_NAME]
+function normalizeFingerprint (value) {
+  return String(value || '').replace(/[^0-9a-f]/gi, '').toUpperCase()
+}
+
+function readCertificateFingerprint (certificatePath, password) {
+  const environment = { ...process.env, [PASSWORD_ENV]: password }
+  const extract = spawnSync('openssl', [
+    'pkcs12',
+    '-in', certificatePath,
+    '-clcerts',
+    '-nokeys',
+    '-passin', `env:${PASSWORD_ENV}`
+  ], {
+    env: environment,
+    encoding: null,
+    maxBuffer: 4 * 1024 * 1024
+  })
+
+  if (extract.error) {
+    throw new Error('[appx-signing] OpenSSL is required to verify the signing certificate.')
+  }
+  if (extract.status !== 0 || !extract.stdout || extract.stdout.length === 0) {
+    throw new Error('[appx-signing] Unable to read the PFX certificate with the configured password.')
+  }
+
+  const inspect = spawnSync('openssl', [
+    'x509',
+    '-noout',
+    '-fingerprint',
+    '-sha256'
+  ], {
+    input: extract.stdout,
+    encoding: 'utf8',
+    maxBuffer: 1024 * 1024
+  })
+
+  if (inspect.error || inspect.status !== 0) {
+    throw new Error('[appx-signing] Unable to inspect the PFX signing certificate.')
+  }
+
+  const fingerprintMatch = inspect.stdout.match(/Fingerprint\s*=\s*([0-9a-f:]+)/i)
+  const fingerprint = normalizeFingerprint(fingerprintMatch && fingerprintMatch[1])
+  if (fingerprint.length !== 64) {
+    throw new Error('[appx-signing] OpenSSL returned an invalid SHA-256 certificate fingerprint.')
+  }
+  return fingerprint
+}
+
+function getAppxSigningCertificate ({ required = false } = {}) {
+  const configuredPath = process.env[PATH_ENV]
+  const password = process.env[PASSWORD_ENV]
+  const expectedFingerprint = normalizeFingerprint(process.env[FINGERPRINT_ENV])
+  const anyConfigured = Boolean(configuredPath || password || expectedFingerprint)
+
+  if (!anyConfigured && !required) return undefined
 
   if (!configuredPath) {
-    if (required) {
-      throw new Error(
-        `[appx-signing] ${ENV_NAME} is required. Set it to an absolute .pfx path outside the repository.`
-      )
-    }
-    return undefined
+    throw new Error(`[appx-signing] ${PATH_ENV} is required.`)
   }
-
+  if (!password) {
+    throw new Error(`[appx-signing] ${PASSWORD_ENV} is required and must not be empty.`)
+  }
+  if (expectedFingerprint.length !== 64) {
+    throw new Error(`[appx-signing] ${FINGERPRINT_ENV} must be a SHA-256 certificate fingerprint.`)
+  }
+  if (expectedFingerprint === RETIRED_FINGERPRINT) {
+    throw new Error('[appx-signing] The retired AlphaBiz development certificate is forbidden.')
+  }
   if (!path.isAbsolute(configuredPath)) {
-    throw new Error(`[appx-signing] ${ENV_NAME} must be an absolute path.`)
+    throw new Error(`[appx-signing] ${PATH_ENV} must be an absolute path.`)
   }
-
   if (!fs.existsSync(configuredPath)) {
-    throw new Error(`[appx-signing] The configured certificate does not exist.`)
+    throw new Error('[appx-signing] The configured certificate does not exist.')
   }
 
   const certificatePath = fs.realpathSync(configuredPath)
-  const certificate = fs.statSync(certificatePath)
-
-  if (!certificate.isFile()) {
-    throw new Error(`[appx-signing] The configured certificate must be a file.`)
+  if (!fs.statSync(certificatePath).isFile()) {
+    throw new Error('[appx-signing] The configured certificate must be a file.')
   }
-
   if (path.extname(certificatePath).toLowerCase() !== '.pfx') {
-    throw new Error(`[appx-signing] The configured certificate must use the .pfx extension.`)
+    throw new Error('[appx-signing] The configured certificate must use the .pfx extension.')
   }
-
   if (isInsideRepository(certificatePath)) {
-    throw new Error(`[appx-signing] The signing certificate must be stored outside the repository.`)
+    throw new Error('[appx-signing] The signing certificate must be stored outside the repository.')
   }
 
-  return certificatePath
+  const actualFingerprint = readCertificateFingerprint(certificatePath, password)
+  if (actualFingerprint === RETIRED_FINGERPRINT) {
+    throw new Error('[appx-signing] The retired AlphaBiz development certificate is forbidden.')
+  }
+  if (actualFingerprint !== expectedFingerprint) {
+    throw new Error('[appx-signing] The certificate fingerprint does not match the approved fingerprint.')
+  }
+
+  return {
+    path: certificatePath,
+    password,
+    fingerprint: actualFingerprint
+  }
 }
 
 if (require.main === module) {
   try {
-    getAppxSigningCertificatePath({ required: true })
-    console.log('[appx-signing] External signing certificate is configured.')
+    getAppxSigningCertificate({ required: true })
+    console.log('[appx-signing] External signing certificate is configured and verified.')
   } catch (error) {
     console.error(error.message)
     process.exitCode = 1
@@ -64,6 +131,11 @@ if (require.main === module) {
 }
 
 module.exports = {
-  ENV_NAME,
-  getAppxSigningCertificatePath
+  PATH_ENV,
+  PASSWORD_ENV,
+  FINGERPRINT_ENV,
+  RETIRED_FINGERPRINT,
+  getAppxSigningCertificate,
+  normalizeFingerprint,
+  readCertificateFingerprint
 }

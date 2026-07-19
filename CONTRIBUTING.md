@@ -21,6 +21,7 @@ the platform prerequisites in `docs/en_us/README.md` and
 
 ```sh
 corepack enable
+corepack prepare yarn@1.22.22 --activate
 yarn install
 ```
 
@@ -28,6 +29,7 @@ Run the credential gate and the tests relevant to your change:
 
 ```sh
 yarn security:scan
+yarn security:test-appx
 ```
 
 Some packaging and end-to-end tests require platform tools or external test
@@ -39,9 +41,14 @@ the pull request. Do not mark a check as complete when it was skipped.
 
 Never place PFX/P12 files, private-key PEM files, `.key` files, keystores, or
 other signing credentials anywhere in the repository. For an APPX build, store
-the certificate outside the checkout and set `ALPHABIZ_APPX_PFX_PATH` to its
-absolute path. E2E tests generate a temporary localhost certificate and clean
-it up automatically.
+the certificate outside the checkout and set its path, password, and approved
+SHA-256 fingerprint only for the packaging process. E2E tests generate a
+temporary localhost certificate and clean it up automatically.
+
+The public repository currently preserves packaged files, tooling,
+documentation, and release history; it is not a complete unminified source
+publication. Additional source publication follows a separate provenance,
+secret, license, and privacy review.
 
 ## Pull requests
 
