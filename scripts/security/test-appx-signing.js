@@ -11,6 +11,7 @@ const {
   PASSWORD_ENV,
   FINGERPRINT_ENV,
   RETIRED_FINGERPRINT,
+  getOpenSslCommand,
   getAppxSigningCertificate,
   readCertificateFingerprint
 } = require('../../build-scripts/windows/appx/signing-certificate')
@@ -24,6 +25,7 @@ const keyPath = path.join(temporaryDirectory, 'test-key.pem')
 const certificatePath = path.join(temporaryDirectory, 'test-cert.pem')
 const pfxPath = path.join(temporaryDirectory, 'test-signing.pfx')
 const password = 'alphabiz-ci-test-only'
+const openssl = getOpenSslCommand()
 
 function clearSigningEnvironment () {
   for (const name of environmentNames) delete process.env[name]
@@ -52,7 +54,7 @@ try {
     )
   }
 
-  execFileSync('openssl', [
+  execFileSync(openssl, [
     'req',
     '-x509',
     '-nodes',
@@ -63,7 +65,7 @@ try {
     '-keyout', keyPath,
     '-out', certificatePath
   ], { stdio: 'ignore' })
-  execFileSync('openssl', [
+  execFileSync(openssl, [
     'pkcs12',
     '-export',
     '-in', certificatePath,

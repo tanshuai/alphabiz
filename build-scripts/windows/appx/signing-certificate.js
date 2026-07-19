@@ -7,6 +7,7 @@ const { spawnSync } = require('child_process')
 const PATH_ENV = 'ALPHABIZ_APPX_PFX_PATH'
 const PASSWORD_ENV = 'ALPHABIZ_APPX_PFX_PASSWORD'
 const FINGERPRINT_ENV = 'ALPHABIZ_APPX_CERT_SHA256'
+const OPENSSL_ENV = 'ALPHABIZ_OPENSSL_PATH'
 const RETIRED_FINGERPRINT = '986AAE60A0B76AD7A28E8BBBBC479B7E8B2564F86A33060513EC350FC22D6035'
 const repositoryRoot = path.resolve(__dirname, '../../..')
 
@@ -23,9 +24,27 @@ function normalizeFingerprint (value) {
   return String(value || '').replace(/[^0-9a-f]/gi, '').toUpperCase()
 }
 
+function getOpenSslCommand () {
+  const configuredPath = process.env[OPENSSL_ENV]
+  if (configuredPath) {
+    if (!path.isAbsolute(configuredPath) || !fs.existsSync(configuredPath)) {
+      throw new Error(`[appx-signing] ${OPENSSL_ENV} must be an existing absolute path.`)
+    }
+    return configuredPath
+  }
+
+  if (process.platform === 'win32') {
+    const programFiles = process.env.ProgramFiles || 'C:\\Program Files'
+    const gitOpenSsl = path.join(programFiles, 'Git', 'usr', 'bin', 'openssl.exe')
+    if (fs.existsSync(gitOpenSsl)) return gitOpenSsl
+  }
+  return 'openssl'
+}
+
 function readCertificateFingerprint (certificatePath, password) {
+  const openssl = getOpenSslCommand()
   const environment = { ...process.env, [PASSWORD_ENV]: password }
-  const extract = spawnSync('openssl', [
+  const extract = spawnSync(openssl, [
     'pkcs12',
     '-in', certificatePath,
     '-clcerts',
@@ -44,7 +63,7 @@ function readCertificateFingerprint (certificatePath, password) {
     throw new Error('[appx-signing] Unable to read the PFX certificate with the configured password.')
   }
 
-  const inspect = spawnSync('openssl', [
+  const inspect = spawnSync(openssl, [
     'x509',
     '-noout',
     '-fingerprint',
@@ -134,7 +153,9 @@ module.exports = {
   PATH_ENV,
   PASSWORD_ENV,
   FINGERPRINT_ENV,
+  OPENSSL_ENV,
   RETIRED_FINGERPRINT,
+  getOpenSslCommand,
   getAppxSigningCertificate,
   normalizeFingerprint,
   readCertificateFingerprint
