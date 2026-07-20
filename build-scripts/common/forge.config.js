@@ -5,7 +5,10 @@ const { default: rebuild } = require('electron-rebuild')
 const { getAppxSigningCertificate } = require('../windows/appx/signing-certificate')
 const __rootdir = resolve(__dirname, '../..')
 
-const publicVersion = require(resolve(__rootdir, 'public/version.json')).version
+const publicVersionPath = resolve(__rootdir, 'public/version.json')
+const publicVersion = fs.existsSync(publicVersionPath)
+  ? JSON.parse(fs.readFileSync(publicVersionPath, 'utf8')).version
+  : package.version
 const versionHeader = publicVersion.match(/\d+\.\d+\.\d+/gm)
 const { version } = package
 const appConfig = require('../../developer/app');
