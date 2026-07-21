@@ -61,7 +61,7 @@ try {
     '-newkey', 'rsa:2048',
     '-sha256',
     '-days', '1',
-    '-subj', '/CN=alphabiz-ci-test',
+    '-subj', '/CN=zeeis',
     '-keyout', keyPath,
     '-out', certificatePath
   ], { stdio: 'ignore' })
@@ -81,7 +81,7 @@ try {
 
   const signing = getAppxSigningCertificate({
     required: true,
-    expectedPublisher: 'CN=alphabiz-ci-test'
+    expectedPublisher: 'CN=zeeis'
   })
   assert.strictEqual(signing.path, fs.realpathSync(pfxPath))
   assert.strictEqual(signing.password, password)
