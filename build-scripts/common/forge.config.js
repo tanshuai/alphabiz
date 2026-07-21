@@ -19,7 +19,7 @@ const homepage = appConfig.homepage;
 const publisher = appConfig.publisher;
 const description = appConfig.description;
 
-const appxSigning = getAppxSigningCertificate()
+const appxSigning = getAppxSigningCertificate({ expectedPublisher: publisher })
 
 // The .deb package requires a .desktop template, see here:
 // node_modules/electron-installer-debian/resources/desktop.ejs
