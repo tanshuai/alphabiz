@@ -1,0 +1,77 @@
+name: Release readiness
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  readiness:
+    name: Inspect release readiness without publishing
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CYPRESS_INSTALL_BINARY: "0"
+      ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22.x"
+          cache: yarn
+          cache-dependency-path: yarn.lock
+
+      - name: Activate Yarn Classic
+        shell: bash
+        run: |
+          set -euo pipefail
+          corepack enable
+          corepack prepare yarn@1.22.22 --activate
+
+      - name: Install dependencies without lifecycle scripts
+        shell: bash
+        run: yarn install --frozen-lockfile --ignore-scripts --ignore-optional --non-interactive
+
+      - name: Validate release metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check
+          node <<'NODE'
+          const fs = require('fs')
+          const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'))
+          const release = JSON.parse(fs.readFileSync('release.json', 'utf8'))
+
+          if (!/^\d+\.\d+\.\d+/.test(packageJson.version)) {
+            throw new Error(`Invalid package version: ${packageJson.version}`)
+          }
+          if (!release.targetTagName || !release.newTagName) {
+            throw new Error('release.json must define targetTagName and newTagName')
+          }
+
+          console.log(`Package version: ${packageJson.version}`)
+          console.log(`Release transition: ${release.targetTagName} -> ${release.newTagName}`)
+          NODE
+
+      - name: Discover release smoke tests
+        shell: bash
+        run: yarn test:release --listTests --runInBand
+
+      - name: Confirm read-only completion
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -n "$(git status --porcelain --untracked-files=no)" ]]; then
+            git status --short
+            printf 'Readiness checks modified tracked files.\n' >&2
+            exit 1
+          fi
+          printf 'Readiness checks completed. No tag, release, artifact, or publication was created.\n'
