@@ -14,7 +14,7 @@ developer | `[APP名称] Team` | (字符串) - Windows 的开发人员名称。*
 appIdentifier | `org.zeeis.alphabiz` | (字符串) - 您在MAS ([Mac应用程序商店](https://developer.apple.com/account))注册的应用程序标识符。建议使用`com.YOUR_COMPANY.YOUR_APP_NAME`，没有特殊字符（空格等）。不同的标识符将被识别为不同的应用程序。
 description | `[APP名称] Blockchain Cryptocurrency Application` | (字符串) - 描述
 appxPackageIdentityName | `[APP名称]` | (字符串) - Appx 安装包识别名称。用于统一 Appx 安装包和 Microsoft Store 注册的软件包标识名称。
-publisher | `CN=zeeis` | (字符串) - 发布者，默认的 appx.pfx 证书的发布者为`zeeis`，若更改发布者`publisher`后想使用 .appx 文件，请手动更改 appx.pfx 证书。
+publisher | `CN=zeeis` | (字符串) - APPX 发布者；必须与 `ALPHABIZ_APPX_PFX_PATH` 指向的仓库外部签名证书一致。禁止把证书或私钥复制到仓库。
 publisherDisplayName | `[APP名称] Team` | (字符串) - 发布者展示名称，符合 Microsoft Store 注册的名称。
 homepage | `https://alpha.biz` | (字符串) - 应用程序的官方网站，在 Linux Debian 包中使用。
 webEditionUrl | `https://web.alpha.biz` | (字符串) - 网页版客户端。
@@ -220,138 +220,28 @@ build-scripts/
 
 ## 9. appx安装包
 
-**1.在微软商店上架appx安装包：**
+APPX 安装包必须使用显式配置的签名证书。仓库不再提供默认或测试
+PFX，也不允许交互式生成的未知证书进入发布产物。
 
-将appx安装包上传至微软商店，根据报错信息修改appx配置信息。**注意：安装包中的`软件包标识名称`、`发布者名称`、`发布者展示名称`、`appx.pfx`证书等信息需要与微软账号的信息匹配成功。**
+请把 PFX 保存在仓库之外，并在当前进程中设置绝对路径：
 
-**2.在本地使用appx安装包：**
-
-appx安装包默认使用手动生成的证书 `appx.pfx`。在本地计算机信任证书之后，可以运行appx安装包并安装应用程序。
-
-如果更改了 `./developer/app.js/publisher` 发布者并希望继续使用.appx文件，则需要手动替换正确的appx.pfx证书。建议按照以下方法自动生成pfx证书：
-
-<details><summary>自动生成pfx证书简单教程(点击查看)</summary>
-
-优点: 根据`./devloper/app.js app.publisher`发布者配置自动生成pfx证书
-
-缺点: 生成证书时，要求手动输入密钥密码
-
-自动生成pfx证书的方法：
-
-(1) 修改appx配置，在`./forge.config.js`文件夹中，注释或删除配置项devCert，如下
-
-```bash
-    {
-      name: '@electron-forge/maker-appx',
-      config: {
-        ...
-        // devCert: appxPfx,
-        ...
-      }
-    }
+```powershell
+$env:ALPHABIZ_APPX_PFX_PATH = "$env:TEMP\alphabiz-signing.pfx"
+yarn make:appx
 ```
 
-(2) 运行`yarn make`生成appx安装包时,会弹出弹框，要求输入密钥密码，没有则选择`None`。
+证书 subject 必须与 `developer/app.js` 中的 `publisher` 一致。预检会拒绝：
 
-(3) 自动生成的pfx证书路径为`out/make/appx/x64/default.pfx`
+- 相对路径；
+- 不存在或不是 `.pfx` 的文件；
+- 位于仓库目录内的证书。
 
-**注意: 自动生成的证书没有错误后，可以用自动生成的证书`out/make/appx/x64/default.pfx`替换掉默认的证书`./developer/appx.pfx`, 恢复appx配置项devCert。这样可以运行`yarn make`将直接导入新的证书，不用手动输入密钥密码。**
+完整 Windows 打包命令 `yarn make` 在缺少该变量时也会提前失败，因此 CI
+不得上传使用未知证书或交互式 fallback 生成的 APPX。
 
-</details>
+本地开发可以在系统临时目录中生成一次性自签名证书，测试结束后立即删除
+PFX 和中间私钥。禁止把 PFX、PEM 私钥、`.key` 或 keystore 复制到项目目录。
 
-<details><summary>手动生成pfx证书简单教程(点击查看)</summary>
-
-需要工具`openssl`
-
-(1) 安装openssl,并配置环境变量
-
-方法很多这里介绍openssl安装包,[见此](http://slproweb.com/products/Win32OpenSSL.html)
-
-在命令行窗口中输入openssl即可查看所有命令
-
-![image](https://user-images.githubusercontent.com/92558550/203238983-dce635a3-0b29-46b0-8406-81827fc9f089.png)
-
-(2) 命令行输入
-
-```
-openssl req -newkey rsa:2048 -nodes -keyout 0.key -x509 -days 365 -out appx.cer
-```
-
-根据提示输入国家代码，省，城市，组织，单位，名称，邮箱
-然后生成 .key , .cer文件
-
-(3) 生成pfx文件
-  
-```
-openssl pkcs12 -export -in youfilename.cer -inkey 0.key -out appx.pfx
-```
-
-根据提示输入密码两次，*使用的时候会提示输入密码
-
-没有密码就直接回车
-
-(4) 将新生成的.pfx文件替换developer/appx.pfx文件
-
-</details>
-
-<details><summary>信任并查看pfx证书方法(点击查看)</summary>
-
-(1) 双击pfx证书文件
-
-(2) 选择本地计算机
-
-![image](https://user-images.githubusercontent.com/92558550/203241747-a2c43819-1495-470e-adaf-7a907be5f18c.png)
-
-(3) 选择指定的证书文件(默认你打开的证书)
-
-(4) 输入证书密码,没有密码直接下一步
-
-![image](https://user-images.githubusercontent.com/92558550/203241726-f86c56da-a5c7-41fb-9eb1-0451a0fd4153.png)
-
-(5) 选择存储,选择受信任的根证书颁发机构
-
-![image](https://user-images.githubusercontent.com/92558550/203241692-8877682b-a0cd-485e-ab22-0ab565cac8b3.png)
-
-<img width="661" alt="f13c36cfe9ec7990c3acf5a574993a0" src="https://user-images.githubusercontent.com/92558550/219249036-26442aca-cf3f-4929-8ebc-14d994bae4d1.png">
-
-(6) 然后打开IE浏览器,找到 设置->Internet选项->内容
-
-![image](https://user-images.githubusercontent.com/92558550/203241485-f308a3cb-ff70-40c0-ba4c-ec2e4ae91266.png)
-
-(7) 点击证书，在刚刚储存的位置(受信任的根证书颁发机构)找到刚导入的证书，双击后看详细信息
-
-![image](https://user-images.githubusercontent.com/92558550/203241528-25efaddf-2622-4678-a584-7805541b70b3.png)
-
-</details>
-
-<details><summary>证书错误排查(点击查看)</summary>
-
-如果出现`Error: C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64\signtool.exe exited with code: 1` 错误，说明证书的发布者和 `app.js` 中的配置不一致。详细信息可通过 Windows 事件查看器查看。
-  
-步骤：
-  - Win+R 打开运行窗口
-  - 输入 `Eventvwr.msc` 点击确定
-  - 找到 `事件查看器（本地）` => `应用程序和服务日志` => `Microsoft` => `Windows` => `AppxPackagingOM` => `Microsoft-Windows-AppxPackaging/Operational`
-  - 找到最新的错误日志，可以在详细信息中查看具体错误原因
-  
-  ![image](https://user-images.githubusercontent.com/87628081/203713756-264f8cf0-e55c-4793-9084-8382dc3104a1.png)
-
-</details>
-
-<details><summary>生成0KB的appx文件错误排查(点击查看)</summary>
-
-原因：构建的app时，没有将所有资源压缩到app.asar
-
-解决方法: 修改electron-packager配置中的asar
-
-(1) 私有仓库所在位置： `./quasar.conf.js` electron.packager对象
-
-(2) 公共仓库所在位置： `./packager.js`
-
-```
-asar: {
-    unpack: '*.{node,dll}'
-  }
-```
-
-</details>
+CI 应从受保护的 secret 将 PFX 写入 runner 临时目录，只在打包 step 设置
+`ALPHABIZ_APPX_PFX_PATH`，随后验证产物签名，并在 `always()` cleanup step
+删除证书。证书准备或签名验证失败时必须停止发布。

@@ -29,32 +29,31 @@ You can download above version from [here](https://wixtoolset.org/docs/v3/releas
 
 ## About `appx` target
 
-The `appx` installer is a wrapper for Universal Windows Platform apps (aka Microsoft Store apps). To build this target you need generate a `pfx` certificate.
+The `appx` installer is a wrapper for Universal Windows Platform apps (also
+known as Microsoft Store apps). Every APPX build must use an explicitly
+configured signing certificate. This repository does not contain a default or
+test signing key.
 
-The simplest way is remove `devCert` in `build-scripts/common/forge.config.js`.
+Store the PFX outside the repository and provide its absolute path for the
+current process:
 
-```js
-    // ...
-    {
-      name: '@electron-forge/maker-appx',
-      config: {
-        // ...
-        // devCert: appxPfx, // Comment this line
-        // ...
-      }
-    }
-    // ...
+```powershell
+$env:ALPHABIZ_APPX_PFX_PATH = "$env:TEMP\alphabiz-signing.pfx"
+yarn make:appx
 ```
 
-Then run `yarn make`. The build script will ask you to create a certificate when building `appx` installer. The generated file will be saved to `out/make/appx/x64/default.pfx`, you can copy it to `developer/appx.pfx` replacing the default one.
+The certificate subject must match `publisher` in `developer/app.js`. The
+preflight check rejects relative paths, missing files, non-PFX files, and any
+certificate located inside the repository. A full Windows release (`yarn
+make`) also fails before packaging when the variable is missing, so CI cannot
+upload an APPX created with an unknown or interactive fallback certificate.
 
-There is also a way to create certificate using `openssl`.
+For local development, create a disposable self-signed certificate in a
+temporary directory or use Windows certificate tooling. Delete the exported
+PFX and any intermediate private-key files when testing is complete. Never
+copy a PFX, PEM private key, `.key`, or keystore into the project directory.
 
-```sh
-cd %temp%
-openssl req -newkey rsa:2048 -nodes -keyout 0.key -x509 -days 365 -out appx.cer
-openssl pkcs12 -export -in appx.cer -inkey 0.key -out appx.pfx
-cp appx.pfx path/to/your/project/developer/
-```
-
-> After create your certificate, double-click it and choose trust for it.
+In CI, materialize the PFX from a protected secret under the runner's temporary
+directory, set `ALPHABIZ_APPX_PFX_PATH` only for the packaging step, verify the
+resulting signature, and remove the file in an `always()` cleanup step. Do not
+upload an APPX when certificate setup or signature verification fails.
