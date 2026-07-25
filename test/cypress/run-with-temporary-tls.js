@@ -43,11 +43,8 @@ function cleanup () {
   fs.rmSync(temporaryDirectory, { recursive: true, force: true })
 }
 
-function quoteForCommand (value) {
-  if (process.platform === 'win32') {
-    return `"${value.replace(/"/g, '\\"')}"`
-  }
-  return `'${value.replace(/'/g, `'"'"'`)}'`
+function environmentReference (name) {
+  return process.platform === 'win32' ? `"%${name}%"` : `"$${name}"`
 }
 
 try {
@@ -72,22 +69,33 @@ try {
   process.exit(1)
 }
 
+const childEnvironment = {
+  ...process.env,
+  E2E_TEST: 'true',
+  START_SERVER_AND_TEST_INSECURE: '1',
+  ALPHABIZ_E2E_DIST: path.join(repositoryRoot, 'dist/spa'),
+  ALPHABIZ_E2E_CERT: certificatePath,
+  ALPHABIZ_E2E_KEY: keyPath,
+  ALPHABIZ_E2E_CONFIG: path.join(repositoryRoot, 'test/cypress/cypress-config.json'),
+  ALPHABIZ_E2E_SPEC: path.join(repositoryRoot, 'test/cypress/integration/main/**')
+}
+
 const serverCommand = [
   'http-server',
-  quoteForCommand(path.join(repositoryRoot, 'dist/spa')),
+  environmentReference('ALPHABIZ_E2E_DIST'),
   ...(mode === 'ci' ? ['--silent'] : []),
   '-S',
-  '-C', quoteForCommand(certificatePath),
-  '-K', quoteForCommand(keyPath)
+  '-C', environmentReference('ALPHABIZ_E2E_CERT'),
+  '-K', environmentReference('ALPHABIZ_E2E_KEY')
 ].join(' ')
 
 const cypressCommand = [
   'cypress',
   mode === 'ci' ? 'run' : 'open',
-  '--config-file', quoteForCommand(path.join(repositoryRoot, 'test/cypress/cypress-config.json')),
+  '--config-file', environmentReference('ALPHABIZ_E2E_CONFIG'),
   ...(mode === 'ci'
     ? [
-        '--spec', quoteForCommand(path.join(repositoryRoot, 'test/cypress/integration/main/**')),
+        '--spec', environmentReference('ALPHABIZ_E2E_SPEC'),
         '--browser', 'chrome'
       ]
     : [])
@@ -99,11 +107,7 @@ const child = spawn(
   [serverCommand, 'https://localhost:8080', cypressCommand],
   {
     cwd: repositoryRoot,
-    env: {
-      ...process.env,
-      E2E_TEST: 'true',
-      START_SERVER_AND_TEST_INSECURE: '1'
-    },
+    env: childEnvironment,
     shell: process.platform === 'win32',
     stdio: 'inherit'
   }
