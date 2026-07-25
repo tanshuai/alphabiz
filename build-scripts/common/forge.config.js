@@ -2,7 +2,7 @@ const package = require('../../package.json')
 const fs = require('fs')
 const { resolve } = require('path')
 const { default: rebuild } = require('electron-rebuild')
-const { getAppxSigningCertificatePath } = require('../windows/appx/signing-certificate')
+const { getAppxSigningCertificate } = require('../windows/appx/signing-certificate')
 const __rootdir = resolve(__dirname, '../..')
 
 const publicVersion = require(resolve(__rootdir, 'public/version.json')).version
@@ -16,7 +16,7 @@ const homepage = appConfig.homepage;
 const publisher = appConfig.publisher;
 const description = appConfig.description;
 
-const appxPfx = getAppxSigningCertificatePath()
+const appxSigning = getAppxSigningCertificate()
 
 // The .deb package requires a .desktop template, see here:
 // node_modules/electron-installer-debian/resources/desktop.ejs
@@ -82,7 +82,7 @@ if (buildPlatform !== 'mas') {
 module.exports = {
   hooks: {
     packageAfterPrune: (conf, buildPath, electronVersion, platform, arch, callback) => {
-      console.log('forge conf', conf)
+      console.log('[forge] Running packageAfterPrune hook.')
       // console.log('---App Build Path---\n', buildPath)
       ['webtorrent', '@quasar/app'].forEach(dep => {
         const src = resolve(__rootdir, 'node_modules', dep)
@@ -204,14 +204,15 @@ module.exports = {
         version
       }
     },
-    {
+    ...(appxSigning ? [{
       name: '@electron-forge/maker-appx',
       config: {
         publisher,
         publisherName: publisher,
         publisherDisplayName: appConfig.publisherDisplayName,
         assets: resolve(__rootdir, 'developer/platform-assets/windows/icon'),
-        ...(appxPfx ? { devCert: appxPfx } : {}),
+        devCert: appxSigning.path,
+        certPass: appxSigning.password,
         deploy: false,
         makePri: true,
         packageName: appConfig.name,
@@ -221,7 +222,7 @@ module.exports = {
         packageExecutable: `app\\${productName}.exe`,
         manifest: resolve(__dirname, '../windows/appx/template.xml')
       }
-    }
+    }] : [])
     // {
     //   name: "@electron-forge/maker-rpm",
     //   config: {}
