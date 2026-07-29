@@ -15,15 +15,19 @@ well-tested fixes.
 
 ## Development setup
 
-The current codebase uses Yarn Classic and a legacy Electron toolchain. Follow
-the platform prerequisites in `docs/en_us/README.md` and
-`docs/en_us/windows.md`, then install dependencies:
+The current CI baseline uses Node.js 22 and Yarn Classic 1.22.22 for frozen
+dependency installation and test discovery. The complete legacy application
+build is still under reproducibility review. Follow the platform prerequisites
+in `docs/en_us/README.md` and `docs/en_us/windows.md`, then install dependencies:
 
 ```sh
 corepack enable
 corepack prepare yarn@1.22.22 --activate
-yarn install
+yarn install --frozen-lockfile
 ```
+
+If your Node distribution does not include Corepack, run the pinned Yarn CLI
+through `npx --yes yarn@1.22.22` instead of silently using a newer Yarn major.
 
 Run the credential gate and the tests relevant to your change:
 

@@ -245,7 +245,7 @@ if (process.argv.includes('--make')) {
   if (platform === 'win32') {
     // A Windows release must never fall back to a certificate stored in Git or
     // to an interactively generated certificate that CI could upload by mistake.
-    getAppxSigningCertificate({ required: true })
+    getAppxSigningCertificate({ required: true, expectedPublisher: appConfig.publisher })
     const xmlFilePath = resolve(__rootdir, 'build-scripts/windows/appx/template.xml')
     const oldAppxTemplate = readFileSync(resolve(__rootdir, 'build-scripts/windows/appx/template.xml'), 'utf-8')
     let appxTemplate = oldAppxTemplate
