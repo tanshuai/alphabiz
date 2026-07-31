@@ -13,17 +13,5 @@
   "experimentalSessionSupport": true,
   "viewportWidth": 1268,
   "viewportHeight": 768,
-  "chromeWebSecurity": false,
-  "clientCertificates": [
-    {
-      "url": "https://localhost:8080/",
-      "ca": [],
-      "certs": [
-        {
-          "cert": "test/cypress/fixtures/E2E-TEST.pem",
-          "key": "test/cypress/fixtures/E2E-TEST-key.pem"
-        }
-      ]
-    }
-  ]
+  "chromeWebSecurity": false
 }

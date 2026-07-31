@@ -2,9 +2,13 @@ const package = require('../../package.json')
 const fs = require('fs')
 const { resolve } = require('path')
 const { default: rebuild } = require('electron-rebuild')
+const { getAppxSigningCertificate } = require('../windows/appx/signing-certificate')
 const __rootdir = resolve(__dirname, '../..')
 
-const publicVersion = require(resolve(__rootdir, 'public/version.json')).version
+const publicVersionPath = resolve(__rootdir, 'public/version.json')
+const publicVersion = fs.existsSync(publicVersionPath)
+  ? JSON.parse(fs.readFileSync(publicVersionPath, 'utf8')).version
+  : package.version
 const versionHeader = publicVersion.match(/\d+\.\d+\.\d+/gm)
 const { version } = package
 const appConfig = require('../../developer/app');
@@ -15,9 +19,7 @@ const homepage = appConfig.homepage;
 const publisher = appConfig.publisher;
 const description = appConfig.description;
 
-const defaultPfxPath = resolve(__dirname, '../windows/appx/default.pfx')
-const appxPfxPath = resolve(__rootdir, 'developer/appx.pfx')
-const appxPfx = fs.existsSync(appxPfxPath) ? appxPfxPath : defaultPfxPath
+const appxSigning = getAppxSigningCertificate({ expectedPublisher: publisher })
 
 // The .deb package requires a .desktop template, see here:
 // node_modules/electron-installer-debian/resources/desktop.ejs
@@ -83,7 +85,7 @@ if (buildPlatform !== 'mas') {
 module.exports = {
   hooks: {
     packageAfterPrune: (conf, buildPath, electronVersion, platform, arch, callback) => {
-      console.log('forge conf', conf)
+      console.log('[forge] Running packageAfterPrune hook.')
       // console.log('---App Build Path---\n', buildPath)
       ['webtorrent', '@quasar/app'].forEach(dep => {
         const src = resolve(__rootdir, 'node_modules', dep)
@@ -124,7 +126,12 @@ module.exports = {
       mirrorOptions: {
         mirror: 'https://github.com/zeeis/velectron/releases/download/'
       },
-      downloader: require('@zeeis/velectron/downloader')
+      // Loading the legacy downloader reads optional user-level auth config.
+      // Keep configuration and security checks side-effect free; the actual
+      // download path remains behind the full-build gate.
+      downloader: {
+        download: (...args) => require('@zeeis/velectron/downloader').download(...args)
+      }
     },
     asar: {
       unpack: '*.{node,dll}'
@@ -205,14 +212,15 @@ module.exports = {
         version
       }
     },
-    {
+    ...(appxSigning ? [{
       name: '@electron-forge/maker-appx',
       config: {
         publisher,
         publisherName: publisher,
         publisherDisplayName: appConfig.publisherDisplayName,
         assets: resolve(__rootdir, 'developer/platform-assets/windows/icon'),
-        devCert: appxPfx,
+        devCert: appxSigning.path,
+        certPass: appxSigning.password,
         deploy: false,
         makePri: true,
         packageName: appConfig.name,
@@ -222,7 +230,7 @@ module.exports = {
         packageExecutable: `app\\${productName}.exe`,
         manifest: resolve(__dirname, '../windows/appx/template.xml')
       }
-    }
+    }] : [])
     // {
     //   name: "@electron-forge/maker-rpm",
     //   config: {}

@@ -2,7 +2,11 @@ const { exec, execSync } = require('child_process')
 const { existsSync, copyFileSync, mkdirSync, readFileSync, writeFileSync, unlinkSync, rmSync, cpSync, readdirSync, statSync } = require('fs')
 const { resolve } = require('path')
 const { version: pkgVersion } = require('../../package.json')
-const publicVersion = require('../../public/version.json').version
+const publicVersionPath = resolve(__dirname, '../../public/version.json')
+const publicVersion = existsSync(publicVersionPath)
+  ? JSON.parse(readFileSync(publicVersionPath, 'utf8')).version
+  : pkgVersion
+const { getAppxSigningCertificate } = require('../windows/appx/signing-certificate')
 const versionHeader = publicVersion.match(/\d+\.\d+\.\d+/gm)
 const appConfig = require('../../developer/app');
 const productName = appConfig.displayName;
@@ -239,6 +243,9 @@ if (process.argv.includes('--make')) {
   })
   // if windows modify appxManifest
   if (platform === 'win32') {
+    // A Windows release must never fall back to a certificate stored in Git or
+    // to an interactively generated certificate that CI could upload by mistake.
+    getAppxSigningCertificate({ required: true, expectedPublisher: appConfig.publisher })
     const xmlFilePath = resolve(__rootdir, 'build-scripts/windows/appx/template.xml')
     const oldAppxTemplate = readFileSync(resolve(__rootdir, 'build-scripts/windows/appx/template.xml'), 'utf-8')
     let appxTemplate = oldAppxTemplate
