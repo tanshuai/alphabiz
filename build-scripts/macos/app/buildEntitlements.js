@@ -1,5 +1,4 @@
-const { existsSync, readFileSync, writeFileSync } = require('fs')
-const { tmpdir } = require('os')
+const { lstatSync, readFileSync, realpathSync, writeFileSync } = require('fs')
 const { resolve } = require('path')
 const app = require('../../../developer/app')
 const identifier = app.appIdentifier
@@ -8,7 +7,7 @@ const fullIdentifier = teamId + '.' + identifier
 
 const toReplace = { identifier, teamId, fullIdentifier }
 
-const buildEntitlements = async (dist = '', isPkg = false) => {
+const buildEntitlements = (dist = '', isPkg = false) => {
   const entitlements = ['mas', 'inherit', 'loginhelper']
   if (isPkg) {
     console.log('Is PKG')
@@ -29,15 +28,21 @@ const buildEntitlements = async (dist = '', isPkg = false) => {
         info = info.replace(`{{${key}}}`, toReplace[key])
       }
     }
-    writeFileSync(dest, info, 'utf-8')
+    writeFileSync(dest, info, {
+      encoding: 'utf-8',
+      flag: 'wx',
+      mode: 0o600
+    })
   })
 }
 
-let dist = ''
-if (process.argv[2] && existsSync(process.argv[2])) {
-  dist = process.argv[2]
-} else {
-  console.warn('Warn: dist not be specified or not exists.')
-  dist = resolve(tmpdir(), 'electron-build/entitlements')
+if (!process.argv[2]) {
+  throw new Error('A freshly-created entitlements directory is required')
 }
+const requestedDist = process.argv[2]
+const requestedDistStat = lstatSync(requestedDist)
+if (requestedDistStat.isSymbolicLink() || !requestedDistStat.isDirectory()) {
+  throw new Error('Entitlements output must be a real directory')
+}
+const dist = realpathSync(requestedDist)
 buildEntitlements(dist, process.argv.includes('--pkg'))

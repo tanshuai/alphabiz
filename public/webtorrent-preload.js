@@ -2,6 +2,10 @@ const { ipcRenderer } = require('electron')
 const { existsSync, writeFileSync, readFileSync, mkdirSync, cpSync, statSync, rmSync } = require('fs')
 const { resolve, dirname } = require('path')
 const WebTorrent = require('webtorrent')
+const { saveTorrentByInfoHash } = globalThis.alphabizTorrentFile || {}
+if (typeof saveTorrentByInfoHash !== 'function') {
+  throw new Error('Torrent file security boundary is not loaded')
+}
 import utils from './webtorrent-utils.js'
 const { torrentToJson } = utils
 
@@ -145,10 +149,18 @@ const queueTask = ({ url, path, origin, postTitle }) => {
   torrent.on('ready', () => {
     clearTimeout(timer)
     if (!torrent.torrentFile || !torrent.infoHash) return
-    const torrentPath = resolve(dirname(path), `../torrents/${torrent.infoHash}.torrent`)
-    if (!existsSync(dirname(torrentPath))) mkdirSync(dirname(torrentPath), { recursive: true })
-    if (!existsSync(torrentPath)) {
-      writeFileSync(torrentPath, torrent.torrentFile)
+    const torrentsDir = resolve(dirname(path), '../torrents')
+    let torrentPath
+    try {
+      torrentPath = saveTorrentByInfoHash(
+        torrentsDir,
+        torrent.infoHash,
+        torrent.torrentFile
+      )
+    } catch (error) {
+      console.error('[Preload] Refused to save torrent metadata', error)
+      ipcRenderer.send('preload-failed', origin)
+      return
     }
     if (!preloadTasks.has(url)) {
       preloadTasks.set(url, {
