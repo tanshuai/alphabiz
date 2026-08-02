@@ -70,6 +70,26 @@ const pruneNative = (dir = '') => {
     }
   })
 }
+const replaceTextInFile = (filePath, transform, allowMissing = false) => {
+  let fileFd
+  try {
+    const noFollow = fs.constants.O_NOFOLLOW || 0
+    fileFd = fs.openSync(filePath, fs.constants.O_RDWR | noFollow)
+    if (!fs.fstatSync(fileFd).isFile()) {
+      throw new Error(`Expected a regular file: ${filePath}`)
+    }
+    const original = fs.readFileSync(fileFd, 'utf-8')
+    const updated = transform(original)
+    fs.ftruncateSync(fileFd, 0)
+    fs.writeSync(fileFd, updated, 0, 'utf-8')
+    return true
+  } catch (error) {
+    if (allowMissing && error.code === 'ENOENT') return false
+    throw error
+  } finally {
+    if (fileFd !== undefined) fs.closeSync(fileFd)
+  }
+}
 /**
  * @type { import('@types/electron-packager').Options }
  */
@@ -130,13 +150,15 @@ const options = {
       if (fs.existsSync(dest)) removeDir(dest)
       copyRecursive(src, dest)
     })
-    const packageJsonPath = resolve(buildPath, 'package.json')
-    fs.writeFileSync(packageJsonPath, fs.readFileSync(packageJsonPath).toString().replace(/Alphabiz/g, app.displayName))
-    const indexPath = resolve(buildPath, 'index.html')
-    if (fs.existsSync(indexPath)) {
-      const index = fs.readFileSync(indexPath).toString('utf-8')
-      fs.writeFileSync(indexPath, index.replace(/Alphabiz/g, app.displayName))
-    }
+    replaceTextInFile(
+      resolve(buildPath, 'package.json'),
+      contents => contents.replace(/Alphabiz/g, app.displayName)
+    )
+    replaceTextInFile(
+      resolve(buildPath, 'index.html'),
+      contents => contents.replace(/Alphabiz/g, app.displayName),
+      true
+    )
     callback()
   }],
   afterCopy: [(buildPath, electronVersion, platform, arch, callback) => {

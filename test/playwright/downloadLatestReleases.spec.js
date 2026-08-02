@@ -4,6 +4,7 @@ const { chromium } = require('playwright')
 const path = require('path')
 const ScreenshotsPath = 'test/output/playwright/downloadLatest/'
 const app = require('../../developer/app.js')
+const escapeRegExp = require('../utils/escapeRegExp')
 let browser, page
 test.beforeAll(async () => {
   browser = await chromium.launch({
@@ -65,7 +66,7 @@ test.describe(`download stable version ${app.name}`, () => {
     process.platform === 'darwin' ? fileExt = 'dmg'
       : process.platform === 'win32' ? fileExt = 'msi'
         : fileExt = 'deb'
-    const regex = new RegExp(`^${app.name.toLowerCase()}-${tagName}\.${fileExt}$`)
+    const regex = new RegExp(`^${escapeRegExp(app.name.toLowerCase())}-${escapeRegExp(tagName)}\\.${escapeRegExp(fileExt)}$`)
     expect(regex.test(fileSuggestedFilename)).toBe(true)
 
     const targetPath = path.resolve(__dirname, `../../${app.name.toLowerCase()}.${fileExt}`)

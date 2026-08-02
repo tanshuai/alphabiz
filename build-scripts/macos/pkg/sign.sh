@@ -27,19 +27,30 @@ else
   echo "Warn: Cannot find embedded.provisionprofile in developer folder. This may cause error if you submit signed app to MAS"
 fi
 
-if test -d "$TMPDIR"; then
+if test -n "${TMPDIR:-}" && test -d "$TMPDIR"; then
     :
-elif test -d "$TMP"; then
+elif test -n "${TMP:-}" && test -d "$TMP"; then
     TMPDIR=$TMP
 elif test -d /var/tmp; then
     TMPDIR=/var/tmp
 else
     TMPDIR=/tmp
 fi
-ENTITLEMENTS_DIR="$TMPDIR/electron-build-mas/entitlements"
-mkdir -p "$ENTITLEMENTS_DIR"
+umask 077
+if ! ENTITLEMENTS_DIR=$(mktemp -d "${TMPDIR%/}/alphabiz-entitlements.XXXXXX"); then
+  echo "Error: failed to create a private entitlements directory" >&2
+  exit 1
+fi
+cleanup_entitlements() {
+  rm -rf "$ENTITLEMENTS_DIR"
+}
+trap cleanup_entitlements 0
+trap 'exit 1' HUP INT TERM
 
-TEAM_ID="$APPLE_TEAM_ID" node "build-scripts/macos/app/buildEntitlements.js" "$ENTITLEMENTS_DIR" --pkg
+if ! TEAM_ID="$APPLE_TEAM_ID" node "build-scripts/macos/app/buildEntitlements.js" "$ENTITLEMENTS_DIR" --pkg; then
+  echo "Error: failed to build entitlements" >&2
+  exit 1
+fi
 
 # ENTITLEMENT="$ENTITLEMENTS_DIR/entitlements.mas.plist"
 ENTITLEMENT="build-scripts/macos/pkg/entitlements.plist"

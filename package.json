@@ -55,7 +55,8 @@
     "security:scan": "node scripts/security/scan-credentials.js",
     "security:test-scan": "node scripts/security/test-credential-scan.js",
     "security:test-appx": "node scripts/security/test-appx-signing.js",
-    "security:test-appx:forge": "node scripts/security/test-appx-signing.js --forge-config"
+    "security:test-appx:forge": "node scripts/security/test-appx-signing.js --forge-config",
+    "security:test-codeql": "node scripts/security/test-codeql-hardening.js"
   },
   "dependencies": {
     "big-json": "^3.2.0",
