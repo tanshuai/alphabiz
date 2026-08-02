@@ -1,54 +1,59 @@
 'use strict'
 
-const path = require('path')
-
-const supportedArchitectures = new Set([
-  'arm',
-  'arm64',
-  'armv7l',
-  'ia32',
-  'mips64el',
-  'universal',
-  'x64'
-])
-const makeScripts = new Map([
-  ['darwin', 'make:dmg'],
-  ['linux', 'make:deb'],
-  ['mas', 'make:dmg'],
-  ['win32', 'make:win']
-])
-
-function validateBuildTarget (arch, platform) {
-  if (!supportedArchitectures.has(arch)) {
-    throw new Error(`Unsupported BUILD_ARCH: ${arch}`)
+function normalizeArchitecture (arch) {
+  switch (arch) {
+    case 'arm': return 'arm'
+    case 'arm64': return 'arm64'
+    case 'armv7l': return 'armv7l'
+    case 'ia32': return 'ia32'
+    case 'mips64el': return 'mips64el'
+    case 'universal': return 'universal'
+    case 'x64': return 'x64'
+    default: throw new Error(`Unsupported BUILD_ARCH: ${arch}`)
   }
-  if (!makeScripts.has(platform)) {
-    throw new Error(`Unsupported BUILD_PLATFORM: ${platform}`)
-  }
-  return { arch, platform }
 }
 
-function createYarnInvocation ({ arch, platform, runtimePlatform, commandInterpreter }) {
-  validateBuildTarget(arch, platform)
-  const script = makeScripts.get(platform)
+function normalizePlatform (platform) {
+  switch (platform) {
+    case 'darwin': return 'darwin'
+    case 'linux': return 'linux'
+    case 'mas': return 'mas'
+    case 'win32': return 'win32'
+    default: throw new Error(`Unsupported BUILD_PLATFORM: ${platform}`)
+  }
+}
+
+function getMakeScript (platform) {
+  switch (platform) {
+    case 'darwin': return 'make:dmg'
+    case 'linux': return 'make:deb'
+    case 'mas': return 'make:dmg'
+    case 'win32': return 'make:win'
+    default: throw new Error(`Unsupported BUILD_PLATFORM: ${platform}`)
+  }
+}
+
+function validateBuildTarget (arch, platform) {
+  return {
+    arch: normalizeArchitecture(arch),
+    platform: normalizePlatform(platform)
+  }
+}
+
+function createYarnInvocation ({ arch, platform, runtimePlatform }) {
+  const target = validateBuildTarget(arch, platform)
+  const script = getMakeScript(target.platform)
   if (runtimePlatform !== 'win32') {
     return {
       command: 'yarn',
-      args: [script, '--arch', arch],
+      args: [script, '--arch', target.arch],
       options: { shell: false }
     }
   }
 
-  const command = commandInterpreter || process.env.ComSpec || 'cmd.exe'
-  if (
-    command !== 'cmd.exe' &&
-    (!path.win32.isAbsolute(command) || path.win32.basename(command).toLowerCase() !== 'cmd.exe')
-  ) {
-    throw new Error('Invalid Windows command interpreter')
-  }
   return {
-    command,
-    args: ['/d', '/s', '/c', 'yarn.cmd', script, '--arch', arch],
+    command: 'C:\\Windows\\System32\\cmd.exe',
+    args: ['/d', '/s', '/c', 'yarn.cmd', script, '--arch', target.arch],
     options: { shell: false, windowsHide: true }
   }
 }
@@ -70,7 +75,5 @@ function createGitRestoreInvocation () {
 module.exports = {
   createGitRestoreInvocation,
   createYarnInvocation,
-  makeScripts,
-  supportedArchitectures,
   validateBuildTarget
 }

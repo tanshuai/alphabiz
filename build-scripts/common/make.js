@@ -24,9 +24,9 @@ const version = publicVersion || pkgVersion
 console.log(`version: ${version}`)
 
 // const { platform } = process
-const arch = process.env.BUILD_ARCH || process.arch
-const platform = process.env.BUILD_PLATFORM || process.platform
-validateBuildTarget(arch, platform)
+const requestedArch = process.env.BUILD_ARCH || process.arch
+const requestedPlatform = process.env.BUILD_PLATFORM || process.platform
+const { arch, platform } = validateBuildTarget(requestedArch, requestedPlatform)
 
 const unsupportedModules = [
   /**
