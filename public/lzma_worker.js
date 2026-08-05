@@ -903,6 +903,9 @@
   de.compress = Ne, de.decompress = Oe, de.prototype.compress = Ne, de.prototype.decompress = Oe;
   var Xn = de;
   typeof self != "undefined" && "importScripts" in self && addEventListener("message", function (e) {
+    // DedicatedWorkerGlobalScope messages have an empty origin. Reject a
+    // non-worker origin or malformed payload before reading message data.
+    if (e.origin !== "" || !e.data || typeof e.data != "object") return;
     e.data.action == ee ? Ne(e.data.data, e.data.mode, e.data.cbn) : e.data.action == je && Oe(e.data.data, e.data.cbn)
   }), Q.LZMA = de, Q.LZMA_WORKER = Xn, Q.compress = Ne, Q.decompress = Oe, Object.defineProperty(Q, "__esModule", {
     value: !0
