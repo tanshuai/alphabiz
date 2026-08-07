@@ -29,8 +29,10 @@ const privateKeyMarkers = [
   new RegExp(`${pemBegin}SSH2 ENCRYPTED ${privateKeyEnd}`),
   new RegExp('PuTTY-User-' + 'Key-File-')
 ]
+const adminQueryRoute = '/development/admin/query'
+const hardcodedAdminToken = /(?:["']?token["']?\s*:\s*)(["'])[^"'\r\n]{4,}\1/
 const scanBufferBytes = 64 * 1024
-const markerOverlapBytes = 256
+const markerOverlapBytes = 2048
 const maximumDerInspectionBytes = 2 * 1024 * 1024
 const findings = []
 
@@ -44,6 +46,17 @@ function containsPrivateKeyMarker (buffer) {
     if (privateKeyMarkers.some((marker) => marker.test(text))) return true
     overlap = text.slice(-markerOverlapBytes)
     offset = end
+  }
+  return false
+}
+
+function containsHardcodedAdminCredential (text) {
+  let routeOffset = text.indexOf(adminQueryRoute)
+  while (routeOffset >= 0) {
+    const start = Math.max(0, routeOffset - 1024)
+    const end = Math.min(text.length, routeOffset + 1024)
+    if (hardcodedAdminToken.test(text.slice(start, end))) return true
+    routeOffset = text.indexOf(adminQueryRoute, routeOffset + adminQueryRoute.length)
   }
   return false
 }
@@ -65,6 +78,9 @@ function isDerPrivateKey (buffer) {
 
 function inspectBuffer (buffer) {
   if (containsPrivateKeyMarker(buffer)) return 'private-key content marker'
+  if (containsHardcodedAdminCredential(buffer.toString('latin1'))) {
+    return 'hardcoded admin-query credential'
+  }
   if (isDerPrivateKey(buffer)) return 'DER private-key structure'
   return undefined
 }
@@ -83,8 +99,11 @@ function inspectFileDescriptor (file, size) {
     const bytesRead = fs.readSync(file, buffer, 0, buffer.length, offset)
     if (bytesRead === 0) break
     const text = overlap + buffer.subarray(0, bytesRead).toString('latin1')
-    if (privateKeyMarkers.some((marker) => marker.test(text))) {
-      return 'private-key content marker'
+    if (
+      privateKeyMarkers.some((marker) => marker.test(text)) ||
+      containsHardcodedAdminCredential(text)
+    ) {
+      return 'private-key marker or hardcoded admin-query credential'
     }
     overlap = text.slice(-markerOverlapBytes)
     offset += bytesRead
