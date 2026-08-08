@@ -47,9 +47,9 @@ describe('upload', () => {
     }
   })
   it('upload seeding', async () => {
-    const uploadFilePath = path.resolve(__dirname, '../../cypress/fixtures/samples/GoneNutty.avi')
-    const torrentName = 'GoneNutty.avi'
-    // const torrentName = 'ChinaCup.1080p.H264.AAC.mp4'
+    const uploadFilePath = path.resolve(__dirname, '../../cypress/fixtures/samples/synthetic-container.avi')
+    const torrentName = 'synthetic-container.avi'
+    // const torrentName = 'synthetic-upload.mp4'
     // 判断是否已经登录
     await sleep(10000)
     console.log('ready to login')
