@@ -3,7 +3,7 @@
 const assert = require('assert').strict
 const { parse, quote } = require('shell-quote')
 
-assert.equal(require('shell-quote/package.json').version, '1.8.4')
+assert.equal(require('shell-quote/package.json').version, '1.9.0')
 
 const safeArguments = [
   'echo',
@@ -56,5 +56,26 @@ for (const terminator of lineTerminators) {
     TypeError
   )
 }
+
+const originalConcat = Array.prototype.concat
+let concatSourceItems = 0
+let manyTokens
+let expandedEnvTokens
+Array.prototype.concat = function (...items) {
+  concatSourceItems += this.length
+  return originalConcat.apply(this, items)
+}
+
+try {
+  manyTokens = parse('x '.repeat(4096))
+  expandedEnvTokens = parse('$X '.repeat(256), () => ['a', 'b'])
+} finally {
+  Array.prototype.concat = originalConcat
+}
+
+assert.equal(manyTokens.length, 4096)
+assert.equal(expandedEnvTokens.length, 256)
+assert.deepEqual(expandedEnvTokens[0], ['a', 'b'])
+assert.equal(concatSourceItems, 0, 'shell-quote parse() still copies a growing concat accumulator')
 
 console.log('[shell-quote] Operator, comment, glob, and envFn injection boundaries passed.')
