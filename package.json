@@ -57,7 +57,8 @@
     "security:test-appx": "node scripts/security/test-appx-signing.js",
     "security:test-appx:forge": "node scripts/security/test-appx-signing.js --forge-config",
     "security:test-codeql": "node scripts/security/test-codeql-hardening.js",
-    "security:test-crypto-transitives": "node scripts/security/test-crypto-transitives.js"
+    "security:test-crypto-transitives": "node scripts/security/test-crypto-transitives.js",
+    "security:test-shell-quote": "node scripts/security/test-shell-quote.js"
   },
   "dependencies": {
     "big-json": "^3.2.0",
@@ -135,6 +136,7 @@
     "fs-chunk-store": "2.0.4",
     "pbkdf2": "3.1.3",
     "sha.js": "2.4.12",
+    "shell-quote": "1.9.0",
     "utf-8-validate": "5.0.8"
   },
   "config": {
