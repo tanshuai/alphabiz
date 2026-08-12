@@ -58,7 +58,8 @@
     "security:test-appx:forge": "node scripts/security/test-appx-signing.js --forge-config",
     "security:test-codeql": "node scripts/security/test-codeql-hardening.js",
     "security:test-crypto-transitives": "node scripts/security/test-crypto-transitives.js",
-    "security:test-shell-quote": "node scripts/security/test-shell-quote.js"
+    "security:test-shell-quote": "node scripts/security/test-shell-quote.js",
+    "security:test-babel-traverse": "node scripts/security/test-babel-traverse.js"
   },
   "dependencies": {
     "big-json": "^3.2.0",
@@ -127,6 +128,7 @@
     "fswin": "^3.23.119"
   },
   "resolutions": {
+    "@babel/traverse": "7.23.2",
     "bittorrent-protocol": "3.5.1",
     "bufferutil": "4.0.6",
     "cipher-base": "1.0.6",
