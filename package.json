@@ -59,7 +59,8 @@
     "security:test-codeql": "node scripts/security/test-codeql-hardening.js",
     "security:test-crypto-transitives": "node scripts/security/test-crypto-transitives.js",
     "security:test-shell-quote": "node scripts/security/test-shell-quote.js",
-    "security:test-babel-traverse": "node scripts/security/test-babel-traverse.js"
+    "security:test-babel-traverse": "node scripts/security/test-babel-traverse.js",
+    "security:test-minimist": "node scripts/security/test-minimist-hardening.js"
   },
   "dependencies": {
     "big-json": "^3.2.0",
@@ -129,6 +130,7 @@
   },
   "resolutions": {
     "@babel/traverse": "7.23.2",
+    "appium/appium-tizen-driver/jimp/@jimp/custom/@jimp/core/mkdirp": "0.5.6",
     "bittorrent-protocol": "3.5.1",
     "bufferutil": "4.0.6",
     "cipher-base": "1.0.6",
