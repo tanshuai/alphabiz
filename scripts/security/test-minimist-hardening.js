@@ -18,7 +18,7 @@ assert.equal(
   'The vulnerable minimist 0.0.8 selector remains in the frozen lockfile'
 )
 assert.ok(
-  /mkdirp@0\.5\.1, mkdirp@0\.5\.6:\n  version "0\.5\.6"/.test(lockfile),
+  /mkdirp@0\.5\.1, mkdirp@0\.5\.6:\r?\n  version "0\.5\.6"/.test(lockfile),
   'The exact Appium/Tizen mkdirp override is missing from the frozen lockfile'
 )
 
