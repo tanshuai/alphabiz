@@ -122,6 +122,7 @@ jobs:
           yarn security:test-shell-quote
           yarn security:test-babel-traverse
           yarn security:test-minimist
+          yarn security:test-form-data
 
   windows-appx-boundary:
     name: Windows APPX signing boundary
@@ -179,6 +180,10 @@ jobs:
       - name: Verify minimist prototype boundary
         shell: pwsh
         run: yarn security:test-minimist
+
+      - name: Verify form-data boundary entropy
+        shell: pwsh
+        run: yarn security:test-form-data
 
       - name: Verify the Forge APPX maker boundary
         shell: pwsh
