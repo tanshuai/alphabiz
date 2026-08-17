@@ -61,7 +61,8 @@
     "security:test-shell-quote": "node scripts/security/test-shell-quote.js",
     "security:test-babel-traverse": "node scripts/security/test-babel-traverse.js",
     "security:test-minimist": "node scripts/security/test-minimist-hardening.js",
-    "security:test-form-data": "node scripts/security/test-form-data-boundary.js"
+    "security:test-form-data": "node scripts/security/test-form-data-boundary.js",
+    "security:test-brace-expansion": "node scripts/security/test-brace-expansion.js"
   },
   "dependencies": {
     "big-json": "^3.2.0",
