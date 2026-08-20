@@ -63,7 +63,8 @@
     "security:test-minimist": "node scripts/security/test-minimist-hardening.js",
     "security:test-form-data": "node scripts/security/test-form-data-boundary.js",
     "security:test-brace-expansion": "node scripts/security/test-brace-expansion.js",
-    "security:test-js-yaml": "node scripts/security/test-js-yaml-hardening.js"
+    "security:test-js-yaml": "node scripts/security/test-js-yaml-hardening.js",
+    "security:test-async-ansi": "node scripts/security/test-async-ansi-hardening.js"
   },
   "dependencies": {
     "big-json": "^3.2.0",
