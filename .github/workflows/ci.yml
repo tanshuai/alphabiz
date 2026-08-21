@@ -126,6 +126,7 @@ jobs:
           yarn security:test-brace-expansion
           yarn security:test-js-yaml
           yarn security:test-async-ansi
+          yarn security:test-flatted
 
   windows-appx-boundary:
     name: Windows APPX signing boundary
@@ -199,6 +200,10 @@ jobs:
       - name: Verify async and ANSI processing boundaries
         shell: pwsh
         run: yarn security:test-async-ansi
+
+      - name: Verify flatted parser boundary
+        shell: pwsh
+        run: yarn security:test-flatted
 
       - name: Verify the Forge APPX maker boundary
         shell: pwsh
