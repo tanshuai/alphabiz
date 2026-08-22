@@ -65,7 +65,8 @@
     "security:test-brace-expansion": "node scripts/security/test-brace-expansion.js",
     "security:test-js-yaml": "node scripts/security/test-js-yaml-hardening.js",
     "security:test-async-ansi": "node scripts/security/test-async-ansi-hardening.js",
-    "security:test-flatted": "node scripts/security/test-flatted-hardening.js"
+    "security:test-flatted": "node scripts/security/test-flatted-hardening.js",
+    "security:test-cross-spawn": "node scripts/security/test-cross-spawn-hardening.js"
   },
   "dependencies": {
     "big-json": "^3.2.0",
