@@ -364,7 +364,7 @@ const crossEnvArguments = [
   'double"quote',
   'single\\backslash',
   'trailing\\',
-  'meta&caret^pipe|percent%bang!',
+  '"(foo|bar>baz|foz)"',
   'unicode-影音-◎'
 ]
 const crossEnvProbeSource = 'process.stdout.write(JSON.stringify({value:process.env.ALPHABIZ_CROSS_SPAWN_GATE,args:process.argv.slice(1)}))'
