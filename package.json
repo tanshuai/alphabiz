@@ -66,7 +66,8 @@
     "security:test-js-yaml": "node scripts/security/test-js-yaml-hardening.js",
     "security:test-async-ansi": "node scripts/security/test-async-ansi-hardening.js",
     "security:test-flatted": "node scripts/security/test-flatted-hardening.js",
-    "security:test-cross-spawn": "node scripts/security/test-cross-spawn-hardening.js"
+    "security:test-cross-spawn": "node scripts/security/test-cross-spawn-hardening.js",
+    "security:test-picomatch": "node scripts/security/test-picomatch-hardening.js"
   },
   "dependencies": {
     "big-json": "^3.2.0",
