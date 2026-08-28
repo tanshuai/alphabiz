@@ -24,6 +24,13 @@ function normalizeFingerprint (value) {
   return String(value || '').replace(/[^0-9a-f]/gi, '').toUpperCase()
 }
 
+function normalizeSubject (value) {
+  return String(value || '')
+    .replace(/^subject\s*=\s*/i, '')
+    .replace(/\s+/g, '')
+    .toUpperCase()
+}
+
 function getOpenSslCommand () {
   const configuredPath = process.env[OPENSSL_ENV]
   if (configuredPath) {
@@ -41,7 +48,7 @@ function getOpenSslCommand () {
   return 'openssl'
 }
 
-function readCertificateFingerprint (certificatePath, password) {
+function readCertificateMetadata (certificatePath, password) {
   const openssl = getOpenSslCommand()
   const environment = { ...process.env, [PASSWORD_ENV]: password }
   const extract = spawnSync(openssl, [
@@ -83,10 +90,35 @@ function readCertificateFingerprint (certificatePath, password) {
   if (fingerprint.length !== 64) {
     throw new Error('[appx-signing] OpenSSL returned an invalid SHA-256 certificate fingerprint.')
   }
-  return fingerprint
+
+  const subjectInspect = spawnSync(openssl, [
+    'x509',
+    '-noout',
+    '-subject',
+    '-nameopt', 'RFC2253',
+    '-checkend', '0'
+  ], {
+    input: extract.stdout,
+    encoding: 'utf8',
+    maxBuffer: 1024 * 1024
+  })
+  if (subjectInspect.error || subjectInspect.status !== 0) {
+    throw new Error('[appx-signing] The PFX certificate is expired or its validity cannot be verified.')
+  }
+  const subjectMatch = subjectInspect.stdout.match(/subject\s*=\s*(.+)/i)
+  const subject = subjectMatch && subjectMatch[1].trim()
+  if (!subject) {
+    throw new Error('[appx-signing] OpenSSL returned an invalid certificate subject.')
+  }
+
+  return { fingerprint, subject }
 }
 
-function getAppxSigningCertificate ({ required = false } = {}) {
+function readCertificateFingerprint (certificatePath, password) {
+  return readCertificateMetadata(certificatePath, password).fingerprint
+}
+
+function getAppxSigningCertificate ({ required = false, expectedPublisher } = {}) {
   const configuredPath = process.env[PATH_ENV]
   const password = process.env[PASSWORD_ENV]
   const expectedFingerprint = normalizeFingerprint(process.env[FINGERPRINT_ENV])
@@ -124,12 +156,19 @@ function getAppxSigningCertificate ({ required = false } = {}) {
     throw new Error('[appx-signing] The signing certificate must be stored outside the repository.')
   }
 
-  const actualFingerprint = readCertificateFingerprint(certificatePath, password)
+  const metadata = readCertificateMetadata(certificatePath, password)
+  const actualFingerprint = metadata.fingerprint
   if (actualFingerprint === RETIRED_FINGERPRINT) {
     throw new Error('[appx-signing] The retired AlphaBiz development certificate is forbidden.')
   }
   if (actualFingerprint !== expectedFingerprint) {
     throw new Error('[appx-signing] The certificate fingerprint does not match the approved fingerprint.')
+  }
+  if (
+    expectedPublisher &&
+    normalizeSubject(metadata.subject) !== normalizeSubject(expectedPublisher)
+  ) {
+    throw new Error('[appx-signing] The certificate subject does not match the configured APPX publisher.')
   }
 
   return {
@@ -141,7 +180,8 @@ function getAppxSigningCertificate ({ required = false } = {}) {
 
 if (require.main === module) {
   try {
-    getAppxSigningCertificate({ required: true })
+    const { publisher } = require('../../../developer/app')
+    getAppxSigningCertificate({ required: true, expectedPublisher: publisher })
     console.log('[appx-signing] External signing certificate is configured and verified.')
   } catch (error) {
     console.error(error.message)
@@ -158,5 +198,7 @@ module.exports = {
   getOpenSslCommand,
   getAppxSigningCertificate,
   normalizeFingerprint,
+  normalizeSubject,
+  readCertificateMetadata,
   readCertificateFingerprint
 }

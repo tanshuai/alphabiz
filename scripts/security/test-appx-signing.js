@@ -79,7 +79,10 @@ try {
   process.env[PASSWORD_ENV] = password
   process.env[FINGERPRINT_ENV] = fingerprint
 
-  const signing = getAppxSigningCertificate({ required: true })
+  const signing = getAppxSigningCertificate({
+    required: true,
+    expectedPublisher: 'CN=alphabiz-ci-test'
+  })
   assert.strictEqual(signing.path, fs.realpathSync(pfxPath))
   assert.strictEqual(signing.password, password)
   assert.strictEqual(signing.fingerprint, fingerprint)
@@ -97,6 +100,14 @@ try {
   )
 
   process.env[FINGERPRINT_ENV] = fingerprint
+  assert.throws(
+    () => getAppxSigningCertificate({
+      required: true,
+      expectedPublisher: 'CN=wrong-publisher'
+    }),
+    /subject does not match/
+  )
+
   if (process.argv.includes('--forge-config')) {
     const signedConfig = loadForgeConfig()
     const appxMaker = signedConfig.makers.find(

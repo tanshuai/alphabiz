@@ -2,6 +2,7 @@
   "name": "alphabiz",
   "main": "electron/UnPackaged/electron-main.js",
   "version": "0.2.4",
+  "packageManager": "yarn@1.22.22",
   "description": "Alphabiz Blockchain Cryptocurrency Application",
   "productName": "Alphabiz",
   "author": "Alphabiz Team <ab@alpha.biz>",
