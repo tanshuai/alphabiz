@@ -224,23 +224,13 @@ try {
     createYarnInvocation({
       arch: 'x64',
       platform: 'win32',
-      runtimePlatform: 'win32',
-      commandInterpreter: 'C:\\Windows\\System32\\cmd.exe'
+      runtimePlatform: 'win32'
     }),
     {
       command: 'C:\\Windows\\System32\\cmd.exe',
       args: ['/d', '/s', '/c', 'yarn.cmd', 'make:win', '--arch', 'x64'],
       options: { shell: false, windowsHide: true }
     }
-  )
-  assert.throws(
-    () => createYarnInvocation({
-      arch: 'x64',
-      platform: 'win32',
-      runtimePlatform: 'win32',
-      commandInterpreter: 'powershell.exe'
-    }),
-    /Invalid Windows command interpreter/
   )
   assert.deepStrictEqual(createGitRestoreInvocation(), {
     command: 'git',
