@@ -3015,10 +3015,9 @@
   resolved "https://registry.yarnpkg.com/@yarnpkg/lockfile/-/lockfile-1.1.0.tgz#e77a97fbd345b76d83245edcd17d393b1b41fb31"
   integrity sha512-GpSwvyXOcOOlV70vbnzjj4fW5xW/FdUF6nQEt1ENy7m4ZCczi1+/buVUPAqmGfqznsORNFzUMjctTIp8a9tuCQ==
 
-"@zeeis/velectron@21.3.3":
+"@zeeis/velectron@github:zeeis/velectron#f31fffebe0b411a66a0b953d52d138f86c116615":
   version "21.3.3"
-  resolved "https://npm.pkg.github.com/download/@zeeis/velectron/21.3.3/cd06be5c4a236527d7d75962b5a69d75cc594ebd#cd06be5c4a236527d7d75962b5a69d75cc594ebd"
-  integrity sha512-uamgBBV0H7isB7jb5pDVpa1bf7BeYxxG3QRp5M6B3YWCyYsh84n+qm67L4mksbF/s0H7IXBM0oXkhvhghtwtWw==
+  resolved "https://codeload.github.com/zeeis/velectron/tar.gz/f31fffebe0b411a66a0b953d52d138f86c116615"
   dependencies:
     "@electron/get" "^1.13.0"
     "@types/node" "^16.9.6"
@@ -14616,10 +14615,9 @@ verror@1.10.0:
     videojs-font "3.2.0"
     videojs-vtt.js "^0.15.3"
 
-videojs-ass-es6@0.0.4:
+"videojs-ass-es6@github:AviiNL/videojs-ass#1745c49a73d98e3b84705a2e044efdc323344883":
   version "0.0.4"
-  resolved "https://registry.yarnpkg.com/videojs-ass-es6/-/videojs-ass-es6-0.0.4.tgz#40aab1f57c635c32ee1ee6b4e1cabe624209c278"
-  integrity sha1-QKqx9XxjXDLuHua04cq+YkIJwng=
+  resolved "https://codeload.github.com/AviiNL/videojs-ass/tar.gz/1745c49a73d98e3b84705a2e044efdc323344883"
   dependencies:
     libjass "0.11.0"
 
