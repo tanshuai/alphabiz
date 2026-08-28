@@ -130,6 +130,7 @@ jobs:
           yarn security:test-cross-spawn
           yarn security:test-picomatch
           yarn security:test-json5
+          yarn security:test-semver
 
   windows-appx-boundary:
     name: Windows APPX signing boundary
@@ -219,6 +220,10 @@ jobs:
       - name: Verify JSON5 parser boundaries
         shell: pwsh
         run: yarn security:test-json5
+
+      - name: Verify semver range boundaries
+        shell: pwsh
+        run: yarn security:test-semver
 
       - name: Verify the Forge APPX maker boundary
         shell: pwsh
