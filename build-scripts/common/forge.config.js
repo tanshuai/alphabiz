@@ -126,7 +126,12 @@ module.exports = {
       mirrorOptions: {
         mirror: 'https://github.com/zeeis/velectron/releases/download/'
       },
-      downloader: require('@zeeis/velectron/downloader')
+      // Loading the legacy downloader reads optional user-level auth config.
+      // Keep configuration and security checks side-effect free; the actual
+      // download path remains behind the full-build gate.
+      downloader: {
+        download: (...args) => require('@zeeis/velectron/downloader').download(...args)
+      }
     },
     asar: {
       unpack: '*.{node,dll}'
