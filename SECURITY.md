@@ -40,9 +40,10 @@ ask for a private reporting channel.
 
 Never commit certificates containing private keys, PFX/P12 files, private-key
 PEM files, `.key` files, keystores, access tokens, or recovery material. APPX
-signing certificates must remain outside the repository and be supplied only
-through `ALPHABIZ_APPX_PFX_PATH`. Run `yarn security:scan` before submitting a
-pull request.
+signing certificates must remain outside the repository. Supply the path,
+password, and approved SHA-256 fingerprint only through the step-scoped
+`ALPHABIZ_APPX_*` environment variables. Run `yarn security:scan` and
+`yarn security:test-appx` before submitting a pull request.
 
 ## Coordinated disclosure
 

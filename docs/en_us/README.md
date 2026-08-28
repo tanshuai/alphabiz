@@ -72,7 +72,7 @@ There are some explainations for keys in `app.js`.
 | `appIdentifier` | `"com.zeeis.alphabiz"` | The appid for your mac app |
 | `microsoftStoreProductId` | `String` | The appid for your win store app |
 | `appxPackageIdentityName` | `"Alphabiz"` | The appid for your appx target|
-| `publisher` | `"CN=zeeis"` | Publisher subject for the external APPX signing certificate configured by `ALPHABIZ_APPX_PFX_PATH` |
+| `publisher` | `"CN=zeeis"` | Publisher subject for the external APPX signing certificate verified through the `ALPHABIZ_APPX_*` environment variables |
 | `publisherDisplayName` | `"Alphabiz Team"` | The publisher name for win store |
 | `upgradeCode` | `String` | An uuid used by msi target to identify same app.<br> Run `npx uuid v4` to generate your owns |
 | `homepage` | `"https://alpha.biz"` | Your official site for your app |

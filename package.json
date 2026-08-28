@@ -51,7 +51,10 @@
     "make:snap:ci": "yarn pkg-fmt -f snap && node build-scripts/linux/snapcraft && sg lxd -c 'snapcraft snap --output=./out/installers/app.snap --use-lxd' && node build-scripts/linux/snapcraft --post",
     "postmake": "node build-scripts/common/make.js --postmake",
     "pkg-fmt": "node build-scripts/common/getPackageFormat.js",
-    "security:scan": "node scripts/security/scan-credentials.js"
+    "security:scan": "node scripts/security/scan-credentials.js",
+    "security:test-scan": "node scripts/security/test-credential-scan.js",
+    "security:test-appx": "node scripts/security/test-appx-signing.js",
+    "security:test-appx:forge": "node scripts/security/test-appx-signing.js --forge-config"
   },
   "dependencies": {
     "big-json": "^3.2.0",

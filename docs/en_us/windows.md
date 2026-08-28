@@ -34,19 +34,23 @@ known as Microsoft Store apps). Every APPX build must use an explicitly
 configured signing certificate. This repository does not contain a default or
 test signing key.
 
-Store the PFX outside the repository and provide its absolute path for the
-current process:
+Store a password-protected PFX outside the repository. Provide its absolute
+path, password, and approved SHA-256 certificate fingerprint for the current
+process:
 
 ```powershell
 $env:ALPHABIZ_APPX_PFX_PATH = "$env:TEMP\alphabiz-signing.pfx"
+$env:ALPHABIZ_APPX_PFX_PASSWORD = Read-Host "PFX password"
+$env:ALPHABIZ_APPX_CERT_SHA256 = "AA:BB:...:FF"
 yarn make:appx
 ```
 
 The certificate subject must match `publisher` in `developer/app.js`. The
-preflight check rejects relative paths, missing files, non-PFX files, and any
-certificate located inside the repository. A full Windows release (`yarn
-make`) also fails before packaging when the variable is missing, so CI cannot
-upload an APPX created with an unknown or interactive fallback certificate.
+preflight check rejects relative paths, missing files, non-PFX files,
+certificates inside the repository, empty passwords, fingerprint mismatches,
+and the retired legacy development certificate. The APPX maker is not added to
+the Forge configuration unless all three values pass verification, so a direct
+Forge command cannot fall back to an automatically generated certificate.
 
 For local development, create a disposable self-signed certificate in a
 temporary directory or use Windows certificate tooling. Delete the exported
@@ -54,6 +58,7 @@ PFX and any intermediate private-key files when testing is complete. Never
 copy a PFX, PEM private key, `.key`, or keystore into the project directory.
 
 In CI, materialize the PFX from a protected secret under the runner's temporary
-directory, set `ALPHABIZ_APPX_PFX_PATH` only for the packaging step, verify the
-resulting signature, and remove the file in an `always()` cleanup step. Do not
-upload an APPX when certificate setup or signature verification fails.
+directory. Set the path, password, and approved fingerprint only for the
+packaging step. Verify the resulting APPX signer independently and remove the
+PFX in an `always()` cleanup step. Do not upload an APPX when certificate setup
+or signature verification fails.
