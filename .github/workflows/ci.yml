@@ -1,0 +1,122 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  hygiene:
+    name: Repository hygiene
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Validate tracked files and metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check
+          node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8')); JSON.parse(require('fs').readFileSync('release.json', 'utf8'));"
+
+          forbidden_files="$(git ls-files -- '*.key' '*.p8' '*.p12' '*.pfx')"
+          if [[ -n "${forbidden_files}" ]]; then
+            printf 'Private-key container files must not be tracked:\n%s\n' "${forbidden_files}" >&2
+            exit 1
+          fi
+
+          if git grep -Il -E -- '-----BEGIN ([A-Z0-9 ]+ )?PRIVATE KEY-----' -- .; then
+            printf 'PEM private key material must not be tracked.\n' >&2
+            exit 1
+          fi
+
+      - name: Validate workflow least privilege and immutable actions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs')
+          const path = require('path')
+
+          const workflowDir = '.github/workflows'
+          const files = fs.readdirSync(workflowDir)
+            .filter((name) => name.endsWith('.yml') || name.endsWith('.yaml'))
+
+          const expressionStart = '$' + '{{'
+          const secretReference = expressionStart + ' secrets.'
+          const mutableAction = /^\s*-?\s*uses:\s*[^#\s]+@([^\s#]+)/gm
+          const failures = []
+
+          for (const name of files) {
+            const file = path.join(workflowDir, name)
+            const contents = fs.readFileSync(file, 'utf8')
+
+            if (contents.includes(secretReference)) {
+              failures.push(`${file}: references repository or environment secrets`)
+            }
+
+            for (const match of contents.matchAll(mutableAction)) {
+              if (!/^[0-9a-f]{40}$/.test(match[1])) {
+                failures.push(`${file}: action is not pinned to a full commit: ${match[0].trim()}`)
+              }
+            }
+          }
+
+          if (failures.length) {
+            console.error(failures.join('\n'))
+            process.exit(1)
+          }
+          NODE
+
+  node-22:
+    name: Node 22 frozen install and release-test discovery
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CYPRESS_INSTALL_BINARY: "0"
+      ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22.x"
+          cache: yarn
+          cache-dependency-path: yarn.lock
+
+      - name: Activate Yarn Classic
+        shell: bash
+        run: |
+          set -euo pipefail
+          corepack enable
+          corepack prepare yarn@1.22.22 --activate
+          node --version
+          yarn --version
+
+      - name: Install dependencies without lifecycle scripts
+        shell: bash
+        run: yarn install --frozen-lockfile --ignore-scripts --ignore-optional --non-interactive
+
+      - name: Discover release smoke tests
+        shell: bash
+        run: yarn test:release --listTests --runInBand
