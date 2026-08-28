@@ -2,6 +2,7 @@ const package = require('../../package.json')
 const fs = require('fs')
 const { resolve } = require('path')
 const { default: rebuild } = require('electron-rebuild')
+const { getAppxSigningCertificatePath } = require('../windows/appx/signing-certificate')
 const __rootdir = resolve(__dirname, '../..')
 
 const publicVersion = require(resolve(__rootdir, 'public/version.json')).version
@@ -15,9 +16,7 @@ const homepage = appConfig.homepage;
 const publisher = appConfig.publisher;
 const description = appConfig.description;
 
-const defaultPfxPath = resolve(__dirname, '../windows/appx/default.pfx')
-const appxPfxPath = resolve(__rootdir, 'developer/appx.pfx')
-const appxPfx = fs.existsSync(appxPfxPath) ? appxPfxPath : defaultPfxPath
+const appxPfx = getAppxSigningCertificatePath()
 
 // The .deb package requires a .desktop template, see here:
 // node_modules/electron-installer-debian/resources/desktop.ejs
@@ -212,7 +211,7 @@ module.exports = {
         publisherName: publisher,
         publisherDisplayName: appConfig.publisherDisplayName,
         assets: resolve(__rootdir, 'developer/platform-assets/windows/icon'),
-        devCert: appxPfx,
+        ...(appxPfx ? { devCert: appxPfx } : {}),
         deploy: false,
         makePri: true,
         packageName: appConfig.name,

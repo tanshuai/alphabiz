@@ -3,6 +3,7 @@ const { existsSync, copyFileSync, mkdirSync, readFileSync, writeFileSync, unlink
 const { resolve } = require('path')
 const { version: pkgVersion } = require('../../package.json')
 const publicVersion = require('../../public/version.json').version
+const { getAppxSigningCertificatePath } = require('../windows/appx/signing-certificate')
 const versionHeader = publicVersion.match(/\d+\.\d+\.\d+/gm)
 const appConfig = require('../../developer/app');
 const productName = appConfig.displayName;
@@ -239,6 +240,9 @@ if (process.argv.includes('--make')) {
   })
   // if windows modify appxManifest
   if (platform === 'win32') {
+    // A Windows release must never fall back to a certificate stored in Git or
+    // to an interactively generated certificate that CI could upload by mistake.
+    getAppxSigningCertificatePath({ required: true })
     const xmlFilePath = resolve(__rootdir, 'build-scripts/windows/appx/template.xml')
     const oldAppxTemplate = readFileSync(resolve(__rootdir, 'build-scripts/windows/appx/template.xml'), 'utf-8')
     let appxTemplate = oldAppxTemplate
