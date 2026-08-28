@@ -10,6 +10,8 @@ const path = require('path')
 const testRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'alphabiz-scan-test-'))
 const scannerSource = path.join(__dirname, 'scan-credentials.js')
 const pemMarker = '-----' + 'BEGIN RSA ' + 'PRIVATE KEY-----'
+const adminRoute = '/development/admin/' + 'query'
+const adminCredential = 'to' + "ken: '" + 's'.repeat(9) + "'"
 
 function git (repository, args) {
   execFileSync('git', args, { cwd: repository, stdio: 'ignore' })
@@ -62,6 +64,14 @@ try {
     ])
     fs.writeFileSync(path.join(repository, 'late-marker.txt'), payload)
     git(repository, ['add', '--', 'late-marker.txt'])
+  })
+
+  expectRejected('hardcoded-admin-token', (repository) => {
+    fs.writeFileSync(
+      path.join(repository, 'bundle.js'),
+      `rest.post('${adminRoute}', { ${adminCredential}, type: 'reg_info' })`
+    )
+    git(repository, ['add', '--', 'bundle.js'])
   })
 
   expectRejected('der-private-key', (repository) => {
