@@ -54,9 +54,9 @@ const app = {
    */
   appxPackageIdentityName: APP,
   /**
-   * The default .pfx file uses publisher: 'CN=zeeis'.
-   * If you want to use .appx file after modifying publisher,
-   * please manually modify app.pfx file
+   * Must match the subject of the external APPX signing certificate.
+   * Configure its absolute path with ALPHABIZ_APPX_PFX_PATH. Never store
+   * the certificate or its private key in this repository.
    */
   publisher: 'CN=zeeis',
   /**
