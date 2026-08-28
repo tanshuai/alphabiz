@@ -55,8 +55,9 @@ const app = {
   appxPackageIdentityName: APP,
   /**
    * Must match the subject of the external APPX signing certificate.
-   * Configure its absolute path with ALPHABIZ_APPX_PFX_PATH. Never store
-   * the certificate or its private key in this repository.
+   * Configure its path, password, and approved SHA-256 fingerprint with the
+   * ALPHABIZ_APPX_* environment variables. Never store the certificate or its
+   * private key in this repository.
    */
   publisher: 'CN=zeeis',
   /**

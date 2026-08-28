@@ -223,10 +223,13 @@ build-scripts/
 APPX 安装包必须使用显式配置的签名证书。仓库不再提供默认或测试
 PFX，也不允许交互式生成的未知证书进入发布产物。
 
-请把 PFX 保存在仓库之外，并在当前进程中设置绝对路径：
+请使用带密码保护的 PFX，并把它保存在仓库之外。在当前进程中同时设置绝对
+路径、密码和已批准的证书 SHA-256 fingerprint：
 
 ```powershell
 $env:ALPHABIZ_APPX_PFX_PATH = "$env:TEMP\alphabiz-signing.pfx"
+$env:ALPHABIZ_APPX_PFX_PASSWORD = Read-Host "PFX password"
+$env:ALPHABIZ_APPX_CERT_SHA256 = "AA:BB:...:FF"
 yarn make:appx
 ```
 
@@ -235,13 +238,15 @@ yarn make:appx
 - 相对路径；
 - 不存在或不是 `.pfx` 的文件；
 - 位于仓库目录内的证书。
+- 空密码或 fingerprint 不匹配；
+- 已退役的旧开发证书。
 
-完整 Windows 打包命令 `yarn make` 在缺少该变量时也会提前失败，因此 CI
-不得上传使用未知证书或交互式 fallback 生成的 APPX。
+只有三项配置全部验证通过时，Forge 才会注册 APPX maker；直接调用 Forge
+也不能回退到自动生成的证书。
 
 本地开发可以在系统临时目录中生成一次性自签名证书，测试结束后立即删除
 PFX 和中间私钥。禁止把 PFX、PEM 私钥、`.key` 或 keystore 复制到项目目录。
 
-CI 应从受保护的 secret 将 PFX 写入 runner 临时目录，只在打包 step 设置
-`ALPHABIZ_APPX_PFX_PATH`，随后验证产物签名，并在 `always()` cleanup step
+CI 应从受保护的 secret 将 PFX 写入 runner 临时目录，只在打包 step 设置路径、
+密码和批准 fingerprint，随后独立验证产物 signer，并在 `always()` cleanup step
 删除证书。证书准备或签名验证失败时必须停止发布。

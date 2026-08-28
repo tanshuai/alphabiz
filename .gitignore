@@ -75,7 +75,9 @@ typings/
 # Signing keys and local TLS credentials must never be committed.
 *.pfx
 *.p12
+*.pkcs12
 *.p8
+*.pkcs8
 *.ppk
 *.key
 *.jks

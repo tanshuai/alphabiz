@@ -5,6 +5,7 @@ const { execFileSync, spawn } = require('child_process')
 const fs = require('fs')
 const os = require('os')
 const path = require('path')
+const startTestCli = require.resolve('start-server-and-test/src/bin/start.js')
 
 const mode = process.argv[2]
 if (!['open', 'ci'].includes(mode)) {
@@ -101,21 +102,22 @@ const cypressCommand = [
     : [])
 ].join(' ')
 
-const startTestCommand = process.platform === 'win32' ? 'start-test.cmd' : 'start-test'
 const child = spawn(
-  startTestCommand,
-  [serverCommand, 'https://localhost:8080', cypressCommand],
+  process.execPath,
+  [startTestCli, serverCommand, 'https://localhost:8080', cypressCommand],
   {
     cwd: repositoryRoot,
     env: childEnvironment,
-    shell: process.platform === 'win32',
+    shell: false,
     stdio: 'inherit'
   }
 )
 
-for (const signal of ['SIGINT', 'SIGTERM']) {
+process.once('exit', cleanup)
+
+for (const signal of ['SIGHUP', 'SIGINT', 'SIGTERM']) {
   process.once(signal, () => {
-    if (!child.killed) child.kill(signal)
+    if (!child.killed) child.kill(process.platform === 'win32' ? undefined : signal)
   })
 }
 
