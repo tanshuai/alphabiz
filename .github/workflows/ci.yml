@@ -151,6 +151,10 @@ jobs:
         shell: pwsh
         run: yarn install --frozen-lockfile --ignore-scripts --ignore-optional --non-interactive
 
-      - name: Verify the APPX maker boundary
+      - name: Verify password and fingerprint checks
+        shell: pwsh
+        run: yarn security:test-appx
+
+      - name: Verify the Forge APPX maker boundary
         shell: pwsh
         run: yarn security:test-appx:forge
