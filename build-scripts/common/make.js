@@ -2,7 +2,10 @@ const { exec, execSync } = require('child_process')
 const { existsSync, copyFileSync, mkdirSync, readFileSync, writeFileSync, unlinkSync, rmSync, cpSync, readdirSync, statSync } = require('fs')
 const { resolve } = require('path')
 const { version: pkgVersion } = require('../../package.json')
-const publicVersion = require('../../public/version.json').version
+const publicVersionPath = resolve(__dirname, '../../public/version.json')
+const publicVersion = existsSync(publicVersionPath)
+  ? JSON.parse(readFileSync(publicVersionPath, 'utf8')).version
+  : pkgVersion
 const { getAppxSigningCertificate } = require('../windows/appx/signing-certificate')
 const versionHeader = publicVersion.match(/\d+\.\d+\.\d+/gm)
 const appConfig = require('../../developer/app');
