@@ -250,10 +250,10 @@ test.describe('播放视频', () => {
     console.log('跳转成功')
   })
   test('avi类型', async () => {
-    const media = 'test/cypress/fixtures/samples/GoneNutty.avi'
+    const media = 'test/cypress/fixtures/samples/synthetic-container.avi'
     // Upload
     await window.waitForTimeout(5000)
-    console.log('准备上传一个avi类型视频--GoneNutty.avi')
+    console.log('准备上传 synthetic AVI fixture--synthetic-container.avi')
     try{
       await playerPage.fileInput.setInputFiles(media, { timeout: 60000 })
     }catch(error){
@@ -273,10 +273,10 @@ test.describe('播放视频', () => {
     await playerPage.stopPlay.click()
     console.log('点击停止播放')
   })
-  test('BlueRay_mkv蓝光视频', async () => {
-    const media = 'test/cypress/fixtures/samples/Test-Sample-Tenet.2020.IMAX.2160p.UHD.BluRay.x265.10bit.HDR.DTS-HD.MA.5.1202111171122322.mkv'
+  test('HEVC Main10 HDR MKV 高规格视频', async () => {
+    const media = 'test/cypress/fixtures/samples/synthetic-hevc-main10-hdr.mkv'
     // Upload
-    console.log('准备上传一个BlueRay_mkv蓝光视频--Test-Sample-Tenet.mkv')
+    console.log('准备上传 synthetic HEVC Main10 HDR MKV fixture')
     try{
       await playerPage.fileInput.setInputFiles(media, { timeout: 60000 })
     }catch(error){
@@ -1064,8 +1064,8 @@ test.describe('upload', () => {
   })
   test.skip('test1', async () => {
     test.setTimeout(60000 * 15)
-    const btName = 'ChinaCup.1080p.H264.AAC.mp4'
-    const btAddress = path.resolve(__dirname, '../cypress/fixtures/samples/ChinaCup.1080p.H264.AAC.mp4')
+    const btName = 'synthetic-upload.mp4'
+    const btAddress = path.resolve(__dirname, '../cypress/fixtures/samples/synthetic-upload.mp4')
     // const oneFile = new File([''], btAddress, { path: btAddress })
     // const btCard = 'text=' + btName + ' >> xpath=..//..//..//..//.. >> '
 
@@ -1073,14 +1073,14 @@ test.describe('upload', () => {
     // Click button:has-text("Upload torrent")
     await window.click('button:has-text("Upload torrent")')
 
-    console.log(path.resolve(__dirname, '../cypress/fixtures/samples/ChinaCup.1080p.H264.AAC.mp4'))
-    // await window.dispatchEvent('input[type="file"]', 'input', path.resolve(__dirname, '../cypress/fixtures/samples/ChinaCup.1080p.H264.AAC.mp4'))
+    console.log(path.resolve(__dirname, '../cypress/fixtures/samples/synthetic-upload.mp4'))
+    // await window.dispatchEvent('input[type="file"]', 'input', path.resolve(__dirname, '../cypress/fixtures/samples/synthetic-upload.mp4'))
     // 1
     // const [fileChooser] = await Promise.all([
     //   window.waitForEvent('filechooser'),
     //   window.click('input[type="file"]')
     // ])
-    // await fileChooser.setFiles(path.resolve(__dirname, '../cypress/fixtures/samples/ChinaCup.1080p.H264.AAC.mp4'))
+    // await fileChooser.setFiles(path.resolve(__dirname, '../cypress/fixtures/samples/synthetic-upload.mp4'))
     // 2
     fs.readFile(btAddress, async function read (err, data) {
       if (err) {
@@ -1088,7 +1088,7 @@ test.describe('upload', () => {
       }
       console.log(data)
       await window.locator('input[type="file"]').setInputFiles({
-        name: 'ChinaCup.1080p.H264.AAC.mp4',
+        name: 'synthetic-upload.mp4',
         mimeType: 'video/mp4',
         buffer: data,
         path: btAddress,

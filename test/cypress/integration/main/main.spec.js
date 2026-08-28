@@ -25,12 +25,12 @@ describe('main', {
   describe('Player', () => {
     it('.mkv', () => {
       cy.signIn('test1' + Cypress.env('testEmailDomain'), 'password')
-      const mediaPath = 'samples/Embedded.Subtitles.Sample.Princess.Mononoke.1080p.H264.AAC.DualAudio.5.1.BDrip.mkv'
-      cy.playMedia(mediaPath, { isPlay: true, duration: 39.795 })
+      const mediaPath = 'samples/synthetic-subtitles.mkv'
+      cy.playMedia(mediaPath, { isPlay: true, duration: 2.046 })
     })
     it('.avi', () => {
       cy.signIn('test1' + Cypress.env('testEmailDomain'), 'password')
-      const mediaPath = 'samples/GoneNutty.avi'
+      const mediaPath = 'samples/synthetic-container.avi'
       cy.playMedia(mediaPath, { isPlay: false })
     })
   })
