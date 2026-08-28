@@ -18,8 +18,54 @@ const testRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'alphabiz-codeql-test-'))
 const makeScript = path.resolve(__dirname, '../../build-scripts/common/make.js')
 const torrentHelperPath = path.resolve(__dirname, '../../public/torrent-file.js')
 const webTorrentHtmlPath = path.resolve(__dirname, '../../public/webtorrent.html')
+const lzmaWorkerPaths = [
+  '../../public/lzma_worker.js',
+  '../../dist/spa/lzma_worker.js',
+  '../../dist/electron/UnPackaged/lzma_worker.js'
+].map(relativePath => path.resolve(__dirname, relativePath))
+
+function loadLzmaMessageHandler (workerPath) {
+  let messageHandler
+  const workerContext = vm.createContext({
+    addEventListener: (type, handler) => {
+      if (type === 'message') messageHandler = handler
+    },
+    importScripts: () => {},
+    postMessage: () => {},
+    setImmediate,
+    setTimeout
+  })
+  workerContext.self = workerContext
+  vm.runInContext(
+    fs.readFileSync(workerPath, 'utf-8'),
+    workerContext,
+    { filename: workerPath, timeout: 5000 }
+  )
+  assert.strictEqual(typeof messageHandler, 'function')
+  return { lzma: workerContext.LZMA, messageHandler }
+}
 
 try {
+  for (const lzmaWorkerPath of lzmaWorkerPaths) {
+    const { lzma, messageHandler } = loadLzmaMessageHandler(lzmaWorkerPath)
+    const compressed = Array.from(lzma.compress('AlphaBiz worker smoke', 1))
+    assert.strictEqual(lzma.decompress(compressed), 'AlphaBiz worker smoke')
+    let actionReads = 0
+    const messageData = {}
+    Object.defineProperty(messageData, 'action', {
+      get: () => {
+        actionReads += 1
+        return 0
+      }
+    })
+    messageHandler({ origin: 'https://attacker.example', data: messageData })
+    messageHandler({ origin: undefined, data: messageData })
+    assert.strictEqual(actionReads, 0)
+    messageHandler({ origin: '', data: messageData })
+    assert.strictEqual(actionReads, 2)
+    assert.doesNotThrow(() => messageHandler({ origin: '', data: null }))
+  }
+
   const torrentHelperSource = fs.readFileSync(torrentHelperPath, 'utf-8')
   const rendererContext = vm.createContext({ Buffer, require })
   vm.runInContext(
