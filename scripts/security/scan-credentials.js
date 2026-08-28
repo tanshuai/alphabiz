@@ -27,23 +27,32 @@ for (const trackedFile of trackedFiles) {
   const normalizedPath = trackedFile.replace(/\\/g, '/')
   const absolutePath = path.join(repositoryRoot, trackedFile)
 
-  if (!fs.existsSync(absolutePath) || !fs.lstatSync(absolutePath).isFile()) continue
-
   if (forbiddenContainer.test(normalizedPath) || forbiddenName.test(normalizedPath)) {
     findings.push({ path: normalizedPath, reason: 'credential container or private-key filename' })
     continue
   }
 
-  const file = fs.openSync(absolutePath, 'r')
+  let file
   try {
+    file = fs.openSync(
+      absolutePath,
+      fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW || 0)
+    )
+    if (!fs.fstatSync(file).isFile()) continue
+
     const buffer = Buffer.alloc(maximumBytesToInspect)
     const bytesRead = fs.readSync(file, buffer, 0, buffer.length, 0)
     const beginning = buffer.subarray(0, bytesRead).toString('utf8')
     if (privateKeyMarkers.some(marker => marker.test(beginning))) {
       findings.push({ path: normalizedPath, reason: 'private-key content marker' })
     }
+  } catch (error) {
+    findings.push({
+      path: normalizedPath,
+      reason: `unable to inspect tracked file safely (${error.code || 'unknown error'})`
+    })
   } finally {
-    fs.closeSync(file)
+    if (file !== undefined) fs.closeSync(file)
   }
 }
 
