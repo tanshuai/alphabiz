@@ -1,6 +1,6 @@
 const fs = require('fs')
 const path = require('path')
-const fetch = require('node-fetch')
+const minVersionsFixture = require('../fixtures/min-versions.json')
 
 const modifyVersion = async (opt = {}) => new Promise(resolve => {
   if (!opt) resolve(false)
@@ -20,22 +20,7 @@ const modifyVersion = async (opt = {}) => new Promise(resolve => {
 })
 
 const getminversions = async () => {
-  const app = require('../../developer/app')
-  const versionsUrl = app.versionsUrl
-  console.log(versionsUrl)
-  let versions
-  try {
-    versions = await (await fetch(versionsUrl)).json()
-  } catch (e) {
-    versions = {
-      min: {
-        stable: '0.1.0',
-        nightly: '0.1.0-nightly-202205301917',
-        internal: '0.1.0-internal-202205301821'
-      }
-    }
-  }
-  return versions.min
+  return { ...minVersionsFixture.min }
 }
 
 const getUpdatableVersion = (channel, minVersion, opt = { isExpired: false }) => {

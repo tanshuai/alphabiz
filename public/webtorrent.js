@@ -4,6 +4,10 @@ const { ipcRenderer } = require('electron')
 const crypto = require('crypto')
 const fs = require('fs')
 const path = require('path')
+const { saveTorrentByName } = globalThis.alphabizTorrentFile || {}
+if (typeof saveTorrentByName !== 'function') {
+  throw new Error('Torrent file security boundary is not loaded')
+}
 const { setSecure } = require('webtorrent/lib/peer')
 // const diskusage = require('diskusage')
 const FSChunkStore = require('fs-chunk-store')
@@ -953,17 +957,17 @@ const saveTorrentFile = (infoHash, dir) => {
       message: 'Torrent Not Ready'
     })
   }
-  const torrentPath = path.resolve(dir, `${tr.name}.torrent`)
-  if (fs.existsSync(torrentPath)) {
+  let torrentPath
+  try {
+    torrentPath = saveTorrentByName(dir, tr.name, tr.torrentFile)
+  } catch (error) {
+    info('Refused to save torrent metadata', error)
     return ipcRenderer.send(channel, {
-      code: 0,
-      message: 'success',
-      infoHash,
-      torrentPath
+      code: -1,
+      message: 'Unable to save torrent metadata safely',
+      infoHash
     })
   }
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
-  fs.writeFileSync(torrentPath, tr.torrentFile)
   ipcRenderer.send(channel, {
     code: 0,
     message: 'success',
