@@ -1,4 +1,4 @@
-const { exec, execSync } = require('child_process')
+const { execSync, spawn } = require('child_process')
 const { existsSync, copyFileSync, mkdirSync, readFileSync, writeFileSync, unlinkSync, rmSync, cpSync, readdirSync, statSync } = require('fs')
 const { resolve } = require('path')
 const { version: pkgVersion } = require('../../package.json')
@@ -7,6 +7,7 @@ const publicVersion = existsSync(publicVersionPath)
   ? JSON.parse(readFileSync(publicVersionPath, 'utf8')).version
   : pkgVersion
 const { getAppxSigningCertificate } = require('../windows/appx/signing-certificate')
+const { createGitRestoreInvocation, createYarnInvocation, validateBuildTarget } = require('./command-boundary')
 const versionHeader = publicVersion.match(/\d+\.\d+\.\d+/gm)
 const appConfig = require('../../developer/app');
 const productName = appConfig.displayName;
@@ -23,8 +24,9 @@ const version = publicVersion || pkgVersion
 console.log(`version: ${version}`)
 
 // const { platform } = process
-const arch = process.env.BUILD_ARCH || process.arch
-const platform = process.env.BUILD_PLATFORM || process.platform
+const requestedArch = process.env.BUILD_ARCH || process.arch
+const requestedPlatform = process.env.BUILD_PLATFORM || process.platform
+const { arch, platform } = validateBuildTarget(requestedArch, requestedPlatform)
 
 const unsupportedModules = [
   /**
@@ -116,11 +118,12 @@ const makeMacUniversal = async () => {
 }
 
 const doMake = async () => {
-  const arg = platform === 'darwin' || platform === 'mas'
-    ? 'make:dmg'
-    : platform === 'win32'
-      ? 'make:win'
-      : 'make:deb'
+  const invocation = createYarnInvocation({
+    arch,
+    platform,
+    runtimePlatform: process.platform
+  })
+  const arg = invocation.args.find(value => value.startsWith('make:'))
   // console.log('make:win')
   console.log(`Make for \x1b[36m${platform}-${arch}\x1b[0m`)
   const packageDir = resolve(__rootdir, `dist/electron/${productName}-${platform}-${arch}`)
@@ -145,7 +148,7 @@ const doMake = async () => {
   // } else await symlinkDir(packageDir, destDir)
   console.log(`Executing: \x1b[32myarn ${arg}\x1b[0m`)
   const prefix = '\x1b[32m  * make \x1b[0m'
-  const res = exec(`yarn ${arg} --arch ${arch}`)
+  const res = spawn(invocation.command, invocation.args, invocation.options)
   res.stdout.on('data', d => {
     // process.stdout.clearLine()
     readline.clearLine(process.stdout, 0)
@@ -159,13 +162,17 @@ const doMake = async () => {
     readline.cursorTo(process.stderr, 0, null)
     process.stderr.write(prefix + e.toString().trim())
   })
+  res.on('error', error => {
+    process.stderr.write(`${prefix}Failed to start Yarn: ${error.message}\n`)
+    process.exit(1)
+  })
   // res.stderr.pipe(process.stderr)
   res.on('exit', code => {
     // process.stdout.clearLine()
     readline.clearLine(process.stdout, 0)
     readline.cursorTo(process.stdout, 0, null)
     process.stdout.write(prefix + 'Exit.\n')
-    process.exit(code)
+    process.exit(code ?? 1)
   })
 }
 
@@ -214,16 +221,21 @@ const doPostmake = () => {
 }
 
 const doReset = () => {
-  const res = exec(`git checkout -- build-scripts/windows/appx/template.xml package.json`)
+  const invocation = createGitRestoreInvocation()
+  const res = spawn(invocation.command, invocation.args, invocation.options)
   res.stdout.on('data', d => {
     process.stdout.write(d.toString().trim())
   })
   res.stderr.on('data', e => {
     process.stderr.write(e.toString().trim())
   })
+  res.on('error', error => {
+    process.stderr.write(`Failed to start Git: ${error.message}\n`)
+    process.exit(1)
+  })
   res.on('exit', code => {
     process.stdout.write('reset build-scripts/windows/appx/template.xml package.json end.\n')
-    process.exit(code)
+    process.exit(code ?? 1)
   })
 }
 
