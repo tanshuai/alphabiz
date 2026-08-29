@@ -123,6 +123,7 @@ jobs:
           yarn security:test-babel-traverse
           yarn security:test-minimist
           yarn security:test-form-data
+          yarn security:test-brace-expansion
 
   windows-appx-boundary:
     name: Windows APPX signing boundary
@@ -184,6 +185,10 @@ jobs:
       - name: Verify form-data boundary entropy
         shell: pwsh
         run: yarn security:test-form-data
+
+      - name: Verify brace-expansion resource bounds
+        shell: pwsh
+        run: yarn security:test-brace-expansion
 
       - name: Verify the Forge APPX maker boundary
         shell: pwsh
