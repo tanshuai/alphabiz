@@ -128,6 +128,7 @@ jobs:
           yarn security:test-async-ansi
           yarn security:test-flatted
           yarn security:test-cross-spawn
+          yarn security:test-picomatch
 
   windows-appx-boundary:
     name: Windows APPX signing boundary
@@ -209,6 +210,10 @@ jobs:
       - name: Verify cross-spawn process boundaries
         shell: pwsh
         run: yarn security:test-cross-spawn
+
+      - name: Verify picomatch glob boundaries
+        shell: pwsh
+        run: yarn security:test-picomatch
 
       - name: Verify the Forge APPX maker boundary
         shell: pwsh
