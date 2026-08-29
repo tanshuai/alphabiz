@@ -1,7 +1,7 @@
 {
   "name": "alphabiz",
   "main": "electron/UnPackaged/electron-main.js",
-  "version": "0.2.4",
+  "version": "0.4.0-beta.1",
   "packageManager": "yarn@1.22.22",
   "description": "Alphabiz Blockchain Cryptocurrency Application",
   "productName": "Alphabiz",
@@ -69,7 +69,10 @@
     "security:test-cross-spawn": "node scripts/security/test-cross-spawn-hardening.js",
     "security:test-picomatch": "node scripts/security/test-picomatch-hardening.js",
     "security:test-json5": "node scripts/security/test-json5-hardening.js",
-    "security:test-semver": "node scripts/security/test-semver-hardening.js"
+    "security:test-semver": "node scripts/security/test-semver-hardening.js",
+    "release:test-version": "node scripts/release/test-version-contract.js",
+    "release:validate-binary-version": "node scripts/release/validate-binary-version.js",
+    "release:validate-version": "node scripts/release/validate-version.js"
   },
   "dependencies": {
     "big-json": "^3.2.0",
