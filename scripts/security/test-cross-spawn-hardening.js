@@ -5,6 +5,34 @@ const fs = require('fs')
 const path = require('path')
 const { spawnSync } = require('child_process')
 
+let activePhase = 'initialization'
+let failureReported = false
+
+function escapeWorkflowData (value) {
+  return String(value)
+    .replace(/%/g, '%25')
+    .replace(/\r/g, '%0D')
+    .replace(/\n/g, '%0A')
+}
+
+function reportFailure (error) {
+  if (failureReported) return
+  failureReported = true
+
+  const details = error && error.stack ? error.stack : String(error)
+  if (process.env.GITHUB_ACTIONS === 'true') {
+    console.error(
+      `::error file=scripts/security/test-cross-spawn-hardening.js::${escapeWorkflowData(`cross-spawn gate failed in ${activePhase}:\n${details}`)}`
+    )
+  } else {
+    console.error(error)
+  }
+  process.exitCode = 1
+}
+
+process.once('uncaughtException', reportFailure)
+process.once('unhandledRejection', reportFailure)
+
 const repositoryRoot = path.resolve(__dirname, '..', '..')
 const rootManifest = JSON.parse(fs.readFileSync(path.join(repositoryRoot, 'package.json'), 'utf8'))
 const lockfile = fs.readFileSync(path.join(repositoryRoot, 'yarn.lock'), 'utf8')
@@ -39,6 +67,7 @@ const crossSpawnBlocks = lockBlocks.filter((block) =>
   selectorsFor(block).some((selector) => selector.startsWith('cross-spawn@'))
 )
 
+activePhase = 'lock graph'
 assert.equal(crossSpawnBlocks.length, 2, 'Unexpected cross-spawn lock block count')
 
 const expectedLocks = [
@@ -85,6 +114,7 @@ const actualConsumerEdges = lockBlocks.flatMap((block) => {
   return selectorsFor(block).map((selector) => `${selector} -> ${dependency[1]}`)
 }).sort()
 
+activePhase = 'consumer selector graph'
 assert.deepEqual(
   actualConsumerEdges,
   expectedConsumerEdges,
@@ -135,6 +165,7 @@ function portableRelative (file) {
 }
 
 const installations = []
+activePhase = 'physical package graph'
 visitNodeModules(path.join(repositoryRoot, 'node_modules'), installations)
 installations.sort((left, right) => left.manifestPath.localeCompare(right.manifestPath))
 
@@ -173,6 +204,7 @@ const redosProbeSource = [
   'assert.ok(Date.now() - startedAt < 1500)'
 ].join('\n')
 
+activePhase = 'bounded escaping probe'
 for (const installation of installations) {
   const probe = spawnSync(process.execPath, [
     '--max-old-space-size=64',
@@ -237,6 +269,7 @@ const corpus = [
   '影音-◎'
 ]
 
+activePhase = 'escaping compatibility corpus'
 for (const installation of installations) {
   const escape = require(installation.escapePath)
   for (const argument of corpus) {
@@ -279,6 +312,7 @@ function assertSpawnResult (result, expectedArguments, label) {
   assert.deepEqual(JSON.parse(result.stdout), expectedArguments, `${label} changed child arguments`)
 }
 
+activePhase = 'direct spawn argument round trip'
 for (const installation of installations) {
   const crossSpawn = require(installation.modulePath)
   const result = crossSpawn.sync(process.execPath, [
@@ -314,6 +348,7 @@ function assertConsumerResolution (consumer, expectedCrossSpawnVersion) {
 }
 
 const crossEnv = resolvePackage('cross-env', repositoryRoot)
+activePhase = 'cross-env consumer'
 assert.equal(crossEnv.manifest.version, '7.0.3')
 const crossEnvCrossSpawn = assertConsumerResolution(crossEnv, '7.0.6')
 const crossEnvShim = path.join(
@@ -380,12 +415,15 @@ function portableCanonicalPath (file) {
 }
 
 async function main () {
+  activePhase = '@malept/cross-spawn-promise 1.1.1 consumer'
   await assertMaleptConsumer('node_modules/@malept/cross-spawn-promise', '1.1.1')
+  activePhase = '@malept/cross-spawn-promise 2.0.0 consumer'
   await assertMaleptConsumer(
     'node_modules/@electron-forge/core/node_modules/@malept/cross-spawn-promise',
     '2.0.0'
   )
 
+  activePhase = 'APPX resolveCommand consumer'
   const makerAppx = resolvePackage('@electron-forge/maker-appx', repositoryRoot)
   assert.equal(makerAppx.manifest.version, '6.0.0-beta.63')
   const makerCrossSpawn = assertConsumerResolution(makerAppx, '7.0.6')
@@ -437,7 +475,4 @@ async function main () {
   )
 }
 
-main().catch((error) => {
-  console.error(error)
-  process.exitCode = 1
-})
+main().catch(reportFailure)
