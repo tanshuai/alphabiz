@@ -68,7 +68,8 @@
     "security:test-flatted": "node scripts/security/test-flatted-hardening.js",
     "security:test-cross-spawn": "node scripts/security/test-cross-spawn-hardening.js",
     "security:test-picomatch": "node scripts/security/test-picomatch-hardening.js",
-    "security:test-json5": "node scripts/security/test-json5-hardening.js"
+    "security:test-json5": "node scripts/security/test-json5-hardening.js",
+    "security:test-semver": "node scripts/security/test-semver-hardening.js"
   },
   "dependencies": {
     "big-json": "^3.2.0",
@@ -139,10 +140,12 @@
   "resolutions": {
     "@babel/traverse": "7.23.2",
     "@playwright/test/json5": "2.2.2",
+    "**/core-js-compat/semver": "7.5.4",
     "**/find-babel-config/json5": "1.0.2",
     "**/appium-support/form-data": "4.0.6",
     "**/jsdom/form-data": "3.0.5",
     "**/request/form-data": "2.5.6",
+    "**/utf7/semver": "5.7.2",
     "appium/appium-tizen-driver/jimp/@jimp/custom/@jimp/core/mkdirp": "0.5.6",
     "bittorrent-protocol": "3.5.1",
     "bufferutil": "4.0.6",
