@@ -367,12 +367,7 @@ const crossEnvArguments = [
   'meta&caret^pipe|percent%bang!',
   'unicode-影音-◎'
 ]
-const crossEnvProbeSource = [
-  'process.stdout.write(JSON.stringify({',
-  '  value: process.env.ALPHABIZ_CROSS_SPAWN_GATE,',
-  '  args: process.argv.slice(1)',
-  '}))'
-].join('\n')
+const crossEnvProbeSource = 'process.stdout.write(JSON.stringify({value:process.env.ALPHABIZ_CROSS_SPAWN_GATE,args:process.argv.slice(1)}))'
 const crossEnvResult = require(crossEnvCrossSpawn.modulePath).sync(crossEnvShim, [
   'ALPHABIZ_CROSS_SPAWN_GATE=value with spaces',
   process.execPath,
