@@ -120,6 +120,7 @@ jobs:
           yarn security:test-codeql
           yarn security:test-crypto-transitives
           yarn security:test-shell-quote
+          yarn security:test-babel-traverse
 
   windows-appx-boundary:
     name: Windows APPX signing boundary
@@ -169,6 +170,10 @@ jobs:
       - name: Verify shell quoting boundary
         shell: pwsh
         run: yarn security:test-shell-quote
+
+      - name: Verify Babel traversal boundary
+        shell: pwsh
+        run: yarn security:test-babel-traverse
 
       - name: Verify the Forge APPX maker boundary
         shell: pwsh
