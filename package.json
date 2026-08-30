@@ -118,7 +118,7 @@
     "electron-packager": "^15.4.0",
     "electron-rebuild": "^3.2.7",
     "electron-wix-msi": "^4.0.0",
-    "eslint": "^8.7.0",
+    "eslint": "^10.9.1",
     "eslint-config-standard": "^16.0.3",
     "http-server": "^14.1.0",
     "jest": "^27.4.7",
