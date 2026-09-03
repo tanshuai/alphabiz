@@ -1,9 +1,9 @@
-# Terms of Service TESTING
+# Terms of Service
 
 ## 1. Introduction
 
 Welcome to Use Alphabiz App (the "App"). The App is operated by Alphabiz Team ("Alphabiz" or "we"). This document – the terms of service – is an agreement between you, the beloved user, and Alphabiz. It's referred to as the "Terms" or the "Agreement".
-These Terms govern your use of the App and this App only. The Terms neither relate to any other Alphabiz application, service or property nor your use of any other Alphabiz application, service or property. For example, these Terms don't govern your use of Alphabiz App.
+These Terms govern your use of the App and this App only. The Terms neither relate to any other Alphabiz application, service or property nor your use of any other Alphabiz application, service or property. For example, these Terms do not govern your use of the Alphabiz website (alpha.biz) or of any other Alphabiz service.
 
 ## 2. Agreement to the Terms
 
