@@ -1,4 +1,4 @@
-# Guild to build macOS .app .dmg and mas target
+# Guide to build macOS .app .dmg and mas target
 
 ## One-command maker
 
@@ -7,6 +7,8 @@
 ```
 
 This command will build mac `.app` and `.dmg` files, both with `x86_64`, `arm64` and `universal` targets. If you want to build specific version, read the sh file for more details.
+
+The `.dmg` files are unsigned unless `APPLE_ID` is set: without `APPLE_ID`/`APPLE_ASP` in `.env` (the build scripts load `.env` from the repository root; export the variables in your shell if you run `yarn make` directly) the `premake:dmg` step skips signing and produces an unsigned dmg, which Gatekeeper warns about on first launch.
 
 ## CodeSign for mas(Mac App Store)
 
@@ -25,7 +27,7 @@ APP="Alphabiz"
 # Platform should be `mas` for Mac App Store, or `darwin` for 3rd party package.
 BUILD_PLATFORM="mas"
 # This overrides `version` in `package.json`
-VERSION="0.2.4"
+VERSION="0.3.3"  # match the release you are submitting
 # Increase this value everytime for a new submission to MAS.
 BUILD_BUNDLE="1"
 # The distribution key you get from App Store Connect
