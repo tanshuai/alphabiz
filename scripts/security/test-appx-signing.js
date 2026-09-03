@@ -45,6 +45,15 @@ try {
     new RegExp(PATH_ENV)
   )
 
+  const makeScriptSource = fs.readFileSync(
+    path.resolve(__dirname, '../../build-scripts/common/make.js'),
+    'utf-8'
+  )
+  assert(
+    makeScriptSource.includes('ALPHABIZ_REQUIRE_APPX'),
+    'make.js must keep the ALPHABIZ_REQUIRE_APPX opt-in for the APPX certificate requirement'
+  )
+
   if (process.argv.includes('--forge-config')) {
     const unsignedConfig = loadForgeConfig()
     assert.strictEqual(

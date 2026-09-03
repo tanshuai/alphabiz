@@ -257,7 +257,16 @@ if (process.argv.includes('--make')) {
   if (platform === 'win32') {
     // A Windows release must never fall back to a certificate stored in Git or
     // to an interactively generated certificate that CI could upload by mistake.
-    getAppxSigningCertificate({ required: true, expectedPublisher: appConfig.publisher })
+    // Without any ALPHABIZ_APPX_* variable the APPX target is skipped; set
+    // ALPHABIZ_REQUIRE_APPX=1 to make it mandatory. Partial configuration
+    // still throws inside the helper, so the check stays fail-closed.
+    const appxSigning = getAppxSigningCertificate({
+      required: process.env.ALPHABIZ_REQUIRE_APPX === '1',
+      expectedPublisher: appConfig.publisher
+    })
+    if (!appxSigning) {
+      console.log('[appx-signing] No external APPX certificate configured; make:win builds exe + msi and skips appx (set ALPHABIZ_REQUIRE_APPX=1 to require it).')
+    }
     const xmlFilePath = resolve(__rootdir, 'build-scripts/windows/appx/template.xml')
     const oldAppxTemplate = readFileSync(resolve(__rootdir, 'build-scripts/windows/appx/template.xml'), 'utf-8')
     let appxTemplate = oldAppxTemplate
