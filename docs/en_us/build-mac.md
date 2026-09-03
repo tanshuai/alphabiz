@@ -8,7 +8,7 @@
 
 This command will build mac `.app` and `.dmg` files, both with `x86_64`, `arm64` and `universal` targets. If you want to build specific version, read the sh file for more details.
 
-The `.dmg` files are unsigned unless `APPLE_ID` is set: without `APPLE_ID`/`APPLE_ASP` in `.env` (the build scripts load `.env` from the repository root; export the variables in your shell if you run `yarn make` directly) the `premake:dmg` step skips signing and produces an unsigned dmg, which Gatekeeper warns about on first launch.
+The `.dmg` files are unsigned unless `APPLE_ID` is set: `premake:dmg` tests only `APPLE_ID`, so without it in `.env` (the build scripts load `.env` from the repository root; export the variables in your shell if you run `yarn make` directly) the signing step is skipped and an unsigned dmg is produced, which Gatekeeper warns about on first launch. `APPLE_ASP` is read only for notarization and validation in `build-scripts/macos/pkg/build.sh`; with `APPLE_ID` set and `APPLE_ASP` missing, signing still runs and `build-scripts/macos/pkg/sign.sh` stops at its own environment checks.
 
 ## CodeSign for mas(Mac App Store)
 

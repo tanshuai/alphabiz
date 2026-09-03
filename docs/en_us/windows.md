@@ -34,8 +34,18 @@ known as Microsoft Store apps). Every APPX build must use an explicitly
 configured signing certificate. This repository does not contain a default or
 test signing key.
 
-Plain `yarn make` and `yarn make:win` currently require these variables; for
-unsigned EXE and MSI installers run `yarn make:squirrel && yarn make:msi`.
+Plain `yarn make` and `yarn make:win` currently require the `ALPHABIZ_APPX_*`
+variables shown below: the certificate is checked before packaging, so without
+them `yarn make` exits immediately and `yarn make:win` fails at its first step.
+For an unsigned build, `yarn make:msi` works on its own because it reads the
+packager output from `dist/electron/` directly. The Squirrel EXE maker instead
+reads Forge's `out/` directory, which `yarn make` normally fills from
+`dist/electron/`, so copy it there first:
+
+```powershell
+robocopy dist\electron\Alphabiz-win32-x64 out\Alphabiz-win32-x64 /E
+yarn make:squirrel
+```
 
 Store a password-protected PFX outside the repository. Provide its absolute
 path, password, and approved SHA-256 certificate fingerprint for the current

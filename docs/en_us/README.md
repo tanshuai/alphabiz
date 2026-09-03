@@ -96,7 +96,7 @@ There are some explanations for keys in `app.js`. The defaults below are transcr
 | `appId` | `'com.zeeis.alphabiz'` | Application ID for your mobile app (Android/iOS). |
 | `appIdentifier` | `'org.zeeis.alphabiz'` | Bundle identifier for your macOS app (Mac App Store). `appId` and `appIdentifier` intentionally use different prefixes; use the identifiers you registered. |
 | `snapName` | `'alphabiz'` (`name` in lower case) | Binary name of the snap package; it launches your app from a terminal. |
-| `microsoftStoreProductId` | `'9PBCCV3MHK04'` | Microsoft Store product ID; **change or clear before shipping** — the default is Alphabiz's own listing. |
+| `microsoftStoreProductId` | `'9PBCCV3MHK04'` | Store product ID used by the `appx` target; **change or clear before shipping** — the default is Alphabiz's own listing. |
 | `appxPackageIdentityName` | `'Alphabiz'` | Package identity name for the `appx` target. |
 | `publisher` | `'CN=zeeis'` | Publisher subject for the external APPX signing certificate verified through the `ALPHABIZ_APPX_*` environment variables. |
 | `publisherDisplayName` | `'Alphabiz Team'` | Publisher display name for the `appx` target. |
@@ -159,7 +159,19 @@ yarn make
 
 Platform notes:
 
-- **Windows** — plain `yarn make` currently requires the `ALPHABIZ_APPX_*` signing variables described in [windows.md](windows.md#about-appx-target) and exits before packaging anything when they are missing; `yarn make:win` builds the EXE and MSI and then fails at its final `make:appx` step for the same reason. For unsigned EXE and MSI installers run `yarn make:squirrel && yarn make:msi` instead (the MSI step needs WiX on your `PATH`).
+- **Windows** — plain `yarn make` currently requires the `ALPHABIZ_APPX_*` signing variables described in [windows.md](windows.md#about-appx-target): on Windows it checks for the certificate before it packages anything, so without them it exits immediately and `yarn make:win` fails at its first step. Without a certificate you can still build the MSI, and the EXE with one extra copy:
+
+  ```powershell
+  # MSI: reads the packager output from dist/electron/ directly (WiX 3.11 on your PATH)
+  yarn make:msi
+
+  # EXE (Squirrel): electron-forge looks in Forge's out/ directory, which `yarn make`
+  # normally fills from dist/electron/ before running the makers, so copy it yourself
+  robocopy dist\electron\Alphabiz-win32-x64 out\Alphabiz-win32-x64 /E
+  yarn make:squirrel
+  ```
+
+  Substitute your own `displayName` and architecture in the copy step. Installers land in `out/installers/<version>/`.
 - **macOS** — the DMG is unsigned unless `APPLE_ID` is set; the `premake:dmg` step skips signing without it, and users of an unsigned DMG see a Gatekeeper warning. A universal build needs both the x64 and the arm64 packager output first (`BUILD_ARCH=x64` and `BUILD_ARCH=arm64`); `./build-scripts/macos/app/build.sh` and `./build-scripts/macos/dmg/build.sh` run the three builds in order. For Mac App Store builds see [build-mac.md](build-mac.md).
 - **Linux** — `yarn make` produces a `.deb`, which needs the optional dependencies: install with plain `yarn`, not `yarn --ignore-optional`. `yarn make` does not build a snap; run `yarn make:snap` (needs snapd, Snapcraft and Multipass), or `yarn make:snap:ci` inside containers and CI runners where Multipass is unavailable (it builds with LXD).
 
