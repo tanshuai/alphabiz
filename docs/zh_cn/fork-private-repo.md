@@ -2,6 +2,8 @@
 
 私有仓库地址: [alphabiz-app](https://github.com/tanshuai/alphabiz-app)
 
+> 本文档面向拥有上游应用仓库访问权限的维护者；外部开发者请使用 [fork-public-repo.md](./fork-public-repo.md)。
+
 ## 开发前的准备
 
 请参考 <a href="https://github.com/tanshuai/alphabiz/blob/main/docs/zh_cn/prepare-before-dev.md"  target="_blank">此文档</a> 进行开发前的准备。
@@ -42,7 +44,7 @@ yarn dev
 
 ### 6.定制 app
 
-使用记事本或[代码编辑器](https://github.com/zeeis/customization-test/tree/main/docs/zh_cn/fork-repo-hint.md#code-editor)工具，修改`developer/`配置文件。等待 Electron 窗口刷新，若没有可以按 F5 手动刷新。调试完代码后，请使用 Ctrl + C 关闭 dev 模式。
+使用记事本或[代码编辑器](./prepare-before-dev.md#code-editor)工具，修改`developer/`配置文件。等待 Electron 窗口刷新，若没有可以按 F5 手动刷新。调试完代码后，请使用 Ctrl + C 关闭 dev 模式。
 
 详细定制化配置信息请参考 <a href="https://github.com/tanshuai/alphabiz/blob/main/docs/zh_cn/customized-content.md">此文档</a>
 
@@ -54,8 +56,8 @@ yarn dev
 yarn build
 ```
 
-1. app 生成路径为`dist/electron/[app 名称]-[系统名称]`。
-2. 如需修改构建 app 安装包的配置，请参考 [此文档](https://github.com/zeeis/customization-test/blob/main/docs/zh_cn/customized-content.md#install-package-config)
+1. app 生成路径为`dist/electron/[app 名称]-[系统名称]-[arch]`。
+2. 如需修改构建 app 安装包的配置，请参考 [此文档](./customized-content.md#install-package-config)
 
 ### 8.生成安装包
 

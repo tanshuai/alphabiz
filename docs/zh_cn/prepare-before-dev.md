@@ -4,7 +4,12 @@
 可以在命令行中输入 `git --version` 来检查是否已安装。推荐使用 [Github Desktop 工具](https://desktop.github.com/)。
 #### (2). 确保已经安装了 Node.js。
 
-建议安装版本为 16，可以在命令行中输入 `node -v` 和 `npm -v` 来检查是否已安装。如果需要管理多个 Node.js 版本，可以使用 [nvm](https://github.com/nvm-sh/nvm) 工具。可以从 [这里](https://nodejs.org/download/release/v16.19.0/) 下载 Node.js 16.19.0 安装包。
+可以在命令行中输入 `node -v` 和 `npm -v` 来检查是否已安装。如果需要管理多个 Node.js 版本，可以使用 [nvm](https://github.com/nvm-sh/nvm) 工具。安装包可以从 [Node.js 官方下载页](https://nodejs.org/en/download) 获取。
+
+本仓库有两套工具链，请按你的目的选择 Node.js 版本：
+
+- 仓库工具链与 CI：Node.js 22，Yarn Classic 1.22.22（corepack 或 `npx --yes yarn@1.22.22`；不支持 Yarn 2+）。
+- 应用构建：Yarn Classic 1.22.22；Python 3.7–3.11（node-gyp 9.3 不支持 3.12 及以上）；C++ 工具链；原生模块按 `@zeeis/velectron` 21.3.3 运行时重新编译；Node.js：已发布版本使用 Node.js 16 构建（旧 nightly 流水线固定为 16），更高版本尚未针对原生模块重编译重新验证——若你在新版本上构建成功，欢迎反馈。
 
 <details><summary>Git 和 Node.js 的安装方法（点击查看）</summary>
 
@@ -17,13 +22,13 @@
    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
    ```
 
-3. 使用以下命令在终端中安装 Git 和 Node.js 16：
+3. 使用以下命令在终端中安装 Git；Node.js 请按上文「两套工具链」说明选择版本，从 [Node.js 官方下载页](https://nodejs.org/en/download) 下载安装包，或用 nvm 安装（例如 `nvm install 16`）：
 
    ```bash
-   brew install git node@16
+   brew install git
    ```
 
-4. 找到nodejs安装的路径，添加到环境变量中
+4. 若你改用 Homebrew 安装了带版本号的 Node.js（例如 `brew install node@16`），需要找到其安装路径并添加到环境变量中
 
   ```bash
   Intel芯片为例
@@ -44,7 +49,7 @@
 1. 下载 Git for Windows 安装程序：https://git-scm.com/download/win
 2. 运行安装程序并按照提示进行操作。默认选项通常是可以接受的。
 3. 在安装过程中，确保选中“Git Bash Here”和“Use Git and optional Unix tools from the Command Prompt”选项。
-4. 下载 Node.js 16.19.0 的 MSI 安装包：https://nodejs.org/download/release/v16.19.0/
+4. 从 [Node.js 官方下载页](https://nodejs.org/en/download) 下载 Windows 安装包（版本按上文「两套工具链」说明选择）
 5. 运行安装程序并按照提示进行操作。默认选项通常是可以接受的。
 6. 等待安装完成后，您可以在命令提示符中输入以下命令来验证 Git 和 Node.js 是否已成功安装：
 
@@ -70,12 +75,10 @@
 
    ```
 
-2. 使用以下命令在终端中安装 Git 和 Node.js 16：
+2. 使用以下命令在终端中安装 Git；Node.js 请按 [Node.js 官方下载页](https://nodejs.org/en/download) 上对应你发行版的方式安装（版本按上文「两套工具链」说明选择），或用 nvm 安装（例如 `nvm install 16`）：
 
    ```bash
    sudo apt-get install git
-   curl -sL https://deb.nodesource.com/setup_16.x | sudo bash -
-   sudo apt -y install nodejs
    ```
 
 3. 等待安装过程完成。
@@ -94,7 +97,7 @@
 #### (3). <span id="build-c++">在 Windows 系统下，需要安装`Visual Studio 2015 及以上版本的桌面开发工具和 C++ 组件`以及`Python`。</span>详细请参考 [这篇文档](https://github.com/Microsoft/nodejs-guidelines/blob/master/windows-environment.md#environment-setup-and-configuration)。
 此步骤用于windows系统下，编译仓库中的C++模块
 
-安装 Python 时，需要安装版本大于等于 **3.6** 且 小于 **3.12**，并且需要勾选 **Add Python to PATH** 选项，以便操作系统可以快速找到 Python 解释器。
+安装 Python 时，需要安装版本大于等于 **3.7** 且小于 **3.12**（即 3.7–3.11；仓库锁定的 node-gyp 9.3 不支持 Python 3.12 及以上），并且需要勾选 **Add Python to PATH** 选项，以便操作系统可以快速找到 Python 解释器。
 
 注意：
 - 确保安装Visual Studio 2019或2017
@@ -123,12 +126,14 @@
 
 #### (4). 确保安装 yarn
 
-检查 yarn 的版本：`yarn -v`
+检查 yarn 的版本：`yarn -v`（应为 `1.22.22`）
 
-安装 yarn：
+本仓库使用 Yarn Classic 1.22.22，**不支持 Yarn 2+**（仓库依赖 Classic 锁文件与 hoisted `node_modules`）。推荐通过 corepack 安装：
 ```bash
-npm install --global yarn
+corepack enable
+corepack prepare yarn@1.22.22 --activate
 ```
+若无法使用 corepack，可以用 `npx --yes yarn@1.22.22 <命令>` 代替 `yarn <命令>`。
 
 #### (5). 在 fork 私有仓库时，需要安装 @quasar/cli
 
@@ -144,7 +149,7 @@ yarn global add @quasar/cli
 
 Wix Toolset 是一个用于创建 Windows 安装程序的工具集。在 Windows 系统下构建 MSI 安装包时需要使用它。
 
-安装前需要确认安装 .NET Framework 3.5.1。安装 Wix Toolset 可以从[官网](https://wixtoolset.org/)下载最新版本的 MSI 安装程序。安装完成后，需要将 Wix Toolset 的安装路径添加到系统 Path 变量中。默认情况下，Wix Toolset 的安装路径为：
+安装前需要确认安装 .NET Framework 3.5.1。请安装 **WiX Toolset v3.11（arm64 需 v3.14）——不要安装 v4 及以上**，安装程序可从 [wix3 的 GitHub Releases](https://github.com/wixtoolset/wix3/releases) 下载。安装完成后，需要将 Wix Toolset 的安装路径添加到系统 Path 变量中。默认情况下，Wix Toolset 的安装路径为：
 ```
 C:\Program Files (x86)\WiX Toolset v3.11\bin
 ```
@@ -172,7 +177,7 @@ C:\Program Files (x86)\WiX Toolset v3.11\bin
 
 <details><summary>安装Wix Toolset、配置环境变量方法(点击查看)</summary>
 
-建议安装最后一个稳定版本的exe安装包
+建议安装 v3.11 系列最后一个稳定版本的 exe 安装包（arm64 用 v3.14），不要安装 v4 及以上
 
 ![image](https://user-images.githubusercontent.com/92558550/202830934-0796cc10-e0d6-4fc6-aa5c-ba7927df3fc8.png)
 

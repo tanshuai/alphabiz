@@ -72,6 +72,13 @@ cp ./build-scripts/macos/.env ./.env
 (5).运行结束后在`out/installers/[app版本号]`路径下生成 x64、amd64、universal版本的dmg安装包
 
 ### 3. mac商店版本
+
+请参考 [build-mac.md](../en_us/build-mac.md)（英文）。
+
 ### 4. Android
 
+公共仓库当前不提供移动端构建文档；移动端由上游应用仓库构建。
+
 ### 5. IOS
+
+公共仓库当前不提供移动端构建文档；移动端由上游应用仓库构建。

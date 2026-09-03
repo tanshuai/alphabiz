@@ -26,7 +26,7 @@ Request failed \"401 Unauthorized\"".
 **报错原因**：未安装好编译C++所需的工具，或node-gyp electron-rebuild出问题
 
 **解决方案**：
-1. 安装好[编译C++所需的工具](https://github.com/zeeis/customization-test/tree/main/docs/zh_cn/fork-repo-hint.md#build-c++)后，重试`yarn`
+1. 安装好[编译C++所需的工具](./prepare-before-dev.md#build-c++)后，重试`yarn`
 2. 若还是失败，可以尝试清空仓库根目录的node_modules文件夹和node-gyp缓存文件。
 
 ```bash
@@ -58,7 +58,7 @@ Output:
 RequestError: read ECONNRESET
 ```
 
-#### (4). 时区报错
+#### (5). 时区报错
 
 **报错原因**：
 1. 系统时间变化：如果你的系统时间突然变化（比如夏令时变化，手动调整，NTP更新等），可能会导致此问题。
@@ -69,7 +69,7 @@ RequestError: read ECONNRESET
 
 错误信息：
 ```
-yarn install v1.22.19
+yarn install v1.22.22
 [1/5] Validating package.json...
 [2/5] Resolving packages...
 [3/5] Fetching packages...
@@ -130,7 +130,7 @@ channel | (字符串) - 默认版本通道，建议与版本号中的通道统�
 buildTime | (字符串) - 软件构建时间。github仓库最后一次commit的时间
 buildCommit | (字符串) - 软件构建github提交记录。github仓库最后一次commit的SHA7，显示在APP标题栏，方便查找版本
 sourceCommit | (字符串) - 软件资源github提交记录。若是私有仓库，则与buildCommit相同；若是公共仓库，则为私有仓库最后一次commit的SHA7，方便查找公共仓库发布的软件对应的私有仓库的提交记录
-version | (字符串) - 完整版本号，规则 <a href="#version">见此</a>
+version | (字符串) - 完整版本号，规则 <a href="./fork-repo-hint.md#version">见此</a>
 
 #### (2). digital envelope routines::unsupported
 
@@ -138,9 +138,7 @@ version | (字符串) - 完整版本号，规则 <a href="#version">见此</a>
 
 > Webpack 导致的 openssl 问题已修复，如果安装新模块后出现报错，检查新引入的模块是否使用了 `crypto` 模块中的旧加密方法
 
-**解决方案**：
-  方法1: node版本重装成16的
-  方法2: 打开终端并粘贴如下所示
+**解决方案**：设置 `NODE_OPTIONS` 环境变量（值见下方对应平台的命令）后重试。打开终端并粘贴如下所示：
 
 Linux and macOS (Windows Git Bash)-
 ```
