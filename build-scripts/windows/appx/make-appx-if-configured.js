@@ -2,13 +2,25 @@
 
 const { spawnSync } = require('child_process')
 const { validateBuildTarget } = require('../../common/command-boundary')
-const { PATH_ENV, PASSWORD_ENV, FINGERPRINT_ENV } = require('./signing-certificate')
+const {
+  PATH_ENV,
+  PASSWORD_ENV,
+  FINGERPRINT_ENV,
+  normalizeFingerprint
+} = require('./signing-certificate')
 
 const REQUIRE_ENV = 'ALPHABIZ_REQUIRE_APPX'
-const CERTIFICATE_ENVS = [PATH_ENV, PASSWORD_ENV, FINGERPRINT_ENV]
 
+// Mirrors `anyConfigured` in signing-certificate.js: the fingerprint is
+// normalized there before it counts as configured, so a value with no hex
+// digits must not make this script disagree with make.js about whether the
+// APPX step is expected to run.
 function isCertificateConfigured (environment) {
-  return CERTIFICATE_ENVS.some(name => Boolean(environment[name]))
+  return Boolean(
+    environment[PATH_ENV] ||
+    environment[PASSWORD_ENV] ||
+    normalizeFingerprint(environment[FINGERPRINT_ENV])
+  )
 }
 
 // `yarn make:win --arch <arch>` (see make.js) appends its trailing arguments to
@@ -22,6 +34,9 @@ function parseArguments (argv) {
       throw new Error(`[appx-signing] Unsupported argument: ${argv[index]}`)
     }
     index += 1
+    if (index >= argv.length) {
+      throw new Error('[appx-signing] --arch requires an architecture value.')
+    }
     args.push('--arch', validateBuildTarget(argv[index], 'win32').arch)
   }
   return args
@@ -44,6 +59,10 @@ function createAppxMakeInvocation ({ runtimePlatform, args = [] }) {
 }
 
 function main () {
+  // Validate arguments before the skip decision, so an unsupported argument
+  // fails the same way on a developer machine without a certificate as it
+  // does on the signing machine.
+  const forwardedArgs = parseArguments(process.argv.slice(2))
   const required = process.env[REQUIRE_ENV] === '1'
   if (!required && !isCertificateConfigured(process.env)) {
     console.log(`[appx-signing] No external APPX certificate configured; skipping make:appx (set ${REQUIRE_ENV}=1 to require it).`)
@@ -52,7 +71,7 @@ function main () {
 
   const invocation = createAppxMakeInvocation({
     runtimePlatform: process.platform,
-    args: parseArguments(process.argv.slice(2))
+    args: forwardedArgs
   })
   const result = spawnSync(invocation.command, invocation.args, {
     ...invocation.options,

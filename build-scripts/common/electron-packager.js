@@ -14,7 +14,7 @@ const basePath = process.env.PROD
 const versionJSONPath = process.env.PROD ? 'version.json' : 'public/version.json'
 const versionJSONFile = resolve(basePath, versionJSONPath)
 if (!fs.existsSync(versionJSONFile)) {
-  throw new Error('[packager] public/version.json is missing. Run yarn unpackaged (or node update-version.js) before yarn packager.')
+  throw new Error(`[packager] ${versionJSONPath} is missing at ${versionJSONFile}. Run yarn unpackaged (or node update-version.js) before yarn packager.`)
 }
 const versionJSON = fs.readFileSync(versionJSONFile)
 const versionObj = JSON.parse(versionJSON)
