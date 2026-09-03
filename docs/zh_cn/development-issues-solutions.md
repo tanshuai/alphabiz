@@ -8,13 +8,13 @@
 
 **解决方案**：以管理员身份打开命令行窗口
 
-#### <span id="401-unauthorized">(2). 401 Unauthorized </span>
+#### <span id="401-unauthorized">(2). 401 Unauthorized（历史问题）</span>
 
-**报错原因**：没有权限安装alphabiz的模块。Github PAT密钥没有配置好、或没有加入zeeis组织
+**报错原因**：旧版本公共仓库依赖私有 GitHub Packages 包。现在这两个包已随仓库 `vendor/` 目录提供，公共仓库的 `yarn unpackaged` 不需要 PAT。若仍看到此错误，通常是 `~/.npmrc` 里填了非空但无效的 token（改为 `//npm.pkg.github.com/:_authToken=` 空值即可），或者你在开发私有仓库 alphabiz-app（需要 zeeis 成员的 PAT）。
 
 **解决方案**：
-1. 查看[github PAT密钥配置文档](https://github.com/tanshuai/alphabiz/blob/main/docs/zh_cn/use-github-pat.md)
-2. 与alphabiz仓库[所有者](https://github.com/tanshuai)联系
+1. 检查 `~/.npmrc`，参考 [use-github-pat.md](./use-github-pat.md)
+2. 开发私有仓库时，与alphabiz仓库[所有者](https://github.com/tanshuai)联系
 
 
 错误信息:

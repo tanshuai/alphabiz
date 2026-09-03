@@ -54,6 +54,13 @@ For macOS you need:
   yarn unpackaged
   ```
 
+  Run both commands from the repository root. The two application packages
+  (`@zeeis/alphabiz-account`, `@zeeis/alphabiz-libdb`) are vendored in `vendor/`, so
+  `yarn unpackaged` needs no registry token. The root `yarn` step currently expects
+  `~/.npmrc` to contain the line `//npm.pkg.github.com/:_authToken=` (leave the value
+  empty; no token is needed) because the `@zeeis/velectron` installer reads that file.
+  Do not put a placeholder value after `=`: a non-empty invalid token causes a 401.
+
 ## Customize your app
 - Edit [developer/app.js](developer/app.js) via your IDE.
 - Edit [developer/assets](developer/assets) and [developer/platform-assets](developer/platform-assets) to change icons and other assets for your app.

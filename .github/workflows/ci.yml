@@ -34,6 +34,7 @@ jobs:
           git diff --check
           node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8')); JSON.parse(require('fs').readFileSync('release.json', 'utf8'));"
           node scripts/security/scan-credentials.js
+          (cd vendor && shasum -a 256 -c SHA256SUMS)
 
       - name: Validate workflow least privilege and immutable actions
         shell: bash
