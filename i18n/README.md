@@ -1,13 +1,17 @@
 # Guide for external i18n
 
-Alphabiz loads its translations from an external i18n directory at runtime, so language packs can be added or updated without shipping a new version of the app. This directory is the one Alphabiz itself loads; a fork points its app at its own copy (see [For forks](#for-forks)).
+Alphabiz ships its built-in translations inside the app and additionally loads language packs from an external i18n directory at runtime, so packs can be added or updated without shipping a new version of the app. This directory is the one Alphabiz itself loads; a fork points its app at its own copy (see [For forks](#for-forks)).
 
 ## Directory layout
 
 - [`example/translations.json`](example/translations.json) is the canonical key set. `check.js` loads it (`require('./example/translations.json')`) and validates every locale directory against it: a locale must contain every key of the example, must not contain keys that are not in the example, and every `{variable}` placeholder in an example value must also appear in the translated value. The `example` directory itself is skipped by the check.
 - [`example/dateTimeFormat.json`](example/dateTimeFormat.json) is the template for the optional date and time formats.
 - The [en-GB](en-GB) directory contains configurations for en-GB.
-- The [locales](locales) file lists the locale codes the app offers.
+- The [locales](locales) file lists the locale codes **this directory provides**. It is additive: the app already
+  ships built-in locales (de-DE, en-US, es-ES, fr-FR, hi-IN, id-ID, it-IT, ja-JP, ko-KR, nl-NL, pl-PL, pt-PT,
+  ru-RU, th-TH, tr-TR, zh-CN, zh-TW), and an entry here either adds a new locale or replaces a built-in one
+  that has the same code. Removing a code from this file, or commenting it out with `#`, only stops that
+  external pack from loading; it does not remove a built-in locale from the app.
 
 You can add your custom language in a directory named by its locale code. The locale codes are recommended to be [BCP-47 language tags](https://gist.github.com/typpo/b2b828a35e683b9bf8db91b5404f1bd1).
 
