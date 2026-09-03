@@ -12,7 +12,7 @@ an open-source framework for building your own branded app on the same core.
 [![Latest stable release](https://img.shields.io/github/v/release/tanshuai/alphabiz?label=stable)](https://github.com/tanshuai/alphabiz/releases/latest)
 [![Downloads of the latest stable release](https://img.shields.io/github/downloads/tanshuai/alphabiz/latest/total?label=downloads%20%28latest%20stable%29)](https://github.com/tanshuai/alphabiz/releases/latest)
 [![License: GPL-2.0](https://img.shields.io/github/license/tanshuai/alphabiz)](LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/tanshuai/alphabiz?style=flat)](https://github.com/tanshuai/alphabiz)
+![GitHub stars](https://img.shields.io/github/stars/tanshuai/alphabiz?style=flat)
 
 ![Alphabiz desktop application](https://user-images.githubusercontent.com/92558550/211519797-4e766719-f6cf-420e-9e04-0057150c5c3a.jpg)
 
@@ -48,8 +48,8 @@ A community-maintained, unaffiliated Arch Linux package, [alphabiz-bin](https://
 
 - 1,215 GitHub stars and 385 forks; public repository since January 2022.
 - 383 GitHub releases: 5 stable versions, 374 nightly builds published daily from January 2022 to August 2023, and 4 version prereleases; 116 releases have 100+ downloads each.
-- Release 0.3.3 alone: more than 3,500 installer downloads across its Windows, macOS and Linux packages (live count in the badge above).
-- [Softpedia](https://www.softpedia.com/get/Internet/File-Sharing/Alphabiz.shtml) lists Alphabiz 0.3.3 with an editor rating of 4.5/5 and a "100% CLEAN" certification.
+- Release 0.3.3 alone: more than 3,500 installer downloads across its Windows, macOS and Linux packages (the badge above tracks every asset of the latest release, checksum files included).
+- [Softpedia](https://www.softpedia.com/get/Internet/File-Sharing/Alphabiz.shtml) lists Alphabiz 0.3.3 with an editor rating of 4.5/5 from an independent review.
 - [22 pull requests merged in August 2026](https://github.com/tanshuai/alphabiz/pulls?q=is%3Apr+is%3Amerged+merged%3A2026-08-01..2026-08-31): security hardening, dependency fixes, least-privilege CI with CodeQL, and a release version contract.
 
 ## What this repository contains

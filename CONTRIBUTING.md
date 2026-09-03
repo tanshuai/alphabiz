@@ -11,7 +11,7 @@ for the application; large feature work should start with a proposal issue.
 - Search existing issues and pull requests before opening a duplicate.
 - Use [GitHub private vulnerability reporting](https://github.com/tanshuai/alphabiz/security/advisories/new)
   for security issues; never disclose an unpatched vulnerability publicly.
-- Keep changes focused. Large feature work should begin with a proposal issue.
+- Keep changes focused.
 - Do not include credentials, private user data, generated signing material, or
   unrelated formatting changes.
 
@@ -50,7 +50,8 @@ value may be left empty) because the `@zeeis/velectron` installer, which downloa
 runtime, reads that file; never put a placeholder value after `=`, because a non-empty invalid token
 causes a 401. Do not install with `--ignore-optional` on this path (`.deb` builds need the optional
 dependencies). State the toolchain you built with in your pull request; see the build guide for what
-has been verified.
+has been verified. The Cypress end-to-end runner (`yarn test:e2e`) needs OpenSSL on `PATH` to create
+and clean up its disposable localhost certificate.
 
 ## Vendored packages
 
