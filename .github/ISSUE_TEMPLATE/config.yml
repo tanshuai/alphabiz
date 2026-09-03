@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability (private)
+    url: https://github.com/tanshuai/alphabiz/security/advisories/new
+    about: Do not open a public issue for a vulnerability. Use GitHub private vulnerability reporting; see SECURITY.md.
+  - name: Ask a question
+    url: https://github.com/tanshuai/alphabiz/discussions
+    about: Questions about installing, building or customizing Alphabiz belong in Discussions.
