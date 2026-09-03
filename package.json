@@ -6,7 +6,7 @@
   "description": "Web3 YouTube alternative - fully decentralized media platform and blockchain-based marketplace",
   "productName": "Alphabiz",
   "author": "Alphabiz Team <ab@alpha.biz>",
-  "license": "GPL-2.0",
+  "license": "GPL-2.0-only",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tanshuai/alphabiz.git"

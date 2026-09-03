@@ -1,7 +1,7 @@
 # Before you ship a fork
 
-Everything below either ships inside your installers or is fetched by your users' installed app from
-the `main` branch of the repository named in `developer/update.js`. A value left at its default means
+Everything below either ships inside your installers or is fetched at runtime by your users' installed
+app from URLs configured in `developer/app.js` and `developer/update.js`. A value left at its default means
 your app talks to Alphabiz's infrastructure, carries Alphabiz's identifiers, or shows Alphabiz's
 content. Work through the list once before your first release and re-check it whenever you sync with
 upstream.
@@ -10,7 +10,7 @@ upstream.
 
 Identity and installers:
 
-- [ ] `name` — at least 3 characters, `A-Z` / `a-z` only, no spaces (checked by `developer/validateAppConfig.js`); it also seeds `snapName`, `protocol` and `LIBDB_NAME`
+- [ ] `name` — must start with at least 3 characters from `a-z`, `A-Z`, `0-9`, `.`, `-`, `+` (that is what `developer/validateAppConfig.js` checks); `developer/app.js` recommends sticking to letters with no spaces. It also seeds `snapName`, `protocol` and `LIBDB_NAME`
 - [ ] `displayName` — the window title and the APPX display name
 - [ ] `fileName` — used for installer file names; keep it to 15 characters or fewer for macOS
 - [ ] `appId` — mobile application id (`com.zeeis.alphabiz` by default)
