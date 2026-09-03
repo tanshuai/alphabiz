@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -7,144 +7,253 @@
     <meta name="theme-color" content="#07111f">
     <meta
       name="description"
-      content="The public maintenance status of AlphaBiz, a GPL-2.0 historical decentralized-media and Web3 project."
+      content="Alphabiz is an open-source, fully decentralized media platform and blockchain-based marketplace for Windows, macOS, Linux and the web, and a framework for building your own branded app."
     >
-    <title>AlphaBiz · Maintenance revival</title>
-    <link rel="stylesheet" href="./assets/maintenance.css">
+    <title>Alphabiz — decentralized media platform and marketplace</title>
+    <link rel="icon" type="image/png" href="./assets/icon.png">
+    <link rel="stylesheet" href="./assets/site.css">
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
 
     <header class="site-header">
-      <a class="brand" href="./" aria-label="AlphaBiz maintenance home">
-        <span class="brand-mark" aria-hidden="true">A</span>
-        <span>AlphaBiz</span>
+      <a class="brand" href="./" aria-label="Alphabiz home">
+        <img class="brand-mark" src="./assets/icon.png" alt="" width="34" height="34">
+        <span>Alphabiz</span>
       </a>
       <nav aria-label="Primary navigation">
-        <a href="#status">Status</a>
-        <a href="#history">History</a>
-        <a href="#release-gates">Release gates</a>
+        <a href="#download">Download</a>
+        <a href="#features">Features</a>
+        <a href="#build">Build your own app</a>
+        <a href="#docs">Docs</a>
+        <a href="https://github.com/tanshuai/alphabiz/blob/main/SECURITY.md">Security</a>
         <a href="https://github.com/tanshuai/alphabiz">GitHub</a>
       </nav>
     </header>
 
     <main id="main">
-      <section class="hero" aria-labelledby="hero-title">
+      <section class="hero" id="hero" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> GPL-2.0 · Maintenance revival</p>
-          <h1 id="hero-title">Returning AlphaBiz to a verifiable maintenance baseline.</h1>
+          <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> GPL-2.0 · Stable release 0.3.3</p>
+          <h1 id="hero-title">Decentralized media platform and marketplace, open source.</h1>
           <p class="hero-lede">
-            AlphaBiz is a GPL-2.0 historical project and public maintenance repository for a
-            desktop and mobile product that explored decentralized media, P2P streaming, and
-            Web3 applications. The repository is being secured and documented before any new
-            production binary is considered.
+            Web3 YouTube alternative: a fully decentralized media platform and blockchain-based marketplace.
+            Alphabiz ships as a desktop application for Windows, macOS and Linux, as a hosted web edition,
+            and as an open-source framework for building your own branded app on the same core.
           </p>
           <div class="actions">
-            <a class="button button-primary" href="https://github.com/tanshuai/alphabiz">View public repository</a>
-            <a class="button button-secondary" href="https://github.com/tanshuai/alphabiz/releases">Legacy release archive</a>
+            <a class="button button-primary" href="#download">Download 0.3.3</a>
+            <a class="button button-secondary" href="https://web.alpha.biz">Open the web edition</a>
+            <a class="button button-secondary" href="https://github.com/tanshuai/alphabiz">View on GitHub</a>
           </div>
         </div>
-        <aside class="notice" aria-label="Current release notice">
-          <span class="notice-label">Current release policy</span>
-          <strong>No new production binary yet.</strong>
-          <p>Security, CI, packaging, and smoke-test gates must pass first.</p>
+        <aside class="notice" aria-label="Current release">
+          <span class="notice-label">Current release</span>
+          <strong>0.3.3 for Windows, macOS and Linux — September 2024.</strong>
+          <p>Preview 0.4.0-beta.1 (August 2026) carries no installers.</p>
         </aside>
       </section>
 
-      <section class="metrics" aria-label="Public repository history">
-        <article><strong>1.2k+</strong><span>GitHub stars</span></article>
-        <article><strong>385</strong><span>public forks</span></article>
-        <article><strong>2.5k+</strong><span>commits</span></article>
-        <article><strong>380+</strong><span>published releases</span></article>
-      </section>
-      <p class="metrics-note">Historical public figures, not a claim of current binary support.</p>
+      <figure class="screenshot">
+        <img
+          src="https://user-images.githubusercontent.com/92558550/211519797-4e766719-f6cf-420e-9e04-0057150c5c3a.jpg"
+          alt="The Alphabiz desktop application showing the media library and player"
+          loading="lazy"
+        >
+        <figcaption>The Alphabiz desktop application.</figcaption>
+      </figure>
 
-      <section class="section" id="status" aria-labelledby="status-title">
+      <section class="metrics" id="metrics" aria-label="Project figures">
+        <article><strong>1,215</strong><span>GitHub stars</span></article>
+        <article><strong>385</strong><span>forks</span></article>
+        <article><strong>383</strong><span>GitHub releases</span></article>
+        <article><strong>3,500+</strong><span>downloads of 0.3.3</span></article>
+      </section>
+      <p class="metrics-note">GitHub figures as of 2026-09-03.</p>
+
+      <section class="section" id="download" aria-labelledby="download-title">
         <div class="section-heading">
-          <p class="eyebrow">Transparent status</p>
-          <h2 id="status-title">What is available today</h2>
+          <p class="eyebrow">Current stable release · 13 September 2024</p>
+          <h2 id="download-title">Download Alphabiz 0.3.3</h2>
+          <p>Installers for every desktop platform, served from this repository's GitHub Releases.</p>
         </div>
-        <div class="card-grid">
-          <article class="card">
-            <span class="card-state state-active">Available</span>
-            <h3>Public repository</h3>
-            <p>Packaged application files, tooling, documentation, and public release history remain available for inspection.</p>
-            <a href="https://github.com/tanshuai/alphabiz">Browse the public repository <span aria-hidden="true">→</span></a>
+        <div class="download-grid">
+          <article class="download-card">
+            <h3>Windows 10/11 (x64)</h3>
+            <ul>
+              <li><a href="https://github.com/tanshuai/alphabiz/releases/download/0.3.3/alphabiz-0.3.3.msi">MSI installer</a> <span>alphabiz-0.3.3.msi</span></li>
+              <li><a href="https://github.com/tanshuai/alphabiz/releases/download/0.3.3/alphabiz-0.3.3.exe">EXE installer</a> <span>alphabiz-0.3.3.exe</span></li>
+            </ul>
           </article>
-          <article class="card">
-            <span class="card-state state-legacy">Deprecated</span>
-            <h3>Legacy binaries</h3>
-            <p>Release 0.3.3 and earlier installers are historical artifacts. They are not recommended for production use.</p>
-            <a href="https://github.com/tanshuai/alphabiz/releases/tag/0.3.3">Inspect release 0.3.3 <span aria-hidden="true">→</span></a>
+          <article class="download-card">
+            <h3>macOS 11+</h3>
+            <ul>
+              <li><a href="https://github.com/tanshuai/alphabiz/releases/download/0.3.3/alphabiz-arm64-0.3.3.dmg">Apple silicon DMG</a> <span>alphabiz-arm64-0.3.3.dmg</span></li>
+              <li><a href="https://github.com/tanshuai/alphabiz/releases/download/0.3.3/alphabiz-x64-0.3.3.dmg">Intel DMG</a> <span>alphabiz-x64-0.3.3.dmg</span></li>
+            </ul>
           </article>
-          <article class="card">
-            <span class="card-state state-blocked">Not trusted</span>
-            <h3>Legacy APPX</h3>
-            <p>The historical APPX package is deprecated and must not be treated as carrying current signing trust.</p>
+          <article class="download-card">
+            <h3>Ubuntu 20.04+ / Debian (x64)</h3>
+            <ul>
+              <li><a href="https://github.com/tanshuai/alphabiz/releases/download/0.3.3/alphabiz-0.3.3.deb">DEB package</a> <span>alphabiz-0.3.3.deb</span></li>
+              <li><a href="https://github.com/tanshuai/alphabiz/releases/download/0.3.3/alphabiz-0.3.3.snap">.snap package</a> <span>install with <code>sudo snap install --dangerous alphabiz-0.3.3.snap</code></span></li>
+            </ul>
           </article>
         </div>
-      </section>
-
-        <div class="scope-note">
-          <strong>Repository scope</strong>
+        <div class="download-notes">
           <p>
-            The current public repository is not a complete, unminified source publication.
-            Any additional full-source publication is undergoing a separate provenance, secret,
-            license, and privacy audit.
+            <a href="https://github.com/tanshuai/alphabiz/releases">All releases <span aria-hidden="true">→</span></a>
+            The official download page, <a href="https://alpha.biz/download/">alpha.biz/download</a>, serves these same
+            files from GitHub Releases. The <a href="https://web.alpha.biz">web edition</a> runs in the browser, nothing to install.
+          </p>
+          <p>
+            Every file on the <a href="https://github.com/tanshuai/alphabiz/releases/tag/0.3.3">0.3.3 release page</a> has a
+            <code>.sha</code> sidecar with its SHA-256 checksum; portable <code>.7z</code> archives and all earlier versions are there too.
+          </p>
+          <div class="state-warn">
+            <strong>Retired development certificate</strong>
+            <p>
+              The <code>.appx</code> attached to 0.3.3 was signed with a development certificate that has since been retired.
+              Do not add that certificate to a trusted certificate store; install the MSI or EXE instead.
+            </p>
+          </div>
+          <p>
+            Also available for Arch Linux as <code>alphabiz-bin</code>, a community-maintained, unaffiliated
+            <a href="https://aur.archlinux.org/packages/alphabiz-bin">AUR package</a>.
           </p>
         </div>
+      </section>
 
-      <section class="section split" id="history" aria-labelledby="history-title">
+      <section class="section split" id="features" aria-labelledby="features-title">
         <div class="section-heading">
-          <p class="eyebrow">Project history</p>
-          <h2 id="history-title">A public foundation worth maintaining</h2>
+          <p class="eyebrow">What Alphabiz does</p>
+          <h2 id="features-title">Publish, stream and build on a decentralized core</h2>
+          <p>One desktop application, one web edition and one framework, all on the same core.</p>
         </div>
         <div class="feature-list">
           <article>
             <span aria-hidden="true">01</span>
-            <div><h3>Decentralized marketplace</h3><p>A marketplace and credit system built with decentralized technologies.</p></div>
+            <div><h3>Marketplace</h3><p>Publish, buy and share media on a credit system built with decentralized technologies.</p></div>
           </article>
           <article>
             <span aria-hidden="true">02</span>
-            <div><h3>P2P media delivery</h3><p>Peer-to-peer media delivery and streaming across desktop application targets.</p></div>
+            <div><h3>P2P streaming</h3><p>Media is delivered and streamed peer-to-peer.</p></div>
           </article>
           <article>
             <span aria-hidden="true">03</span>
-            <div><h3>Application framework</h3><p>A framework for media and Web3 experiences across Windows, macOS, and Linux.</p></div>
+            <div><h3>Media player</h3><p>Plays mainstream formats with subtitle support.</p></div>
+          </article>
+          <article>
+            <span aria-hidden="true">04</span>
+            <div><h3>Framework</h3><p>Fork this repository, edit <code>developer/app.js</code> and the assets, and build Windows, macOS and Linux installers under your own brand.</p></div>
           </article>
         </div>
       </section>
 
-      <section class="section" id="release-gates" aria-labelledby="gates-title">
-        <div class="section-heading">
-          <p class="eyebrow">Evidence before release</p>
-          <h2 id="gates-title">The next binary must earn production status</h2>
-          <p>AlphaBiz will not publish a new production binary until each gate has current, reviewable evidence.</p>
+      <section class="section" id="build" aria-labelledby="build-title">
+        <div class="split">
+          <div class="build-copy">
+            <p class="eyebrow">Framework</p>
+            <h2 id="build-title">Build your own branded app</h2>
+            <p>
+              This repository is Alphabiz's distribution point and its "build your own branded app" framework.
+              The application core (renderer and main process) is built from the upstream Alphabiz application
+              repository and shipped here as production bundles with each release; everything needed to brand,
+              package and test an app on that core lives here.
+            </p>
+            <p>
+              Clone your fork with git (a source ZIP will not build), edit <code>developer/app.js</code> and the
+              assets, then run the four commands from the repository root. Before you ship, work through the
+              <a href="https://github.com/tanshuai/alphabiz/blob/main/docs/en_us/fork-checklist.md">fork checklist</a>:
+              update repository, <code>versionsUrl</code>, <code>externalI18n</code>, take-down admins, recommended
+              channels and community links all default to Alphabiz's own values.
+            </p>
+            <p>
+              <a href="https://github.com/tanshuai/alphabiz/blob/main/docs/en_us/README.md">Build guide <span aria-hidden="true">→</span></a>
+            </p>
+          </div>
+          <div>
+            <ol class="steps">
+              <li><span>1</span><div><strong><code>yarn</code></strong><p>Tooling and the custom Electron 21.3.3 runtime.</p></div></li>
+              <li><span>2</span><div><strong><code>yarn unpackaged</code></strong><p>The application bundle's dependencies — vendored, no registry token.</p></div></li>
+              <li><span>3</span><div><strong><code>yarn packager</code></strong><p>Assembles the app under <code>dist/electron/&lt;Name&gt;-&lt;platform&gt;-&lt;arch&gt;</code>.</p></div></li>
+              <li><span>4</span><div><strong><code>yarn make</code></strong><p>Installers land in <code>out/installers/&lt;version&gt;/</code>.</p></div></li>
+            </ol>
+            <p class="steps-note">
+              Windows: an APPX needs a signing certificate supplied through the <code>ALPHABIZ_APPX_*</code> variables;
+              for unsigned EXE and MSI installers run <code>yarn make:squirrel &amp;&amp; yarn make:msi</code> instead.
+              If you change <code>version</code> in <code>package.json</code>, set the same value as
+              <code>newTagName</code> in <code>release.json</code> and keep <code>targetTagName</code> at <code>main</code>.
+            </p>
+          </div>
         </div>
+        <div class="repo-panel">
+          <h3>What is in the repository</h3>
+          <dl>
+            <dt><code>dist/</code></dt>
+            <dd>Production application bundles: the Electron main process (<code>dist/electron/UnPackaged/</code>) and the SPA (<code>dist/spa/</code>).</dd>
+            <dt><code>developer/</code></dt>
+            <dd>Branding and behaviour: <code>app.js</code>, icons and platform assets, update channels, take-down policy, dynamic config, terms of service.</dd>
+            <dt><code>build-scripts/</code></dt>
+            <dd>Installer builds: Squirrel EXE, MSI (WiX), APPX, DMG, DEB, Snap.</dd>
+            <dt><code>vendor/</code></dt>
+            <dd>Vendored first-party packages (<code>@zeeis/alphabiz-account</code>, <code>@zeeis/alphabiz-libdb</code>) so a fork installs without a registry token.</dd>
+            <dt><code>i18n/</code></dt>
+            <dd>External translations, loaded by installed apps at runtime from <code>main</code>.</dd>
+            <dt><code>test/</code></dt>
+            <dd>Playwright, Cypress and Jest end-to-end and release tests.</dd>
+            <dt><code>scripts/</code></dt>
+            <dd>Credential scanning, dependency regression tests and the release version contract run by CI.</dd>
+            <dt><code>docs/</code></dt>
+            <dd>Build and customization guides in English and 中文.</dd>
+          </dl>
+        </div>
+      </section>
+
+      <section class="section" id="maintenance" aria-labelledby="standards-title">
+        <div class="section-heading">
+          <p class="eyebrow">Engineering standards</p>
+          <h2 id="standards-title">Maintenance and release standards</h2>
+          <p>
+            <a href="https://github.com/tanshuai/alphabiz/pulls?q=is%3Apr+is%3Amerged+merged%3A2026-08-01..2026-08-31">August 2026 brought 22 merged pull requests</a>:
+            security hardening, dependency fixes, least-privilege CI with CodeQL, a release version contract and
+            vendored first-party packages. CI and CodeQL run on every push and pull request to <code>main</code>.
+          </p>
+        </div>
+        <p class="badges">
+          <a href="https://github.com/tanshuai/alphabiz/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/tanshuai/alphabiz/ci.yml?branch=main&amp;label=CI" alt="CI workflow status on main" height="20"></a>
+          <a href="https://github.com/tanshuai/alphabiz/actions/workflows/codeql.yml"><img src="https://img.shields.io/github/actions/workflow/status/tanshuai/alphabiz/codeql.yml?branch=main&amp;label=CodeQL" alt="CodeQL workflow status on main" height="20"></a>
+        </p>
+        <h3 class="list-title">Release quality standards</h3>
+        <p class="list-lede">Applied to every tagged release.</p>
         <ol class="gate-list">
-          <li><span>1</span><div><strong>Security</strong><p>No tracked signing keys or credential material; modern scanning and least-privilege automation.</p></div></li>
-          <li><span>2</span><div><strong>Reproducibility</strong><p>A clean checkout can install dependencies and build through a documented, repeatable path.</p></div></li>
-          <li><span>3</span><div><strong>Quality</strong><p>Required CI, static analysis, and platform smoke tests pass from the release candidate.</p></div></li>
-          <li><span>4</span><div><strong>Release integrity</strong><p>Artifacts, checksums, provenance, and signing expectations are explicit and independently checkable.</p></div></li>
+          <li><span>1</span><div><strong>Security</strong><p>No signing keys or credential material in the repository; credential scanning, CodeQL and least-privilege automation run on every change.</p></div></li>
+          <li><span>2</span><div><strong>Repeatable builds</strong><p>A clean git clone installs its dependencies and builds through the documented path, with the first-party packages vendored in the repository.</p></div></li>
+          <li><span>3</span><div><strong>Quality</strong><p>Required CI, static analysis and platform smoke tests pass on the release candidate.</p></div></li>
+          <li><span>4</span><div><strong>Release integrity</strong><p>Artifacts, <code>.sha</code> checksums, build provenance and signing expectations are explicit and independently checkable.</p></div></li>
         </ol>
       </section>
 
-      <section class="section link-panel" aria-labelledby="links-title">
+      <section class="section link-panel" id="docs" aria-labelledby="docs-title">
         <div>
-          <p class="eyebrow">Work in the open</p>
-          <h2 id="links-title">Follow the evidence, not a marketing claim.</h2>
+          <p class="eyebrow">Read more</p>
+          <h2 id="docs-title">Documentation and project links</h2>
+          <p>Guides in English and 中文, translations, releases and the security policy.</p>
         </div>
         <div class="link-list">
-          <a href="https://github.com/tanshuai/alphabiz">Public repository <span aria-hidden="true">↗</span></a>
-          <a href="https://github.com/tanshuai/alphabiz/actions">Automation history <span aria-hidden="true">↗</span></a>
-          <a href="https://github.com/tanshuai/alphabiz/releases">Release archive <span aria-hidden="true">↗</span></a>
-          <a href="https://github.com/tanshuai/alphabiz/security">Private security reporting <span aria-hidden="true">↗</span></a>
+          <a href="https://github.com/tanshuai/alphabiz/blob/main/docs/en_us/README.md">Build guide (English) <span aria-hidden="true">↗</span></a>
+          <a href="https://github.com/tanshuai/alphabiz/blob/main/docs/README.md">中文文档 <span aria-hidden="true">↗</span></a>
+          <a href="https://github.com/tanshuai/alphabiz/blob/main/i18n/README.md">Translations (i18n) <span aria-hidden="true">↗</span></a>
+          <a href="https://github.com/tanshuai/alphabiz/releases">Releases <span aria-hidden="true">↗</span></a>
+          <a href="https://github.com/tanshuai/alphabiz/actions">CI runs <span aria-hidden="true">↗</span></a>
+          <a href="https://github.com/tanshuai/alphabiz/blob/main/SECURITY.md">Security policy (SECURITY.md) <span aria-hidden="true">↗</span></a>
+          <a href="https://github.com/tanshuai/alphabiz/security/advisories/new">Report a vulnerability privately <span aria-hidden="true">↗</span></a>
         </div>
       </section>
     </main>
 
     <footer>
-      <span>AlphaBiz · GPL-2.0 maintenance revival</span>
+      <span>Alphabiz · GPL-2.0 · <a href="https://alpha.biz">alpha.biz</a></span>
       <a href="https://github.com/tanshuai/alphabiz/blob/main/LICENSE">GPL-2.0 license</a>
     </footer>
   </body>
