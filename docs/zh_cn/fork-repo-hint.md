@@ -13,7 +13,7 @@
 
 (3).点击[Create fork]按钮。创建fork
 
-截图以`zeeis/customization-test`仓库为例
+截图以一个示例 fork 为例
 
 ![image](https://user-images.githubusercontent.com/92558550/202063641-d763dea6-8583-4cac-8b57-39ec8860bd96.png)
 
@@ -47,7 +47,7 @@
 
 可以在[View conflicts]按钮中快速找到发生冲突的文件
 
-<img width="722" alt="1e023a3636086f7b6c436758363093f" src="https://github.com/zeeis/customization-test/assets/92558550/712a4321-a90b-4545-9f94-d6c1e5e956ad">
+（示意：在 GitHub Desktop 的冲突提示中点击【View conflicts】，会列出带三角形感叹号的冲突文件，可直接从列表中打开）
 
 <img width="805" alt="d89e1b0540f0fb834b915479438058d" src="https://user-images.githubusercontent.com/92558550/202371563-42d4fc80-41d3-4938-9a74-b6ad35442d83.png">
 
@@ -82,7 +82,7 @@
 
 <img width="764" alt="c2fa9cfc756564ca2b7198e98d4c910" src="https://user-images.githubusercontent.com/92558550/201564728-51366560-3bc5-4e32-b93f-5148a398a484.png">
 
-<img width="391" alt="48b7ccbf90af5c5fced9579e9bb67cf" src="https://github.com/zeeis/customization-test/assets/92558550/1aa7262b-5cc2-4adf-aa97-08d264b7eef9">
+（示意：在 GitHub Desktop 的【Clone a repository】窗口切换到【URL】标签，粘贴仓库 url，并在【Local path】中选择本地文件夹）
 
 然后根据自己需求，修改本地文件夹的路径或名称
 
@@ -120,7 +120,7 @@ github Desktop恢复文件方法： 在被修改的文件中，右键目标文�
 命令行恢复文件方法： (确保package.json没有其他修改内容，以免恢复文件后，其他修改被恢复)
 
 ```bash
-yarn node make.js --reset
+node build-scripts/common/make.js --reset
 ```
 
 ### 5. <span id="github-release">手动发布github release: </span>
@@ -228,7 +228,7 @@ ubuntu-latest runner
 
 日期统一格式为：yyyymmddhhmmss，时区统一为东八区
 
-如果要在应用中使用版本更新功能，则需要在 Github Releases 上发布自己的版本。详细信息请参考[alphabiz releases](https://github.com/tanshuai/alphabiz/releases)，并更改更新通道信息。具体方法请参见[此处](https://github.com/zeeis/customization-test/blob/main/docs/zh_cn/customized-content.md#update-channel)。需要注意以下几点：
+如果要在应用中使用版本更新功能，则需要在 Github Releases 上发布自己的版本。详细信息请参考[alphabiz releases](https://github.com/tanshuai/alphabiz/releases)，并更改更新通道信息。具体方法请参见[此处](./customized-content.md#update-channel)。需要注意以下几点：
 
 1. tag标签名称: 版本号
 2. assets(上传资源名称): [app名称]-版本名称.(安装包拓展名)(deb | dmg | msi)

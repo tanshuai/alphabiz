@@ -32,7 +32,7 @@ yarn
 
 ### 5.安装 unpackaged 文件的 Node.js 模块
 
-由于公共仓库的代码是私有仓库预编译过的代码，需要安装预编译代码的模块，在仓库根目录打开命令行，并执行以下命令：
+公共仓库中的 `dist/electron/UnPackaged` 是由上游应用仓库构建产出的应用包，需要单独安装它的 Node.js 模块。它依赖的两个应用包（`@zeeis/alphabiz-account`、`@zeeis/alphabiz-libdb`）发布在 GitHub Packages 上，该 registry 即使对公开包也要求 token，因此需要在 `~/.npmrc` 中配置带 `read:packages` 权限的 PAT，见 [use-github-pat.md](./use-github-pat.md)。在仓库根目录打开命令行，并执行以下命令：
 
 ```bash
 yarn unpackaged
@@ -40,7 +40,7 @@ yarn unpackaged
 
 ### 6.定制 app
 
-请使用记事本或[代码编辑器](https://github.com/zeeis/customization-test/tree/main/docs/zh_cn/fork-repo-hint.md#code-editor)工具，修改`developer/`配置文件。详细定制化配置信息请参考 <a href="https://github.com/tanshuai/alphabiz/blob/main/docs/zh_cn/customized-content.md">此文档</a> 。
+请使用记事本或[代码编辑器](./prepare-before-dev.md#code-editor)工具，修改`developer/`配置文件。详细定制化配置信息请参考 <a href="https://github.com/tanshuai/alphabiz/blob/main/docs/zh_cn/customized-content.md">此文档</a> 。
 
 ### 7.构建 app
 
@@ -49,7 +49,7 @@ yarn unpackaged
 yarn packager
 ```
 注意以下内容：
-- 生成的 app 存储路径为`build/electron/[app名称]-[系统名称]`
+- 生成的 app 存储路径为`dist/electron/[displayName]-[platform]-[arch]`
 - 暂定调试流程:
   1. 重复执行步骤 7 和 8，检查新生成的 app。
   2. 修改配置后，开启 e2e 测试的 debug 模式并查看配置修改情况。可以通过 ctrl+c 关闭运行的命令行或关闭运行中的 electron 和 playwright 窗口，并重复操作 `yarn test:e2e:electron:custom --debug`
@@ -62,6 +62,7 @@ yarn make
 ```
 注意以下内容：
 - 安装包存储路径为`out/installers/[app版本号]`
+- 在 Windows 上，`yarn make` 会在打包前检查 APPX 签名证书：需要通过 `ALPHABIZ_APPX_PFX_PATH`、`ALPHABIZ_APPX_PFX_PASSWORD`、`ALPHABIZ_APPX_CERT_SHA256` 提供仓库外部的证书（见 [appx 安装包](./customized-content.md#9-appx%E5%AE%89%E8%A3%85%E5%8C%85)）。没有证书时，`yarn make:msi` 可以单独运行（它直接读取 `dist/electron/` 下的打包产物）；Squirrel 的 EXE 打包器读取 electron-forge 的 `out/` 目录，而该目录平时由 `yarn make` 从 `dist/electron/` 复制填充，因此需要先手动复制一次：`robocopy dist\electron\Alphabiz-win32-x64 out\Alphabiz-win32-x64 /E`，再运行 `yarn make:squirrel`（请把名称与架构替换为你自己的）。
 - 如果需要在 Windows 上生成安装包，请先安装<a href="https://github.com/tanshuai/alphabiz/blob/main/docs/zh_cn/prepare-before-dev.md#7-%E5%9C%A8-windows-%E7%B3%BB%E7%BB%9F%E4%B8%8B%E9%9C%80%E8%A6%81%E5%AE%89%E8%A3%85-wix-toolset">Wix Toolset</a>
 - 如果在`yarn make`过程中使用 Ctrl+C 强制退出，可能导致部分动态修改的文件无法恢复。如遇到此问题，请参考 <a href="https://github.com/tanshuai/alphabiz/blob/main/docs/zh_cn/fork-repo-hint.md#4-%E6%81%A2%E5%A4%8D%E8%A2%AB%E5%8A%A8%E6%80%81%E4%BF%AE%E6%94%B9%E7%9A%84%E6%96%87%E4%BB%B6-">这里</a> 解决。
 - 在 Windows 系统下，可能会因为 Windows 路径长度限制而导致 yarn make 报错，提示某个文件路径过长。如遇到此问题，请参考 <a href="https://github.com/tanshuai/alphabiz/blob/main/docs/zh_cn/development-issues-solutions.md#3-windows%E7%B3%BB%E7%BB%9F%E6%96%87%E4%BB%B6%E8%B7%AF%E5%BE%84%E8%BF%87%E9%95%BF-">这里</a> 解除路径长度限制。
@@ -81,5 +82,5 @@ yarn make
 ```bash
 yarn node copy-patch.js --post
 ```
-5. 每次提交代码时都会运行测试用例，每晚会执行用于发布 nightly 版本的工作流。具体内容请参考[这里](https://github.com/tanshuai/alphabiz/blob/main/.github/workflows/release-nightly.yml)。
+5. 每次 push／PR 到 main 会运行 CI 与 CodeQL，具体内容请参考[这里](../../.github/workflows/ci.yml)；nightly 发布流水线已暂停，历史 nightly 版本见 [Releases](https://github.com/tanshuai/alphabiz/releases)。
 6. 如果工作流中包含自动提交 commit 的步骤，建议统一设置 Actions Runner 的时区为东八区，以方便管理版本号中的日期。具体设置方法请参考<a href="https://github.com/tanshuai/alphabiz/blob/main/docs/zh_cn/fork-repo-hint.md#7-workflow%E8%AE%BE%E7%BD%AE%E6%97%B6%E5%8C%BA%E6%AD%A5%E9%AA%A4-">此文档</a>

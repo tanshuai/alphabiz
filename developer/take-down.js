@@ -16,9 +16,11 @@ module.exports = {
   mode: 'committee',
   /**
    * @type { string[] }
-   * Preset keys of admins.
-   * Note that you should use pubkey, not id.
-   * Type `lib.user.is.pub` in main-process devtools console to get your pubkey.
+   * Preset admin pubkeys (use pubkeys, not ids; type `lib.user.is.pub` in the
+   * main-process devtools console to print yours).
+   * FORKS: replace this whole list with your own pubkey(s). The first entry is the
+   * upstream Alphabiz administrator key; in 'committee' mode it keeps a take-down
+   * vote in your app until you remove it. See docs/en_us/fork-checklist.md.
    */
   admins: [
     'FQi3UfsB5zY7SSfLMPdl9Fdh7_EeM4og0ZGivp4tfJU.yXhvCAmmUz1Pw9-Iwhf9hpo9-H4WDHwezzRAGE5Oipk',

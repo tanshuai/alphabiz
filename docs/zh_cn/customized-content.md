@@ -21,17 +21,25 @@ webEditionUrl | `https://web.alpha.biz` | (字符串) - 网页版客户端。
 upgradeCode | `4d8a65aa-fc5b-421c-94ab-cb722ef737e2` | (字符串) - Windows 升级码。如果两个应用程序有相同的代码，Windows 将删除旧的安装时。您可以通过运行命令 `npx uuid v4` 创建自己的代码。
 protocol | `alphabiz` | (字符串) - 链接协议。默认情况下，应用程序将注册 `alphabiz://` 作为它的url协议。**注意，至少3个字符，只能使用a-z，不能与微软商店保留的协议重复，不能与链接协议缩写重复**
 shortProtocol | `ab` | (字符串) - 链接协议缩写，默认使用 `ab://` **注意，至少2个字符，只能使用a-z，不能与微软商店保留的协议重复，不能与链接协议、app名称重复**
-versionsUrl | `https://raw.githubusercontent.com/  tanshuai/alphabiz/main/versions.json` | (字符串) - 应用程序检查该文件，判断是否需要强制更新，<a href="#forced-update">见此</a>
+versionsUrl | `https://raw.githubusercontent.com/tanshuai/alphabiz/main/versions.json` | (字符串) - 应用程序检查该文件，判断是否需要强制更新，<a href="#forced-update">见此</a>
 twitterAccount | `@alphabiz_app` | (字符串) - 用于反馈功能的推特账号
 LIBDB_NAME | `[APP名称]` | (字符串) - 用于区分不同的媒体库。当应用程序名称相同时想要使用不同的媒体库时，您可以向 `LIBDB_NAME` 添加一个尾部来分隔库。
 microsoftStoreProductId | `9PBCCV3MHK04` | (字符串) - 微软商店产品 ID。
+communities | `[{ enable: true, url: 'https://github.com/tanshuai/alphabiz', icon: 'https://github.githubassets.com/favicons/favicon.svg' }]` | (数组) - 社区链接（如 Discord）。图标显示在应用右上角版本标签旁，点击后在浏览器中打开链接；`icon` 可以是图片 url 或 base64 字符串；`enable: false` 可隐藏图标而不删除配置；多于一个时显示为下拉列表。**默认指向上游 Alphabiz 仓库，fork 后请替换为你自己的社区链接。**
+externalI18n | `https://raw.githubusercontent.com/tanshuai/alphabiz/main/i18n` | (字符串) - 外部 i18n 目录地址，目录结构见 [i18n](../../i18n/README.md)。若用 GitHub 托管，需使用 `raw.githubusercontent.com` 而不是 `github.com`。**fork 后请改为你自己仓库的 raw 地址，否则你的应用会从上游 Alphabiz 仓库的 `main` 分支加载翻译。**
 
 **register(object):** 配置哪个地区的用户可以使用你的应用程序
 
 | Key | Default | Description |
 | :---- | :---- | :---- |
 mode | `none` | (字符串) - `none`: 任何人都可以注册；`blacklist`: 名单中的国家将被禁用；`whitelist`: 只启用名单中的国家。**注意，启用白名单时，list至少包含一个国家代码**
-list | `['US', 'CN']` | (数组) - 国家代码列表，必须是 GeoIP ISO 3166-1-alpha-2 代码，[见此](http://www.geonames.org/countries/)
+list | `[]` | (数组) - 国家代码列表（例如 `['US', 'CN']`），必须是 GeoIP ISO 3166-1-alpha-2 代码，[见此](http://www.geonames.org/countries/)
+
+**library(object):** 媒体库
+
+| Key | Default | Description |
+| :---- | :---- | :---- |
+recommends | `{ default: ['fxpebrsi9ij5pzinwdky', 'cut44dbbfxjpqka39qix'], 'zh-CN': ['vs52l0yqtqqpqtw33ycx', 'cut44dbbfxjpqka39qix'] }` | (对象) - 按语言预置的推荐频道 id 列表，应用按 `navigator.language`（而不是设置中选择的语言）匹配。**默认是上游 Alphabiz 的频道，fork 后请替换或清空。**
 
 **theme(object):** 主题
 
@@ -44,7 +52,7 @@ accent | `#fbbb4a` | (字符串) - 强调主题颜色
 **cornerLogoStyle**|  | 应用程序侧边栏左上角图标背景,修改下面的参数对位置进行微调
 left | `-72px` | (字符串) - 水平方向
 top | `-92px` | (字符串) - 垂直方向
-height | `-245px` |  (字符串) - 图标大小
+height | `245px` |  (字符串) - 图标大小
 
 ## 2. <span id="update-channel">更新通道信息 `update.js`</span>
 
@@ -61,7 +69,7 @@ internalRepo | `alphabiz-app` | (字符串) - Internal 版本发布所在仓库�
 bucketUrl | `https://s3.amazonaws.com/internal.alpha.biz` | (字符串) - 内部版本更新通道-S3 储存桶链接，若不使用 S3 储存桶，则设置为`''`空字符串，例如`bucketUrl: ''`。
 s3DownloadUrl| `https://d2v5t3td4po4es.cloudfront.net/releases/` | (字符串) - 可使用 AWS CloudFront 全球加速生成的 URL，若不使用 CloudFront，则修改为 [S3 bucket url] + [正确路径]。
 
-**版本号规则，<a href="https://github.com/zeeis/customization-test/tree/main/docs/zh_cn/fork-repo-hint.md#version">见此</a>**
+**版本号规则，<a href="./fork-repo-hint.md#version">见此</a>**
 
 ## 3. 动态配置文件 `dynamicConfig.js`
 
@@ -145,7 +153,7 @@ developer/                                # 定制化文件夹
 Key | Default | Description
 :---- | :---- | :----
 mode | `committee` | (字符串) - `admin` 频道被管理员投了一票后，将被下架; `committee` 半数及以上的委员会成员对频道投票后，该频道将会下架
-admins | ['an_id_of_admin', 'an_id_of_other_admin' ] | (数组) - 管理员的预设键列表。**注意，应该使用pubkey，而不是id。导入媒体库密钥后，在主进程的devtools控制台输入`lib.user.is.pub`，获得当前导入密钥的pubkey**
+admins | `['<上游 Alphabiz 管理员 pubkey>', 'an_id_of_admin', 'an_id_of_other_admin']` | (数组) - 管理员的预设公钥列表。**请把 admins 整个列表替换为你自己的 pubkey；默认第一项是上游 Alphabiz 管理员公钥，committee 模式下它会保留一票下架投票权。注意，应该使用pubkey，而不是id。导入媒体库密钥后，在主进程的devtools控制台输入`lib.user.is.pub`，获得当前导入密钥的pubkey**
 
 #### (2) ` take-down.json `
 
@@ -170,7 +178,7 @@ electron-packager的详细配置可以参考[此处](https://electron.github.io/
 
 electron-forge详细配置可以参考[此处](https://www.electronforge.io/config/makers)
 
-app安装包图标的配置可以参考<a href="https://github.com/zeeis/customization-test/blob/main/docs/zh_cn/customized-content.md#app-icon">此处</a>
+app安装包图标的配置可以参考<a href="#app-icon">此处</a>
 
 ```bash
 build-scripts/
