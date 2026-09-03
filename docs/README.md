@@ -14,7 +14,6 @@ the `developer/app.js` key table.
 | [macOS / Mac App Store](en_us/build-mac.md) | The `.app`, `.dmg` and `mas` targets, signing and App Store submission |
 | [Fork checklist](en_us/fork-checklist.md) | Everything to change before you ship a fork: identifiers, runtime endpoints, take-down admins, assets, versions and signing |
 | [External i18n](../i18n/README.md) | Layout of the translation directory that installed apps load at runtime, and the `check.js` validator |
-| [Vendored packages](../vendor/README.md) | The two first-party application packages tracked under `vendor/`, their provenance, and how to verify or update them |
 | [Contributing](../CONTRIBUTING.md) | Development setup and pull request expectations |
 | [Security policy](../SECURITY.md) | Supported versions, private vulnerability reporting and the rules for signing material |
 

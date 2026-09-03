@@ -44,22 +44,21 @@ on Windows), then:
 yarn && yarn unpackaged && yarn packager && yarn make      # from the repository root
 ```
 
-The two application packages are vendored under `vendor/`, so no registry token is needed. The root
-`yarn` step currently expects `~/.npmrc` to contain the line `//npm.pkg.github.com/:_authToken=` (the
-value may be left empty) because the `@zeeis/velectron` installer, which downloads the custom Electron
-runtime, reads that file; never put a placeholder value after `=`, because a non-empty invalid token
-causes a 401. Do not install with `--ignore-optional` on this path (`.deb` builds need the optional
+The application bundle depends on two packages published to GitHub Packages
+(`@zeeis/alphabiz-account`, `@zeeis/alphabiz-libdb`); that registry requires a token even for public
+packages, so `yarn unpackaged` needs a personal access token with the `read:packages` scope on the
+`//npm.pkg.github.com/:_authToken=` line of your `~/.npmrc` — not the repository's own `.npmrc`. The
+root `yarn` step reads the same file because the `@zeeis/velectron` installer looks there, but the
+custom Electron runtime is a public download, so an empty value on that line is enough for `yarn`
+alone. Never write a placeholder after `=`, because a non-empty invalid token causes a 401. Do not install with `--ignore-optional` on this path (`.deb` builds need the optional
 dependencies). State the toolchain you built with in your pull request; see the build guide for what
 has been verified. The Cypress end-to-end runner (`yarn test:e2e`) needs OpenSSL on `PATH` to create
 and clean up its disposable localhost certificate.
 
-## Vendored packages
+## Registry credentials
 
-`vendor/` holds the two first-party application packages as tarballs with a `SHA256SUMS` file that CI
-verifies. To update one: replace the tarball, regenerate `SHA256SUMS`, update `vendor/README.md` and
-the `file:` specifier in `dist/electron/UnPackaged/package.json`, and extract and scan the new tarball
-for credential material before committing (the credential scanner cannot see inside gzip). Never add
-`.npmrc`/`.yarnrc` registry or token lines anywhere in the repository.
+Never add a token to any `.npmrc` or `.yarnrc` inside the repository — the registry line belongs in
+your own `~/.npmrc`. Removing the GitHub Packages requirement from the build is tracked separately.
 
 ## Signing keys and local certificates
 

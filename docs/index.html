@@ -175,7 +175,7 @@
           <div>
             <ol class="steps">
               <li><span>1</span><div><strong><code>yarn</code></strong><p>Tooling and the custom Electron 21.3.3 runtime.</p></div></li>
-              <li><span>2</span><div><strong><code>yarn unpackaged</code></strong><p>The application bundle's dependencies — vendored, no registry token.</p></div></li>
+              <li><span>2</span><div><strong><code>yarn unpackaged</code></strong><p>The application bundle's dependencies, from GitHub Packages.</p></div></li>
               <li><span>3</span><div><strong><code>yarn packager</code></strong><p>Assembles the app under <code>dist/electron/&lt;Name&gt;-&lt;platform&gt;-&lt;arch&gt;</code>.</p></div></li>
               <li><span>4</span><div><strong><code>yarn make</code></strong><p>Installers land in <code>out/installers/&lt;version&gt;/</code>.</p></div></li>
             </ol>
@@ -196,8 +196,6 @@
             <dd>Branding and behaviour: <code>app.js</code>, icons and platform assets, update channels, take-down policy, dynamic config, terms of service.</dd>
             <dt><code>build-scripts/</code></dt>
             <dd>Installer builds: Squirrel EXE, MSI (WiX), APPX, DMG, DEB, Snap.</dd>
-            <dt><code>vendor/</code></dt>
-            <dd>Vendored first-party packages (<code>@zeeis/alphabiz-account</code>, <code>@zeeis/alphabiz-libdb</code>) so a fork installs without a registry token.</dd>
             <dt><code>i18n/</code></dt>
             <dd>External translations, loaded by installed apps at runtime from <code>main</code>.</dd>
             <dt><code>test/</code></dt>
@@ -216,8 +214,7 @@
           <h2 id="standards-title">Maintenance and release standards</h2>
           <p>
             <a href="https://github.com/tanshuai/alphabiz/pulls?q=is%3Apr+is%3Amerged+merged%3A2026-08-01..2026-08-31">August 2026 brought 22 merged pull requests</a>:
-            security hardening, dependency fixes, least-privilege CI with CodeQL, a release version contract and
-            vendored first-party packages. CI and CodeQL run on every push and pull request to <code>main</code>.
+            security hardening, dependency fixes, least-privilege CI with CodeQL, and a release version contract. CI and CodeQL run on every push and pull request to <code>main</code>.
           </p>
         </div>
         <p class="badges">
@@ -228,7 +225,7 @@
         <p class="list-lede">Applied to every tagged release.</p>
         <ol class="gate-list">
           <li><span>1</span><div><strong>Security</strong><p>No signing keys or credential material in the repository; credential scanning, CodeQL and least-privilege automation run on every change.</p></div></li>
-          <li><span>2</span><div><strong>Repeatable builds</strong><p>A clean git clone installs its dependencies and builds through the documented path, with the first-party packages vendored in the repository.</p></div></li>
+          <li><span>2</span><div><strong>Repeatable builds</strong><p>A clean git clone installs its dependencies and builds through the documented path.</p></div></li>
           <li><span>3</span><div><strong>Quality</strong><p>Required CI, static analysis and platform smoke tests pass on the release candidate.</p></div></li>
           <li><span>4</span><div><strong>Release integrity</strong><p>Artifacts, <code>.sha</code> checksums, build provenance and signing expectations are explicit and independently checkable.</p></div></li>
         </ol>

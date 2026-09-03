@@ -64,7 +64,6 @@ app on that core lives here:
 | `dist/electron/UnPackaged/`, `dist/spa/` | Production application bundles (Electron main process and SPA) |
 | `developer/` | Branding and behaviour: `app.js`, icons and platform assets, update channels, take-down policy, dynamic config, terms of service |
 | `build-scripts/` | Installer builds: Squirrel EXE, MSI (WiX), APPX, DMG, DEB, Snap |
-| `vendor/` | Vendored first-party packages (`@zeeis/alphabiz-account`, `@zeeis/alphabiz-libdb`) so a fork installs without a registry token |
 | `i18n/` | External translations, loaded by installed apps at runtime from `main` |
 | `test/` | Playwright, Cypress and Jest end-to-end and release tests |
 | `scripts/security/`, `scripts/release/` | Credential scanning, dependency regression tests and the release version contract run by CI |
@@ -76,7 +75,7 @@ app on that core lives here:
 git clone https://github.com/<you>/<your-app>.git   # your fork, cloned with git (a source ZIP will not build)
 cd <your-app>
 yarn              # tooling and the custom Electron 21.3.3 runtime
-yarn unpackaged   # the application bundle's dependencies (vendored, no registry token)
+yarn unpackaged   # the application bundle's dependencies (needs a read:packages token, see the build guide)
 yarn packager     # assemble the app: dist/electron/<Name>-<platform>-<arch>
 yarn make         # installers land in out/installers/<version>/
 ```

@@ -46,7 +46,7 @@ ask for a private reporting channel.
 CodeQL (security-extended) runs on every push and pull request to `main` and on a weekly schedule;
 Dependabot opens weekly dependency and Actions updates; the CI hygiene job scans every tracked file
 for private-key material (`yarn security:scan`), rejects workflow files that reference repository
-secrets or unpinned actions, and verifies the checksums of the vendored packages. Open findings are
+secrets or unpinned actions. Open findings are
 triaged in the repository's Security tab.
 
 ## Credentials and signing material
