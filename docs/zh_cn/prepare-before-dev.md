@@ -28,13 +28,15 @@
    brew install git
    ```
 
-4. 若你改用 Homebrew 安装了带版本号的 Node.js（例如 `brew install node@16`），需要找到其安装路径并添加到环境变量中
+4. 若你用 Homebrew 安装了带版本号的 Node.js（Homebrew 目前只提供 node@18／node@20／node@22／node@24；Node 16 请改用 nvm），需要找到其安装路径并添加到环境变量中
 
   ```bash
   Intel芯片为例
-  echo 'PATH="/usr/local/opt/node@16/bin:$PATH"' >> ~/.zshrc
-  echo 'PATH="/usr/local/opt/node@16/bin:$PATH"' >> ~/.bash_profile
+  echo 'PATH="/usr/local/opt/node@22/bin:$PATH"' >> ~/.zshrc
+  echo 'PATH="/usr/local/opt/node@22/bin:$PATH"' >> ~/.bash_profile
   ```
+
+  把 `node@22` 换成你实际安装的版本；Apple 芯片的前缀是 `/opt/homebrew/opt/`。
 
 5. 等待安装完成后，您可以通过运行以下命令来验证 Git 和 Node.js 是否已成功安装：
 

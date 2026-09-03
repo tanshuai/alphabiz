@@ -138,7 +138,7 @@ version | (字符串) - 完整版本号，规则 <a href="./fork-repo-hint.md#ve
 
 > Webpack 导致的 openssl 问题已修复，如果安装新模块后出现报错，检查新引入的模块是否使用了 `crypto` 模块中的旧加密方法
 
-**解决方案**：设置 `NODE_OPTIONS` 环境变量（值见下方对应平台的命令）后重试。打开终端并粘贴如下所示：
+**解决方案**：把 `NODE_OPTIONS` 环境变量设为 `--openssl-legacy-provider` 后重试。打开终端并粘贴如下所示：
 
 Linux and macOS (Windows Git Bash)-
 ```
