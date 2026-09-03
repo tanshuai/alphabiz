@@ -15,6 +15,11 @@ const {
   getAppxSigningCertificate,
   readCertificateFingerprint
 } = require('../../build-scripts/windows/appx/signing-certificate')
+const {
+  createAppxMakeInvocation,
+  isCertificateConfigured,
+  parseArguments
+} = require('../../build-scripts/windows/appx/make-appx-if-configured')
 
 const environmentNames = [PATH_ENV, PASSWORD_ENV, FINGERPRINT_ENV]
 const originalEnvironment = Object.fromEntries(
@@ -44,6 +49,55 @@ try {
     () => getAppxSigningCertificate({ required: true }),
     new RegExp(PATH_ENV)
   )
+
+  const makeScriptSource = fs.readFileSync(
+    path.resolve(__dirname, '../../build-scripts/common/make.js'),
+    'utf-8'
+  )
+  assert(
+    makeScriptSource.includes('ALPHABIZ_REQUIRE_APPX'),
+    'make.js must keep the ALPHABIZ_REQUIRE_APPX opt-in for the APPX certificate requirement'
+  )
+
+  // The make:win chain ends in make-appx-if-configured.js, which builds a
+  // command line from process.argv. Lock its boundary the way
+  // test-codeql-hardening.js locks createYarnInvocation.
+  assert.deepStrictEqual(
+    createAppxMakeInvocation({ runtimePlatform: 'win32', args: ['--arch', 'x64'] }),
+    {
+      command: 'C:\\Windows\\System32\\cmd.exe',
+      args: ['/d', '/s', '/c', 'yarn.cmd', 'make:appx', '--arch', 'x64'],
+      options: { shell: false, windowsHide: true }
+    }
+  )
+  assert.deepStrictEqual(
+    createAppxMakeInvocation({ runtimePlatform: 'linux' }),
+    {
+      command: 'yarn',
+      args: ['make:appx'],
+      options: { shell: false }
+    }
+  )
+  assert.deepStrictEqual(parseArguments([]), [])
+  assert.deepStrictEqual(parseArguments(['--arch', 'x64']), ['--arch', 'x64'])
+  assert.throws(
+    () => parseArguments(['--inspect']),
+    /Unsupported argument/
+  )
+  assert.throws(
+    () => parseArguments(['--arch', 'x64;touch-pwned']),
+    /Unsupported BUILD_ARCH/
+  )
+  assert.throws(
+    () => parseArguments(['--arch']),
+    /--arch requires an architecture value/
+  )
+
+  // The skip decision must agree with getAppxSigningCertificate: a
+  // fingerprint with no hex digits counts as unconfigured for both.
+  assert.strictEqual(isCertificateConfigured({}), false)
+  assert.strictEqual(isCertificateConfigured({ [FINGERPRINT_ENV]: 'xxx' }), false)
+  assert.strictEqual(isCertificateConfigured({ [PATH_ENV]: '/tmp/cert.pfx' }), true)
 
   if (process.argv.includes('--forge-config')) {
     const unsignedConfig = loadForgeConfig()
@@ -96,7 +150,7 @@ try {
   process.env[FINGERPRINT_ENV] = RETIRED_FINGERPRINT
   assert.throws(
     () => getAppxSigningCertificate({ required: true }),
-    /retired AlphaBiz development certificate/
+    /retired Alphabiz development certificate/
   )
 
   process.env[FINGERPRINT_ENV] = fingerprint

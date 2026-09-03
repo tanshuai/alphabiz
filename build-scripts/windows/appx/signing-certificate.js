@@ -136,7 +136,7 @@ function getAppxSigningCertificate ({ required = false, expectedPublisher } = {}
     throw new Error(`[appx-signing] ${FINGERPRINT_ENV} must be a SHA-256 certificate fingerprint.`)
   }
   if (expectedFingerprint === RETIRED_FINGERPRINT) {
-    throw new Error('[appx-signing] The retired AlphaBiz development certificate is forbidden.')
+    throw new Error('[appx-signing] The retired Alphabiz development certificate is forbidden.')
   }
   if (!path.isAbsolute(configuredPath)) {
     throw new Error(`[appx-signing] ${PATH_ENV} must be an absolute path.`)
@@ -159,7 +159,7 @@ function getAppxSigningCertificate ({ required = false, expectedPublisher } = {}
   const metadata = readCertificateMetadata(certificatePath, password)
   const actualFingerprint = metadata.fingerprint
   if (actualFingerprint === RETIRED_FINGERPRINT) {
-    throw new Error('[appx-signing] The retired AlphaBiz development certificate is forbidden.')
+    throw new Error('[appx-signing] The retired Alphabiz development certificate is forbidden.')
   }
   if (actualFingerprint !== expectedFingerprint) {
     throw new Error('[appx-signing] The certificate fingerprint does not match the approved fingerprint.')

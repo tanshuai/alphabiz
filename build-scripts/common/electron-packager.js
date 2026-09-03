@@ -12,7 +12,11 @@ const basePath = process.env.PROD
   ? process.resourcesPath
   : process.cwd()
 const versionJSONPath = process.env.PROD ? 'version.json' : 'public/version.json'
-const versionJSON = fs.readFileSync(resolve(basePath, versionJSONPath))
+const versionJSONFile = resolve(basePath, versionJSONPath)
+if (!fs.existsSync(versionJSONFile)) {
+  throw new Error(`[packager] ${versionJSONPath} is missing at ${versionJSONFile}. Run yarn unpackaged (or node update-version.js) before yarn packager.`)
+}
+const versionJSON = fs.readFileSync(versionJSONFile)
 const versionObj = JSON.parse(versionJSON)
 const buildVersion = process.env.BUILD_VERSION || versionObj.version
 const buildArch = process.env.BUILD_ARCH || process.arch
@@ -260,7 +264,12 @@ const options = {
     mirrorOptions: {
       mirror: 'https://github.com/zeeis/velectron/releases/download/'
     },
-    downloader: require('@zeeis/velectron/downloader')
+    // Requiring the velectron downloader eagerly reads optional user-level
+    // auth config. Keep module load side-effect free; the actual download
+    // path remains behind the full-build gate.
+    downloader: {
+      download: (...args) => require('@zeeis/velectron/downloader').download(...args)
+    }
   },
   // asar compress all resources to app.asar, which is
   // not an accessable directory for __statics, set to
