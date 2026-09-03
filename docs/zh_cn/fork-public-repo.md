@@ -32,7 +32,7 @@ yarn
 
 ### 5.安装 unpackaged 文件的 Node.js 模块
 
-公共仓库中的 `dist/electron/UnPackaged` 是由上游应用仓库构建产出的应用包，需要单独安装它的 Node.js 模块。它依赖的两个应用包（`@zeeis/alphabiz-account`、`@zeeis/alphabiz-libdb`）已随仓库 `vendor/` 目录一起提供，无需 GitHub PAT。在仓库根目录打开命令行，并执行以下命令：
+公共仓库中的 `dist/electron/UnPackaged` 是由上游应用仓库构建产出的应用包，需要单独安装它的 Node.js 模块。它依赖的两个应用包（`@zeeis/alphabiz-account`、`@zeeis/alphabiz-libdb`）发布在 GitHub Packages 上，该 registry 即使对公开包也要求 token，因此需要在 `~/.npmrc` 中配置带 `read:packages` 权限的 PAT，见 [use-github-pat.md](./use-github-pat.md)。在仓库根目录打开命令行，并执行以下命令：
 
 ```bash
 yarn unpackaged

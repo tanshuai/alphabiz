@@ -10,10 +10,10 @@
 
 #### <span id="401-unauthorized">(2). 401 Unauthorized </span>
 
-**报错原因**：没有权限安装alphabiz的模块。Github PAT密钥没有配置好、或没有加入zeeis组织
+**报错原因**：`dist/electron/UnPackaged` 的两个应用包发布在 GitHub Packages 上，该 registry 即使对公开包也要求 token。通常是 `~/.npmrc` 里没有配置带 `read:packages` 权限的 PAT，或者填了一个非空但无效的 token。
 
 **解决方案**：
-1. 查看[github PAT密钥配置文档](https://github.com/tanshuai/alphabiz/blob/main/docs/zh_cn/use-github-pat.md)
+1. 查看 [PAT 配置文档](./use-github-pat.md)
 2. 与alphabiz仓库[所有者](https://github.com/tanshuai)联系
 
 

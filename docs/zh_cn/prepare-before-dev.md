@@ -145,7 +145,7 @@ yarn global add @quasar/cli
 ```
 
 #### (6). <span id="github-pat">生成github PAT</span>
-当前使用的一些模块仍然是 alphabiz 的私有模块，因此需要使用 zeeis 成员的 GitHub PAT。详情请参考 [这篇文档](https://github.com/zeeis/customization-test/tree/main/docs/zh_cn/use-github-pat.md)
+`dist/electron/UnPackaged` 依赖的两个应用包发布在 GitHub Packages 上，该 registry 即使对公开包也要求 token，因此需要一个带 `read:packages` 权限的 GitHub PAT。配置方法见 [use-github-pat.md](./use-github-pat.md)。
 
 #### (7). 在 Windows 系统下，需要安装 <span id="wix-tool">Wix Toolset</span>
 
