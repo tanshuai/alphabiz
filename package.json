@@ -3,9 +3,18 @@
   "main": "electron/UnPackaged/electron-main.js",
   "version": "0.4.0-beta.1",
   "packageManager": "yarn@1.22.22",
-  "description": "Alphabiz Blockchain Cryptocurrency Application",
+  "description": "Web3 YouTube alternative - fully decentralized media platform and blockchain-based marketplace",
   "productName": "Alphabiz",
   "author": "Alphabiz Team <ab@alpha.biz>",
+  "license": "GPL-2.0-only",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tanshuai/alphabiz.git"
+  },
+  "homepage": "https://alpha.biz",
+  "bugs": {
+    "url": "https://github.com/tanshuai/alphabiz/issues"
+  },
   "scripts": {
     "preunpackaged": "node update-version.js",
     "postinstall": "node build-scripts/common/skipPatch.js && node ./node_modules/symlink-dir/dist/cli.js node_modules/@zeeis/velectron node_modules/electron && ./node_modules/.bin/electron-rebuild -v 21.3.3",

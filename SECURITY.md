@@ -2,24 +2,29 @@
 
 ## Supported versions
 
-AlphaBiz is currently in a maintenance revival. Security fixes are developed
-against the default branch. Published `0.3.x` and `0.2.x` artifacts are legacy
-builds. They must not be assumed to receive security updates unless a release
-is explicitly marked as supported.
-
 | Version | Status |
 | --- | --- |
-| `main` | Security fixes accepted |
-| Published `0.3.x` and `0.2.x` builds | Legacy; not supported |
-| Older builds | Not supported |
+| `main` | Security fixes are developed and merged here first |
+| 0.3.x (current stable line; latest 0.3.3, September 2024) | Supported — reports are triaged against 0.3.3 and fixes ship in the next release |
+| 0.2.x and older | Not supported — upgrade to the current stable release |
 
-## Legacy APPX signing notice
+Two facts to weigh when assessing 0.3.3: it was built in September 2024, before the August 2026
+hardening of this repository, which changed build tooling, CI and dependency manifests and added
+runtime-boundary hardening to the tracked application bundle on `main` (pull requests #46–#48); the
+hardened bundle ships in the next release. The migration of locally encrypted data from CryptoJS 3.x
+to 4.x is tracked in [issue #41](https://github.com/tanshuai/alphabiz/issues/41) and is deliberately
+not applied until read-compatibility is demonstrated.
 
-APPX artifacts published through `0.3.3` used development signing material
-that has now been retired. Treat those APPX files as deprecated: do not install
-them and do not add their publisher certificate to a trusted certificate
-store. New APPX publication remains disabled until a replacement signing path
-and signature-verification gate are in place.
+## Retired development signing certificate (APPX)
+
+Until August 2026 this repository tracked a self-signed development certificate used to sign locally
+built APPX packages (SHA-256 fingerprint `986AAE60A0B76AD7A28E8BBBBC479B7E8B2564F86A33060513EC350FC22D6035`).
+That certificate has been removed and retired. Do not add it to a trusted certificate store and do not
+sideload an APPX signed with it; install 0.3.3 from the MSI or EXE on the Releases page instead. Local
+APPX builds now require an externally supplied certificate whose path, password and approved
+fingerprint are passed through the `ALPHABIZ_APPX_*` environment variables (`docs/en_us/windows.md`);
+the build rejects the retired fingerprint. This notice concerns APPX packages signed with that
+certificate only.
 
 ## Report a vulnerability
 
@@ -30,11 +35,19 @@ vulnerability or exposed credential.
 Include the affected version or commit, impact, reproduction steps or a proof
 of concept, and any suggested mitigation. Remove personal data and unrelated
 secrets from the report. We aim to acknowledge a complete report within seven
-days, but response times may vary while the project is in maintenance mode.
+days.
 
 If private vulnerability reporting is temporarily unavailable, contact the
 maintainer through the GitHub profile without including exploit details and
 ask for a private reporting channel.
+
+## Automated checks
+
+CodeQL (security-extended) runs on every push and pull request to `main` and on a weekly schedule;
+Dependabot opens weekly dependency and Actions updates; the CI hygiene job scans every tracked file
+for private-key material (`yarn security:scan`), rejects workflow files that reference repository
+secrets or unpinned actions. Open findings are
+triaged in the repository's Security tab.
 
 ## Credentials and signing material
 

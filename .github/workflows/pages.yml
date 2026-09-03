@@ -1,4 +1,4 @@
-name: Deploy maintenance site to Pages
+name: Deploy project site to Pages
 
 on:
   push:
