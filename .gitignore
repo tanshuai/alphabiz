@@ -64,6 +64,8 @@ typings/
 
 # Output of 'npm pack'
 *.tgz
+# Vendored first-party application packages are tracked on purpose (see vendor/README.md)
+!vendor/*.tgz
 
 # Yarn Integrity file
 .yarn-integrity

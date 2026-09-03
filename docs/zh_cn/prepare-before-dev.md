@@ -138,7 +138,7 @@ yarn global add @quasar/cli
 ```
 
 #### (6). <span id="github-pat">生成github PAT</span>
-当前使用的一些模块仍然是 alphabiz 的私有模块，因此需要使用 zeeis 成员的 GitHub PAT。详情请参考 [这篇文档](https://github.com/zeeis/customization-test/tree/main/docs/zh_cn/use-github-pat.md)
+公共仓库所需的两个应用包（`@zeeis/alphabiz-account`、`@zeeis/alphabiz-libdb`）已随仓库 `vendor/` 目录一起提供，`yarn unpackaged` 不再需要 GitHub PAT。根目录 `yarn` 目前仍要求 `~/.npmrc` 里存在一行 `//npm.pkg.github.com/:_authToken=`（值留空即可，不要填占位符），因为 `@zeeis/velectron` 的安装脚本会读取该文件。只有开发私有仓库 alphabiz-app 时才需要真正的 PAT，见 [use-github-pat.md](./use-github-pat.md)。
 
 #### (7). 在 Windows 系统下，需要安装 <span id="wix-tool">Wix Toolset</span>
 

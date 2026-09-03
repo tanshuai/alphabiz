@@ -1,5 +1,7 @@
 # Use Github PAT(Personal Access Token)
 
+> **说明**：本文档只在开发私有仓库 `alphabiz-app` 时需要。公共仓库 `tanshuai/alphabiz` 的两个应用包已 vendor 进 `vendor/`，无需 PAT；只需保证 `~/.npmrc` 含一行 `//npm.pkg.github.com/:_authToken=`（值留空）。
+
 ## 1. Create a personal access token
 
 - 在 `Github` 首页点击右上角头像→ `Settings`
@@ -8,7 +10,7 @@
 
 - 选择 `Personal access tokens`, 选择`Tokens(classic)`, 点击 `Generate new token`, 点击 `Generate new token(classic)`
 
-- 勾选下方 `Select scopes` 中的第一项(`repo`)、第三项(`write:packages`), 点击 `Generate toke`
+- 勾选下方 `Select scopes` 中的 `read:packages`（只读安装私有包即可，不需要 `repo` 或 `write:packages`）, 点击 `Generate token`
 
 - 复制生成的 `token`, 此 `token` 只会展示一次, 如果不慎遗失可以重新生成
 
@@ -19,7 +21,7 @@
 **注意!!!： 是`~`目录下, 不清楚请自行查找各操作系统下`~`目录所在位置。不要修改github 仓库根目录的`.npmrc`文件，以免在后面`yarn install`时，一直出现401错误。**
 
 ``` txt
-//npm.pkg.github.com/:_authToken=YOUT_TOKEN
+//npm.pkg.github.com/:_authToken=YOUR_TOKEN
 ```
 
 - 前往`~`文件夹的命令行：
@@ -58,10 +60,3 @@ yarn
 ```
 
 `node_modules/electron` 将被重定向到 `node_modules/@zeeis/velectron`, 如出现问题可尝试移除 `node_modules` 文件夹后重试
-
-NOTE: *当前有两个可能的警告来自 `electron v11.5.0` 本身*
-
-``` txt
-electron: The default of contextIsolation is deprecated ...
-ExtensionLoadWarning: Warnings loading extension ...
-```
