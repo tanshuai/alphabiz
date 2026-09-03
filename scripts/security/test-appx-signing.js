@@ -150,7 +150,7 @@ try {
   process.env[FINGERPRINT_ENV] = RETIRED_FINGERPRINT
   assert.throws(
     () => getAppxSigningCertificate({ required: true }),
-    /retired AlphaBiz development certificate/
+    /retired Alphabiz development certificate/
   )
 
   process.env[FINGERPRINT_ENV] = fingerprint
