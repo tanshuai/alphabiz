@@ -155,4 +155,3 @@ Please report vulnerabilities through [private vulnerability reporting](https://
 
 Alphabiz is free software under the [GNU General Public License v2](LICENSE). Licensing or source questions: <ab@alpha.biz>.
 
----
