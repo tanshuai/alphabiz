@@ -130,8 +130,6 @@ The application core (renderer and main process) is developed in the upstream Al
 
 ## 🗺️ What's next
 
-- **0.4.0** — the [0.4.0-beta.1 preview](https://github.com/tanshuai/alphabiz/releases/tag/0.4.0-beta.1) carries the August 2026 security, dependency and CI hardening plus a version and provenance contract for tagged releases; installers follow.
-- **Zero-credential forks** — vendoring the two first-party packages so `yarn unpackaged` needs no registry token ([#69](https://github.com/tanshuai/alphabiz/pull/69)).
 - **CryptoJS 4 migration** with full compatibility for existing encrypted data ([#41](https://github.com/tanshuai/alphabiz/issues/41)).
 - **Automated release pipeline** — build, checksum, sign and publish every tagged release from CI.
 
@@ -158,5 +156,3 @@ Please report vulnerabilities through [private vulnerability reporting](https://
 Alphabiz is free software under the [GNU General Public License v2](LICENSE). Licensing or source questions: <ab@alpha.biz>.
 
 ---
-
-<p align="center"><sub>Alphabiz 是完全去中心化的媒体平台与区块链市场，也是可定制品牌的应用框架。中文构建与定制文档见 <a href="docs/zh_cn/">docs/zh_cn</a>，索引见 <a href="docs/README.md#中文文档">docs/README.md</a>。</sub></p>
