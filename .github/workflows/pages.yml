@@ -19,6 +19,7 @@ jobs:
   build:
     name: Package static site
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
     steps:
@@ -37,6 +38,7 @@ jobs:
     name: Deploy static site
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

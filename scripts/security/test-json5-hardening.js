@@ -6,6 +6,7 @@ const fs = require('fs')
 const os = require('os')
 const path = require('path')
 const { spawnSync } = require('child_process')
+const { validateJson5Locks } = require('./json5-lock-contract')
 
 const repositoryRoot = path.resolve(__dirname, '..', '..')
 const rootManifest = JSON.parse(
@@ -49,42 +50,10 @@ function json5Dependency (block) {
   return matches[0][1] || matches[0][2]
 }
 
-const expectedLockBlocks = [
-  [
-    'json5@2.2.0, json5@2.2.2, json5@2.x, json5@^2.1.2:',
-    '  version "2.2.2"',
-    '  resolved "https://registry.yarnpkg.com/json5/-/json5-2.2.2.tgz#64471c5bdcc564c18f7c1d4df2e2297f2457c5ab"',
-    '  integrity sha512-46Tk9JiOL2z7ytNQWFLpj99RZkVgeHf87yGQKsIkaPz1qSH9UczKH1rO7K3wgRselo0tYMUNfecYpm/p1vC7tQ=='
-  ].join('\n'),
-  [
-    'json5@1.0.2, json5@^0.5.1:',
-    '  version "1.0.2"',
-    '  resolved "https://registry.yarnpkg.com/json5/-/json5-1.0.2.tgz#63d98d60f21b313b77c4d6da18bfa69d80e1d593"',
-    '  integrity sha512-g1MWMLBiz8FKi1e4w0UyVL3w+iJceWAFBAaBnnGKOpNa5f8TLktkbre1+s6oICydWAm+HRUGTmI+//xv2hvXYA==',
-    '  dependencies:',
-    '    minimist "^1.2.0"'
-  ].join('\n'),
-  [
-    'json5@^1.0.1:',
-    '  version "1.0.2"',
-    '  resolved "https://registry.yarnpkg.com/json5/-/json5-1.0.2.tgz#63d98d60f21b313b77c4d6da18bfa69d80e1d593"',
-    '  integrity sha512-g1MWMLBiz8FKi1e4w0UyVL3w+iJceWAFBAaBnnGKOpNa5f8TLktkbre1+s6oICydWAm+HRUGTmI+//xv2hvXYA==',
-    '  dependencies:',
-    '    minimist "^1.2.0"'
-  ].join('\n')
-]
-
 const json5Blocks = lockBlocks.filter((block) =>
   selectorsFor(block).some((selector) => selector.startsWith('json5@'))
 )
-
-assert.equal(json5Blocks.length, expectedLockBlocks.length, 'Unexpected json5 lock block count')
-for (const expectedBlock of expectedLockBlocks) {
-  const header = expectedBlock.split('\n', 1)[0]
-  const actualBlock = json5Blocks.find((block) => normalizedHeader(block) === header)
-  assert.ok(actualBlock, `Missing frozen json5 lock block: ${header}`)
-  assert.equal(actualBlock, expectedBlock, `${header} changed from its reviewed lock block`)
-}
+validateJson5Locks(lockfile)
 
 const expectedIntegrity = {
   '1.0.2': 'sha512-g1MWMLBiz8FKi1e4w0UyVL3w+iJceWAFBAaBnnGKOpNa5f8TLktkbre1+s6oICydWAm+HRUGTmI+//xv2hvXYA==',
