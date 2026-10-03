@@ -77,7 +77,7 @@
     "security:test-flatted": "node scripts/security/test-flatted-hardening.js",
     "security:test-cross-spawn": "node scripts/security/test-cross-spawn-hardening.js",
     "security:test-picomatch": "node scripts/security/test-picomatch-hardening.js",
-    "security:test-json5": "node scripts/security/test-json5-hardening.js",
+    "security:test-json5": "node scripts/security/test-json5-lock-contract.js && node scripts/security/test-json5-hardening.js",
     "security:test-semver": "node scripts/security/test-semver-hardening.js",
     "release:test-version": "node scripts/release/test-version-contract.js",
     "release:validate-binary-version": "node scripts/release/validate-binary-version.js",
