@@ -99,7 +99,7 @@
     "webpack": "4.44.2"
   },
   "devDependencies": {
-    "@babel/preset-env": "^7.16.8",
+    "@babel/preset-env": "^8.0.2",
     "@electron-forge/cli": "^6.0.0-beta.63",
     "@electron-forge/maker-appx": "^6.0.0-beta.63",
     "@electron-forge/maker-deb": "^6.0.0-beta.63",
